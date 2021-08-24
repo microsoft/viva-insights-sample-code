@@ -6,7 +6,7 @@ tutorials or demos.
 
 Explore the repo to discover sample code: 
 
-- [Extending Workplace Analytics with R](https://github.com/microsoft/viva-insights-sample-code/extending-wpa-with-R/)
+- [Extending Workplace Analytics with R](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/extending-wpa-with-R)
 
 ## Contributing
 
