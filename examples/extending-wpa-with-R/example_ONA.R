@@ -12,6 +12,7 @@
 
 ## Load libraries ----------------------------------------------------------
 library(wpa)
+library(igraph)
 library(dplyr)
 
 ## ONA and Community Detection ---------------------------------------------
@@ -32,12 +33,29 @@ p2p_data %>%
   )
 
 ## Return underlying igraph object
-p2p_data %>%
+g <-
+  p2p_data %>%
   network_p2p(
     hrvar = "Organization",
     display = "hrvar",
     return = "network"
   )
+
+## Compute closeness
+# Calculate the shortest paths between all nodes, then
+# assigns each node a score based on its sum of shortest paths.
+igraph::closeness(g) %>%
+  tibble::enframe()
+
+## Compute degree
+# Number of adjacent edges
+igraph::degree(g) %>%
+  tibble::enframe()
+
+## Compute betweeness
+# Number of shortest paths going through a vertex
+igraph::betweenness(g) %>%
+  tibble::enframe()
 
 ## Use Louvain community detection
 p2p_data %>%
