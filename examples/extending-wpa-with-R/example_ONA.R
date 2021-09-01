@@ -50,7 +50,8 @@ igraph::closeness(g) %>%
 ## Compute degree
 # Number of adjacent edges
 igraph::degree(g) %>%
-  tibble::enframe()
+  tibble::enframe() %>%
+  summary()
 
 ## Compute betweeness
 # Number of shortest paths going through a vertex
@@ -62,6 +63,14 @@ p2p_data %>%
   network_p2p(
     display = "louvain",
     return = "plot",
+    path = NULL # Render in browser instead of saving to PDF
+  )
+
+## Return table
+p2p_data %>%
+  network_p2p(
+    display = "louvain",
+    return = "table",
     path = NULL # Render in browser instead of saving to PDF
   )
 

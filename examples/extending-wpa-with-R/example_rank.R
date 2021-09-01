@@ -42,6 +42,7 @@ sq_data %>%
     mode = "combine"
   )
 
+
 ## Return a plot - plot mode 1
 sq_data %>%
   create_rank(
@@ -56,4 +57,16 @@ sq_data %>%
     metric = "Collaboration_hours",
     return = "plot",
     plot_mode = 2 # Highlights top and bottom per HR attribute
+  )
+
+## Bar chart
+
+sq_data %>%
+  create_rank(
+    metric = "Collaboration_hours"
+  ) %>%
+  head(5) %>%
+  create_bar_asis(
+    group_var = "group",
+    bar_var = "Collaboration_hours"
   )
