@@ -31,9 +31,10 @@ vignettes/*.pdf
 *_cache/
 /cache/
 
-# Temporary files created by R markdown
+# Temporary files created by R markdown or Jupyter
 *.utf8.md
 *.knit.md
+*.ipynb_checkpoints/
 
 # R Environment Variables
 .Renviron
