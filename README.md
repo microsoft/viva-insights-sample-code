@@ -1,12 +1,16 @@
 # Viva Insights Sample Code Library
 
-This repository contains sample code for the Viva Insights [wpa R
-package](https://microsoft.github.io/wpa/), including code that is used in
+This repository contains sample code for the Viva Insights open-source packages , including code that is used in
 tutorials or demos.
+
+- [vivainsights Python package](https://microsoft.github.io/vivainsights-py/)
+- [vivainsights R package](https://microsoft.github.io/vivainsights/)
+- [wpa R package (legacy)](https://microsoft.github.io/wpa/)
 
 Explore the repo to discover sample code: 
 
 - [Extending Workplace Analytics with R](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/extending-wpa-with-R)
+- [Introduction to Viva Insights with Python](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/intro-to-vivainsights-py)
 
 ## Contributing
 
