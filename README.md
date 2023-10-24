@@ -7,10 +7,19 @@ tutorials or demos.
 - [vivainsights R package](https://microsoft.github.io/vivainsights/)
 - [wpa R package (legacy)](https://microsoft.github.io/wpa/)
 
+## Contents
+
 Explore the repo to discover sample code: 
 
-- [Extending Workplace Analytics with R](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/extending-wpa-with-R)
+### R
+
+- [Extending Workplace Analytics with R](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/extending-wpa-with-R) - based on the legacy 'wpa' package
+- [Utility code for R](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-r)
+
+### Python
+
 - [Introduction to Viva Insights with Python](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/intro-to-vivainsights-py)
+- [Utility code for Python](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python)
 
 ## Contributing
 
