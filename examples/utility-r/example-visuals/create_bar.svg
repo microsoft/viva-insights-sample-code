@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='864.00pt' height='648.00pt' viewBox='0 0 864.00 648.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: none;'/>
+<defs>
+  <clipPath id='cpMC4wMHw4NjQuMDB8MC4wMHw2NDguMDA='>
+    <rect x='0.00' y='0.00' width='864.00' height='648.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw4NjQuMDB8MC4wMHw2NDguMDA=)'>
+</g>
+<defs>
+  <clipPath id='cpMTAxLjYzfDg1OC41Mnw1NC43Mnw1OTAuNDM='>
+    <rect x='101.63' y='54.72' width='756.89' height='535.71' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTAxLjYzfDg1OC41Mnw1NC43Mnw1OTAuNDM=)'>
+<rect x='109.05' y='219.08' width='570.27' height='109.58' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #34B1E2;' />
+<rect x='109.05' y='340.84' width='467.66' height='109.58' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #34B1E2;' />
+<rect x='109.05' y='462.59' width='427.08' height='109.58' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #34B1E2;' />
+<rect x='109.05' y='97.33' width='570.81' height='109.58' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #34B1E2;' />
+<text x='394.18' y='277.82' text-anchor='middle' style='font-size: 11.04px; font-weight: bold;fill: #FFFFFF; font-family: "Arial";' textLength='21.47px' lengthAdjust='spacingAndGlyphs'>38.1</text>
+<text x='342.88' y='399.57' text-anchor='middle' style='font-size: 11.04px; font-weight: bold;fill: #FFFFFF; font-family: "Arial";' textLength='21.47px' lengthAdjust='spacingAndGlyphs'>31.3</text>
+<text x='322.59' y='521.33' text-anchor='middle' style='font-size: 11.04px; font-weight: bold;fill: #FFFFFF; font-family: "Arial";' textLength='21.47px' lengthAdjust='spacingAndGlyphs'>28.6</text>
+<text x='394.45' y='156.07' text-anchor='middle' style='font-size: 11.04px; font-weight: bold;fill: #FFFFFF; font-family: "Arial";' textLength='21.47px' lengthAdjust='spacingAndGlyphs'>38.2</text>
+<text x='765.48' y='276.93' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";' textLength='21.59px' lengthAdjust='spacingAndGlyphs'>n= 27</text>
+<text x='765.48' y='398.68' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";' textLength='21.59px' lengthAdjust='spacingAndGlyphs'>n= 21</text>
+<text x='765.48' y='520.43' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";' textLength='21.59px' lengthAdjust='spacingAndGlyphs'>n= 21</text>
+<text x='765.48' y='155.18' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";' textLength='21.59px' lengthAdjust='spacingAndGlyphs'>n= 31</text>
+<rect x='708.40' y='91.25' width='114.16' height='487.01' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #595959; fill-opacity: 0.20;' />
+<line x1='109.05' y1='54.72' x2='702.69' y2='54.72' style='stroke-width: 1.60; stroke-linecap: butt;' />
+</g>
+<g clip-path='url(#cpMC4wMHw4NjQuMDB8MC4wMHw2NDguMDA=)'>
+<text x='109.05' y='49.79' text-anchor='middle' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='5.57px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='258.55' y='49.79' text-anchor='middle' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='11.13px' lengthAdjust='spacingAndGlyphs'>10</text>
+<text x='408.05' y='49.79' text-anchor='middle' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='11.13px' lengthAdjust='spacingAndGlyphs'>20</text>
+<text x='557.55' y='49.79' text-anchor='middle' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='11.13px' lengthAdjust='spacingAndGlyphs'>30</text>
+<text x='707.06' y='49.79' text-anchor='middle' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='11.13px' lengthAdjust='spacingAndGlyphs'>40</text>
+<text x='96.70' y='520.96' text-anchor='end' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='34.48px' lengthAdjust='spacingAndGlyphs'>Product</text>
+<text x='96.70' y='399.21' text-anchor='end' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='14.44px' lengthAdjust='spacingAndGlyphs'>HR</text>
+<text x='96.70' y='277.46' text-anchor='end' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='35.60px' lengthAdjust='spacingAndGlyphs'>Finance</text>
+<text x='96.70' y='155.70' text-anchor='end' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='91.22px' lengthAdjust='spacingAndGlyphs'>Sales and Marketing</text>
+<rect x='426.26' y='607.57' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #34B1E2;' />
+<text x='447.81' y='619.09' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='91.77px' lengthAdjust='spacingAndGlyphs'>Internal network size</text>
+<text x='101.63' y='32.52' style='font-size: 12.00px;fill: #666666; font-family: "Arial";' textLength='129.22px' lengthAdjust='spacingAndGlyphs'>Average by organization</text>
+<text x='101.63' y='15.50' style='font-size: 14.00px; font-weight: bold;fill: #666666; font-family: "Arial";' textLength='138.43px' lengthAdjust='spacingAndGlyphs'>Internal network size</text>
+<text x='858.52' y='640.84' text-anchor='end' style='font-size: 8.00px;fill: #666666; font-family: "Arial";' textLength='189.92px' lengthAdjust='spacingAndGlyphs'>Data from week of 2022-05-01 to week of 2022-07-03</text>
+</g>
+</svg>

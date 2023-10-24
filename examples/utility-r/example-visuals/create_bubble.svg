@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='864.00pt' height='648.00pt' viewBox='0 0 864.00 648.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: none;'/>
+<defs>
+  <clipPath id='cpMC4wMHw4NjQuMDB8MC4wMHw2NDguMDA='>
+    <rect x='0.00' y='0.00' width='864.00' height='648.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw4NjQuMDB8MC4wMHw2NDguMDA=)'>
+</g>
+<defs>
+  <clipPath id='cpMzUuNDB8ODU4LjUyfDQwLjUyfDU1MS4zMQ=='>
+    <rect x='35.40' y='40.52' width='823.12' height='510.78' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMzUuNDB8ODU4LjUyfDQwLjUyfDU1MS4zMQ==)'>
+<circle cx='128.82' cy='358.37' r='7.71' style='stroke-width: 0.71; stroke: #0078D4; stroke-opacity: 0.50; fill: #0078D4; fill-opacity: 0.50;' />
+<circle cx='404.25' cy='451.77' r='7.71' style='stroke-width: 0.71; stroke: #0078D4; stroke-opacity: 0.50; fill: #0078D4; fill-opacity: 0.50;' />
+<circle cx='299.91' cy='329.99' r='11.02' style='stroke-width: 0.71; stroke: #0078D4; stroke-opacity: 0.50; fill: #0078D4; fill-opacity: 0.50;' />
+<circle cx='352.01' cy='383.03' r='1.42' style='stroke-width: 0.71; stroke: #0078D4; stroke-opacity: 0.50; fill: #0078D4; fill-opacity: 0.50;' />
+<circle cx='91.98' cy='378.98' r='7.16' style='stroke-width: 0.71; stroke: #0078D4; stroke-opacity: 0.50; fill: #0078D4; fill-opacity: 0.50;' />
+<circle cx='534.97' cy='63.74' r='7.71' style='stroke-width: 0.71; stroke: #0078D4; stroke-opacity: 0.50; fill: #0078D4; fill-opacity: 0.50;' />
+<circle cx='72.81' cy='528.09' r='9.54' style='stroke-width: 0.71; stroke: #0078D4; stroke-opacity: 0.50; fill: #0078D4; fill-opacity: 0.50;' />
+<circle cx='821.11' cy='281.38' r='7.16' style='stroke-width: 0.71; stroke: #0078D4; stroke-opacity: 0.50; fill: #0078D4; fill-opacity: 0.50;' />
+<text x='141.12' y='353.73' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";' textLength='34.14px' lengthAdjust='spacingAndGlyphs'>Analytics</text>
+<text x='416.10' y='447.29' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";' textLength='70.19px' lengthAdjust='spacingAndGlyphs'>Customer_Service</text>
+<text x='312.40' y='325.29' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";' textLength='45.53px' lengthAdjust='spacingAndGlyphs'>Engineering</text>
+<text x='364.49' y='378.48' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";' textLength='36.05px' lengthAdjust='spacingAndGlyphs'>G_and_A</text>
+<text x='83.18' y='387.50' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";' textLength='7.58px' lengthAdjust='spacingAndGlyphs'>IT</text>
+<text x='547.02' y='59.29' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";' textLength='37.46px' lengthAdjust='spacingAndGlyphs'>Marketing</text>
+<text x='84.85' y='523.57' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";' textLength='36.05px' lengthAdjust='spacingAndGlyphs'>R_and_D</text>
+<text x='809.01' y='292.06' text-anchor='middle' style='font-size: 8.54px; font-family: "Arial";' textLength='21.34px' lengthAdjust='spacingAndGlyphs'>Sales</text>
+</g>
+<g clip-path='url(#cpMC4wMHw4NjQuMDB8MC4wMHw2NDguMDA=)'>
+<polyline points='35.40,551.31 35.40,40.52 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<text x='30.47' y='438.15' text-anchor='end' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='11.13px' lengthAdjust='spacingAndGlyphs'>15</text>
+<text x='30.47' y='297.26' text-anchor='end' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='11.13px' lengthAdjust='spacingAndGlyphs'>20</text>
+<text x='30.47' y='156.36' text-anchor='end' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='11.13px' lengthAdjust='spacingAndGlyphs'>25</text>
+<polyline points='35.40,551.31 858.52,551.31 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<text x='150.00' y='563.40' text-anchor='middle' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='13.91px' lengthAdjust='spacingAndGlyphs'>1.1</text>
+<text x='304.12' y='563.40' text-anchor='middle' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='13.91px' lengthAdjust='spacingAndGlyphs'>1.2</text>
+<text x='458.24' y='563.40' text-anchor='middle' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='13.91px' lengthAdjust='spacingAndGlyphs'>1.3</text>
+<text x='612.37' y='563.40' text-anchor='middle' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='13.91px' lengthAdjust='spacingAndGlyphs'>1.4</text>
+<text x='766.49' y='563.40' text-anchor='middle' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='13.91px' lengthAdjust='spacingAndGlyphs'>1.5</text>
+<text x='446.96' y='576.84' text-anchor='middle' style='font-size: 12.00px;fill: #666666; font-family: "Arial";' textLength='63.37px' lengthAdjust='spacingAndGlyphs'>Email hours</text>
+<text transform='translate(14.08,295.91) rotate(-90)' text-anchor='middle' style='font-size: 12.00px;fill: #666666; font-family: "Arial";' textLength='76.05px' lengthAdjust='spacingAndGlyphs'>Meeting hours</text>
+<text x='378.08' y='613.55' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='5.57px' lengthAdjust='spacingAndGlyphs'>n</text>
+<circle cx='397.26' cy='609.97' r='6.55' style='stroke-width: 0.71; stroke: #0078D4; stroke-opacity: 0.50; fill: #0078D4; fill-opacity: 0.50;' />
+<circle cx='438.64' cy='609.97' r='9.12' style='stroke-width: 0.71; stroke: #0078D4; stroke-opacity: 0.50; fill: #0078D4; fill-opacity: 0.50;' />
+<circle cx='485.56' cy='609.97' r='11.02' style='stroke-width: 0.71; stroke: #0078D4; stroke-opacity: 0.50; fill: #0078D4; fill-opacity: 0.50;' />
+<text x='410.89' y='613.55' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='11.13px' lengthAdjust='spacingAndGlyphs'>10</text>
+<text x='455.27' y='613.55' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='11.13px' lengthAdjust='spacingAndGlyphs'>15</text>
+<text x='504.71' y='613.55' style='font-size: 10.00px;fill: #666666; font-family: "Arial";' textLength='11.13px' lengthAdjust='spacingAndGlyphs'>20</text>
+<text x='35.40' y='32.52' style='font-size: 12.00px;fill: #666666; font-family: "Arial";' textLength='92.51px' lengthAdjust='spacingAndGlyphs'>By Function Type</text>
+<text x='35.40' y='15.50' style='font-size: 14.00px; font-weight: bold;fill: #666666; font-family: "Arial";' textLength='208.38px' lengthAdjust='spacingAndGlyphs'>Email hours and Meeting hours</text>
+<text x='858.52' y='640.84' text-anchor='end' style='font-size: 8.00px;fill: #666666; font-family: "Arial";' textLength='276.75px' lengthAdjust='spacingAndGlyphs'>Total employees = 100 | Data from week of 2022-05-01 to week of 2022-07-03</text>
+</g>
+</svg>
