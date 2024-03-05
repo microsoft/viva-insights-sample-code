@@ -21,6 +21,11 @@ Explore the repo to discover sample code:
 - [Introduction to Viva Insights with Python](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/intro-to-vivainsights-py)
 - [Utility code for Python](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python)
 
+### Advanced scenarios
+
+- [Top Performers Modelling with Viva Insights in Python](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/top-performers-rf.ipynb)
+- [Information Value with Viva Insights in Python](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/information-value.ipynb)
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require
