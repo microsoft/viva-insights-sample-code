@@ -15,17 +15,22 @@ Explore the repo to discover sample code:
 
 - [Extending Workplace Analytics with R](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/extending-wpa-with-R) - based on the legacy 'wpa' package
 - [Utility code for R](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-r)
+- [Creating essential VI visualizations in R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/create-example-visuals.R)
 
 ### Python
 
 - [Introduction to Viva Insights with Python](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/intro-to-vivainsights-py)
 - [Utility code for Python](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python)
+- [Creating essential VI visualizations in Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/create-example-visuals.py)
 
 ### Advanced scenarios
 
 - [Top Performers Modelling with Viva Insights in Python](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/top-performers-rf.ipynb)
 - [Top Performers Modelling with Viva Insights in R](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-r/top-performers-rf.Rmd)
 - [Information Value with Viva Insights in Python](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/information-value.ipynb)
+- [Performing Pairwise Chi-square Tests for categorical variables in Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/pairwise-chisq.py)
+- [Customizing Group-to-group network visuals - Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/custom-network-g2g.py)
+- [Customizing Person-to-person network visuals - Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/custom-network-p2p.py)
 
 ## Contributing
 
