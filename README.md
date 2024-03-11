@@ -24,6 +24,7 @@ Explore the repo to discover sample code:
 ### Advanced scenarios
 
 - [Top Performers Modelling with Viva Insights in Python](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/top-performers-rf.ipynb)
+- [Top Performers Modelling with Viva Insights in R](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-r/top-performers-rf.Rmd)
 - [Information Value with Viva Insights in Python](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/information-value.ipynb)
 
 ## Contributing
