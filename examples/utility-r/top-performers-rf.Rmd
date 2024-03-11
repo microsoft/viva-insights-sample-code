@@ -1,0 +1,428 @@
+---
+title: "Top Performers Model"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: "lumen"
+---
+
+# Top Performers Model
+
+## Introduction
+
+This RMarkdown documents the process of building a model to predict the top performers in the company. The model will be used to identify the top performers in the company and provide insights into the factors that contribute to their success. The model will be built using a demo dataset composed of metrics from Viva Insights, and we will be using a random forest classifier from the R package **randomForest** for this purpose.  
+
+We'll start by loading necessary libraries and importing data, then preprocess the data, build the model, and evaluate its performance.
+
+## Set-up
+
+Let's begin by loading the required libraries and importing the dataset.
+
+```{r setup, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+library(tidyverse)  
+library(vivainsights)
+library(randomForest) # For fitting random forest model and extracting stats
+library(caret) # For splitting training and test datasets
+library(pROC)
+```
+
+In R, once a package is loaded with `library(package)`, it's not necessary to prefix the function with the package name when calling it. However, if you want to use a function without loading the entire package, or if there's a naming conflict between functions from different packages, you can use `package::function()` to explicitly call the function. For clarity in this demonstration, we'll use this explicit notation to show which package each function comes from.
+
+The next step here is to load in the dataset, and then examine the data. In our local directory, we have a demo dataset that has a similar structure to a Person Query, with an additional 5-point scale 'performance' attribute that represents performance scores. 
+
+`import_query()` imports the demo person query data, and performs cleaning on the variable names. An alternative to this is to use `read_csv()` (from the package **readr**, which is part of **tidyverse**), which does the same thing of reading in the input csv file. 
+
+```{r}
+# Set path to direct to where the Person Query is saved
+raw_data <- vivainsights::import_query("_data/Top_Performers_Dataset_v2.csv")
+
+# Examine the data
+head(raw_data)
+```
+
+## Data Preparation
+
+There are typically a number of data preparation and validation procedures involved before fitting a model, such as: 
+- Handling missing values
+- Changing variable types
+- Handling outliers and unwanted data
+- Splitting data into training and test sets
+
+In this notebook, we will assume that the dataset is in decent quality, and all that is required are the standard procedures of changing variable types and splitting data into train/test sets. 
+
+We start off by dropping any non-numeric columns (`PersonId` in this case). It is optional, but we also convert the `performance` variable into a binary variable (`perform_cat`), so we would yield a classification model. This step is for demo purposes as there are more use cases where the outcome variable is binary rather than ordinal or continuous. 
+
+```{r}
+clean_data <- 
+  raw_data %>%
+  mutate(perform_cat = ifelse(performance >= 4, 1, 0)) %>% # Create binary variable
+  mutate(perform_cat = factor(perform_cat)) %>% # ensures model is classification
+  select(-PersonId, -performance) # drop unnecessary columns
+
+head(clean_data)
+```
+
+The `createDataPartition()` function from **caret** makes it easy to split the data into training and testing datasets. In the following example, the parameters are provided in this order: (i) data frame containing the predictor variables only, (ii) data frame containing the outcome variable only, and (iii) `test_size` controlling the proportion of the dataset to include in the train split.
+
+This is assigned to four data frames:
+- `x_train` - predictors, train set
+- `x_test` - predictors, test set
+- `y_train` - outcome, train set
+- `y_test` - outcome, test set
+
+```{r}
+# Set randomisation split
+set.seed(123) 
+
+# Split data into training and testing sets
+trainIndex <- caret::createDataPartition(
+  y = clean_data$perform_cat, # outcome
+  p = 0.7, # percentage goes into training
+  list = FALSE # do not return result as list
+  )
+
+train_df <- clean_data[trainIndex, ]
+test_df <- clean_data[-trainIndex, ]
+```
+
+
+It is good practice to double check what is in your training data frame prior to running the model, to ensure that you are not including any unwanted predictors by mistake: 
+
+```{r}
+names(train_df)
+```
+
+## Fitting the model
+
+The next step is to fit the random forest model, with `randomForest()` from the **randomForest** package.
+
+With `randomForest()`, it is possible to specify your variables either in the (i) formula style or by  (ii) supplying data frames of predictors and outcome. The following example shows the formula style. 
+ 
+Note that `randomForest()` comes with many default parameters, which you can find out more [from its official reference manual](https://cran.r-project.org/web/packages/randomForest/index.html). 
+
+We are using all the default parameters here to `randomForest()`. There is a section at the bottom that covers how the hyperparameters can be tuned for the random forest model. Also note that we set `importance = TRUE` here, which tells `randomForest` to compute variable importance measures that we can use afterwards. 
+
+
+```{r}
+# Build the random forest model
+rf <- randomForest(
+  formula = perform_cat ~ .,
+  data = train_df,
+  importance = TRUE # to allow importance to be calculated afterwards
+)
+
+rf
+```
+
+Here are some bullet points on how to interpret the model summary: 
+
+- **Type of random forest: classification**: This tells us that the model is used for classification tasks, not regression.
+
+- **Number of trees: 500**: This is the number of decision trees in the random forest. A higher number typically improves the model's performance but also increases computational cost.
+
+- **No. of variables tried at each split: 2**: This is the number of features considered at each split when building the trees. It's a parameter that can be tuned to optimize the model's performance.
+
+- **OOB estimate of error rate: 0.57%**: This is the out-of-bag (OOB) error estimate, which is a method of measuring the prediction error of random forests. It's calculated using the average error rate of the trees in the forest on the out-of-bag samples. An OOB error of 0.57% means that, on average, the model misclassifies about 0.57% of the observations.
+
+- **Confusion matrix**: This is a table that summarizes the performance of the model. The rows represent the actual classes and the columns represent the predicted classes. In your case, the model made 668 correct predictions for class 0 (true negatives), 29 correct predictions for class 1 (true positives), made 2 incorrect predictions of class 1 (false positives), and 2 incorrect predictions of class 0 (false negatives).
+
+- **class.error**: This is the misclassification rate for each class. For class 0, it's about 0.3% (2 out of 670), and for class 1, it's about 6.5% (2 out of 31). This suggests that the model is more accurate at predicting class 0 than class 1.
+
+Overall, the model seems to perform quite well, with a low OOB error rate and high accuracy for both classes. However, it's slightly less accurate at predicting class 1, which might be an area to focus on to improve the model.
+
+
+## Evaluating the model
+
+If no errors or warnings pop up, then the first iteration of the model is trained. The next step is to understand the model, and then to interpret and evaluate its outputs. 
+
+```{r}
+# Generate predictions with model and test data
+pred <- predict(object = rf, newdata = test_df)
+
+# Attach this to a data frame for easy referencing
+test_df_with_pred <-
+  test_df %>%
+  mutate(predictions = pred)
+
+# Extract and assign variables
+actual <- test_df_with_pred$perform_cat
+predicted <- test_df_with_pred$predictions
+
+# Create a confusion matrix
+cm <- confusionMatrix(predicted, actual)
+
+# Accuracy
+accuracy <- cm$overall['Accuracy']
+
+# Precision, Recall, and F1 Score
+precision <- cm$byClass['Pos Pred Value']
+recall <- cm$byClass['Sensitivity']
+f1_score <- 2 * (precision * recall) / (precision + recall)
+
+# Print the metrics
+data.frame(
+  statistic = c("Accuracy", "Precision", "Recall", "F1 Score"),
+  value = c(accuracy, precision, recall, f1_score)
+)
+```
+
+In this above code, we ask our random forest model to generate the predictions using the test data (`test_df`), and we assign these results to a new column in the new data frame `test_df_with_pred`.
+
+We also generated a number of metrics for assessing the model. The first four metrics below range between 0 and 1, and an idealistic perfect model would return 1, meaning that it makes no errors of the type:  
+
+- **Accuracy**: This is the ratio of correct predictions to the total number of predictions. It's a good measure when the target variable classes in the data are nearly balanced. However, it can be misleading if the classes are imbalanced. 
+
+- **Precision**: Precision is the ratio of true positives (correctly predicted positive observations) to the total predicted positives. It's a measure of a classifier's exactness. A low precision indicates a high number of false positives (Type I errors). 
+
+- **Recall (Sensitivity)**: Recall is the ratio of true positives to the total actual positives. It's a measure of a classifier's completeness. A low recall indicates a high number of false negatives (Type II errors). 
+
+- **F1 Score**: The F1 Score is the weighted average of **Precision** and **Recall**. It tries to balance the two metrics. It's a good measure to use if you need to seek a balance between Precision and Recall and there is an uneven class distribution. It is given by:
+ ```
+ F1 = 2 * (precision * recall) / (precision + recall)
+ ```
+
+All of these metrics can be calculated directly from a **Confusion Matrix**, which is a table that is often used to describe the performance of a classification model on a set of data for which the true values are known. It contains information about actual and predicted classifications done by the classifier. It's a good way to visualize the performance of the model. In R, this is generated with the `confsionMatrix()` function from **caret**. 
+
+The choice of metric depends on your business objective. For example, if the cost of having false positives is high, the strategy might be to optimize for precision; this arguably applies to a top performers use case, where it is preferred that the model predicts fewer top performers. If the cost of missing positives (having false negatives) is high, the strategy might be to optimize for recall, which could be more relevant for an attrition use case.
+
+In R, you can call the confusion matrix with `cm$table`, if you have assigned the output of `confusionMatrix()` to `cm`: 
+
+```{r}
+cm$table
+```
+See below for a guide on how to interpret the confusion matrix:
+
+A confusion matrix is a table that is often used to describe the performance of a classification model on a set of data for which the true values are known. In binary classification, the confusion matrix is a 2x2 matrix. Here's how to interpret it:
+
+- The first row of the matrix represents the instances in the actual class (true class) - in this case, it's the negative class.
+- The second row of the matrix represents the instances in the actual class (true class) - in this case, it's the positive class.
+- The first column of the matrix represents the instances in the predicted class - in this case, it's the negative class.
+- The second column of the matrix represents the instances in the predicted class - in this case, it's the positive class.
+
+So, the confusion matrix looks like this:
+
+|                    | Predicted Negative | Predicted Positive |
+|--------------------|--------------------|--------------------|
+| **Actual Negative**| True Negative (TN) | False Positive (FP)|
+| **Actual Positive**| False Negative (FN)| True Positive (TP) |
+
+- **True Positives (TP)**: These are cases in which we predicted yes (positive), and the actual was also yes (positive).
+- **True Negatives (TN)**: We predicted no (negative), and the actual was also no (negative).
+- **False Positives (FP)**: We predicted yes (positive), but the actual was no (negative). Also known as "Type I error".
+- **False Negatives (FN)**: We predicted no (negative), but the actual was yes (positive). Also known as "Type II error".
+
+The diagonal elements represent the number of points for which the predicted label is equal to the true label, while off-diagonal elements are those that are mislabeled by the classifier. The higher the diagonal values of the confusion matrix, the better, indicating many correct predictions.
+
+In the above, the confusion matrix is transformed into a dictionary to make it easier for interpretation. 
+
+## Variable importance
+
+One of the major outputs of the Random Forest model is **feature importance**. 
+
+
+
+Feature importance can be calculated with `randomForest::importance()`, which allows you to return two types of calculations. 
+
+1. **Impurity-based Feature Importance: Mean Decrease in Gini impurity (MDG)**: MDG is the total decrease in node impurities from splitting on the variable, averaged over all trees. For classification, the node impurity is measured by the Gini index. For regression, it is measured by residual sum of squares. This is sometimes called _Mean Decrease in Impurity (MDI)_. This method is fast to compute and does not require a separate validation set or model re-fitting. However, it tends to inflate the importance of continuous features or high-cardinality categorical variables. It is also biased towards features with more categories.
+
+2. **Permutation-based Feature Importance: Mean Decrease in Accuracy (MDA)**: MDA is computed from permuting OOB data: For each tree, the prediction error on the out-of-bag portion of the data is recorded (error rate for classification, MSE for regression). Then the same is done after permuting each predictor variable. The difference between the two are then averaged over all trees, and normalized by the standard deviation of the differences. If the standard deviation of the differences is equal to 0 for a variable, the division is not done (but the average is almost always equal to 0 in that case). This method is more reliable and has less bias towards continuous or high-cardinality features, but it is computationally expensive as it requires re-fitting the model for each feature.
+
+
+It is worth noting that both methods aim to capture the importance of features, but they focus on different aspects. MDG emphasizes impurity reduction during tree construction, while MDA directly considers the impact on model accuracy.
+
+### Calculating and Visualising Feature Importance
+
+Here is an example of MDG, as well as how to visualise it (using `varImpPlot()`): 
+
+```{r}
+randomForest::importance(rf, type = 2)
+```
+
+```{r}
+randomForest::varImpPlot(rf, type = 2)
+```
+
+
+And here is the equivalent for MDA:
+
+```{r}
+randomForest::importance(rf, type = 1)
+```
+
+
+```{r}
+randomForest::varImpPlot(rf, type = 1)
+```
+
+For those comparing the results between Python's **scikit-learn** library and R's **randomForest** package, note that `feature_importances_` in **scikit-learn** by default computes _Mean Decrease Impurity (MDI)_, and not _Mean Decrease Accuracy (MDA)_. To compute MDA, **scikit-learn** uses a separate function `permutation_importance()` to do so. The main difference is that in R, this is being controlled by the `importance` argument within `randomForest` itself. 
+
+# Tuning hyperparameters of the model
+
+We can then tune the parameters of the random forest model to find the optimal values of the hyperparameters that maximize the performance and accuracy of the model. 
+
+- `ntree`: The number of trees in the forest. A higher number of trees can improve the accuracy of the model, but it also increases the computational complexity and the risk of overfitting. Therefore, we need to find the optimal number of trees that balances the trade-off between performance and efficiency.
+- `nodesize`: Minimum size of terminal nodes. Setting this number larger causes smaller trees to be grown (and thus take less time). This can indirectly control the depth of the trees, which is a parameter available in **scikit-learn** (`max_depth`).
+- `mtry`: This controls the number of variables randomly sampled as candidates at each split.
+
+
+Note that a hyperparameter is external to the model, and therefore is not itself an output of the ML model. 
+
+In the following section, we will look at how to tune the above parameters.
+
+In all the following plots, they will be measured against the Area Under the Curve (AUC) score, a model performance score ranging from 0 to 1. The AUC represents the likelihood that a classifier will assign a higher predicted probability to the positive class, compared to the negative class. 
+
+To interpret the following plots: 
+
+- Look at how the AUC scores change as the hyperparameter increases. If the AUC score increases with the hyperparameter, it means that increasing that hyperparameter is improving the model's performance.
+- Compare the 'Train AUC' and 'Test AUC' series. If the 'Train AUC' is much higher than the 'Test AUC', it could indicate that the model is overfitting to the training data. If both series are close together, it suggests that the model is generalizing well to unseen data.
+
+## Number of estimators
+
+The plot below is showing how the Area Under the Curve (AUC) score of a Random Forest model changes as the number of estimators (i.e., the number of trees in the forest) increases. The 'Train AUC' series shows the AUC score on the training data, while the 'Test AUC' series shows the AUC score on the test data.
+
+```{r message=FALSE, warning=FALSE}
+# Create function to loop through hyperparameter
+tune_rf_ntree <- function(ntree){
+  rf <- randomForest(
+    formula = perform_cat ~ .,
+    data = train_df,
+    ntree = ntree
+  )
+    
+  # Predicted probabilities
+  pred_probs_train <- predict(rf, type = "prob", newdata = train_df)[, 2]
+  pred_probs_test <- predict(rf, type = "prob", newdata = test_df)[, 2]
+    
+  # Compute ROC curve
+  roc_obj_train <- pROC::roc(train_df$perform_cat, pred_probs_train)
+  roc_obj_test <- pROC::roc(test_df$perform_cat, pred_probs_test)
+  
+  # Return results
+  data.frame(
+   ntree = ntree,
+   auc_train = roc_obj_train$auc %>% as.numeric(),
+   auc_test = roc_obj_test$auc %>% as.numeric()
+  )
+}
+
+auc_ntrees <-
+  c(1, 2, 4, 8, 16, 32, 64, 100, 200) %>%
+  purrr::map(tune_rf_ntree) %>%
+  bind_rows()
+
+auc_ntrees
+```
+
+```{r}
+auc_ntrees %>%
+  ggplot() +
+  geom_line(aes(x = ntree, y = auc_train, colour = "Train"), linewidth = 0.8) +
+  geom_line(aes(x = ntree, y = auc_test, colour = "Test"), linewidth = 0.8) +
+  labs(
+    title = "Effect of Number of Estimators on AUC Score for Random Forest Model",
+    y = "AUC Score",
+    x = "Number of estimators / trees"
+  ) +
+  scale_colour_manual(values = c("Train" = "red", "Test" = "blue"))
+```
+## Minimum node size
+
+The data frame and plot below are showing how the Area Under the Curve (AUC) score of a Random Forest model changes as the number of minimum node size increases. The 'Train AUC' series shows the AUC score on the training data, while the 'Test AUC' series shows the AUC score on the test data.
+
+```{r message=FALSE, warning=FALSE}
+tune_rf_nodesize <- function(nodesize){
+  rf <- randomForest(
+    formula = perform_cat ~ .,
+    data = train_df,
+    nodesize = nodesize
+  )
+    
+  # Predicted probabilities
+  pred_probs_train <- predict(rf, type = "prob", newdata = train_df)[, 2]
+  pred_probs_test <- predict(rf, type = "prob", newdata = test_df)[, 2]
+    
+  # Compute ROC curve
+  roc_obj_train <- pROC::roc(train_df$perform_cat, pred_probs_train)
+  roc_obj_test <- pROC::roc(test_df$perform_cat, pred_probs_test)
+  
+  # Return results
+  data.frame(
+   nodesize = nodesize,
+   auc_train = roc_obj_train$auc %>% as.numeric(),
+   auc_test = roc_obj_test$auc %>% as.numeric()
+  )
+}
+
+auc_nodesize <-
+  c(1, 2, 4, 8, 16, 32, 64, 100, 200) %>%
+  purrr::map(tune_rf_nodesize) %>%
+  bind_rows()
+
+auc_nodesize
+```
+```{r}
+auc_nodesize %>%
+  ggplot() +
+  geom_line(aes(x = nodesize, y = auc_train, colour = "Train"), linewidth = 0.8) +
+  geom_line(aes(x = nodesize, y = auc_test, colour = "Test"), linewidth = 0.8) +
+  labs(
+    title = "Effect of Minimum Node Size on AUC Score for Random Forest Model",
+    y = "AUC Score",
+    x = "Minimum node size"
+  ) +
+  scale_colour_manual(values = c("Train" = "red", "Test" = "blue"))
+```
+## Number of variables randomly sampled as candidates at each split
+
+The data frame and plot below are showing how the Area Under the Curve (AUC) score of a Random Forest model changes as the number of variables randomly sampled as candidates at each split. The 'Train AUC' series shows the AUC score on the training data, while the 'Test AUC' series shows the AUC score on the test data.
+
+
+```{r message=FALSE, warning=FALSE}
+# Create function to loop through hyperparameter
+tune_rf_mtry <- function(mtry){
+  rf <- randomForest(
+    formula = perform_cat ~ .,
+    data = train_df,
+    mtry = mtry
+  )
+    
+  # Predicted probabilities
+  pred_probs_train <- predict(rf, type = "prob", newdata = train_df)[, 2]
+  pred_probs_test <- predict(rf, type = "prob", newdata = test_df)[, 2]
+    
+  # Compute ROC curve
+  roc_obj_train <- pROC::roc(train_df$perform_cat, pred_probs_train)
+  roc_obj_test <- pROC::roc(test_df$perform_cat, pred_probs_test)
+  
+  # Return results
+  data.frame(
+   mtry = mtry,
+   auc_train = roc_obj_train$auc %>% as.numeric(),
+   auc_test = roc_obj_test$auc %>% as.numeric()
+  )
+}
+
+auc_mtry <-
+  seq(1, 6) %>%
+  purrr::map(tune_rf_mtry) %>%
+  bind_rows()
+
+auc_mtry
+```
+
+
+```{r}
+auc_mtry %>%
+  ggplot() +
+  geom_line(aes(x = mtry, y = auc_train, colour = "Train"), linewidth = 0.8) +
+  geom_line(aes(x = mtry, y = auc_test, colour = "Test"), linewidth = 0.8) +
+  labs(
+    title = "Effect of number of randomly sampled candidates at each split\n on AUC Score for Random Forest Model",
+    y = "AUC Score",
+    x = "mtry"
+  ) +
+  scale_colour_manual(values = c("Train" = "red", "Test" = "blue"))
+```
