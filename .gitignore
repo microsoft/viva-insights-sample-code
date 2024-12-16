@@ -44,3 +44,6 @@ vignettes/*.pdf
 
 # Output files
 *.html
+
+# Data files
+*.csv
