@@ -443,6 +443,8 @@ The returned output will be a data frame that looks like this:
 | 16    | Work life balance  | Finance  | Number of chats are sent over the weekend on average                     | 3.5           | 3.48  | Number  | 100 | 2024-05-05 to 2024-05-29 |
 ```
 
+## Notes
+
 Note that there is one further custom function that is used in the script called `convert_to_time()`, which converts time into nicely formatted hour and minutes. This function can be found at the bottom of `generate_kpis.R`.
 
 At the beginning of the function, a check also ensures that the daily Person Query and the weekly Person Query are always aligned. A diagnostic message is printed out during the function run so as an Analyst, you can confirm whether you are running the data for the right date range. 
