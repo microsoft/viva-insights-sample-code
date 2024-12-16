@@ -1,0 +1,203 @@
+[
+  {
+      "Order": 1,
+      "Metric": "Collaboration_hours",
+      "Category": "Collaboration KPIs",
+      "ToDisplay": "",
+      "FullLabel": "",
+      "Unit": ""
+    },
+    {
+      "Order": 2,
+      "Metric": "Percent_week_in_collaboration",
+      "Category": "Collaboration KPIs",
+      "ToDisplay": "Yes",
+      "FullLabel": "% of a 40h workweek spent in collaboration",
+      "Unit": "Percent"
+    },
+    {
+      "Order": 3,
+      "Metric": "Meeting_hours",
+      "Category": "Collaboration KPIs",
+      "ToDisplay": "Yes",
+      "FullLabel": "Total hours per week in average spent in meetings",
+      "Unit": "Hours"
+    },
+    {
+      "Order": 4,
+      "Metric": "Meeting_and_call_hours",
+      "Category": "Collaboration KPIs",
+      "ToDisplay": "",
+      "FullLabel": "",
+      "Unit": ""
+    },
+    {
+      "Order": 5,
+      "Metric": "Chat_hours",
+      "Category": "Collaboration KPIs",
+      "ToDisplay": "Yes",
+      "FullLabel": "Total hours per week in average spent on chats",
+      "Unit": "Hours"
+    },
+    {
+      "Order": 6,
+      "Metric": "Email_hours",
+      "Category": "Collaboration KPIs",
+      "ToDisplay": "Yes",
+      "FullLabel": "Total hours per week in average spent reading and writing emails",
+      "Unit": "Hours"
+    },
+    {
+      "Order": 7,
+      "Metric": "Unscheduled_call_hours",
+      "Category": "Collaboration KPIs",
+      "ToDisplay": "",
+      "FullLabel": "",
+      "Unit": ""
+    },
+    {
+      "Order": 8,
+      "Metric": "Unscheduled_call_minutes",
+      "Category": "Collaboration KPIs",
+      "ToDisplay": "Yes",
+      "FullLabel": "Total hours per week in average spent on unscheduled calls",
+      "Unit": "Minutes"
+    },
+    {
+      "Order": 9,
+      "Metric": "Meeting_hours_not_ended_on_time",
+      "Category": "Meetings behaviour",
+      "ToDisplay": "",
+      "FullLabel": "",
+      "Unit": ""
+    },
+    {
+      "Order": 10,
+      "Metric": "Meeting_hours_not_joined_on_time",
+      "Category": "Meetings behaviour",
+      "ToDisplay": "",
+      "FullLabel": "",
+      "Unit": ""
+    },
+    {
+      "Order": 11,
+      "Metric": "Percent_meetings_ended_late",
+      "Category": "Meetings behaviour",
+      "ToDisplay": "Yes",
+      "FullLabel": "% of meeting hours are ended late",
+      "Unit": "Percent"
+    },
+    {
+      "Order": 12,
+      "Metric": "Percent_meetings_joined_late",
+      "Category": "Meetings behaviour",
+      "ToDisplay": "Yes",
+      "FullLabel": "% of meeting hours are joined late",
+      "Unit": "Percent"
+    },
+    {
+      "Order": 13,
+      "Metric": "Large_and_long_meeting_hours",
+      "Category": "Meetings behaviour",
+      "ToDisplay": "",
+      "FullLabel": "",
+      "Unit": ""
+    },
+    {
+      "Order": 14,
+      "Metric": "Percent_meetings_large_and_long",
+      "Category": "Meetings behaviour",
+      "ToDisplay": "Yes",
+      "FullLabel": "% of meetings are long (>1 hour) and large meetings (9+ attendees)",
+      "Unit": "Percent"
+    },
+    {
+      "Order": 15,
+      "Metric": "Uninterrupted_hours",
+      "Category": "Meetings behaviour",
+      "ToDisplay": "",
+      "FullLabel": "",
+      "Unit": ""
+    },
+    {
+      "Order": 16,
+      "Metric": "Multitasking_15pct",
+      "Category": "Meetings behaviour",
+      "ToDisplay": "Yes",
+      "FullLabel": "% of spend >15% of meeting time doing emails or chatting outside of the meeting",
+      "Unit": "Percent"
+    },
+    {
+      "Order": 17,
+      "Metric": "Uninterrupted_hours_per_day",
+      "Category": "Meetings behaviour",
+      "ToDisplay": "",
+      "FullLabel": "Total hours per day of uninterrupted focus available for employees to do independent work",
+      "Unit": "Hours"
+    },
+    {
+      "Order": 18,
+      "Metric": "Uninterrupted_mins_per_day",
+      "Category": "Meetings behaviour",
+      "ToDisplay": "Yes",
+      "FullLabel": "Total minutes per day of uninterrupted focus available for employees to do independent work",
+      "Unit": "Minutes"
+    },
+    {
+      "Order": 19,
+      "Metric": "FirstHourOfDay",
+      "Category": "Work life balance",
+      "ToDisplay": "Yes",
+      "FullLabel": "Average first active hours during the day",
+      "Unit": "Time"
+    },
+    {
+      "Order": 20,
+      "Metric": "LastHourOfDay",
+      "Category": "Work life balance",
+      "ToDisplay": "Yes",
+      "FullLabel": "Average last active hours during the day",
+      "Unit": "Time"
+    },
+    {
+      "Order": 21,
+      "Metric": "WeekendCollabMoreThanTwiceMonthly",
+      "Category": "Work life balance",
+      "ToDisplay": "Yes",
+      "FullLabel": "% who are active on weekends - two or more weekends per month",
+      "Unit": "Percent"
+    },
+    {
+      "Order": 22,
+      "Metric": "Weekend_collaboration_hours",
+      "Category": "Work life balance",
+      "ToDisplay": "",
+      "FullLabel": "",
+      "Unit": ""
+    },
+    {
+      "Order": 23,
+      "Metric": "Weekend_collab_minutes",
+      "Category": "Work life balance",
+      "ToDisplay": "Yes",
+      "FullLabel": "Average collaboration minutes per day during the weekend",
+      "Unit": "Minutes"
+    },
+    {
+      "Order": 24,
+      "Metric": "Weekend_emails_sent",
+      "Category": "Work life balance",
+      "ToDisplay": "Yes",
+      "FullLabel": "Number of emails are sent over the weekend on average",
+      "Unit": "Number"
+    },
+    {
+      "Order": 25,
+      "Metric": "Weekend_chats_sent",
+      "Category": "Work life balance",
+      "ToDisplay": "Yes",
+      "FullLabel": "Number of chats are sent over the weekend on average",
+      "Unit": "Number"
+    }
+  
+]
