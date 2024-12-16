@@ -422,6 +422,7 @@ generate_kpis(
 ```
 
 The returned output will be a data frame that looks like this: 
+(_the data is fabricated for demo purposes only_)
 
 | Order | Category           | Group    | FullLabel                                                                 | ValueLabelled | Value        | Unit    | n   | DateRange               |
 |-------|--------------------|----------|--------------------------------------------------------------------------|---------------|--------------|---------|-----|-------------------------|
@@ -433,10 +434,10 @@ The returned output will be a data frame that looks like this:
 | 6     | Meetings behaviour | Finance  | % of meeting hours are ended late                                        | 38%           | 0.37  | Percent | 100 | 2024-05-05 to 2024-05-29 |
 | 7     | Meetings behaviour | Finance  | % of meeting hours are joined late                                       | 35%           | 0.35  | Percent | 100 | 2024-05-05 to 2024-05-29 |
 | 8     | Meetings behaviour | Finance  | % of meetings are long (>1 hour) and large meetings (9+ attendees)       | 35.50%        | 0.35  | Percent | 100 | 2024-05-05 to 2024-05-29 |
-| 9     | Meetings behaviour | Finance  | % of spend >15% of meeting time doing emails or chatting outside of the meeting | 55.90%        | 0.559458591  | Percent | 100 | 2024-05-05 to 2024-05-29 |
-| 10    | Meetings behaviour | Finance  | Total minutes per day of uninterrupted focus available for employees to do independent work | 309.8 minutes | 309.8387455  | Minutes | 100 | 2024-05-05 to 2024-05-29 |
-| 11    | Work life balance  | Finance  | Average first active hours during the day                                | 8 h 5 m       | 8.33  | Time    | 100 | 2024-05-05 to 2024-05-29 |
-| 12    | Work life balance  | Finance  | Average last active hours during the day                                 | 39 h 50 m     | 39.49  | Time    | 100 | 2024-05-05 to 2024-05-29 |
+| 9     | Meetings behaviour | Finance  | % of spend >15% of meeting time doing emails or chatting outside of the meeting | 55.90%        | 0.559  | Percent | 100 | 2024-05-05 to 2024-05-29 |
+| 10    | Meetings behaviour | Finance  | Total minutes per day of uninterrupted focus available for employees to do independent work | 309.8 minutes | 309.84  | Minutes | 100 | 2024-05-05 to 2024-05-29 |
+| 11    | Work life balance  | Finance  | Average first active hours during the day                                | 8 h 5 m       | 8.05  | Time    | 100 | 2024-05-05 to 2024-05-29 |
+| 12    | Work life balance  | Finance  | Average last active hours during the day                                 | 17 h 50 m     | 17.83  | Time    | 100 | 2024-05-05 to 2024-05-29 |
 | 13    | Work life balance  | Finance  | % who are active on weekends - two or more weekends per month            | 55.50%        | 0.55  | Percent | 100 | 2024-05-05 to 2024-05-29 |
 | 14    | Work life balance  | Finance  | Average collaboration minutes per day during the weekend                 | 34.5 minutes  | 34.35   | Minutes | 100 | 2024-05-05 to 2024-05-29 |
 | 15    | Work life balance  | Finance  | Number of emails are sent over the weekend on average                    | 3.3           | 3.34  | Number  | 100 | 2024-05-05 to 2024-05-29 |
