@@ -1,12 +1,12 @@
-# Generate custom KPIs from Viva Insights in R
+# Generate custom KPIs from Viva Insights metrics in R
 
 ## Overview
 
-This document walks through an example on how to set up a workflow to compute custom KPIs from Viva Insights in R. 
+This document walks through an example on how to set up a workflow to compute custom KPIs from Viva Insights metrics in R. 
 
 Viva Insights provides over a hundred metrics that can be used to measure an organization's wellbeing, productivity, and collaborative culture. However, these metrics may not always come in the right unit to be communicated to a wider audience. For instance, _Collaboration hours_ may be more interpretable when expressed as a percentage of the expected weekly work hours, e.g. % of a 40-hour work week. Another example would be metrics like _% of population who are active on weekends_, which requires a different aggregation method that is less straightforward than a calculating a mean. 
 
-In the example below, we walk through a script that computes the following metrics: 
+In the example below, we walk through a script that computes the following KPIs: 
 
 1. % of a 40h workweek spent in collaboration
 2. Total hours per week in average spent in meetings
