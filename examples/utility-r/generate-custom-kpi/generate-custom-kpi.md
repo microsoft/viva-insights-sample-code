@@ -441,7 +441,7 @@ The returned output will be a data frame that looks like this:
 | 14    | Work life balance  | Finance  | Average collaboration minutes per day during the weekend                 | 34.5 minutes  | 34.35   | Minutes | 100 | 2024-05-05 to 2024-05-29 |
 | 15    | Work life balance  | Finance  | Number of emails are sent over the weekend on average                    | 3.3           | 3.34  | Number  | 100 | 2024-05-05 to 2024-05-29 |
 | 16    | Work life balance  | Finance  | Number of chats are sent over the weekend on average                     | 3.5           | 3.48  | Number  | 100 | 2024-05-05 to 2024-05-29 |
-```
+
 
 ## Notes
 
