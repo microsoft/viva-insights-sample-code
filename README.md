@@ -16,6 +16,7 @@ Explore the repo to discover sample code:
 - [Extending Workplace Analytics with R](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/extending-wpa-with-R) - based on the legacy 'wpa' package
 - [Utility code for R](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-r)
 - [Creating essential VI visualizations in R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/create-example-visuals.R)
+- [Generate custom KPIs from Viva Insights in R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/generate-custom-kpi/generate-custom-kpi.md)
 
 ### Python
 
