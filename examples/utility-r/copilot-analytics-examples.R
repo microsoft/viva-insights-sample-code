@@ -22,13 +22,13 @@ demo_pq <- import_query(here("data", "pq_data.csv"))
 # Assign names of relevant metrics to variables -------------------------------------------------------
 # Metrics: Copilot actions taken in
 metrics_cop_actions_taken_in <-
-  demo_raw %>%
+  demo_pq %>%
   names() %>%
   str_subset("Copilot_actions_taken_in")
 
 # Metrics: summarise
 metrics_summarise_cop <-
-  demo_raw %>%
+  demo_pq %>%
   names() %>%
   str_subset("Summarise")
 
@@ -36,7 +36,7 @@ metrics_summarise_cop <-
 # Create plot
 temp_plot <- 
   keymetrics_scan(
-    data = demo_raw,
+    data = demo_pq,
     hrvar = "Organization",
     metrics = metrics_cop_actions_taken_in,
     return = "plot"
@@ -54,7 +54,7 @@ temp_plot %>%
 # Boxplot - Copilot Assisted Hours ---------------------------------------
 # Create plot
 temp_plot <-
-  demo_raw %>%
+  demo_pq %>%
   create_boxplot(
     hrvar = "Team",
     metric = "Copilot_assisted_hours",
@@ -74,7 +74,7 @@ temp_plot %>%
 # Lorenz curve - Total Copilot actions --------------------------------
 # Create plot
 temp_plot <-
-  demo_raw %>%
+  demo_pq %>%
   mutate(Total_Copilot_actions = select(
     ., all_of(metrics_cop_actions_taken_in)) %>%
            rowSums()) %>%
@@ -94,7 +94,7 @@ temp_plot %>%
   )
 
 # Cumulative share table
-demo_raw %>%
+demo_pq %>%
   mutate(Total_Copilot_actions = select(
     ., all_of(metrics_cop_actions_taken_in)) %>%
       rowSums()) %>%
@@ -106,7 +106,7 @@ demo_raw %>%
 
 # Ranked - Total Copilot Actions ----------------------------------------
 # Top 10 - results copied to clipboard
-demo_raw %>%
+demo_pq %>%
   mutate(Total_Copilot_actions = select(
     ., all_of(metrics_cop_actions_taken_in)) %>%
       rowSums()) %>%
@@ -120,7 +120,7 @@ demo_raw %>%
   export()
 
 # Bottom 10 - results copied to clipboard
-demo_raw %>%
+demo_pq %>%
   mutate(Total_Copilot_actions = select(
     ., all_of(metrics_cop_actions_taken_in)) %>%
       rowSums()) %>%
@@ -132,3 +132,29 @@ demo_raw %>%
   ) %>%
   tail(10) %>%
   export()
+
+# Information value - Heavy Copilot Users ------------------------------
+# Identify heavy Copilot users
+tb_heavy_copilot_users <-
+  demo_pq %>%
+  mutate(Total_Copilot_actions = select(
+    ., all_of(metrics_cop_actions_taken_in)
+  ) %>%
+    rowSums()) %>%
+  group_by(PersonId) %>%
+  summarise(HeavyCopilotUsers = ifelse(Total_Copilot_actions >= 10, 1, 0))
+
+# Join user segments with Heavy Copilot users
+demo_pq %>%
+  left_join(tb_heavy_copilot_users, by = "PersonId") %>%
+  create_IV(
+    outcome = "HeavyCopilotUsers",
+    predictors = c(
+      "Collaboration_hours",
+      "Internal_network_size",
+      "Influencer_score",
+      "Emails_sent",
+      "Active_connected_hours"
+    ),
+    return = "plot"
+  ) 
