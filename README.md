@@ -32,6 +32,7 @@ Explore the repo to discover sample code:
 - [Performing Pairwise Chi-square Tests for categorical variables in Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/pairwise-chisq.py)
 - [Customizing Group-to-group network visuals - Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/custom-network-g2g.py)
 - [Customizing Person-to-person network visuals - Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/custom-network-p2p.py)
+- [Copilot Advanced Analysis sample scripts - R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-analytics-examples.R)
 
 ## Contributing
 
