@@ -142,7 +142,8 @@ tb_heavy_copilot_users <-
   ) %>%
     rowSums()) %>%
   group_by(PersonId) %>%
-  summarise(HeavyCopilotUsers = ifelse(Total_Copilot_actions >= 10, 1, 0))
+  summarise(Total_Copilot_actions = mean(Total_Copilot_actions, na.rm = TRUE)) %>%
+  mutate(HeavyCopilotUsers = ifelse(Total_Copilot_actions >= 10, 1, 0))
 
 # Join user segments with Heavy Copilot users
 demo_pq %>%
