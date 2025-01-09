@@ -51,6 +51,47 @@ temp_plot %>%
     height = 5
   )
 
+# Key metrics scan: High vs Medium vs Low Copilot users ------------------
+tb_cop_usage_segments <-
+  demo_pq %>%
+  mutate(Total_Copilot_actions = select(
+    ., all_of(metrics_cop_actions_taken_in)
+  ) %>%
+    rowSums()) %>%
+  group_by(PersonId) %>%
+  summarise(Total_Copilot_actions = mean(Total_Copilot_actions, na.rm = TRUE)) %>%
+  mutate(CopilotUsageSegment = case_when(
+    Total_Copilot_actions >= 10 ~ "Heavy\n(10+ actions)",
+    Total_Copilot_actions >= 4 ~ "Medium\n(4-9 actions)",
+    Total_Copilot_actions >= 1 ~ "Low\n(1-3 actions)",
+    TRUE ~ "Non-user"
+    )) %>%
+  mutate(CopilotUsageSegment = factor(
+    CopilotUsageSegment,
+    levels = c(
+      "Heavy\n(10+ actions)",
+      "Medium\n(4-9 actions)",
+      "Low\n(1-3 actions)",
+      "Non-user"
+  )))
+
+# Join user segments with Heavy Copilot users
+temp_plot <- 
+  demo_pq %>%
+  left_join(tb_cop_usage_segments, by = "PersonId") %>%
+  keymetrics_scan(
+    hrvar = "CopilotUsageSegment"
+  )
+
+temp_plot %>%
+  export(
+    method = "png",
+    path = here("output", "keymetrics_scan_cop_segments"),
+    timestamp = FALSE,
+    width = 9.25,
+    height = 5
+  )
+
 # Boxplot - Copilot Assisted Hours ---------------------------------------
 # Create plot
 temp_plot <-
@@ -159,3 +200,24 @@ demo_pq %>%
     ),
     return = "plot"
   ) 
+
+# Internal and External network size -------------------------------------
+# By Copilot usage segments
+
+temp_plot <-
+  demo_pq %>%
+  left_join(tb_cop_usage_segments, by = "PersonId") %>%
+  create_bubble(
+    metric_x = "Internal_network_size",
+    metric_y = "External_network_size",
+    hrvar = "CopilotUsageSegment"
+  )
+
+temp_plot %>%
+  export(
+    method = "png",
+    path = here("output", "network_sizes_by_cop_usage"),
+    timestamp = FALSE,
+    width = 9.25,
+    height = 5
+  )
