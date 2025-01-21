@@ -1,11 +1,11 @@
 ---
-title: "R notebook"
+title: "Information Value analysis with the **vivainsights** R library"
 output:
   html_document:
     df_print: paged
 ---
 
-# Information Value analysis with the **vivainsights** R library
+# Introduction
 
 This notebook provides a demo on the Information Value (IV) functions for the **vivainsights** package. For more information about the package, please see:
 
