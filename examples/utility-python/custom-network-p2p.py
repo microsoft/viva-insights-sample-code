@@ -9,7 +9,7 @@ import igraph as ig
 import matplotlib.patches as mpatches
 
 # Adjust placeholder text to your needs
-hrvar_text = 'Grade'
+hrvar_text = 'Organization'
 
 # Generate graph
 g = vi.network_p2p(
