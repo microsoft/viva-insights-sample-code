@@ -13,7 +13,7 @@ hrvar_text = 'Grade'
 
 # Generate graph
 g = vi.network_p2p(
-    data = pq_data,
+    data = vi.p2p_data_sim(), # Replace with your own P2P data
     hrvar = hrvar_text,
     return_type = "network"
     )
