@@ -28,14 +28,14 @@ unique_nodes = set(g.vs[hrvar_text])
 # Generate a list of colors from the 'hsv' palette, based on unique values
 colors = sns.color_palette('hsv', unique_values)
 
-# Create a dictionary that maps each unique grade to a unique color
-grade_to_color = {grade: color for grade, color in zip(set(g.vs[hrvar_text]), colors)}
+# Create a dictionary that maps each unique org to a unique color
+org_to_color = {org: color for org, color in zip(set(g.vs[hrvar_text]), colors)}
 
 # Create a new vertex attribute that contains the corresponding color for each vertex
-g.vs["node_color"] = [grade_to_color[grade] for grade in g.vs[hrvar_text]]
+g.vs["node_color"] = [org_to_color[org] for org in g.vs[hrvar_text]]
 
 # Create legend handles
-legend_handles = [mpatches.Patch(color=grade_to_color[grade], label=grade) for grade in unique_nodes]
+legend_handles = [mpatches.Patch(color=org_to_color[org], label=org) for org in unique_nodes]
 
 # Start plotting
 fig, ax = plt.subplots(figsize=(8, 8))
