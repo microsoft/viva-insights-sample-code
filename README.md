@@ -39,6 +39,7 @@ Explore the repo to discover sample code:
 
 ### Other
 
+- [Performing Pairwise Chi-square Tests for categorical variables in R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/pairwise_chisq.Rmd)
 - [Performing Pairwise Chi-square Tests for categorical variables in Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/pairwise-chisq.py)
 - [Extending Workplace Analytics with R](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/extending-wpa-with-R) - based on the legacy 'wpa' package
 
