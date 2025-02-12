@@ -30,7 +30,7 @@ Explore the repo to discover sample code:
 ### Network analysis
 
 - [Customizing Group-to-group network visuals - Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/custom-network-g2g.py)
-- [Customizing Group-to-group network visuals - Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/custom-network-g2g.Rmd)
+- [Customizing Group-to-group network visuals - R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/custom-network-g2g.Rmd)
 - [Customizing Person-to-person network visuals - Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/custom-network-p2p.py)
 
 ### Copilot Analytics
