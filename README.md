@@ -7,6 +7,8 @@ tutorials or demos. The sample code shown in this repository cover more elaborat
 - [vivainsights R package](https://microsoft.github.io/vivainsights/)
 - [wpa R package (legacy)](https://microsoft.github.io/wpa/)
 
+Depending on the specific example, the sample script may be in the format of a RMarkdown (.Rmd), Jupyter Notebook (.ipynb), or raw R and Python files. In most of these examples, you will be expected to run the scripts on top of flexible query exports from the Viva Insights Analyst portal.
+
 ## Contents
 
 Explore the repo to discover sample code: 
