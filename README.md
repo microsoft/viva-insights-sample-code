@@ -1,7 +1,7 @@
 # Viva Insights Sample Code Library
 
 This repository contains sample code for the Viva Insights open-source packages , including code that is used in
-tutorials or demos.
+tutorials or demos. The sample code shown in this repository cover more elaborate scenarios and examples that leverage, but are not included in the R and Python packages themselves. 
 
 - [vivainsights Python package](https://microsoft.github.io/vivainsights-py/)
 - [vivainsights R package](https://microsoft.github.io/vivainsights/)
