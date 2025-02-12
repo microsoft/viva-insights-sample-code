@@ -13,7 +13,7 @@ This script demonstrates how to generate and visualize a network graph using the
 
 ## Step 1: load libraries and sample data
 
-In this example, we will use the sample `g2g_data` dataset from the **vivainsights** package. We will also use **dplyr** and **purrr** for data manipulation and iteration respectively, and you can load the **igraph** package for network graph creation and visualization
+In this example, we will use the sample `g2g_data` dataset from the **vivainsights** package. We will also use **dplyr** and **purrr** for data manipulation and iteration respectively, as well as the **igraph** package for network graph creation and visualization.
 
 ```{r setup, message=FALSE, warning=FALSE}
 library(vivainsights)
@@ -31,10 +31,9 @@ head(g2g_data)
 
 The `network_g2g()` function constructs a network graph based on collaboration data. We set:
 
-`primary` and `secondary` to define the connection points
-`metric` to specify the weight of relationships
-`return = "network"` to get an igraph object
-
+* `primary` and `secondary` to define the connection points
+* `metric` to specify the weight of relationships
+* `return = "network"` to get an igraph object
 
 ```{r}
 g <- network_g2g(
@@ -51,9 +50,9 @@ g <- network_g2g(
 
 Before plotting, we refine the graph by:
 
-Removing `loops` (self-connections) and `multiple edges` (redundant links)
-Setting vertex sizes based on the "org_size" attribute
-Defining a layout using `Multidimensional Scaling (MDS)`
+* Removing `loops` (self-connections) and `multiple edges` (redundant links)
+* Setting vertex sizes based on the "org_size" attribute
+* Defining a layout using `Multidimensional Scaling (MDS)`
 
 ```{r}
 # Simplify the graph (remove redundant edges and self-loops)
@@ -71,11 +70,11 @@ layout_mds <- layout_with_mds(g)
 
 We set vertex and edge properties for better readability:
 
-`Vertex color` → blue
-`Edge color` → grey
-`Vertex labels` → organization names
-`Edge width` → fixed at 2 for clarity
-`Transparency (alpha)` for edges (adjusted manually)
+* `Vertex color` → blue
+* `Edge color` → grey
+* `Vertex labels` → organization names
+* `Edge width` → fixed at 2 for clarity
+* `Transparency (alpha)` for edges (adjusted manually)
 
 ```{r}
 # Example: Assign colors based on an attribute (assuming 'group' exists in V(g))
