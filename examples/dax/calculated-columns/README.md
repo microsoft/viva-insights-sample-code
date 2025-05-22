@@ -52,3 +52,24 @@ This folder contains DAX scripts for calculated columns used to segment users by
 4. Use the resulting columns to analyze and visualize Copilot adoption and habit formation.
 
 See the main tutorial for more details on usage and definitions.
+
+## Total Copilot actions
+
+It may be necessary to create a custom total Copilot actions column in the Power Query step under 'Transform Data'. An example of this is presented below: 
+
+```m
+= let
+    Source = #"Changed Type", // Update with name of previous step as appropriate
+    AddedCustomColumn = Table.AddColumn(
+    Source, 
+    "Total Copilot actions",
+    each [#"Copilot actions taken in Teams"] + 
+         [#"Copilot actions taken in Outlook"] +
+         [#"Copilot actions taken in Word"] +
+         [#"Copilot actions taken in Excel"] +
+         [#"Copilot actions taken in Powerpoint"],
+    Int64.Type
+    )
+in
+    AddedCustomColumn
+```
