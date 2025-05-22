@@ -1,11 +1,13 @@
 # Viva Insights Sample Code Library
 
 This repository contains sample code for the Viva Insights open-source packages , including code that is used in
-tutorials or demos.
+tutorials or demos. The sample code shown in this repository cover more elaborate scenarios and examples that leverage, but are not included in the R and Python packages themselves. 
 
 - [vivainsights Python package](https://microsoft.github.io/vivainsights-py/)
 - [vivainsights R package](https://microsoft.github.io/vivainsights/)
 - [wpa R package (legacy)](https://microsoft.github.io/wpa/)
+
+Depending on the specific example, the sample script may be in the format of a RMarkdown (.Rmd), Jupyter Notebook (.ipynb), or raw R and Python files. In most of these examples, you will be expected to run the scripts on top of flexible query exports from the Viva Insights Analyst portal.
 
 ## Contents
 
@@ -30,7 +32,9 @@ Explore the repo to discover sample code:
 ### Network analysis
 
 - [Customizing Group-to-group network visuals - Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/custom-network-g2g.py)
+- [Customizing Group-to-group network visuals - R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/custom-network-g2g.Rmd)
 - [Customizing Person-to-person network visuals - Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/custom-network-p2p.py)
+- [Customizing Person-to-person network visuals - R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/custom-network-p2p.Rmd)
 
 ### Copilot Analytics
 
