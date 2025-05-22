@@ -1,0 +1,24 @@
+_IsHabit_RL12W =
+VAR __PersonId = 'MainPersonQuery'[PersonId]
+VAR __Date = 'MainPersonQuery'[MetricDate]
+VAR __PrevWeeks =
+    FILTER(
+        'MainPersonQuery',
+        'MainPersonQuery'[PersonId] = __PersonId &&
+        'MainPersonQuery'[MetricDate] IN {
+            __Date,
+            __Date - 7, __Date - 14, __Date - 21,
+            __Date - 28, __Date - 35, __Date - 42,
+            __Date - 49, __Date - 56, __Date - 63,
+            __Date - 70, __Date - 77
+        }
+    )
+VAR __NonZeroWeeks =
+    COUNTROWS(
+        FILTER(
+            __PrevWeeks,
+            'MainPersonQuery'[Total Copilot actions] > 0
+        )
+    )
+RETURN
+    IF(__NonZeroWeeks >= 9, TRUE(), FALSE())

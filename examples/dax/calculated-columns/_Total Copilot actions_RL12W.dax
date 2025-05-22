@@ -1,0 +1,27 @@
+_Total Copilot actions_RL12W =
+VAR _PersonId = MainPersonQuery[PersonId]
+VAR _Date = MainPersonQuery[MetricDate]
+VAR summary_table =
+    DISTINCT(
+        SELECTCOLUMNS(
+            MainPersonQuery,
+            "_PersonId", MainPersonQuery[PersonId],
+            "_Date", MainPersonQuery[MetricDate],
+            "_Total_Copilot_actions", MainPersonQuery[Total Copilot actions]
+        )
+    )
+RETURN
+    AVERAGEX(
+        FILTER(
+            summary_table,
+            [_PersonId] = _PersonId &&
+            [_Date] IN {
+                _Date,
+                _Date - 7, _Date - 14, _Date - 21,
+                _Date - 28, _Date - 35, _Date - 42,
+                _Date - 49, _Date - 56, _Date - 63,
+                _Date - 70, _Date - 77
+            }
+        ),
+        [_Total_Copilot_actions]
+    )

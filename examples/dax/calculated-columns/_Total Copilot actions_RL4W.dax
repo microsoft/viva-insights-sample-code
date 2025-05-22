@@ -1,0 +1,23 @@
+_Total Copilot actions_RL4W = 
+var _PersonId = MainPersonQuery[PersonId]
+var _Date = MainPersonQuery[MetricDate]
+VAR _PrevWeek1 = _Date - 7
+VAR _PrevWeek2 = _Date - 14
+VAR _PrevWeek3 = _Date - 21
+VAR summary_table =
+DISTINCT(
+SELECTCOLUMNS(
+MainPersonQuery,
+"_PersonId", MainPersonQuery[PersonId],
+"_Date", MainPersonQuery[MetricDate],
+"_Total_Copilot_actions", MainPersonQuery[Total Copilot actions]
+)
+)
+RETURN
+AVERAGEX(
+FILTER(
+summary_table,
+[_PersonId] = _PersonId && ([_Date] = _Date || [_Date] = _PrevWeek1 || [_Date] = _PrevWeek2 || [_Date] = _PrevWeek3 )
+),
+[_Total_Copilot_actions]
+)

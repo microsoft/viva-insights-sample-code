@@ -1,0 +1,14 @@
+_CopilotUsageSegment_RL12W =
+VAR TotalCopilotRL12W = [_Total Copilot actions_RL12W]
+VAR IsHabitual = [_IsHabit_RL12W]
+
+RETURN
+SWITCH(
+    TRUE(),
+    TotalCopilotRL12W > 15 && IsHabitual = TRUE(), "Power Users",
+    IsHabitual = TRUE(), "Habitual Users",
+    TotalCopilotRL12W >= 1, "Novice Users",
+    TotalCopilotRL12W > 0, "Low Users",
+    TotalCopilotRL12W = 0, "Non-users",
+    "ERROR"
+)
