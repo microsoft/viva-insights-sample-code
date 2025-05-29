@@ -48,4 +48,3 @@ vignettes/*.pdf
 
 # Data files
 examples/utility-r/_data/*.csv
-viva-insights-sample-code.Rproj
