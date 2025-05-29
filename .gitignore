@@ -19,6 +19,7 @@
 
 # RStudio files
 .Rproj.user/
+*.Rproj
 
 # produced vignettes
 vignettes/*.html
@@ -46,4 +47,5 @@ vignettes/*.pdf
 *.html
 
 # Data files
-*.csv
+examples/utility-r/_data/*.csv
+viva-insights-sample-code.Rproj
