@@ -1,0 +1,45 @@
+# Jekyll configuration for GitHub Pages
+title: "Viva Insights Sample Code Library"
+description: "Sample code and tutorials for Microsoft Viva Insights analytics"
+baseurl: "/viva-insights-sample-code"
+url: "https://microsoft.github.io"
+
+# Theme
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Navigation
+header_pages:
+  - index.md
+  - essentials.md
+  - analytics.md
+  - network.md
+  - copilot.md
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Collections for organizing content
+collections:
+  examples:
+    output: true
+    permalink: /:collection/:name/
+
+# Include/exclude files
+include:
+  - _pages
+exclude:
+  - README.md
+  - LICENSE
+  - CODE_OF_CONDUCT.md
+  - SECURITY.md
+  - SUPPORT.md
+  - "*.Rproj"
+  - .gitignore
