@@ -1,8 +1,10 @@
 ---
-layout: custom-page
+layout: page
 title: "Copilot Analytics"
 permalink: /copilot/
 ---
+
+{% include dropdown-nav.html %}
 
 # Copilot Analytics Scripts
 

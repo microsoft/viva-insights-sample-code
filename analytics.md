@@ -1,8 +1,10 @@
 ---
-layout: custom-page
+layout: page
 title: "Advanced Analytics"
 permalink: /analytics/
 ---
+
+{% include dropdown-nav.html %}
 
 # Advanced Analytics Scripts
 

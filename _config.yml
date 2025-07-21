@@ -11,68 +11,13 @@ plugins:
   - jekyll-sitemap
   - jekyll-seo-tag
 
-# Navigation with dropdowns
-navigation:
-  - title: "Home"
-    url: "/"
-  - title: "Essentials"
-    url: "/essentials/"
-    dropdown:
-      - title: "R Utilities"
-        url: "https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-r"
-      - title: "Python Utilities"
-        url: "https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python"
-      - title: "Create Visuals (R)"
-        url: "https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/create-example-visuals.R"
-      - title: "Create Visuals (Python)"
-        url: "https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/create-example-visuals.py"
-      - title: "Custom KPIs (R)"
-        url: "https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/generate-custom-kpi/generate-custom-kpi.md"
-      - title: "Intro to Python"
-        url: "https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/intro-to-vivainsights-py"
-  - title: "Analytics"
-    url: "/analytics/"
-    dropdown:
-      - title: "Top Performers (Python)"
-        url: "https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/top-performers-rf.ipynb"
-      - title: "Top Performers (R)"
-        url: "https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/top-performers-rf.Rmd"
-      - title: "Information Value (Python)"
-        url: "https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/information-value.ipynb"
-      - title: "Information Value (R)"
-        url: "https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/information-value.Rmd"
-      - title: "Chi-Square Tests (Python)"
-        url: "https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/pairwise-chisq.py"
-      - title: "Chi-Square Tests (R)"
-        url: "https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/pairwise_chisq.Rmd"
-  - title: "Network"
-    url: "/network/"
-    dropdown:
-      - title: "Group-to-Group (Python)"
-        url: "https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/custom-network-g2g.py"
-      - title: "Group-to-Group (R)"
-        url: "https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/custom-network-g2g.Rmd"
-      - title: "Person-to-Person (Python)"
-        url: "https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/custom-network-p2p.py"
-      - title: "Person-to-Person (R)"
-        url: "https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/custom-network-p2p.Rmd"
-      - title: "ONA Examples (R)"
-        url: "https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/extending-vivainsights-with-R/example_ONA.R"
-  - title: "Copilot"
-    url: "/copilot/"
-    dropdown:
-      - title: "Analysis Scripts (R)"
-        url: "https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/copilot-analytics-examples.R"
-      - title: "Analysis Scripts (Python)"
-        url: "https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/copilot-analytics-examples.py"
-      - title: "Jupyter Notebook"
-        url: "https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/copilot-analytics-examples.ipynb"
-      - title: "DAX Scripts (12W)"
-        url: "https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/dax/calculated-columns"
-      - title: "DAX Scripts (4W)"
-        url: "https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/dax/calculated-columns"
-      - title: "Usage Segmentation Guide"
-        url: "https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/dax/calculated-columns/README.md"
+# Navigation
+header_pages:
+  - index.md
+  - essentials.md
+  - analytics.md
+  - network.md
+  - copilot.md
 
 # Build settings
 markdown: kramdown

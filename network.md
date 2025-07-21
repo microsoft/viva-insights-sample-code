@@ -1,8 +1,10 @@
 ---
-layout: custom-page
+layout: page
 title: "Network Analysis"
 permalink: /network/
 ---
+
+{% include dropdown-nav.html %}
 
 # Network Analysis Scripts
 

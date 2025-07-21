@@ -1,8 +1,10 @@
 ---
-layout: custom-page
+layout: page
 title: "Essentials"
 permalink: /essentials/
 ---
+
+{% include dropdown-nav.html %}
 
 # Essential Viva Insights Scripts
 
