@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: custom-page
 title: "Advanced Analytics"
 permalink: /analytics/
 ---

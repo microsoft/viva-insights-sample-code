@@ -1,5 +1,5 @@
 ---
-layout: home
+layout: custom-home
 title: "Viva Insights Sample Code Library"
 ---
 

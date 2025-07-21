@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: custom-page
 title: "Copilot Analytics"
 permalink: /copilot/
 ---
