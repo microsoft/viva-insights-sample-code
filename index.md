@@ -74,7 +74,7 @@ This repository contains sample code for the Viva Insights open-source packages,
 
 - [vivainsights Python package](https://microsoft.github.io/vivainsights-py/)
 - [vivainsights R package](https://microsoft.github.io/vivainsights/)
-- [wpa R package (legacy)](https://microsoft.github.io/wpa/)
+- [Copilot Analytics: Decoding Super Usage](https://github.com/microsoft/DecodingSuperUsage/)
 
 ## How to Use This Library
 
@@ -88,16 +88,16 @@ Browse the categories below to find sample code that matches your needs. Each sc
 
 ## Categories
 
-### 🔧 [Essentials](essentials.html)
+### 🔧 [Essentials](essentials/)
 Essential utility functions and visualizations for getting started with Viva Insights analysis.
 
-### 📊 [Advanced Analytics](analytics.html)
+### 📊 [Advanced Analytics](analytics/)
 Regression models, machine learning, and statistical analysis techniques.
 
-### 🔗 [Network Analysis](network.html)
+### 🔗 [Network Analysis](network/)
 Collaboration network visualization and analysis scripts.
 
-### 🤖 [Copilot Analytics](copilot.html)
+### 🤖 [Copilot Analytics](copilot/)
 Analysis and visualization scripts specifically for Microsoft Copilot usage data.
 
 ---
