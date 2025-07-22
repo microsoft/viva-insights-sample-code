@@ -62,6 +62,9 @@ document.addEventListener('DOMContentLoaded', function() {
           <a href="https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/dax/calculated-columns/README.md">Usage Segmentation Guide</a>
         </div>
       </div>
+      <a class="page-link" href="https://github.com/microsoft/viva-insights-sample-code" target="_blank">
+        GitHub
+      </a>
     `;
   }
 });
