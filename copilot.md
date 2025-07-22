@@ -6,6 +6,20 @@ permalink: /copilot/
 
 {% include custom-navigation.html %}
 
+<style>
+/* Hide any default Minima navigation that might appear */
+.site-header .site-nav,
+.trigger,
+.page-link:not(.dropdown-toggle):not(.btn) {
+  display: none !important;
+}
+
+/* Ensure our custom navigation is visible */
+.custom-nav {
+  display: block !important;
+}
+</style>
+
 # Copilot Analytics Scripts
 
 Specialized scripts for analyzing Microsoft Copilot usage data from Viva Insights.
