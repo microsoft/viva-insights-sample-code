@@ -11,13 +11,13 @@ plugins:
   - jekyll-sitemap
   - jekyll-seo-tag
 
-# Navigation
-header_pages:
-  - index.md
-  - essentials.md
-  - advanced.md
-  - network.md
-  - copilot.md
+# Navigation - Disabled default header_pages to use custom Bootstrap navigation
+# header_pages:
+#   - index.md
+#   - essentials.md
+#   - advanced.md
+#   - network.md
+#   - copilot.md
 
 # Build settings
 markdown: kramdown
