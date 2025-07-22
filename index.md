@@ -19,10 +19,6 @@ title: "Viva Insights Sample Code Library"
 }
 </style>
 
-# Welcome to the Viva Insights Sample Code Library
-
-# Welcome to the Viva Insights Sample Code Library
-
 This repository contains sample code for the Viva Insights open-source packages, including code that is used in tutorials or demos. The sample code shown here covers more elaborate scenarios and examples that leverage, but are not included in the R and Python packages themselves.
 
 ## Quick Links
