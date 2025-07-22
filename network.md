@@ -22,7 +22,14 @@ permalink: /network/
 
 # Network Analysis Scripts
 
-Collaboration network visualization and analysis scripts for understanding organizational connectivity.
+Collaboration network visualization and analysis scripts for understanding organizational connectivity. 
+
+In Viva Insights, network metrics are available in four main queries.
+
+1. The **person query** provides network metrics aggregated at the person-date level, such as `Strong ties`, `Diverse ties`, `Influencer score`, `Internal network size`, etc. 
+2. The **group-to-group query** is an edgelist with each row representing the collaboration with one grouping (organizational) attribute with another. 
+3. The **person-to-person query** is an edgelist with each row representign the collaboration with one person with another. 
+4. The **person-to-group query** which is an edgelist with each row representing the collaboration of each person with respect to a grouping (organizational) attribute.
 
 ## Group-to-Group Network Analysis
 

@@ -23,13 +23,16 @@ This repository contains sample code for the Viva Insights open-source packages,
 
 ## Quick Links
 
+- [Viva Insights official documentation](https://learn.microsoft.com/en-us/viva/insights/introduction)
 - [vivainsights Python package](https://microsoft.github.io/vivainsights-py/)
 - [vivainsights R package](https://microsoft.github.io/vivainsights/)
 - [Copilot Analytics: Decoding Super Usage](https://github.com/microsoft/DecodingSuperUsage/)
+- [Copilot Analytics: advanced examples playbook](https://aka.ms/CopilotAdvancedAnalytics/)
 
 ## How to Use This Library
 
 Browse the categories below to find sample code that matches your needs. Each script includes:
+
 - **Purpose**: What the script accomplishes
 - **Prerequisites**: Required packages and data formats
 - **Usage**: How to run and customize the code
