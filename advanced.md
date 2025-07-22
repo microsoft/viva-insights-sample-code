@@ -1,7 +1,7 @@
 ---
 layout: page
 title: "Advanced Analytics"
-permalink: /analytics/
+permalink: /advanced/
 ---
 
 <link rel="stylesheet" href="{{ "/assets/css/custom-nav.css" | relative_url }}">
@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
       <div class="dropdown">
-        <a class="page-link dropdown-toggle" href="${baseUrl}/analytics/">
-          Analytics <span class="dropdown-arrow">▼</span>
+        <a class="page-link dropdown-toggle" href="${baseUrl}/advanced/">
+          Advanced <span class="dropdown-arrow">▼</span>
         </a>
         <div class="dropdown-content">
           <a href="https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/top-performers-rf.ipynb">Top Performers (Python)</a>

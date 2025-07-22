@@ -25,8 +25,8 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
       <div class="dropdown">
-        <a class="page-link dropdown-toggle" href="${baseUrl}/analytics/">
-          Analytics <span class="dropdown-arrow">▼</span>
+        <a class="page-link dropdown-toggle" href="${baseUrl}/advanced/">
+          Advanced <span class="dropdown-arrow">▼</span>
         </a>
         <div class="dropdown-content">
           <a href="https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/top-performers-rf.ipynb">Top Performers (Python)</a>
@@ -91,7 +91,7 @@ Browse the categories below to find sample code that matches your needs. Each sc
 ### 🔧 [Essentials](essentials/)
 Essential utility functions and visualizations for getting started with Viva Insights analysis.
 
-### 📊 [Advanced Analytics](analytics/)
+### 📊 [Advanced Analytics](advanced/)
 Regression models, machine learning, and statistical analysis techniques.
 
 ### 🔗 [Network Analysis](network/)

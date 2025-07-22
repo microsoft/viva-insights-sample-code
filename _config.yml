@@ -15,7 +15,7 @@ plugins:
 header_pages:
   - index.md
   - essentials.md
-  - analytics.md
+  - advanced.md
   - network.md
   - copilot.md
 
