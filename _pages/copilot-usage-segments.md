@@ -134,6 +134,34 @@ While the standard definitions above work well for most organizations, you may n
 
 > **Recommendation**: Start with the standard definition and consider variations only when your specific context clearly warrants the adjustment. Consistency in measurement approach over time is often more valuable than perfect threshold optimization.
 
+---
+
+## What about Super Users?
+
+**Super Users** represent a segment of highly engaged Copilot users as identified in our [Super Users report](https://aka.ms/decodingsuperusage/). Super Users are defined as the top 10% of users based on weekly Copilot actions, calculated over a predetermined date period.
+
+The Super Users report identifies five distinct usage groups based on activity volume: 
+
+* **Super Users** (top 10%)
+* **High usage** (top 25%)
+* **Moderate usage** (top 50%)
+* **Low usage** (bottom 50%)
+* **Very low usage** (bottom 25%)
+
+### When to Use Super Users vs. Power Users
+
+The Super Users paradigm offers several advantages:
+- **Simple calculation**: Straightforward percentile-based segmentation
+- **Clear explanation**: Easy to communicate to stakeholders
+- **Usage distribution insights**: Reveals how Copilot activity is distributed across your user population
+- **Gap analysis**: Highlights opportunities to bridge usage differences between high and low users
+
+However, the **Power Users framework is recommended for ongoing measurement** and goal-setting because:
+- **Consistent definitions**: Segments remain stable over time, enabling trend analysis
+- **Absolute thresholds**: Not dependent on population size or date range selection
+- **Habit measurement**: Focuses on behavioral consistency, which predicts long-term adoption success
+
+**Best Practice**: Use Super Users for initial usage distribution analysis and stakeholder communication, then transition to Power Users segmentation for continuous monitoring and improvement initiatives. 
 
 ---
 
