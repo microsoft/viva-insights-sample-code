@@ -1,5 +1,3 @@
-
-
 ---
 layout: page
 title: "Copilot Usage Segments"
