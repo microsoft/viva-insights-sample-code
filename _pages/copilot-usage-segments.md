@@ -30,15 +30,18 @@ The goal of this segmentation technique is to identify segments of users in an o
 
 Furthermore, consistency is a critical factor in successful AI adoption. Consistent users are less likely to revert to non-usage, making this an important concept for measuring how well an organization has successfully evolved its AI culture and embedded Copilot into daily workflows.
 
-## Definitions - what are the segments?
+## Definitions - What Are the Segments?
 
-There are five user segments: 
+There are five user segments that represent different stages of Copilot adoption:
 
-Power Users represent the ideal user who maximizes the potential of Copilot and are both consistent and high-volume users. This group is likely to be a minority of users but can be seen as aspirational group for deploying an AI adoption strategy.
+### 🚀 Power Users
 
-Habitual Users are consistent users of Copilot, with lower volume than Power Users. They represent ‘everyday’ users who have successfully adopted Copilot into their routine. 
+**Power Users** represent the ideal user who maximizes the potential of Copilot and are both consistent and high-volume users. This group is likely to be a minority of users but can be seen as an aspirational group for deploying an AI adoption strategy.
 
-Power and Habitual Users represent a success measure. The higher the incidence of Power and Habitual Users in your organization, the more embedded is Copilot in your organization. 
+### 🔄 Habitual Users  
+**Habitual Users** are consistent users of Copilot, with lower volume than Power Users. They represent 'everyday' users who have successfully adopted Copilot into their routine.
+
+> **Success Measure**: Power and Habitual Users represent a success measure. The higher the incidence of Power and Habitual Users in your organization, the more embedded Copilot is in your organization.
 
 ### 🌱 Novice Users
 **Novice Users** are users with potential to become Habitual Users, but who may need additional support to avoid lapsing into lower usage.
