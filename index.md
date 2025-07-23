@@ -42,16 +42,16 @@ Browse the categories below to find sample code that matches your needs. Each sc
 
 ## Categories
 
-### 🔧 [Essentials](essentials/)
+- 🔧 [Essentials](essentials/)
 Essential utility functions and visualizations for getting started with Viva Insights analysis.
 
-### 📊 [Advanced Analytics](advanced/)
+- 📊 [Advanced Analytics](advanced/)
 Regression models, machine learning, and statistical analysis techniques.
 
-### 🔗 [Network Analysis](network/)
+- 🔗 [Network Analysis](network/)
 Collaboration network visualization and analysis scripts.
 
-### 🤖 [Copilot Analytics](copilot/)
+- 🤖 [Copilot Analytics](copilot/)
 Analysis and visualization scripts specifically for Microsoft Copilot usage data.
 
 ---
