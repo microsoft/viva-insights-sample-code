@@ -5,7 +5,6 @@ permalink: /copilot-usage-segments/
 ---
 
 {% include custom-navigation.html %}
-{% include floating-toc.html %}
 
 <style>
 /* Hide any default Minima navigation that might appear */
