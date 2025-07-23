@@ -7,6 +7,7 @@ permalink: /generate-custom-kpi/
 # Generate Custom KPIs from Viva Insights Metrics in R
 
 {% include custom-navigation.html %}
+{% include floating-toc.html %}
 
 <style>
 /* Hide default Minima navigation to prevent duplicates */

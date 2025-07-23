@@ -7,6 +7,7 @@ permalink: /causal-inference/
 # Causal Inference in Copilot Analytics
 
 {% include custom-navigation.html %}
+{% include floating-toc.html %}
 
 <style>
 /* Hide default Minima navigation to prevent duplicates */

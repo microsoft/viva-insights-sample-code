@@ -7,6 +7,7 @@ permalink: /dax-calculated-columns/
 # Calculated Columns for Copilot Usage Segmentation
 
 {% include custom-navigation.html %}
+{% include floating-toc.html %}
 
 <style>
 /* Hide default Minima navigation to prevent duplicates */
