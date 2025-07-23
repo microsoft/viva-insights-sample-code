@@ -203,6 +203,15 @@ vi.create_bar(person_data, metric="Email_hours")
 
 Whilst you can use `read.csv()` (R) or `pd.read_csv()` (Python) for reading in the .csv query into your R or Python environment, we recommend using the `import_query()` function instead from the **vivainsights** package. `import_query()` standardizes variable names and 'cleans' special characters, ensuring that you minimize the number of errors arising from variable name mismatches. 
 
+If you do not have a person query handy, you can also try out the code using our inbuilt sample datasets from the two packages: 
+```r
+person_data = pq_data # Use in place of csv load
+```
+
+```python
+person_data = vi.load_pq_data() # Use in place of csv load
+```
+
 #### 3. Common Analysis Patterns
 
 **Time Trend Analysis:**
@@ -313,15 +322,6 @@ create_report <- function(data_path, output_path) {
   ggsave(paste0(output_path, "/trend_analysis.png"), trend_plot)
 }
 ```
-
-### Sample Data and Examples
-
-To get started immediately, check out our sample datasets:
-
-- **[📁 Example Data](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/example-data)**: Sample CSV files with realistic Viva Insights data
-- **[📊 R Examples](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-r)**: Complete R scripts with sample analyses
-- **[🐍 Python Examples](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python)**: Python notebooks and scripts
-- **[📓 Jupyter Notebooks](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/intro-to-vivainsights-py)**: Interactive Python tutorials
 
 ---
 
