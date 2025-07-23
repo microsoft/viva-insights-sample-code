@@ -22,7 +22,11 @@ permalink: /essentials/
 
 # Essential Viva Insights Scripts
 
-Get started with these fundamental scripts for Viva Insights analysis.
+This page provides some essential scripts to let you get started with analysis in Viva Insights. Using the R and Python scripts below, you can: 
+
+* perform exploratory data analysis and identify key interesting hypotheses for your organization
+* run a range of custom visualizations on your Viva Insights data
+* create custom KPIs or segments using a combination of Viva Insights metrics and organizational / survey data
 
 ## Utility Scripts
 

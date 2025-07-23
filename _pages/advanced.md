@@ -22,7 +22,15 @@ permalink: /advanced/
 
 # Advanced Analytics Scripts
 
-Machine learning, regression models, and statistical analysis techniques for Viva Insights data.
+This page covers machine learning, regression models, and statistical analysis techniques for Viva Insights data.
+
+The **top performers** use case is used for understanding the drivers behind top performance, in which top performance is usually provided by a business outcome metric uploaded into Viva Insights. The example scripts below make use of a random forest model, which has the benefits of handling non-linear relationships, providing feature importance rankings, and being robust to outliers and missing values. The same technique can be used for predicting other outcomes, such as high engagement or likelihood to stay (using sentiment surveys). 
+
+The **information value** use case is used for feature selection and understanding which Viva Insights metrics are most predictive of a categorical outcome variable. Similar to the top performers use case, this allows you to identify the most important Viva Insights metrics that differentiate between different groups or categories for a categorical outcome variable. Information Value (IV) is particularly useful for identifying variables with strong predictive power while avoiding overfitting in your models.
+
+When choosing which technique to use, consider if you need to build a predictive model that can handle complex, non-linear relationships and you want to make actual predictions on new data (e.g., predicting which employees are likely to be top performers). Random Forest is ideal when you have sufficient sample size (typically 100+ observations) and want robust predictions with feature importance rankings. Use information value when you need to perform initial feature selection, have limited sample sizes, or want to understand the univariate predictive power of individual variables before building more complex models. IV is particularly valuable for preprocessing large numbers of potential predictors and identifying which variables are worth including in downstream modeling efforts.
+
+The **pairwise chi-square tests** use case is used for statistical hypothesis testing to determine if there are significant associations between categorical variables - typically organizational attributes or survey attributes - in your Viva Insights data. This technique is particularly valuable when you want to understand relationships between different organizational attributes (such as department, level, or location) and collaboration patterns or behaviors. The scripts include multiple testing corrections to control for false discovery rates when performing many simultaneous comparisons, ensuring reliable statistical conclusions. 
 
 ## Machine Learning & Predictive Modeling
 
@@ -88,12 +96,6 @@ Machine learning, regression models, and statistical analysis techniques for Viv
 ---
 
 ## Sample Datasets
-
-### Top Performers Dataset
-**📄 [Top_Performers_Dataset_v2.csv](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/_data/Top_Performers_Dataset_v2.csv)**
-- **Purpose**: Sample dataset for top performers analysis
-- **Format**: CSV
-- **Contents**: Employee performance metrics, collaboration data, demographic information
 
 ### Simulated Person Query
 **📄 [simulated_person_query.csv](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/_data/simulated_person_query.csv)**

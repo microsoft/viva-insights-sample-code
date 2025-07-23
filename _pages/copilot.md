@@ -22,7 +22,13 @@ permalink: /copilot/
 
 # Copilot Analytics Scripts
 
-Specialized scripts for analyzing Microsoft Copilot usage data from Viva Insights.
+This page contains specialized scripts for analyzing Microsoft Copilot usage data from Viva Insights.
+
+Beyond covering key analyses around Copilot usage volume and breadth (range of actions and applications), these scripts also include a method for measuring Copilot habituality based on behavioral research. This approach determines whether a user can be considered a habitual Copilot user, enabling visualization through user segmentation that identifies **Power Users** and **Habitual Users** within an organization. This segmentation provides a framework for continuously tracking Copilot adoption success and measuring the effectiveness of your deployment strategy.
+
+See our [DAX Calculated Columns](/dax-calculated-columns/) page for detailed instructions on how to identify Copilot Usage Segments using Power BI templates and pre-built DAX formulas.
+
+---
 
 ## Advanced Analysis Scripts
 

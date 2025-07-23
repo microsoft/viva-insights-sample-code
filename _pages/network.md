@@ -22,7 +22,28 @@ permalink: /network/
 
 # Network Analysis Scripts
 
-Collaboration network visualization and analysis scripts for understanding organizational connectivity. 
+This page covers collaboration network visualization and analysis scripts for understanding organizational connectivity, typically referred to as organizational network analysis (ONA). Viva Insights offers a unique data source to visualize information flow between people and groups in an organization, providing insights that traditional organizational charts cannot reveal.
+
+## What is Organizational Network Analysis?
+
+Organizational Network Analysis (ONA) maps the relationships and interactions between people, teams, and departments based on actual collaboration patterns rather than formal reporting structures. Unlike traditional organizational charts that show hierarchical relationships, ONA reveals the informal networks that drive real work and innovation within organizations.
+
+## Key Use Cases for Network Analysis
+
+Network analysis with Viva Insights data is particularly valuable for:
+
+- **Change Management**: Identify key influencers and communication pathways to ensure successful organizational transformations
+- **Organizational Design**: Understand how work actually flows across teams and departments to optimize organizational structure
+- **Talent Development**: Discover high-potential employees who serve as connectors and bridge-builders across the organization
+- **Innovation & Knowledge Sharing**: Map how expertise and information flow to identify bottlenecks and opportunities for better collaboration
+- **Merger & Acquisition Integration**: Visualize collaboration patterns between merged entities and track integration progress
+- **Remote Work Optimization**: Understand how distributed teams collaborate and identify potential isolation or over-collaboration issues
+- **Leadership Development**: Identify informal leaders and understand influence patterns beyond formal hierarchy
+- **Diversity & Inclusion**: Analyze collaboration patterns across different demographic groups to identify potential barriers or silos
+- **Team Formation**: Use network insights to create more effective cross-functional teams based on existing collaboration patterns
+- **Risk Management**: Identify over-dependencies on key individuals or potential knowledge silos that could impact business continuity
+
+## Network Analysis Capabilities
 
 In Viva Insights, network metrics are available in four main queries.
 
@@ -30,6 +51,8 @@ In Viva Insights, network metrics are available in four main queries.
 2. The **group-to-group query** is an edgelist with each row representing the collaboration with one grouping (organizational) attribute with another. 
 3. The **person-to-person query** is an edgelist with each row representign the collaboration with one person with another. 
 4. The **person-to-group query** which is an edgelist with each row representing the collaboration of each person with respect to a grouping (organizational) attribute.
+
+---
 
 ## Group-to-Group Network Analysis
 
