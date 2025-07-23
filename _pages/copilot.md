@@ -28,6 +28,10 @@ Beyond covering key analyses around Copilot usage volume and breadth (range of a
 
 See our [DAX Calculated Columns](/dax-calculated-columns/) page for detailed instructions on how to identify Copilot Usage Segments using Power BI templates and pre-built DAX formulas.
 
+For more information on the Copilot Usage Segments, see this [introduction](/copilot-usage-segments/).
+
+For more inspiration on analyzing Copilot adoption and impact, have a look at our [advanced examples playbook](https://aka.ms/CopilotAdvancedAnalytics/).
+
 ---
 
 ## Advanced Analysis Scripts
