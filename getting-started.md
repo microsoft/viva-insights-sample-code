@@ -35,13 +35,10 @@ Before installing R packages, ensure you have:
 ```r
 # Install core packages from CRAN
 install.packages(c(
-  "tidyverse",    # Complete data science toolkit (includes dplyr, ggplot2, readr, tidyr, etc.)
+  "tidyverse",    # Complete data science toolkit 
   "vivainsights", # Microsoft Viva Insights R package
   "igraph",       # Network analysis
-  "visNetwork",   # Interactive networks
-  "plotly",       # Interactive plots
-  "rmarkdown",    # Document generation
-  "knitr"         # Dynamic reports
+  "visNetwork"   # Interactive networks
 ))
 ```
 
@@ -170,13 +167,15 @@ Viva Insights provides several types of queries that you can export and analyze:
 
 #### 2. Load and Explore Data
 
+The following code snippet demonstrates how to load the required packages, load the .csv query into your environment, run some quick checks on the structure of the data, and create a simple visualization: 
+
 **R Example:**
 ```r
 library(vivainsights)
 library(dplyr)
 
-# Load person query data
-person_data <- read.csv("path/to/your/person_query.csv")
+# Load person query data and standardizes variable names
+person_data <- import_query("path/to/your/person_query.csv")
 
 # Quick exploration
 glimpse(person_data)
@@ -191,8 +190,8 @@ person_data %>% create_bar(metric = "Email_hours")
 import vivainsights as vi
 import pandas as pd
 
-# Load person query data
-person_data = pd.read_csv("path/to/your/person_query.csv")
+# Load person query data and standardizes variable names
+person_data = vi.import_query("path/to/your/person_query.csv")
 
 # Quick exploration
 print(person_data.info())
@@ -201,6 +200,8 @@ print(person_data.describe())
 # Use vivainsights functions
 vi.create_bar(person_data, metric="Email_hours")
 ```
+
+Whilst you can use `read.csv()` (R) or `pd.read_csv()` (Python) for reading in the .csv query into your R or Python environment, we recommend using the `import_query()` function instead from the **vivainsights** package. `import_query()` standardizes variable names and 'cleans' special characters, ensuring that you minimize the number of errors arising from variable name mismatches. 
 
 #### 3. Common Analysis Patterns
 
@@ -227,12 +228,12 @@ vi.create_boxplot(person_data, metric="Meeting_hours", hrvar="Organization")
 **Network Analysis:**
 ```r
 # R - Group-to-Group networks
-g2g_data <- read.csv("path/to/g2g_query.csv")
+g2g_data <- import_query("path/to/g2g_query.csv")
 g2g_data %>% network_g2g(primary = "Organization", secondary = "LevelDesignation")
 ```
 ```python
 # Python - Group-to-Group networks
-g2g_data = pd.read_csv("path/to/g2g_query.csv")
+g2g_data = vi.import_query("path/to/g2g_query.csv")
 vi.network_g2g(g2g_data, primary="Organization", secondary="LevelDesignation")
 ```
 
@@ -301,7 +302,7 @@ combined_data <- left_join(person_summary, meeting_summary,
 ```r
 # R - Create automated reports
 create_report <- function(data_path, output_path) {
-  data <- read.csv(data_path)
+  data <- import_query(data_path)
   
   # Generate multiple visualizations
   bar_plot <- data %>% create_bar(metric = "Email_hours")
