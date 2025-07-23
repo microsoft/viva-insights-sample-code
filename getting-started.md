@@ -24,30 +24,25 @@ Welcome to Viva Insights sample code! This guide will help you set up your devel
 ## 🔧 Setting Up R
 
 ### Prerequisites
+
 Before installing R packages, ensure you have:
+
 - **R version 4.0.0 or higher** - [Download R](https://cran.r-project.org/)
 - **RStudio** (recommended) - [Download RStudio](https://www.rstudio.com/products/rstudio/download/)
 
 ### Install Required R Packages
 
 ```r
-# Install from CRAN
+# Install core packages from CRAN
 install.packages(c(
-  "dplyr",        # Data manipulation
-  "ggplot2",      # Data visualization
-  "readr",        # Data import
-  "tidyr",        # Data tidying
-  "lubridate",    # Date handling
+  "tidyverse",    # Complete data science toolkit (includes dplyr, ggplot2, readr, tidyr, etc.)
+  "vivainsights", # Microsoft Viva Insights R package
   "igraph",       # Network analysis
   "visNetwork",   # Interactive networks
   "plotly",       # Interactive plots
   "rmarkdown",    # Document generation
   "knitr"         # Dynamic reports
 ))
-
-# Install vivainsights package from GitHub
-if (!require(devtools)) install.packages("devtools")
-devtools::install_github("microsoft/vivainsights")
 ```
 
 ### Verify R Installation
