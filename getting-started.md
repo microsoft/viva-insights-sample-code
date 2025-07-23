@@ -57,14 +57,9 @@ help(package = "vivainsights")
 
 ### R Environment Setup Tips
 
-1. **Set up a project**: Create an RStudio project for your Viva Insights analysis
-2. **Use renv**: Consider using `renv` for package management:
-   ```r
-   install.packages("renv")
-   renv::init()
-   ```
-3. **Configure data paths**: Set up consistent paths for your data files
-4. **Enable auto-completion**: RStudio provides excellent auto-completion for vivainsights functions
+1. **Set up a project**: Create an RStudio project for your Viva Insights analysis - [Learn how to use RStudio projects](https://martinctc.github.io/blog/rstudio-projects-and-working-directories-a-beginner's-guide/)
+2. **Configure data paths**: Set up consistent paths for your data files
+3. **Enable auto-completion**: RStudio provides excellent auto-completion for vivainsights functions
 
 ---
 
