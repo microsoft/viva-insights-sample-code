@@ -30,8 +30,6 @@ This guide introduces the fundamental concepts, practical applications, and stra
 
 ## What is Causal Inference?
 
-## What is Causal Inference?
-
 Causal inference is the scientific process of determining whether and how much a specific intervention actually causes changes in an outcome of interest. Unlike correlation analysis, which simply identifies patterns between variables, causal inference aims to answer the counterfactual question: **"What would have happened if we had not implemented this intervention?"**
 
 ### The Fundamental Challenge
@@ -208,158 +206,26 @@ For organizations just beginning their causal inference journey, we recommend st
 
 ---
 
+## Quick Navigation
+
+### This Guide
+- [What is Causal Inference?](#what-is-causal-inference)
+- [Why Apply Causal Inference to Copilot Analytics?](#why-apply-causal-inference-to-copilot-analytics)
+- [Common Applications in Copilot Analytics](#common-applications-in-copilot-analytics)
+- [Key Methodological Approaches](#key-methodological-approaches)
+- [Implementation Considerations](#implementation-considerations)
+- [Getting Started](#getting-started)
+
+### Detailed Technical Guides
+- **[Technical Implementation Overview]({{ site.baseurl }}/causal-inference-technical/)** - Method selection and workflow guide
+- **[Data Preparation]({{ site.baseurl }}/causal-inference-data-prep/)** - Data validation and preprocessing
+- **[Regression Adjustment]({{ site.baseurl }}/causal-inference-regression/)** - Linear models and diagnostics
+- **[Propensity Score Methods]({{ site.baseurl }}/causal-inference-propensity/)** - Matching, weighting, and stratification
+- **[Difference-in-Differences]({{ site.baseurl }}/causal-inference-did/)** - Panel data and parallel trends
+- **[Instrumental Variables]({{ site.baseurl }}/causal-inference-iv/)** - Two-stage estimation and validity testing
+- **[Doubly Robust Methods]({{ site.baseurl }}/causal-inference-doubly-robust/)** - Double ML and TMLE
+- **[Validation & Testing]({{ site.baseurl }}/causal-inference-validation/)** - Assumption checking and robustness
+
+---
+
 *Remember: Causal inference is as much about asking the right questions as it is about applying the right methods. Start with clear business objectives and let those guide your analytical approach.*
-
----
-
-## Table of Contents
-
-1. [What is causal inference?](#what-is-causal-inferencerence to Copilot data?](#whyPre-analysis considerations](#pre-Causal inference techniques & choosing the right one](#causal-inference-techniques--choosing-theleadership  
-6. [Hands-on: Jupyter notebooks & sample code](#hands-on-jupyter-notebooks--ng](#next-steps--fat is causal inference?  
-Causal inference asks the question:  
-> “If we *intervene*—for example, enable or encourage Copilot usage—*what difference* does that make in our outcome of interest, compared to *not* intervening?”
-
-Key concepts:  
-- **Treatment (T)**: the action or “intervention” (e.g. using Copilot).  
-- **Outcome (Y)**: the metric you hope changes (e.g. tickets resolved, deals closed).  
-- **Counterfactual**: the unobserved scenario (“What would have happened if…?”).  
-- **Confounders (X)**: variables that influence both T and Y (e.g. job function, tenure, workload).  
-
-Unlike simple correlation, causal inference methods strive to emulate a randomized trial in observational data by balancing or adjusting for confounders, isolating the *effect* of T on Y.
-
----
-
-## 2. Why apply causal inference to Copilot data?  
-1. **Quantify true impact**  
-   - Estimate how Copilot usage increases tickets resolved, deal closure rate, margin per deal, or time freed for customer engagement.  
-2. **Drive adoption strategy**  
-   - Identify which roles, seniority levels, or training programs lead to the greatest lift—so you can prioritize pilots and rollouts.  
-3. **Optimize training & support**  
-   - Understand if additional nudges (emails, workshops) cause higher sustained usage and downstream gains.  
-4. **Secure executive buy-in**  
-   - Translate “15% more tickets closed” into clear financial or time-savings figures that resonate with leadership.
-
----
-
-## 3. Pre-analysis considerations  
-Before you run any models, clarify:
-
-### 3.1 Define your variables  
-- **Outcome Y**: e.g.  
-  - *Productivity*: Tickets closed/week, emails drafted/hour, average deal size.  
-  - *Engagement*: Survey score, likelihood to stay.  
-- **Treatment T**:  
-  - Binary (used vs. not used in period) or continuous (number of Copilot prompts/week).  
-- **Confounders X**:  
-  - Role, tenure, manager span, past performance, meeting load, team size.
-
-### 3.2 Data requirements  
-- **Time ordering**: Ensure usage (T) occurs before outcome measurement.  
-- **Sufficient overlap**: Your treated and control groups should overlap on X (no “all juniors vs. all seniors” extremes).  
-- **Sample size**: Each subgroup should have enough observations for stable estimates.
-
-### 3.3 Assumptions to check  
-- **Ignorability**: All major confounders are measured & included.  
-- **Positivity (Overlap)**: Every unit has a non-zero probability of treatment.  
-- **Stable Unit Treatment Value Assumption (SUTVA)**: One user’s treatment doesn’t affect another’s outcome.
-
----
-
-## 4. Causal inference techniques & choosing the right one  
-
-| Method                                    | When to use                                                        |  
-|-------------------------------------------|--------------------------------------------------------------------|  
-| **Regression adjustment**                 | Continuous T/Y, few confounders                                    |  
-| **Propensity Score Matching (PSM)/Weighting** | Binary T; balance high-dimensional X                               |  
-| **Difference-in-Differences (DiD)**       | Clear before/after periods; panel data                             |  
-| **Instrumental Variables (IV)**           | Unobserved confounding; credible instrument exists                 |  
-| **Doubly Robust / Double ML**             | Many covariates; combine outcome and propensity models             |  
-| **Synthetic Control**                     | Aggregate-level intervention (e.g. department-wide rollout)        |  
-
-### 4.1 Regression adjustment  
-A baseline linear model:  
-```python
-import statsmodels.formula.api as smf
-
-# df has columns: outcome Y, treatment T, confounders X1,X2,X3…
-model = smf.ols('Y ~ T + X1 + X2 + X3', data=df).fit()
-print(model.summary())
-```
-
-* Pros: Simple, transparent.
-* Cons: Biased if functional form mis-specified or unobserved confounders remain.
-
-### 4.2 Propensity Score Matching & Weighting
-
-1. Fit a logistic model for P(T=1 | X).
-2. Match treated & control by similar propensity scores, or weight each row by the inverse probability of treatment.
-
-```python
-from sklearn.linear_model import LogisticRegression
-from causalml.match import NearestNeighborMatch
-
-# 1) Propensity model
-ps_model = LogisticRegression().fit(X, df['T'])
-ps = ps_model.predict_proba(X)[:,1]
-
-# 2) Nearest-neighbor matching
-matcher = NearestNeighborMatch(replace=False, ratio=1)
-matched = matcher.match(df, treatment_col='T', score=ps)
-ate = matched['Y_treated'].mean() - matched['Y_control'].mean()
-```
-* Pros: Balances observed confounders.
-* Cons: Cannot adjust for unobserved confounders.
-
-### 4.3 Difference-in-Differences (DiD)
-Compare trends before/after a rollout between treated and control groups:
-
-```R
-library(fixest)
-# R: DiD with two-way fixed effects
-did_model <- feols(Y ~ T*post + X1 + X2 | user_id + time_period, data=df)
-summary(did_model)
-```
-
-* Pros: Controls for constant unit/time effects.
-* Cons: Relies on parallel trends assumption.
-
-### 4.4 Instrumental Variables (IV)
-Use an instrument Z that affects T but not Y directly (except through T).
-
-```python
-
-from linearmodels.iv import IV2SLS
-
-iv = IV2SLS.from_formula('Y ~ 1 + X1 + [T ~ Z]', data=df).fit()
-print(iv.summary)
-```
-
-* Pros: Addresses unobserved confounding if Z is valid.
-* Cons: Finding a credible instrument is hard.
-
-### 4.5 Doubly Robust & Double ML
-Combine outcome modeling and propensity modeling for protection against misspecification. Libraries such as EconML or DoWhy let you run these seamlessly.
-
-### 5. Interpreting & translating results for leadership
-Average Treatment Effect (ATE)
-
-“Users who engaged with Copilot closed 5 more tickets per month on average.”
-Confidence Intervals & p-values
-
-Always report uncertainty: “95% CI [3.2, 6.8] tickets.”
-Heterogeneous Treatment Effects (CATE)
-
-Show which cohorts gain most (e.g. senior reps vs. juniors).
-Business Translation
-
-Convert units into £/$ or hours:
-“A lift of 5 tickets/mo × £200 margin = £1 000 extra margin per user.”
-
-Visualizations
-
-Forest plots of subgroup effects
-Pre/post trend charts for DiD
-Actionable Insights
-
-“Invest in Copilot training for the 20–30 tenure cohort, where we saw the highest lift.”
-“Roll out Copilot first to sales engineers—projected ROI of 150% in Q4.”
