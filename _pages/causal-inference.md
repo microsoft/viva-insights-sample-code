@@ -40,13 +40,10 @@ This creates what statisticians call the "fundamental problem of causal inferenc
 
 ### Key Concepts in Causal Analysis
 
-**Treatment**: The intervention being studied – in our case, Copilot usage. This might be defined as binary (used vs. not used) or continuous (frequency of use).
-
-**Outcome**: The metric we believe might be influenced by Copilot usage, such as tickets resolved per week, deal closure rates, or time saved on routine tasks.
-
-**Confounders**: Variables that influence both Copilot adoption and the outcome measures. These might include job function, tenure, existing productivity levels, or team characteristics.
-
-**Counterfactual**: The hypothetical scenario representing what would have happened to the same individual or team without Copilot usage.
+* **Treatment**: The intervention being studied – in our case, Copilot usage. This might be defined as binary (used vs. not used) or continuous (frequency of use).
+* **Outcome**: The metric we believe might be influenced by Copilot usage, such as tickets resolved per week, deal closure rates, or time saved on routine tasks.
+* **Confounders**: Variables that influence both Copilot adoption and the outcome measures. These might include job function, tenure, existing productivity levels, or team characteristics.
+* **Counterfactual**: The hypothetical scenario representing what would have happened to the same individual or team without Copilot usage.
 
 ---
 
@@ -60,13 +57,10 @@ Traditional analytics might reveal that teams using Copilot complete 20% more ti
 
 Causal inference enables evidence-based decisions about Copilot deployment:
 
-**Investment Justification**: Provide concrete evidence of ROI to secure executive buy-in and budget approval for expanded rollouts.
-
-**Targeted Deployment**: Identify which roles, departments, or user profiles benefit most from Copilot, allowing for strategic prioritization of limited licenses.
-
-**Training Optimization**: Understand whether additional training programs actually improve outcomes, and by how much.
-
-**Adoption Strategy**: Determine the most effective approaches for driving sustained usage and maximizing business impact.
+* Investment Justification: Provide concrete evidence of ROI to secure executive buy-in and budget approval for expanded rollouts.
+* Targeted Deployment: Identify which roles, departments, or user profiles benefit most from Copilot, allowing for strategic prioritization of limited licenses.
+* Training Optimization: Understand whether additional training programs actually improve outcomes, and by how much.
+* Adoption Strategy: Determine the most effective approaches for driving sustained usage and maximizing business impact.
 
 ### Financial and Resource Planning
 
@@ -82,25 +76,25 @@ By quantifying true causal effects, organizations can:
 
 ### Productivity Impact Assessment
 
-**Question**: "How much does Copilot usage actually increase productivity metrics?"
+#### **Question**: "How much does Copilot usage actually increase productivity metrics?"
 
 Causal inference can isolate the true productivity gains attributable to Copilot from other factors like seasonal variations, team changes, or concurrent process improvements. This analysis might reveal, for example, that Copilot causes a genuine 15% increase in tickets resolved, with 95% confidence that the true effect is between 12% and 18%.
 
 ### Adoption Driver Analysis
 
-**Question**: "Which interventions most effectively drive sustained Copilot usage?"
+#### **Question**: "Which interventions most effectively drive sustained Copilot usage?"
 
 Organizations often implement multiple strategies to encourage adoption – training sessions, email reminders, manager coaching. Causal analysis can determine which of these interventions actually cause increased usage and sustained engagement, allowing teams to focus resources on the most effective approaches.
 
 ### Heterogeneous Treatment Effects
 
-**Question**: "Who benefits most from Copilot?"
+#### **Question**: "Who benefits most from Copilot?"
 
 Different users may experience vastly different benefits from Copilot. Causal inference can identify which characteristics predict the largest productivity gains, enabling targeted deployment strategies. For instance, analysis might reveal that customer service representatives with 2-5 years of experience see the greatest improvements, while very senior staff show minimal gains.
 
 ### Long-term Impact Measurement
 
-**Question**: "Do Copilot benefits persist over time?"
+#### **Question**: "Do Copilot benefits persist over time?"
 
 Initial productivity boosts might fade as novelty wears off, or they might compound as users develop more sophisticated usage patterns. Causal inference can track these dynamics and identify factors that sustain long-term benefits.
 
@@ -118,11 +112,9 @@ When feasible, randomly assigning Copilot access provides the clearest causal ev
 
 These approaches approximate experimental conditions using observational data:
 
-**Propensity Score Methods**: Balance treated and control groups by matching users with similar likelihood of Copilot adoption.
-
-**Difference-in-Differences**: Compare productivity trends before and after Copilot rollout between departments that received access at different times.
-
-**Instrumental Variables**: Use external factors that influence Copilot adoption but don't directly affect productivity outcomes.
+* **Propensity Score Methods**: Balance treated and control groups by matching users with similar likelihood of Copilot adoption.
+* **Difference-in-Differences**: Compare productivity trends before and after Copilot rollout between departments that received access at different times.
+* **Instrumental Variables**: Use external factors that influence Copilot adoption but don't directly affect productivity outcomes.
 
 ### Machine Learning Enhanced Approaches
 
@@ -161,11 +153,9 @@ Successful causal inference requires:
 
 ### Common Pitfalls
 
-**Selection Bias**: If Copilot users systematically differ from non-users in unmeasured ways, causal estimates may be biased.
-
-**Spillover Effects**: Benefits to one user might affect their teammates' performance, violating standard causal inference assumptions.
-
-**Measurement Issues**: Poorly defined or inconsistently measured outcomes can lead to misleading conclusions.
+* **Selection Bias**: If Copilot users systematically differ from non-users in unmeasured ways, causal estimates may be biased.
+* **Spillover Effects**: Benefits to one user might affect their teammates' performance, violating standard causal inference assumptions.
+* **Measurement Issues**: Poorly defined or inconsistently measured outcomes can lead to misleading conclusions.
 
 ### Organizational Prerequisites
 
@@ -217,14 +207,14 @@ For organizations just beginning their causal inference journey, we recommend st
 - [Getting Started](#getting-started)
 
 ### Detailed Technical Guides
-- **[Technical Implementation Overview]({{ site.baseurl }}/causal-inference-technical/)** - Method selection and workflow guide
-- **[Data Preparation]({{ site.baseurl }}/causal-inference-data-prep/)** - Data validation and preprocessing
-- **[Regression Adjustment]({{ site.baseurl }}/causal-inference-regression/)** - Linear models and diagnostics
-- **[Propensity Score Methods]({{ site.baseurl }}/causal-inference-propensity/)** - Matching, weighting, and stratification
-- **[Difference-in-Differences]({{ site.baseurl }}/causal-inference-did/)** - Panel data and parallel trends
-- **[Instrumental Variables]({{ site.baseurl }}/causal-inference-iv/)** - Two-stage estimation and validity testing
-- **[Doubly Robust Methods]({{ site.baseurl }}/causal-inference-doubly-robust/)** - Double ML and TMLE
-- **[Validation & Testing]({{ site.baseurl }}/causal-inference-validation/)** - Assumption checking and robustness
+- [Technical Implementation Overview]({{ site.baseurl }}/causal-inference-technical/) - Method selection and workflow guide
+- [Data Preparation]({{ site.baseurl }}/causal-inference-data-prep/) - Data validation and preprocessing
+- [Regression Adjustment]({{ site.baseurl }}/causal-inference-regression/) - Linear models and diagnostics
+- [Propensity Score Methods]({{ site.baseurl }}/causal-inference-propensity/) - Matching, weighting, and stratification
+- [Difference-in-Differences]({{ site.baseurl }}/causal-inference-did/) - Panel data and parallel trends
+- [Instrumental Variables]({{ site.baseurl }}/causal-inference-iv/) - Two-stage estimation and validity testing
+- [Doubly Robust Methods]({{ site.baseurl }}/causal-inference-doubly-robust/) - Double ML and TMLE
+- [Validation & Testing]({{ site.baseurl }}/causal-inference-validation/) - Assumption checking and robustness
 
 ---
 
