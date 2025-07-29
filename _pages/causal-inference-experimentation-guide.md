@@ -4,7 +4,7 @@ title: "Causal Inference: Experimentation Guide"
 permalink: /causal-inference-experimentation-guide/
 ---
 
-# Guidance on Causal Inference with Copilot Analytics
+# Causal Inference: Experimentation Guide for Copilot Analytics
 
 {% include custom-navigation.html %}
 {% include floating-toc.html %}
@@ -310,7 +310,7 @@ All relevant confounding variables (covariates) must be collected to control for
 
 #### Step 2: Update the Jupyter notebook with new file paths
 
-1. Open `Treatment_Featurization_VI_v42_spline_simdata.ipynb` in VS Code or Jupyter
+1. Open the provided `.ipynb` in VS Code or Jupyter
 2. Locate the data loading cell (typically near the top):
    ```python
    data = pd.read_csv("data/synthetic_employees_data_v32.csv")
