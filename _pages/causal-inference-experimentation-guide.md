@@ -1,4 +1,13 @@
+---
+layout: default
+title: "Causal Inference: Experimentation Guide"
+permalink: /causal-inference-experimentation-guide/
+---
+
 # Guidance on Causal Inference with Copilot Analytics
+
+{% include custom-navigation.html %}
+{% include floating-toc.html %}
 
 This is a comprehensive guide on how to run a causal inference (or treatment effect estimation) analysis with Copilot Analytics. 
 
