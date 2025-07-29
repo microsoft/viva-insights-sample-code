@@ -74,9 +74,11 @@ For non-sales focused scenarios, other outcome variables such as number of ticke
 
 The treatment variable represents Copilot usage intensity, measured as continuous variables such as:
 
-- "Teams Copilot Usage" (hours per week)
-- "GitHub Copilot Usage" (hours per week)  
-- "M365 Copilot Usage" (hours per week)
+- Total Copilot actions taken
+- Total Copilot active days
+- Copilot actions taken in [app]
+
+The full list of these M365 Copilot metrics can be found in the [advanced analysis metric descriptions](https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics#microsoft-365-copilot-metrics).
 
 We model treatment as continuous rather than binary (user vs. non-user) because:
 
