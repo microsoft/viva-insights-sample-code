@@ -1,0 +1,5 @@
+# outputs
+outputs/
+
+# Python cache files
+__pycache__/
