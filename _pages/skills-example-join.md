@@ -73,37 +73,54 @@ To perform this analysis, you'll need:
    - **RelatedSkills**: Information about related skills
    - **HierarchicalSkills**: Hierarchical structure of skills
 
+It is recommended that you save the data within a project directory structure detailed below. 
+
 ### Development Environment Setup
 
-Choose your preferred analysis environment:
+For performing data joins and analyses, this tutorial covers example scripts in both the R and Python analysis environments. Here are the pre-requisites for them respectively: 
 
 #### Option 1: R Environment
-- **Install R**: Download from [https://cran.r-project.org/](https://cran.r-project.org/)
-- **Install RStudio** (recommended): Download from [https://www.rstudio.com/](https://www.rstudio.com/)
+
+To run the R code in this tutorial, you must have R and ideally a code editor installed: 
+
+- Install R: Download from [https://cran.r-project.org/](https://cran.r-project.org/)
+- Install RStudio (recommended): Download from [https://www.rstudio.com/](https://www.rstudio.com/). Alternatively, you may choose to use [Visual Studio Code](https://code.visualstudio.com/) as your IDE. 
 
 **Required R Packages:**
-```r
-install.packages(c("vivainsights", "tidyverse", "here"))
-```
+
+The next step is to install the required R packages: 
 
 - **[vivainsights](https://microsoft.github.io/vivainsights/)**: Microsoft's R package for Viva Insights analysis
 - **[tidyverse](https://www.tidyverse.org/)**: Collection of R packages for data science
 - **[here](https://here.r-lib.org/)**: Easy file path management
 
+If these are not already installed, you can install them in R with: 
+```r
+install.packages(c("vivainsights", "tidyverse", "here"))
+```
+
 #### Option 2: Python Environment  
-- **Install Python**: Download from [https://www.python.org/downloads/](https://www.python.org/downloads/) or use [Anaconda](https://www.anaconda.com/products/distribution)
-- **Install Jupyter** (recommended): Comes with Anaconda or install via `pip install jupyter`
+
+To run the Python code in this tutorial, you must have Python and ideally a code editor installed: 
+
+- Install Python: Download from [https://www.python.org/downloads/](https://www.python.org/downloads/) or use [Anaconda](https://www.anaconda.com/products/distribution)
+- Install Jupyter (recommended): Comes with Anaconda or install via `pip install jupyter`. Alternatively, you may choose to use [Visual Studio Code](https://code.visualstudio.com/) as your IDE. 
 
 **Required Python Packages:**
-```bash
-pip install vivainsights pandas numpy plotly scipy
-```
+
+Ensure that you have the following python packages installed: 
 
 - **[vivainsights](https://microsoft.github.io/vivainsights-py/)**: Microsoft's Python package for Viva Insights analysis
 - **[pandas](https://pandas.pydata.org/)**: Data manipulation and analysis library
 - **[numpy](https://numpy.org/)**: Fundamental package for scientific computing
 - **[plotly](https://plotly.com/)**: Interactive visualization library
 - **[scipy](https://scipy.org/)**: Scientific computing tools
+
+If not, you can install them in the Command Prompt with: 
+
+```bash
+pip install vivainsights pandas numpy plotly scipy
+```
 
 ### Project Structure Setup
 
@@ -892,26 +909,6 @@ You can also consider extending the analysis with:
 - **Predictive Modeling**: Build models to predict skill development or attrition
 - **Network Analysis**: Understand skill relationships and knowledge flow
 - **Automated Reporting**: Create scheduled reports using these analysis patterns
-
-### Production Considerations
-
-**Data Refresh Strategy:**
-
-- Set up automated data pipelines for regular analysis updates
-- Consider incremental vs. full refresh based on your needs
-- Implement data quality checks and validation
-
-**Scaling and Performance:**
-
-- For large datasets, consider sampling strategies for exploratory analysis
-- Optimize joins and aggregations for better performance
-- Use appropriate visualization tools for different audience sizes
-
-**Governance and Privacy:**
-
-- Ensure compliance with your organization's data governance policies
-- Implement appropriate access controls for sensitive skills information
-- Document data lineage and transformation logic
 
 ### Resources for Continued Learning
 
