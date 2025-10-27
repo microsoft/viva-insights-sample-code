@@ -41,11 +41,11 @@ By the end of this tutorial, you'll be able to:
 
 This tutorial demonstrates five key scenarios that analysts commonly need to address:
 
-1. **🎯 Deep Knowledge Discovery**: Finding people with specific skills (e.g., "Prompt Engineering")
-2. **🌐 Broader Capability Assessment**: Understanding AI skills across the organization including subskills and related skills
-3. **🗺️ Skills Landscape Mapping**: Identifying top skill areas and organizational strengths
-4. **💼 Talent Well-being Analysis**: Comparing work patterns between different skill groups
-5. **🚀 Technology Adoption Insights**: Analyzing the relationship between skills and tool usage
+1. **Deep Knowledge Discovery**: Finding people with specific skills (e.g., "Prompt Engineering")
+2. **Broader Capability Assessment**: Understanding AI skills across the organization including subskills and related skills
+3. **Skills Landscape Mapping**: Identifying top skill areas and organizational strengths
+4. **Talent Well-being Analysis**: Comparing work patterns between different skill groups
+5. **Technology Adoption Insights**: Analyzing the relationship between skills and tool usage
 
 Each scenario includes:
 
@@ -282,7 +282,7 @@ print(f"Unique skills: {df_combined_skills['SkillId'].nunique():,}")
 
 Now that we have our master dataset, let's explore five practical business scenarios that demonstrate the power of combining skills data with organizational insights.
 
-### Scenario 1: Deep Knowledge Discovery 🎯
+### Scenario 1: Deep Knowledge Discovery
 
 **Business Question**: "How many people are using Prompt Engineering skills in our organization, and which departments have them?"
 
@@ -373,7 +373,7 @@ if people_count > 0:
 
 ---
 
-### Scenario 2: Broader Capability Assessment 🌐
+### Scenario 2: Broader Capability Assessment
 
 **Business Question**: "How many people have skills in Artificial Intelligence, including all related subskills and adjacent capabilities?"
 
@@ -513,7 +513,7 @@ if all_ai_skills:
 
 ---
 
-### Scenario 3: Skills Landscape Mapping 🗺️
+### Scenario 3: Skills Landscape Mapping
 
 **Business Question**: "What are the top-level skill areas across our organization, and where do we have the most capability?"
 
@@ -614,7 +614,7 @@ vi.create_bar_asis(
 
 ---
 
-### Scenario 4: Talent Well-being Analysis 💼
+### Scenario 4: Talent Well-being Analysis
 
 **Business Question**: "Are employees with critical AI skills showing signs of being overworked, and should we be concerned about retention?"
 
@@ -733,7 +733,7 @@ if all_ai_skills:
 
 ---
 
-### Scenario 5: Technology Adoption Insights 🚀
+### Scenario 5: Technology Adoption Insights
 
 **Business Question**: "Are employees with AI-related skills more likely to adopt new AI tools like Copilot? Can skills predict technology adoption patterns?"
 
@@ -876,26 +876,19 @@ Through this tutorial, you've learned how to:
 ✅ **Use advanced techniques** like hierarchical skill navigation and statistical testing  
 ✅ **Create compelling visualizations** for stakeholder communication  
 
-### Key Analytical Techniques Covered
-
-- **Strategic Data Joins**: Combining skills, HR, and collaboration data for comprehensive analysis
-- **Hierarchy Navigation**: Using parent-child skill relationships for broader coverage  
-- **Statistical Analysis**: T-tests and descriptive statistics for evidence-based insights
-- **Risk Assessment**: Combining skills with well-being metrics for proactive talent management
-- **Technology Adoption Analysis**: Predicting behavior patterns based on existing capabilities
 
 ### Adapting These Analyses for Your Organization
 
-**Customize for Your Context:**
+Below are further examples on how you can further customize the analysis for your organizational context: 
 
 - Replace skill categories and hierarchies with your organization's taxonomy
 - Adjust collaboration thresholds based on your organizational norms
 - Add organizational filters for department-specific analysis
 - Incorporate additional Viva Insights metrics for richer insights
 
-**Extend the Analysis:**
+You can also consider extending the analysis with: 
 
-- **Time Series Analysis**: Use the MetricDate column for trend analysis
+- **Time Series Analysis**: Use the `MetricDate` column for trend analysis
 - **Predictive Modeling**: Build models to predict skill development or attrition
 - **Network Analysis**: Understand skill relationships and knowledge flow
 - **Automated Reporting**: Create scheduled reports using these analysis patterns
@@ -931,7 +924,9 @@ Through this tutorial, you've learned how to:
 
 - **R**: [vivainsights R package](https://microsoft.github.io/vivainsights/)
 - **Python**: [vivainsights Python package](https://microsoft.github.io/vivainsights-py/)
-- **General**: [Tidyverse documentation](https://www.tidyverse.org/) | [Pandas documentation](https://pandas.pydata.org/)
+- **General**: 
+  - [Tidyverse documentation](https://www.tidyverse.org/)
+  - [Pandas documentation](https://pandas.pydata.org/)
 
 ### Getting Help
 
