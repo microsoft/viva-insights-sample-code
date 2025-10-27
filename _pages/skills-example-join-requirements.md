@@ -67,3 +67,5 @@ If not, you can install them in the Command Prompt with:
 ```bash
 pip install vivainsights pandas numpy plotly scipy
 ```
+
+Once the developer pre-requisites are satisfied, see [how to load and join data]({{ site.baseurl }}/skills-data-join/#data-loading-and-joining). 

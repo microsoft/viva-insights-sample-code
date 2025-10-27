@@ -41,11 +41,11 @@ By the end of this tutorial, you'll be able to:
 
 This tutorial demonstrates five key scenarios that analysts commonly need to address:
 
-1. **Deep Knowledge Discovery**: Finding people with specific skills (e.g., "Prompt Engineering")
-2. **Broader Capability Assessment**: Understanding AI skills across the organization including subskills and related skills
-3. **Skills Landscape Mapping**: Identifying top skill areas and organizational strengths
-4. **Talent Well-being Analysis**: Comparing work patterns between different skill groups
-5. **Technology Adoption Insights**: Analyzing the relationship between skills and tool usage
+1. [Deep Knowledge Discovery]({{ site.baseurl }}/skills-data-join/#scenario-1-deep-knowledge-discovery): Finding people with specific skills (e.g., "Prompt Engineering")
+2. [Broader Capability Assessment]({{ site.baseurl }}/skills-data-join/#scenario-2-broader-capability-assessment): Understanding AI skills across the organization including subskills and related skills
+3. [Skills Landscape Mapping]({{ site.baseurl }}/skills-data-join/#scenario-3-skills-landscape-mapping): Identifying top skill areas and organizational strengths
+4. [Talent Well-being Analysis]({{ site.baseurl }}/skills-data-join/#scenario-4-talent-well-being-analysis): Comparing work patterns between different skill groups
+5. [Technology Adoption Insights]({{ site.baseurl }}/skills-data-join/#scenario-5-technology-adoption-insights): Analyzing the relationship between skills and tool usage
 
 Each scenario includes:
 
@@ -107,7 +107,7 @@ For performing data joins and analyses, this tutorial covers example scripts in 
 
 --- 
 
-## Essential Data Loading and Joining
+## Data Loading and Joining
 
 ### Understanding the Data Structure
 
