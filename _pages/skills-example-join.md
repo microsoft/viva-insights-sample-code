@@ -75,13 +75,9 @@ To perform this analysis, you'll need:
 
 It is recommended that you save the data within a project directory structure detailed below. 
 
-### Development Environment Setup
-
-For performing data joins and analyses, this tutorial covers example scripts in both the R and Python analysis environments. On how to set this up, see [Skills Data Join Requirements]({{ site.baseurl }}/skills-data-join-requirements/).
-
 ### Project Structure Setup
 
-Set up your project folder with this recommended structure:
+To ensure reproducibility, set up your project folder with this structure:
 
 ```
 📁 skills-analysis-project/
@@ -101,7 +97,13 @@ Set up your project folder with this recommended structure:
     └── 📄 results.html        # Generated reports
 ```
 
+Additional analysis scripts that you create on top can be added under `scripts`. 
+
 > **💡 Tip**: This structure makes it easy to reference files and ensures your analysis is reproducible across different environments.
+
+### Development Environment Setup
+
+For performing data joins and analyses, this tutorial covers example scripts in both the R and Python analysis environments. On how to set this up, see [Skills Data Join Requirements]({{ site.baseurl }}/skills-data-join-requirements/).
 
 --- 
 
