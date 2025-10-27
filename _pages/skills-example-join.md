@@ -1,3 +1,26 @@
+---
+layout: page
+title: "Skills data join"
+permalink: /skills-data-join/
+---
+
+{% include custom-navigation.html %}
+{% include floating-toc.html %}
+
+<style>
+/* Hide any default Minima navigation that might appear */
+.site-header .site-nav,
+.trigger,
+.page-link:not(.dropdown-toggle):not(.btn) {
+  display: none !important;
+}
+
+/* Ensure our custom navigation is visible */
+.custom-nav {
+  display: block !important;
+}
+</style>
+
 # Joining People Skills Data with Viva Insights: Complete Tutorial
 
 This comprehensive tutorial walks through how to join People Skills data with Viva Insights to answer common business questions that analysts frequently encounter. We'll demonstrate practical scenarios using both R and Python, showing you how to transform raw skills data into actionable organizational insights.
