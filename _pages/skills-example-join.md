@@ -122,15 +122,14 @@ The Skills landscape data consists of multiple interconnected tables:
 
 ### Step 1: Load Required Packages
 
+The first step here is to load the required packages. A different set of packages are loaded in for R and Python: 
+
 **R Setup:**
 ```r
 # Load required packages
 library(vivainsights)
 library(tidyverse)
 library(here)
-
-# Set display options
-options(dplyr.summarise.inform = FALSE)
 ```
 
 **Python Setup:**
@@ -143,7 +142,7 @@ import plotly.express as px
 import vivainsights as vi
 from scipy import stats
 
-# Set display options for better output
+# Set display options for better output (optional)
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', 50)
@@ -151,19 +150,24 @@ pd.set_option('display.max_colwidth', 50)
 
 ### Step 2: Set File Paths and Load Data
 
+Since each file is nested in a subfolder, it is handy to list out the paths of the file before importing them. 
+
+For R, `here()` offers a simple way of handling relative file paths. We first set `base_path` as the root path to where all the subfolders are: 
+
 **R Implementation:**
 ```r
 # Set file paths for all demo data tables
-path_PersonQuery <- here('data', 'demo-data', 'MetricOutput', 'Skills landscape_manualTestE3_1_29Sep2025_2237Hours.Csv')
-path_HR <- here('data', 'demo-data', 'HR', 'HR.Csv')
-path_PersonSkillsMap <- here('data', 'demo-data', 'PersonSkillsMappingMetadata', 'PersonSkillsMappingMetadata.Csv')
-path_PersonSkills <- here('data', 'demo-data', 'PersonSkills', 'PersonSkills.Csv')
-path_SkillsLib <- here('data', 'demo-data', 'SkillsLibrary', 'SkillsLibrary.Csv')
-path_RelatedSkills <- here('data', 'demo-data', 'RelatedSkills', 'RelatedSkills.Csv')
-path_HierarchicalSkills <- here('data', 'demo-data', 'HierarchicalSkills', 'HierarchicalSkills.Csv')
+base_path <- here('data', 'demo-data') # root for data files
+path_PersonQuery <- here(base_path, 'MetricOutput', 'Skills landscape_manualTestE3_1_29Sep2025_2237Hours.Csv')
+path_HR <- here(base_path, 'HR', 'HR2.Csv')
+path_PersonSkillsMap <- here(base_path, 'PersonSkillsMappingMetadata','PersonSkillsMappingMetadata.Csv')
+path_PersonSkills <- here(base_path, 'PersonSkills', 'PersonSkills.Csv')
+path_SkillsLib <- here(base_path, 'SkillsLibrary', 'SkillsLibrary.Csv')
+path_RelatedSkills <- here(base_path, 'RelatedSkills', 'RelatedSkills.Csv')
+path_HierarchicalSkills <- here(base_path, 'HierarchicalSkills', 'HierarchicalSkills.Csv')
 
 # Load all data tables
-df_PersonQuery <- import_query(path_PersonQuery)
+df_PersonQuery <- import_query(path_PersonQuery) # `import_query()` for handling Viva Insights query
 df_HR <- read_csv(path_HR)
 df_PersonSkillsMap <- read_csv(path_PersonSkillsMap)
 df_PersonSkills <- read_csv(path_PersonSkills)
@@ -171,6 +175,8 @@ df_SkillsLib <- read_csv(path_SkillsLib)
 df_RelatedSkills <- read_csv(path_RelatedSkills)
 df_HierarchicalSkills <- read_csv(path_HierarchicalSkills)
 ```
+
+For Python, the approach is similar: 
 
 **Python Implementation:**
 ```python
@@ -189,7 +195,7 @@ paths = {
 }
 
 # Load all data tables
-df_PersonQuery = pd.read_csv(paths['PersonQuery'])
+df_PersonQuery = vi.import_query(paths['PersonQuery']) # `import_query()` for handling Viva Insights query
 df_HR = pd.read_csv(paths['HR'])
 df_PersonSkillsMap = pd.read_csv(paths['PersonSkillsMap'])
 df_PersonSkills = pd.read_csv(paths['PersonSkills'])
@@ -198,9 +204,21 @@ df_RelatedSkills = pd.read_csv(paths['RelatedSkills'])
 df_HierarchicalSkills = pd.read_csv(paths['HierarchicalSkills'])
 ```
 
+You can verify that the files have been loaded successfully using data exploration functions:
+
+R options:
+- `glimpse(df_PersonQuery)` - View structure and first few values (tidyverse)
+- `str(df_PersonQuery)` - View data structure (base R)
+- `head(df_PersonQuery)` - View first few rows
+
+Python options:
+- `df_PersonQuery.info()` - View structure and data types
+- `df_PersonQuery.head()` - View first few rows  
+- `df_PersonQuery.describe()` - View summary statistics
+
 ### Step 3: Create Master Dataset
 
-The key step is joining all tables to create a comprehensive dataset where each row represents a person-skill combination.
+Once all the data has been loaded in successfully, the key step is joining all tables to create a comprehensive dataset where each row represents a person-skill combination.
 
 **R Implementation:**
 ```r
@@ -220,7 +238,11 @@ df_combined_skills <- df_combined_skills %>%
     After_hours_collaboration_hours = round(runif(n(), 0, 10), 1),
     Total_Copilot_actions_taken = round(runif(n(), 0, 100))
   )
+```
 
+Run the following to print a summary of the joined data file: 
+
+```r
 # Display summary
 cat("Master dataset created with", nrow(df_combined_skills), "rows and", ncol(df_combined_skills), "columns\n")
 cat("Unique people:", n_distinct(df_combined_skills$PersonId), "\n")
@@ -243,7 +265,11 @@ df_combined_skills = (
 np.random.seed(123)
 df_combined_skills['After_hours_collaboration_hours'] = np.round(np.random.uniform(0, 10, len(df_combined_skills)), 1)
 df_combined_skills['Total_Copilot_actions_taken'] = np.round(np.random.uniform(0, 100, len(df_combined_skills)))
+```
 
+
+Then, run the following to print a summary of the joined data file: 
+```python
 # Display summary
 print(f"Master dataset created with {df_combined_skills.shape[0]} rows and {df_combined_skills.shape[1]} columns")
 print(f"Unique people: {df_combined_skills['PersonId'].nunique():,}")
