@@ -4,6 +4,23 @@ title: "Skills data join requirements"
 permalink: /skills-data-join-requirements/
 ---
 
+{% include custom-navigation.html %}
+{% include floating-toc.html %}
+
+<style>
+/* Hide any default Minima navigation that might appear */
+.site-header .site-nav,
+.trigger,
+.page-link:not(.dropdown-toggle):not(.btn) {
+  display: none !important;
+}
+
+/* Ensure our custom navigation is visible */
+.custom-nav {
+  display: block !important;
+}
+</style>
+
 ### Development Environment Setup
 
 For performing data joins and analyses, this tutorial covers example scripts in both the R and Python analysis environments. Here are the pre-requisites for them respectively: 
