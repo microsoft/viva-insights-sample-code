@@ -91,6 +91,7 @@ To ensure reproducibility, set up your project folder with this structure:
 ├── 📁 scripts/
 │   ├── 📄 analysis.R          # Your R analysis script
 │   └── 📄 analysis.ipynb      # Your Python Jupyter notebook
+│   └── 📄 analysis.py         # OR Python script
 └── 📁 output/
     └── 📄 results.html        # Generated reports
 ```
@@ -111,7 +112,7 @@ For performing data joins and analyses, this tutorial covers example scripts in 
 
 The Skills landscape data consists of multiple interconnected tables:
 
-- **MetricOutput** (main join table): Links people to their skills through key relationships
+- **MetricOutput** (main join table): Links people to their skills through key relationships. This contains a Person query, where the key identifier variables are `PersonId` and `MetricDate`. Other additional Viva Insights metrics like `Collaboration hours` and `Total Copilot actions taken` can be added to this query.  
 - **HR**: Provides organizational context (department, level, etc.)
 - **SkillsLibrary**: Contains the catalog of all available skills
 - **PersonSkills + PersonSkillsMappingMetadata**: Bridge tables connecting people to their skills
@@ -150,14 +151,14 @@ pd.set_option('display.max_colwidth', 50)
 
 Since each file is nested in a subfolder, it is handy to list out the paths of the file before importing them. 
 
-For R, `here()` offers a simple way of handling relative file paths. We first set `base_path` as the root path to where all the subfolders are: 
+For R, `here()` offers a simple way of handling relative file paths. We first set `base_path` as the root path to where all the subfolders are. You may also need to update the file names (especially the Person query) if they differ from ones you have downloaded.
 
 **R Implementation:**
 ```r
 # Set file paths for all demo data tables
 base_path <- here('data', 'demo-data') # root for data files
 path_PersonQuery <- here(base_path, 'MetricOutput', 'Skills landscape_manualTestE3_1_29Sep2025_2237Hours.Csv')
-path_HR <- here(base_path, 'HR', 'HR2.Csv')
+path_HR <- here(base_path, 'HR', 'HR.Csv')
 path_PersonSkillsMap <- here(base_path, 'PersonSkillsMappingMetadata','PersonSkillsMappingMetadata.Csv')
 path_PersonSkills <- here(base_path, 'PersonSkills', 'PersonSkills.Csv')
 path_SkillsLib <- here(base_path, 'SkillsLibrary', 'SkillsLibrary.Csv')
@@ -201,6 +202,7 @@ df_SkillsLibrary = pd.read_csv(paths['SkillsLibrary'])
 df_RelatedSkills = pd.read_csv(paths['RelatedSkills'])
 df_HierarchicalSkills = pd.read_csv(paths['HierarchicalSkills'])
 ```
+Note that for the Person query, we use `import_query()` from the **vivainsights** package where it performs variable name standardization, such as replacing special characters and spaces, which makes the variables easier to reference at a later analysis stage. 
 
 You can verify that the files have been loaded successfully using data exploration functions:
 
@@ -228,8 +230,8 @@ df_combined_skills <-
     left_join(df_PersonSkills, by = 'SkillHistoricalId') %>%
     left_join(df_SkillsLib, by = 'SkillId')
 
-# Add simulated collaboration metrics for demonstration
-# In real analysis, these would come from your Viva Insights query
+# FOR DEMO ONLY: add simulated collaboration metrics
+# In a real analysis, these would come from your Viva Insights query
 set.seed(123)
 df_combined_skills <- df_combined_skills %>%
   mutate(
@@ -258,13 +260,12 @@ df_combined_skills = (
     .merge(df_SkillsLibrary, on='SkillId', how='left')
 )
 
-# Add simulated collaboration metrics for demonstration
-# In real analysis, these would come from your Viva Insights query
+# FOR DEMO ONLY: add simulated collaboration metrics
+# In a real analysis, these would come from your Viva Insights query
 np.random.seed(123)
 df_combined_skills['After_hours_collaboration_hours'] = np.round(np.random.uniform(0, 10, len(df_combined_skills)), 1)
 df_combined_skills['Total_Copilot_actions_taken'] = np.round(np.random.uniform(0, 100, len(df_combined_skills)))
 ```
-
 
 Then, run the following to print a summary of the joined data file: 
 ```python
@@ -288,30 +289,36 @@ Now that we have our master dataset, let's explore five practical business scena
 
 **Why This Matters**: When you need to find subject matter experts for specific projects, form specialized teams, or understand the distribution of critical skills across your organization.
 
-**Methodology**: This analysis uses exact string matching on the `SkillName` column to find people with specific expertise. We then aggregate by organizational units to understand distribution patterns.
+**Methodology**: This analysis uses exact string matching on the `SkillName` column to find people with specific expertise. We then aggregate by organizational units to understand distribution patterns. 
+
+**Customization**: In the following example, we use `Organization` as the grouping variable, but this can be replaced by any HR attribute that is made available in the specific query that you have run (e.g. `SupervisorIndicator`, `LevelDesignation`, `Region`) - you will just need to update the relevant parts in the code. Similarly, you can also choose to customize skill by replacing the value of `target_skill` with a skill text of your own choice. 
 
 **R Implementation:**
 ```r
-# Define target skill
-target_skill <- "Prompt engineering"
+# Define target skill - update as appropriate
+target_skill <- "Prompt engineering" 
 
 # Filter and analyze
 scenario1_results <- df_combined_skills %>%
   filter(!is.na(SkillName), 
          str_detect(SkillName, regex(target_skill, ignore_case = TRUE))) %>%
   summarise(
+    skill_matches = paste(unique(SkillName), collapse = ", "),
     people_count = n_distinct(PersonId),
     total_instances = n(),
-    skill_matches = paste(unique(SkillName), collapse = ", ")
+    .groups = 'drop'
   )
 
-# Breakdown by organization
+# Breakdown by Organization
 org_breakdown <- df_combined_skills %>%
-  filter(!is.na(SkillName), 
-         str_detect(SkillName, regex(target_skill, ignore_case = TRUE))) %>%
-  group_by(Organization) %>%
-  summarise(people_count = n_distinct(PersonId)) %>%
-  arrange(desc(people_count))
+    filter(!is.na(SkillName), 
+           str_detect(SkillName, regex(target_skill, ignore_case = TRUE))) %>%
+    group_by(Organization) %>% # Update `Organization` as appropriate
+    summarise(
+      people_count = n_distinct(PersonId),
+      .groups = 'drop'
+    ) %>%
+    arrange(desc(people_count))
 
 # Display results
 cat("Found", scenario1_results$people_count, "people with", target_skill, "skills\n")
@@ -321,9 +328,9 @@ print(org_breakdown)
 if(nrow(org_breakdown) > 0) {
   p1 <- org_breakdown %>%
     create_bar_asis(
-      group_var = "Organization",
+      group_var = "Organization", # Update `Organization` as appropriate
       bar_var = "people_count",
-      title = paste("People with", target_skill, "by Organization")
+      title = paste("People with", target_skill, "by Organization") # Update `Organization` as appropriate
     )
   print(p1)
 }
@@ -336,7 +343,7 @@ _The above visual is based on sample data for demonstration purposes only and do
 **Python Implementation:**
 ```python
 # Define target skill
-target_skill = "Prompt engineering"
+target_skill = "Prompt engineering" # Update as appropriate
 
 # Filter and analyze
 scenario1_data = df_combined_skills[
@@ -348,13 +355,13 @@ people_count = scenario1_data['PersonId'].nunique()
 total_instances = len(scenario1_data)
 skill_matches = scenario1_data['SkillName'].unique()
 
-# Breakdown by organization
+# Breakdown by Organization
 if people_count > 0:
-    org_breakdown = (scenario1_data.groupby('Organization')['PersonId']
+    org_breakdown = (scenario1_data.groupby('Organization')['PersonId'] # Update `Organization` as appropriate
                      .nunique()
                      .sort_values(ascending=False)
                      .reset_index())
-    org_breakdown.columns = ['Organization', 'People_Count']
+    org_breakdown.columns = ['Organization', 'People_Count'] # Update `Organization` as appropriate
     
     print(f"Found {people_count} people with {target_skill} skills")
     print(org_breakdown)
@@ -364,8 +371,8 @@ if people_count > 0:
         vi.create_bar_asis(
             data=org_breakdown,
             bar_var='People_Count',
-            group_var='Organization', 
-            title=f'People with {target_skill} by Organization'
+            group_var='Organization', # Update `Organization` as appropriate
+            title=f'People with {target_skill} by Organization' # Update `Organization` as appropriate
         )
 ```
 
@@ -633,7 +640,8 @@ talent_wellbeing <- df_combined_skills %>%
   summarise(
     has_ai_skills = any(SkillName %in% all_ai_skills),
     avg_after_hours = mean(After_hours_collaboration_hours, na.rm = TRUE),
-    organization = first(Organization)
+    organization = first(Organization),
+    .groups = "drop"
   )
 
 # Summary comparison
@@ -642,7 +650,8 @@ scenario4_summary <- talent_wellbeing %>%
   summarise(
     people_count = n(),
     avg_after_hours = round(mean(avg_after_hours, na.rm = TRUE), 1),
-    median_after_hours = round(median(avg_after_hours, na.rm = TRUE), 1)
+    median_after_hours = round(median(avg_after_hours, na.rm = TRUE), 1),
+    .groups = "drop"
   ) %>%
   mutate(skill_group = ifelse(has_ai_skills, "Has AI Skills", "No AI Skills"))
 
@@ -871,27 +880,25 @@ if len(copilot_summary) > 1:
 Through this tutorial, you've learned how to:
 
 ✅ **Set up a comprehensive skills analysis environment** in both R and Python  
-✅ **Join multiple data sources** to create rich, analyzable datasets  
+✅ **Join multiple People Skill data sources** to create analyzable datasets  
 ✅ **Answer strategic business questions** using data-driven approaches  
 ✅ **Use advanced techniques** like hierarchical skill navigation and statistical testing  
-✅ **Create compelling visualizations** for stakeholder communication  
-
+✅ **Create compelling visualizations** for stakeholder communication
 
 ### Adapting These Analyses for Your Organization
 
-Below are further examples on how you can further customize the analysis for your organizational context: 
+To customize these analyses for your organizational context, you can:
 
-- Replace skill categories and hierarchies with your organization's taxonomy
-- Adjust collaboration thresholds based on your organizational norms
-- Add organizational filters for department-specific analysis
-- Incorporate additional Viva Insights metrics for richer insights
+* replace skill categories and hierarchies with your organization's specific taxonomy, 
+* add organizational filters for department-specific analysis, and 
+* incorporate additional Viva Insights metrics for richer insights. 
 
-You can also consider extending the analysis with: 
+Beyond basic customization, you can extend the analysis by:
 
-- **Time Series Analysis**: Use the `MetricDate` column for trend analysis
-- **Predictive Modeling**: Build models to predict skill development or attrition
-- **Network Analysis**: Understand skill relationships and knowledge flow
-- **Automated Reporting**: Create scheduled reports using these analysis patterns
+* implementing time series analysis using the `MetricDate` column for trend analysis, 
+* building predictive models to forecast skill development or attrition, 
+* conducting network analysis to understand skill relationships and knowledge flow, and 
+* creating automated reporting systems using these analysis patterns.
 
 ### Resources for Continued Learning
 
