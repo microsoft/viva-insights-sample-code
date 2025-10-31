@@ -43,7 +43,7 @@ This tutorial demonstrates five key scenarios that analysts commonly need to add
 2. [Broader Capability Assessment]({{ site.baseurl }}/skills-data-join/#scenario-2-broader-capability-assessment): Understanding AI skills across the organization including subskills and related skills
 3. [Skills Landscape Mapping]({{ site.baseurl }}/skills-data-join/#scenario-3-skills-landscape-mapping): Identifying top skill areas and organizational strengths
 4. [Talent Well-being Analysis]({{ site.baseurl }}/skills-data-join/#scenario-4-talent-well-being-analysis): Comparing work patterns between different skill groups
-5. [Technology Adoption Insights]({{ site.baseurl }}/skills-data-join/#scenario-5-technology-adoption-insights): Analyzing the relationship between skills and tool usage
+5. [Technology Adoption Insights]({{ site.baseurl }}/skills-data-join/#scenario-5-technology-adoption-insights): Analyzing the relationship between skills and tool usage (e.g. Copilot)
 
 Each scenario includes:
 
@@ -140,11 +140,6 @@ from pathlib import Path
 import plotly.express as px
 import vivainsights as vi
 from scipy import stats
-
-# Set display options for better output (optional)
-pd.set_option('display.max_columns', None)
-pd.set_option('display.width', None)
-pd.set_option('display.max_colwidth', 50)
 ```
 
 ### Step 2: Set File Paths and Load Data
@@ -274,6 +269,12 @@ print(f"Master dataset created with {df_combined_skills.shape[0]} rows and {df_c
 print(f"Unique people: {df_combined_skills['PersonId'].nunique():,}")
 print(f"Unique skills: {df_combined_skills['SkillId'].nunique():,}")
 ```
+Something similar to the below will be printed to your console: 
+```
+Master dataset created with 2772 rows and 15 columns
+Unique people: 40 
+Unique skills: 660 
+```
 
 > **💡 Understanding the Join**: This creates a "person-skill" level dataset where each row represents one skill for one person. A person with 5 skills will have 5 rows in this dataset.
 
@@ -323,7 +324,15 @@ org_breakdown <- df_combined_skills %>%
 # Display results
 cat("Found", scenario1_results$people_count, "people with", target_skill, "skills\n")
 print(org_breakdown)
+```
 
+In this example, the following gets printed: 
+```
+Found 50 people with Prompt engineering skills
+```
+
+Next, you can visualize the breakdown in a bar chart:
+```r
 # Visualization
 if(nrow(org_breakdown) > 0) {
   p1 <- org_breakdown %>%
