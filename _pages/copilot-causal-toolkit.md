@@ -4,6 +4,20 @@ title: "Copilot Causal Toolkit"
 permalink: /copilot-causal-toolkit/
 ---
 
+# Copilot Causal Toolkit
+
+{% include custom-navigation.html %}
+{% include floating-toc.html %}
+
+<style>
+/* Hide default Minima navigation to prevent duplicates */
+.site-header .site-nav,
+.site-header .trigger,
+.site-header .page-link {
+  display: none !important;
+}
+</style>
+
 The [Copilot Causal Toolkit](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/causal-inference/copilot-causal-toolkit) is a package that enables you to run causal inference analysis with Viva Insights data. The key scenarios covered in this documentation involve using Copilot usage (`Total_Copilot_actions_taken`) as a treatment variable, and evaluating the treatment effect of using Copilot on an outcome variable (e.g. external or after-hours collaboration hours). 
 
 You can access the toolkit [here](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/causal-inference/copilot-causal-toolkit).
