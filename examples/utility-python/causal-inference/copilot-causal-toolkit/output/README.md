@@ -1,0 +1,1 @@
+This subdirectory ('output') is where all the output plots and files are saved. 

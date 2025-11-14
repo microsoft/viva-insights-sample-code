@@ -1,0 +1,2 @@
+This subdirectory ('data') is where you should place your data files, such as Viva Insights person queries. 
+Use the same names of the files saved here when updating file paths in the Jupyter notebooks. 
