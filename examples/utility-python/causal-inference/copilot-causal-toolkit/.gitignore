@@ -1,0 +1,5 @@
+# Prevent accidental committing data files
+*.csv
+
+# Developer notes
+DEV_NOTES.md
