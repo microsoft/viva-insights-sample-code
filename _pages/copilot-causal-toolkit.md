@@ -18,9 +18,14 @@ permalink: /copilot-causal-toolkit/
 }
 </style>
 
-The [Copilot Causal Toolkit](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/causal-inference/copilot-causal-toolkit) is a package that enables you to run causal inference analysis with Viva Insights data. The key scenarios covered in this documentation involve using Copilot usage (`Total_Copilot_actions_taken`) as a treatment variable, and evaluating the treatment effect of using Copilot on an outcome variable (e.g. external or after-hours collaboration hours). 
+The [Copilot Causal Toolkit](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/causal-inference/copilot-causal-toolkit) enables you to run causal inference analysis with Viva Insights data. For example, this can be used to address: 
 
-You can access the toolkit [here](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/causal-inference/copilot-causal-toolkit).
+* Does Copilot usage increase the time that our sellers spend with our customers?
+* Does Copilot usage impact our team's wellbeing positively? 
+
+Two key scenarios - Seller Productivity and Burnout Prevention - are covered in this toolkit. Both involve using Copilot usage (`Total_Copilot_actions_taken`) as a treatment variable, and evaluating the treatment effect of using Copilot on an outcome variable (e.g. external or after-hours collaboration hours). 
+
+You can access the toolkit [here](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/causal-inference/copilot-causal-toolkit) on GitHub.
 
 **Python** and **Jupyter notebooks** (.ipynb) are used for running the analysis. It is therefore recommended that you read the pre-requisites section and ensure that all of these are satisfied. 
 
@@ -287,7 +292,7 @@ In this scenario, the goal is to understand how increasing Copilot usage increas
   - Other relevant behavioral and network metrics from your Person Query
 * **Organizational attributes:** These are used for heterogeneity analysis (identifying which subgroups benefit most/least from Copilot). Include as many as possible, typically covering dimensions like `Organization`, `Function`, `Level`, `IsManager`, and `Area`. The exact names can differ based on your organization's HR data structure—just ensure the variable names in the notebook are updated accordingly in the configuration section.
 
-#### Columns to include: Wellbeing Scenario
+#### Columns to include: Burnout Prevention Scenario
 
 In this scenario, the goal is to understand how increasing Copilot usage increases or decreases after-hours work patterns, which can impact employee wellbeing and burnout risk.
 
