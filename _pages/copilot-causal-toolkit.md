@@ -26,10 +26,10 @@ You can access the toolkit [here](https://github.com/microsoft/viva-insights-sam
 
 ## Directory
 
-The `ci-package` directory is organized as follows:
+The `copilot-causal-toolkit` directory is organized as follows:
 
 ```
-ci-package/
+copilot-causal-toolkit/
 ├── data/                          # Directory for input data files
 │   └── (Place your CSV files here - Person Query or Super Users Report exports)
 │
@@ -82,28 +82,28 @@ First, you'll need to get a copy of the causal inference package on your local c
 1. Click the green "Code" button at the top of the repository
 2. Select "Download ZIP"
 3. Extract the ZIP file to a location on your computer (e.g., `C:\Users\YourName\Documents\repository-name`)
-4. Navigate to the `ci-package` subdirectory within the extracted folder
-5. Remember this `ci-package` location—it will be your **working directory**
+4. Navigate to the `copilot-causal-toolkit` subdirectory within the extracted folder
+5. Remember this `copilot-causal-toolkit` location—it will be your **working directory**
 
 **Option B: Clone with Git** (If you have Git installed)
 ```bash
 git clone [repository-url]
-cd [repository-name]/ci-package
+cd [repository-name]/copilot-causal-toolkit
 ```
 
-**Note:** The `ci-package` folder may be located within a larger repository. Make sure you're working from the `ci-package` subdirectory specifically, as this is where the analysis notebooks and modules are located.
+**Note:** The `copilot-causal-toolkit` folder may be located within a larger repository. Make sure you're working from the `copilot-causal-toolkit` subdirectory specifically, as this is where the analysis notebooks and modules are located.
 
 ### Step 2: Open the Project in Your Editor
 
 **Using Visual Studio Code (Recommended):**
 1. Open VS Code
 2. Go to `File` → `Open Folder...`
-3. Navigate to and select the `ci-package` folder specifically (not the parent repository)
-   - If you cloned the full repository, make sure to navigate into the `ci-package` subdirectory
-   - Example path: `C:\Users\YourName\Documents\repository-name\ci-package`
-4. VS Code will now show the ci-package structure in the sidebar (with `data/`, `script/`, `output/` folders)
+3. Navigate to and select the `copilot-causal-toolkit` folder specifically (not the parent repository)
+   - If you cloned the full repository, make sure to navigate into the `copilot-causal-toolkit` subdirectory
+   - Example path: `C:\Users\YourName\Documents\repository-name\copilot-causal-toolkit`
+4. VS Code will now show the copilot-causal-toolkit structure in the sidebar (with `data/`, `script/`, `output/` folders)
 
-**Important:** Make sure you open the `ci-package` folder itself, not the parent repository folder. This ensures all relative file paths in the notebooks work correctly.
+**Important:** Make sure you open the `copilot-causal-toolkit` folder itself, not the parent repository folder. This ensures all relative file paths in the notebooks work correctly.
 
 Once your project is open, you can proceed to set up the prerequisites and data.
 
@@ -248,7 +248,7 @@ This second method assumes that you already have a Super Users Report (.pbit/.pb
      - No excessive blank rows or formatting issues
 
 6. **Save to the data folder**
-   - Move the exported CSV file to `ci-package/data/`
+   - Move the exported CSV file to `copilot-causal-toolkit/data/`
    - Rename it something descriptive (e.g., `SuperUsersReport_Export_2025.csv`)
 
 **Important notes for Super Users Report data:**
@@ -266,7 +266,7 @@ If your report is published to Power BI Service (online):
 2. Navigate to the relevant page showing the data table
 3. Click the **"..."** (More options) on a visual showing the underlying data
 4. Select **"Export data"** → Choose **"Underlying data"** → **".csv"** format
-5. Download and save to `ci-package/data/`
+5. Download and save to `copilot-causal-toolkit/data/`
 
 **Note:** Some Power BI reports may have export restrictions depending on your organization's policies. Contact your Power BI admin if you cannot export data.
 
@@ -430,7 +430,7 @@ If you encounter errors while running the notebook, here's how to resolve them:
 
 - **Cause:** The data file path is incorrect or the file doesn't exist
 - **Solution:** 
-  1. Check that your CSV file is in the `ci-package/data/` folder
+  1. Check that your CSV file is in the `copilot-causal-toolkit/data/` folder
   2. Verify the filename in `data_file_path` matches exactly (including capitalization)
   3. Try using the full absolute path: `data_file_path = r"C:\Users\YourName\...\data\file.csv"`
 
