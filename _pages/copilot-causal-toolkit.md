@@ -1,6 +1,12 @@
-# README for Causal Inference package
+---
+layout: default
+title: "Copilot Causal Toolkit"
+permalink: /copilot-causal-toolkit/
+---
 
-Please use this README for instructions on how to run a causal inference analysis with Viva Insights data. The key scenarios covered in this documentation involve using Copilot usage (`Total_Copilot_actions_taken`) as a treatment variable, and evaluating the treatment effect of using Copilot on an outcome variable (e.g. external or after-hours collaboration hours). 
+The [Copilot Causal Toolkit](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/causal-inference/copilot-causal-toolkit) is a package that enables you to run causal inference analysis with Viva Insights data. The key scenarios covered in this documentation involve using Copilot usage (`Total_Copilot_actions_taken`) as a treatment variable, and evaluating the treatment effect of using Copilot on an outcome variable (e.g. external or after-hours collaboration hours). 
+
+You can access the toolkit [here](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/causal-inference/copilot-causal-toolkit).
 
 **Python** and **Jupyter notebooks** (.ipynb) are used for running the analysis. It is therefore recommended that you read the pre-requisites section and ensure that all of these are satisfied. 
 
@@ -30,7 +36,7 @@ ci-package/
 ├── output/                        # Directory for analysis outputs
 │   └── (Analysis results, plots, and reports will be saved here)
 │
-└── README.md                      # This documentation file
+└── README.md                      # Documentation file
 ```
 
 **Key directories:**
@@ -56,7 +62,7 @@ We recommend creating a copy of the template that you wish to use and renaming t
 
 ### Step 1: Download or Clone the Repository
 
-First, you'll need to get a copy of this causal inference package on your local computer:
+First, you'll need to get a copy of the causal inference package on your local computer:
 
 **Option A: Download as ZIP** (Recommended for beginners)
 1. Click the green "Code" button at the top of the repository
