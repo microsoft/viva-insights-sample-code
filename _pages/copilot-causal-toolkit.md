@@ -84,7 +84,8 @@ We recommend creating a copy of the template that you wish to use and renaming t
 First, you'll need to get a copy of the causal inference package on your local computer:
 
 **Option A: Download as ZIP** (Recommended for beginners)
-1. Click the green "Code" button at the top of the repository
+
+1. Click the green "Code" button at the top of the [repository](https://github.com/microsoft/viva-insights-sample-code/)
 2. Select "Download ZIP"
 3. Extract the ZIP file to a location on your computer (e.g., `C:\Users\YourName\Documents\repository-name`)
 4. Navigate to the `copilot-causal-toolkit` subdirectory within the extracted folder
@@ -120,7 +121,7 @@ Before running the causal inference analysis, ensure you have the following inst
 
 #### 1. Python Installation
 
-You'll need **Python 3.8 or higher** (Python 3.9 or 3.10 recommended). 
+You'll need **Python 3.8 or higher**. 
 
 To check if Python is already installed:
 
@@ -165,15 +166,8 @@ pip install numpy pandas matplotlib scipy scikit-learn econml vivainsights
 
 To verify all packages are installed correctly, run:
 
-```python
-import numpy
-import pandas
-import matplotlib
-import scipy
-import sklearn
-import econml
-import vivainsights
-print("✓ All packages installed successfully!")
+```bash
+python -c "import numpy, pandas, matplotlib, scipy, sklearn, econml, vivainsights"
 ```
 
 You can run this in a Python terminal or in a Jupyter notebook cell.
