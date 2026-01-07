@@ -223,8 +223,8 @@ This second method assumes that you already have a Super Users Report (.pbit/.pb
 1. **Open your Super Users Report** in Power BI Desktop
    - If you don't have the report file, ask your Viva Insights admin or check your organization's shared workspace
 
-2. **Navigate to the data view**
-   - In Power BI Desktop, click the **Data** icon (table icon) on the left sidebar
+2. **Navigate to the Table view**
+   - In Power BI Desktop, click the **Table** icon on the left sidebar
    - This shows all tables in your report
 
 3. **Find the appropriate data table**
@@ -234,7 +234,7 @@ This second method assumes that you already have a Super Users Report (.pbit/.pb
      - `Total_Copilot_actions_taken`
      - Collaboration metrics (hours, meeting hours, etc.)
      - Organizational attributes
-   - Common table names: `PersonMetrics`, `UserData`, or similar
+   - This should be called `Table`, but may be renamed so it is advisable to check. 
 
 4. **Export the table to CSV**
    - **Option A:** Right-click on the table name → Select **"Copy table"** → Paste into Excel → Save as CSV
