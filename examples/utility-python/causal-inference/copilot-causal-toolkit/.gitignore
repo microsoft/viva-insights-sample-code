@@ -3,3 +3,6 @@
 
 # Developer notes
 DEV_NOTES.md
+
+# All Jupyter notebooks that are prefixed with underscore
+_*.ipynb
