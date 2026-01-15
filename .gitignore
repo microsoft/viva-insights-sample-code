@@ -45,3 +45,6 @@ vignettes/*.pdf
 
 # Data files
 examples/utility-r/_data/*.csv
+
+# Output files
+examples/utility-python/causal-inference/copilot-causal-toolkit/output/*
