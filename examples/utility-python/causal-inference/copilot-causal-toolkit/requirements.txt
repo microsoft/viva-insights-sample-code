@@ -1,0 +1,25 @@
+# Copilot Causal Toolkit - Required Python Packages
+# Install with: pip install -r requirements.txt
+
+# Core data manipulation
+numpy>=1.21.0
+pandas>=1.3.0
+
+# Visualization
+matplotlib>=3.4.0
+
+# Statistical analysis
+scipy>=1.7.0
+
+# Machine learning
+scikit-learn>=1.0.0
+
+# Causal inference (Double Machine Learning)
+econml>=0.14.0
+
+# Viva Insights data utilities
+vivainsights>=0.3.0
+
+# Jupyter notebook support (optional, for running .ipynb files)
+jupyter>=1.0.0
+ipykernel>=6.0.0

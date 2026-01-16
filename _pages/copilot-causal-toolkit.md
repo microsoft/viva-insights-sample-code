@@ -145,10 +145,24 @@ Alternatively, you can use **Visual Studio Code** with the Python and Jupyter ex
 
 #### 3. Required Python Packages
 
-The analysis requires several Python packages. Copy and paste the following command to install all required packages at once:
+The analysis requires several Python packages. We provide a `requirements.txt` file in the toolkit directory for easy installation.
+
+**Recommended: Install from requirements.txt**
+
+Navigate to the `copilot-causal-toolkit` directory and run:
 
 ```bash
-pip install numpy pandas matplotlib scipy scikit-learn econml vivainsights
+pip install -r requirements.txt
+```
+
+This installs all required packages with compatible versions automatically.
+
+**Alternative: Manual installation**
+
+If you prefer to install packages individually:
+
+```bash
+pip install numpy pandas matplotlib scipy scikit-learn econml vivainsights jupyter
 ```
 
 **Package purposes:**
@@ -159,8 +173,32 @@ pip install numpy pandas matplotlib scipy scikit-learn econml vivainsights
 - `scikit-learn` - Machine learning models and preprocessing
 - `econml` - Causal inference methods (Double Machine Learning)
 - `vivainsights` - Microsoft Viva Insights data loading and analysis
+- `jupyter` - Running notebook files interactively
 
 **Installation time:** This may take 5-10 minutes depending on your internet connection.
+
+**Installing for a specific Python environment:**
+
+If you have multiple Python versions installed, you can target a specific one:
+
+```bash
+# Using the py launcher (Windows) - specify Python version
+py -3.11 -m pip install -r requirements.txt
+
+# Using the full path to a specific Python executable
+C:\Path\To\Python\python.exe -m pip install -r requirements.txt
+
+# For a virtual environment (after creating it)
+C:\Path\To\venv\Scripts\python.exe -m pip install -r requirements.txt
+
+# For conda environments
+conda run -n <env_name> pip install -r requirements.txt
+```
+
+To check which Python you're currently using:
+```bash
+python -c "import sys; print(sys.executable)"
+```
 
 #### 4. Verify Installation
 
@@ -186,9 +224,11 @@ venv\Scripts\activate
 # Activate it (Mac/Linux)
 source venv/bin/activate
 
-# Then install packages
-pip install numpy pandas matplotlib scipy scikit-learn econml vivainsights jupyter
+# Install all packages from requirements.txt
+pip install -r requirements.txt
 ```
+
+**Note:** Make sure you're in the `copilot-causal-toolkit` directory when running these commands, or provide the full path to `requirements.txt`.
 
 ### Downloading the data
 
