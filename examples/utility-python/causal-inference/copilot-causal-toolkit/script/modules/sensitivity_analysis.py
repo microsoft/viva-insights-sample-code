@@ -241,10 +241,9 @@ def rosenbaum_bounds_approximation(
         )
     elif critical_gamma is None:
         interpretation = (
-            f"The observed effect is highly robust to hidden bias. "
-            f"Even with hidden bias strong enough to make treatment assignment odds "
-            f"differ by a factor of 5 or more, the result would remain significant. "
-            f"(Original p-value: {original_p_value:.6f})"
+            f"Critical Gamma exceeds the tested range (Γ > 5.0). "
+            f"The result remains significant even under substantial hidden bias assumptions. "
+            f"(Original p-value: {original_p_value:.2e})"
         )
     else:
         interpretation = (
@@ -252,12 +251,12 @@ def rosenbaum_bounds_approximation(
             f"This means hidden bias would need to make the odds of treatment assignment "
             f"differ by a factor of {critical_gamma:.1f} or more between individuals "
             f"to alter the study's conclusions. "
-            f"(Original p-value: {original_p_value:.6f})"
+            f"(Original p-value: {original_p_value:.2e})"
         )
-    
-    # Add practical interpretation
+
+    # Add practical interpretation with appropriate caveats
     if critical_gamma is None:
-        strength = "exceptionally strong"
+        strength = "high (Γ > 5.0)"
     elif critical_gamma >= 3.0:
         strength = "very strong"
     elif critical_gamma >= 2.0:
@@ -266,9 +265,18 @@ def rosenbaum_bounds_approximation(
         strength = "moderate"
     else:
         strength = "weak"
+
+    interpretation += f"\n\nRobustness level: {strength}."
     
-    interpretation += f"\n\nThis represents {strength} robustness to hidden bias."
-    
+    # Add methodological caveat for CATE estimates
+    interpretation += (
+        f"\n\n⚠️ Note: This is an approximation based on Wilcoxon signed-rank test applied to "
+        f"CATE estimates. Classical Rosenbaum bounds are designed for matched observational "
+        f"studies with observed paired differences. Results on ML-estimated treatment effects "
+        f"should be interpreted with caution, as this method does not account for estimation "
+        f"uncertainty in the CATE values themselves."
+    )
+
     return {
         'original_p_value': original_p_value,
         'critical_gamma': critical_gamma,
