@@ -55,6 +55,7 @@ Explore the repo to discover sample code:
 
 - [Super Users Report for Copilot Analytics](https://aka.ms/DecodingSuperUsage)
 - [Copilot Analytics All-in-one Dashboard](https://github.com/microsoft/AI-in-One-Dashboard)
+- [Super Users Impact Report](https://github.com/microsoft/superuserimpact)
 
 ## Contributing
 
