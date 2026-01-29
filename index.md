@@ -61,8 +61,9 @@ These analytics are based on behavioral research and provide actionable insights
 - [Viva Insights official documentation](https://learn.microsoft.com/en-us/viva/insights/introduction)
 - [vivainsights Python package](https://microsoft.github.io/vivainsights-py/)
 - [vivainsights R package](https://microsoft.github.io/vivainsights/)
-- [Copilot Analytics: Decoding Super Usage](https://github.com/microsoft/DecodingSuperUsage/)
-- [Copilot Analytics: advanced examples playbook](https://aka.ms/CopilotAdvancedAnalytics/)
+- [Super Users Report for Copilot Analytics](https://aka.ms/DecodingSuperUsage)
+- [Copilot Analytics All-in-one Dashboard](https://github.com/microsoft/AI-in-One-Dashboard)
+- [Super Users Impact Report](https://github.com/microsoft/superuserimpact)
 
 ## How to Use This Library
 
