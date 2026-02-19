@@ -87,17 +87,24 @@ First, you'll need to get a copy of the causal inference package on your local c
 
 1. Click the green "Code" button at the top of the [repository](https://github.com/microsoft/viva-insights-sample-code/)
 2. Select "Download ZIP"
-3. Extract the ZIP file to a location on your computer (e.g., `C:\Users\YourName\Documents\repository-name`)
-4. Navigate to the `copilot-causal-toolkit` subdirectory within the extracted folder
+3. Extract the ZIP file to a location on your computer (e.g., `C:\Users\YourName\Documents\viva-insights-sample-code`)
+4. Navigate to the `copilot-causal-toolkit` subdirectory within the extracted folder. The full relative path from the repository root is:
+   ```
+   examples/utility-python/causal-inference/copilot-causal-toolkit
+   ```
+   For example, if you extracted to `C:\Users\YourName\Documents\viva-insights-sample-code`, the full path would be:
+   ```
+   C:\Users\YourName\Documents\viva-insights-sample-code\examples\utility-python\causal-inference\copilot-causal-toolkit
+   ```
 5. Remember this `copilot-causal-toolkit` location—it will be your **working directory**
 
 **Option B: Clone with Git** (If you have Git installed)
 ```bash
 git clone [repository-url]
-cd [repository-name]/copilot-causal-toolkit
+cd [repository-name]/examples/utility-python/causal-inference/copilot-causal-toolkit
 ```
 
-**Note:** The `copilot-causal-toolkit` folder may be located within a larger repository. Make sure you're working from the `copilot-causal-toolkit` subdirectory specifically, as this is where the analysis notebooks and modules are located.
+**Note:** The `copilot-causal-toolkit` folder is nested several levels deep within the repository at `examples/utility-python/causal-inference/copilot-causal-toolkit`. Make sure you navigate to this specific subdirectory, as this is where the analysis notebooks and modules are located.
 
 ### Step 2: Open the Project in Your Editor
 
@@ -105,8 +112,8 @@ cd [repository-name]/copilot-causal-toolkit
 1. Open VS Code
 2. Go to `File` → `Open Folder...`
 3. Navigate to and select the `copilot-causal-toolkit` folder specifically (not the parent repository)
-   - If you cloned the full repository, make sure to navigate into the `copilot-causal-toolkit` subdirectory
-   - Example path: `C:\Users\YourName\Documents\repository-name\copilot-causal-toolkit`
+   - If you cloned the full repository, make sure to navigate into the `copilot-causal-toolkit` subdirectory (located at `examples/utility-python/causal-inference/copilot-causal-toolkit`)
+   - Example path: `C:\Users\YourName\Documents\viva-insights-sample-code\examples\utility-python\causal-inference\copilot-causal-toolkit`
 4. VS Code will now show the copilot-causal-toolkit structure in the sidebar (with `data/`, `script/`, `output/` folders)
 
 **Important:** Make sure you open the `copilot-causal-toolkit` folder itself, not the parent repository folder. This ensures all relative file paths in the notebooks work correctly.
@@ -248,7 +255,7 @@ For best results, we generally recommend the first method as this ensures that w
 3. Configure:
    * Time period: Last 6 months (rolling)
    * Group by: Week
-   * Metrics: See sub-step 4 for required attribute selection.
+   * Metrics: See step 4 below for the specific columns/metrics to include.
    * Filter: Is Active = True (if available) - You can validate the number of employees here.
    * Attributes: Include Organization and Function Type (others optional) - this is the last box on this page.
 4. Select required metrics (see below section on what columns to include)
@@ -359,34 +366,52 @@ for hr_var in hrvar_str:
 
 ### Changing parameters in the scripts
 
-Before running the analysis, you'll need to customize a few parameters in the notebook to match your data and organizational structure. Open your chosen notebook and look for these configuration sections:
+Before running the analysis, you'll need to customize a few parameters **directly inside the Jupyter notebook cells**. These are **not** terminal commands — you edit them by opening the `.ipynb` notebook file in VS Code or Jupyter, clicking into the relevant code cell, and changing the values in-place.
 
-#### 1. File Paths (Setup and Imports)
+**How to make these edits:**
 
-Update the data file path to match your actual CSV filename:
+1. Open your chosen notebook (e.g., `CI-DML_AftCollabHours_PQ.ipynb`) in VS Code or Jupyter Notebook
+2. Scroll to the cell containing the parameter you want to change (cell numbers are noted below)
+3. Click into the cell to enter edit mode
+4. Change the value as described below
+5. Do **not** run the cell yet — continue reviewing all parameters first
+
+Here are the configuration sections you'll need to review and update:
+
+#### 1. File Paths (Cell 3: Setup and Imports)
+
+In the third code cell of the notebook, find and update the data file path to match your actual CSV filename:
 
 ```python
 # Update this line to match your data file name
 data_file_path = os.path.join(script_dir, '..', 'data', 'PersonQuery.Csv')
-# For example: 'MyCompany_PersonQuery_2025.csv' or 'SuperUsersReport_Export.csv'
-
-# Update the output directory name
-output_base_dir = os.path.join(script_dir, '..', 'output', 'Subgroup Analysis - [YOUR COMPANY]')
-# Replace [YOUR COMPANY] with your organization name, e.g., 'Contoso' or 'Fabrikam'
+# For example, change 'PersonQuery.Csv' to your filename:
+# data_file_path = os.path.join(script_dir, '..', 'data', 'MyCompany_PersonQuery_2025.csv')
 ```
 
-#### 2. Analysis Configuration (For After-Hours notebooks only)
+In the same cell, update the output directory name:
 
-For after-hours collaboration analysis, decide whether you want to find subgroups with negative effects (reductions) or positive effects (increases):
+```python
+# Update the output directory name
+output_base_dir = os.path.join(script_dir, '..', 'output', 'Subgroup Analysis - [YOUR COMPANY]')
+# Replace [YOUR COMPANY] with your organization name, e.g.:
+# output_base_dir = os.path.join(script_dir, '..', 'output', 'Subgroup Analysis - Contoso')
+```
+
+#### 2. Analysis Configuration (Cell 3, After-Hours notebooks only)
+
+Also in cell 3 of the After-Hours notebooks (`CI-DML_AftCollabHours_*.ipynb`), find and update the toggle that controls which direction of effect to search for:
 
 ```python
 # Toggle to control whether to find subgroups with NEGATIVE or POSITIVE effects
 FIND_NEGATIVE_EFFECTS = True  # Set to True for reductions, False for increases
 ```
 
-#### 3. Organizational Attributes (Variable Definitions)
+This toggle does not exist in the External Collaboration notebooks — it only applies to After-Hours analysis.
 
-Update these variable lists to match the column names in your data. Look for sections defining:
+#### 3. Organizational Attributes (Cell 7: Variable Definitions)
+
+In cell 7, update these variable lists to match the column names in your data:
 
 **SUBGROUP_VARS** - Organizational attributes for subgroup analysis and heterogeneity analysis:
 ```python
@@ -420,13 +445,22 @@ COLLABORATION_VARS = [
 ]
 ```
 
-#### 4. Treatment and Outcome Variables (Usually no changes needed)
+#### 4. Date Range Filter (Cell 7)
+
+Also in cell 7, update the date range to match the period covered by your data:
+
+```python
+start_date_str = '2025-03-01'  # Change to your data's start date
+end_date_str   = '2025-06-30'  # Change to your data's end date
+```
+
+#### 5. Treatment and Outcome Variables (Cell 5, usually no changes needed)
 
 These are typically standard, but verify they exist in your data:
 - Treatment: `Total_Copilot_actions_taken`
 - Outcome: `External_collaboration_hours` or `After_hours_collaboration_hours`
 
-#### 5. Quick Checklist Before Running
+#### 6. Quick Checklist Before Running
 
 - [ ] Data file is in the `data/` folder
 - [ ] `data_file_path` matches your CSV filename exactly (case-sensitive)
