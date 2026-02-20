@@ -255,11 +255,10 @@ For best results, we generally recommend the first method as this ensures that w
 3. Configure:
    * Time period: Last 6 months (rolling)
    * Group by: Week
-   * Metrics: See step 4 below for the specific columns/metrics to include.
+   * Metrics: Include the columns listed in the "Columns to include" sections below (Seller Productivity or Burnout Prevention, depending on your scenario).
    * Filter: Is Active = True (if available) - You can validate the number of employees here.
    * Attributes: Include Organization and Function Type (others optional) - this is the last box on this page.
-4. Select required metrics (see below section on what columns to include)
-5. Save and Run query. Wait until **Status = Completed**.
+4. Save and Run query. Wait until **Status = Completed**.
   
 #### Method 2: Export query from Super Users Report
 
