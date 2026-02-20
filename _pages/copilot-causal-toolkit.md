@@ -27,7 +27,7 @@ Two key scenarios - Seller Productivity and Burnout Prevention - are covered in 
 
 You can access the toolkit [here](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/causal-inference/copilot-causal-toolkit) on GitHub.
 
-**Python** and **Jupyter notebooks** (.ipynb) are used for running the analysis. It is therefore recommended that you read the pre-requisites section and ensure that all of these are satisfied. Once you have results, see the [Interpretation Guide](/copilot-causal-toolkit-interpretation-guide/) for detailed guidance on reading every output.
+**Python** and **Jupyter notebooks** (.ipynb) are used for running the analysis. It is therefore recommended that you read the pre-requisites section and ensure that all of these are satisfied. Once you have results, see the [Interpretation Guide]({{ site.baseurl }}/copilot-causal-toolkit-interpretation-guide/) for detailed guidance on reading every output.
 
 ## Directory
 
@@ -469,7 +469,7 @@ These are typically standard, but verify they exist in your data:
 
 ## Running the analysis
 
-Once everything is in place, you can choose to either run the notebook in its entirety or cell-by-cell. After the run completes, refer to the [Interpretation Guide](/copilot-causal-toolkit-interpretation-guide/) for a detailed walkthrough of every output file and plot.
+Once everything is in place, you can choose to either run the notebook in its entirety or cell-by-cell. After the run completes, refer to the [Interpretation Guide]({{ site.baseurl }}/copilot-causal-toolkit-interpretation-guide/) for a detailed walkthrough of every output file and plot.
 
 ### Recommended: Run Cell-by-Cell
 
@@ -550,7 +550,7 @@ Copilot can help explain error messages, suggest fixes, and guide you through mo
 
 ## Interpreting the outputs
 
-> **Looking for more detail?** The [Interpretation Guide](/copilot-causal-toolkit-interpretation-guide/) provides an in-depth, file-by-file walkthrough of every output — including how to read the dose-response plots, sensitivity analysis metrics, and transition matrices.
+> **Looking for more detail?** The [Interpretation Guide]({{ site.baseurl }}/copilot-causal-toolkit-interpretation-guide/) provides an in-depth, file-by-file walkthrough of every output — including how to read the dose-response plots, sensitivity analysis metrics, and transition matrices.
 
 After running the analysis successfully, you'll find results in the `output/` directory. The structure looks like this:
 

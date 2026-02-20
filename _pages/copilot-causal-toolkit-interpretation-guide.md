@@ -20,7 +20,7 @@ permalink: /copilot-causal-toolkit-interpretation-guide/
 
 Now that you have successfully run the Copilot Causal Toolkit notebooks, you should see results appear in your Jupyter notebook and in your output directory (and with no errors). This document provides detailed guidance on how to interpret every output the toolkit produces, and what actions you should consider as a result.
 
-For instructions on setting up and running the toolkit, see the main [Copilot Causal Toolkit](/copilot-causal-toolkit/) page.
+For instructions on setting up and running the toolkit, see the main [Copilot Causal Toolkit]({{ site.baseurl }}/copilot-causal-toolkit/) page.
 
 ---
 
