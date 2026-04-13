@@ -22,8 +22,9 @@ The [Copilot Causal Toolkit](https://github.com/microsoft/viva-insights-sample-c
 
 * Does Copilot usage increase the time that our sellers spend with our customers?
 * Does Copilot usage impact our team's wellbeing positively? 
+* Does Copilot usage influence employee engagement?
 
-Two key scenarios - Seller Productivity and Burnout Prevention - are covered in this toolkit. Both involve using Copilot usage (`Total_Copilot_actions_taken`) as a treatment variable, and evaluating the treatment effect of using Copilot on an outcome variable (e.g. external or after-hours collaboration hours). 
+Three key scenarios - Seller Productivity, Burnout Prevention, and Employee Engagement - are covered in this toolkit. All three involve using Copilot usage (`Total_Copilot_actions_taken`) as a treatment variable, and evaluating the treatment effect of using Copilot on an outcome variable (e.g. external or after-hours collaboration hours, or a survey-based engagement metric). 
 
 You can access the toolkit [here](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/causal-inference/copilot-causal-toolkit) on GitHub.
 
@@ -41,6 +42,7 @@ copilot-causal-toolkit/
 ├── script/                        # Main analysis scripts and modules
 │   ├── CI-DML_AftCollabHours_PQ.ipynb     # After-hours collab analysis (Person Query)
 │   ├── CI-DML_AftCollabHours_SUR.ipynb    # After-hours collab analysis (Super Users Report)
+│   ├── CI-DML_Engagement_PQ.ipynb         # Employee engagement analysis (Person Query)
 │   ├── CI-DML_ExtCollabHours_PQ.ipynb     # External collab analysis (Person Query)
 │   ├── CI-DML_ExtCollabHours_SUR.ipynb    # External collab analysis (Super Users Report)
 │   └── modules/                   # Helper modules for DML analysis
@@ -65,15 +67,18 @@ copilot-causal-toolkit/
 - `script/modules/`: Python modules with reusable functions for the analysis pipeline
 - `output/`: All analysis outputs (results tables, plots, HTML reports) are saved here
 
-This directory contains four main Jupyter notebooks (.ipynb) for running causal inference analysis on top of Viva Insights data. Two work directly with a Person Query (PQ) schema: 
+This directory contains five main Jupyter notebooks (.ipynb) for running causal inference analysis on top of Viva Insights data. Three work directly with a Person Query (PQ) schema: 
 
 * `CI-DML_AftCollabHours_PQ.ipynb` (Uses After-hours collaboration hours as outcome)
 * `CI-DML_ExtCollabHours_PQ.ipynb` (Uses External collaboration hours as outcome)
+* `CI-DML_Engagement_PQ.ipynb` (Uses an ordinal survey outcome, e.g. employee engagement)
 
 And two of these work from an output from the Super Users Report (SUR):
 
 * `CI-DML_AftCollabHours_SUR.ipynb` (Uses After-hours collaboration hours as outcome)
 * `CI-DML_ExtCollabHours_SUR.ipynb` (Uses External collaboration hours as outcome)
+
+**Note on the Employee Engagement notebook:** Unlike the Seller Productivity and Burnout Prevention notebooks which use continuous Viva Insights metrics as outcomes, `CI-DML_Engagement_PQ.ipynb` is designed for **ordinal survey outcomes** such as Glint survey metrics (e.g. `eSat`). Because Glint metrics vary by organization and can be custom-defined, this notebook is intended as a **template** — the analyst should update the outcome variable name, scale configuration, and confounder variables to match their specific survey data before running the analysis. Only the Person Query (PQ) version is available for this scenario.
 
 We recommend creating a copy of the template that you wish to use and renaming them to match the scenario of your analysis. 
 
@@ -248,6 +253,8 @@ There are two means of obtaining data for this causal inference analysis:
 
 For best results, we generally recommend the first method as this ensures that we have comprehensive coverage of all the covariates required in order to produce a causal inference result that we can be confident in. The second method can be quicker and immediately extracted from a Super Users report as it does not require the running and setting up of a fresh query. 
 
+**For the Employee Engagement scenario:** The Person Query must include Glint survey data as the outcome variable. This requires a prior setup step to import survey data into Viva Insights. See [Import survey data from Viva Glint](https://learn.microsoft.com/en-us/viva/insights/advanced/admin/import-survey-glint) for instructions on configuring this integration. Once Glint data is imported, the survey metrics (e.g. `eSat`) will be available as columns in the Person Query export.
+
 #### Method 1: Export query from Viva Insights
 
 1. Open: <https://analysis.insights.viva.office.com/Analysis/CreateAnalysis>
@@ -255,7 +262,7 @@ For best results, we generally recommend the first method as this ensures that w
 3. Configure:
    * Time period: Last 6 months (rolling)
    * Group by: Week
-   * Metrics: Include the columns listed in the "Columns to include" sections below (Seller Productivity or Burnout Prevention, depending on your scenario).
+   * Metrics: Include the columns listed in the "Columns to include" sections below (Seller Productivity, Burnout Prevention, or Employee Engagement, depending on your scenario).
    * Filter: Is Active = True (if available) - You can validate the number of employees here.
    * Attributes: Include Organization and Function Type (others optional) - this is the last box on this page.
 4. Save and Run query. Wait until **Status = Completed**.
@@ -350,6 +357,30 @@ In this scenario, the goal is to understand how increasing Copilot usage increas
   - Other relevant behavioral and network metrics from your Person Query
 * **Organizational attributes:** These are used for heterogeneity analysis (identifying which subgroups experience the largest changes in after-hours work). Include as many as possible, typically covering dimensions like `Organization`, `Function`, `Level`, `IsManager`, and `Area`. The exact names can differ based on your organization's HR data structure—just ensure the variable names in the notebook are updated accordingly in the configuration section.
 
+#### Columns to include: Employee Engagement Scenario
+
+In this scenario, the goal is to understand how increasing Copilot usage influences employee engagement as measured by an ordinal survey outcome (e.g. a Glint survey metric). Unlike the Seller Productivity and Burnout Prevention scenarios which use continuous Viva Insights metrics, this scenario uses a **survey-based ordinal variable** as the outcome.
+
+**Important:** This notebook is designed as a **template**. Because Glint metrics vary across organizations and can be custom-defined (e.g. differently named or scaled), the analyst should review and update the outcome variable, its scale, and the confounder variables to match their specific data before running the analysis.
+
+* **Outcome variable:** A Glint survey metric such as `eSat` (Employee Satisfaction) — this should be updated to whichever ordinal survey outcome the analyst intends to evaluate. Any valid ordinal survey outcome variable can be used here.
+* **Treatment variable:** `Total_Copilot_actions_taken` - Total number of Copilot interactions per person per week
+* **Outcome scale configuration:** Because the outcome is ordinal rather than continuous, the notebook includes scale parameters (`OUTCOME_SCALE_MIN`, `OUTCOME_SCALE_MAX`) that must be set to match the survey's response scale (e.g. 1–5, 1–7, or 1–10). These are used for ceiling/floor effect diagnostics and interpretation.
+* **Confounder variables (time-varying controls):** The default set of confounders is provided as a starting point, but should be revised depending on which outcome variable is selected:
+  - `Collaboration_hours` - Total collaboration time (meetings + emails + chats)
+  - `Available_to_focus_hours` - Time available for deep work without interruptions
+  - `Active_connected_hours` - Hours actively connected to work tools
+  - `Uninterrupted_hours` - Uninterrupted focus time
+  - `After_hours_collaboration_hours` - Time spent in work activities outside standard business hours
+  - `Collaboration_span` - Duration of collaboration window during the day
+  - `Meeting_and_call_hours_with_manager_1_1` - One-on-one time with direct manager
+  - Other relevant behavioral and network metrics from your Person Query
+* **Organizational attributes:** Same as the other scenarios — include dimensions like `Organization`, `Function`, `Level`, `IsManager`, and `Area` for subgroup/heterogeneity analysis.
+
+**Data requirement:** The Person Query must include Glint survey data. This requires a prior integration step — see [Import survey data from Viva Glint](https://learn.microsoft.com/en-us/viva/insights/advanced/admin/import-survey-glint) for setup instructions.
+
+**Note:** Only the Person Query (PQ) version of the notebook is available for this scenario. There is no Super Users Report (SUR) version.
+
 To examine the organizational or HR attributes you have in your dataset, you can run the following scripts to explore them: 
 ```python
 hrvar_str = vi.extract_hr(data, return_type = 'vars').columns
@@ -397,16 +428,31 @@ output_base_dir = os.path.join(script_dir, '..', 'output', 'Subgroup Analysis - 
 # output_base_dir = os.path.join(script_dir, '..', 'output', 'Subgroup Analysis - Contoso')
 ```
 
-#### 2. Analysis Configuration (Cell 3, After-Hours notebooks only)
+#### 2. Analysis Configuration (Cell 3, After-Hours and Engagement notebooks)
 
-Also in cell 3 of the After-Hours notebooks (`CI-DML_AftCollabHours_*.ipynb`), find and update the toggle that controls which direction of effect to search for:
+Also in cell 3 of the After-Hours notebooks (`CI-DML_AftCollabHours_*.ipynb`) and the Engagement notebook (`CI-DML_Engagement_PQ.ipynb`), find and update the toggle that controls which direction of effect to search for:
 
 ```python
 # Toggle to control whether to find subgroups with NEGATIVE or POSITIVE effects
 FIND_NEGATIVE_EFFECTS = True  # Set to True for reductions, False for increases
 ```
 
-This toggle does not exist in the External Collaboration notebooks — it only applies to After-Hours analysis.
+This toggle does not exist in the External Collaboration notebooks — it only applies to After-Hours and Engagement analysis.
+
+**Engagement notebook only — Outcome Variable and Scale Configuration (Cell 4):**
+
+The Engagement notebook requires additional configuration for the ordinal survey outcome. In cell 4, update the outcome variable name and scale to match your survey data:
+
+```python
+# Update OUTCOME_VAR to match your Glint survey metric column name
+OUTCOME_VAR = 'eSat'  # Change to your survey outcome variable (e.g., 'eSat', 'eNPS', etc.)
+
+# Update the scale to match your survey's response range
+OUTCOME_SCALE_MIN = 1   # Minimum value on the scale
+OUTCOME_SCALE_MAX = 7   # Maximum value on the scale (e.g., 5, 7, 9, or 10)
+```
+
+Since Glint metrics can vary by organization and may be custom-defined, ensure the `OUTCOME_VAR` name matches the exact column name in your Person Query export. The scale parameters are used for ceiling/floor effect diagnostics and for interpreting the magnitude of treatment effects on the ordinal scale.
 
 #### 3. Organizational Attributes (Cell 7: Variable Definitions)
 
@@ -457,7 +503,9 @@ end_date_str   = '2025-06-30'  # Change to your data's end date
 
 These are typically standard, but verify they exist in your data:
 - Treatment: `Total_Copilot_actions_taken`
-- Outcome: `External_collaboration_hours` or `After_hours_collaboration_hours`
+- Outcome: `External_collaboration_hours`, `After_hours_collaboration_hours`, or your chosen survey metric (e.g. `eSat` for the Engagement notebook)
+
+**Note for the Engagement notebook:** The outcome variable will need to be updated in the configuration cell (see section 2 above). Unlike the other notebooks where the outcome is pre-defined, the Engagement notebook expects the analyst to specify which ordinal survey variable to use.
 
 #### 6. Quick Checklist Before Running
 
@@ -465,7 +513,9 @@ These are typically standard, but verify they exist in your data:
 - [ ] `data_file_path` matches your CSV filename exactly (case-sensitive)
 - [ ] `output_base_dir` has your organization name (optional but recommended)
 - [ ] All variables in `SUBGROUP_VARS` exist in your dataset
-- [ ] `FIND_NEGATIVE_EFFECTS` is set appropriately (after-hours notebooks only)
+- [ ] `FIND_NEGATIVE_EFFECTS` is set appropriately (after-hours and engagement notebooks only)
+- [ ] *(Engagement notebook only)* `OUTCOME_VAR` matches the survey metric column name in your data
+- [ ] *(Engagement notebook only)* `OUTCOME_SCALE_MIN` and `OUTCOME_SCALE_MAX` match your survey's response scale
 
 ## Running the analysis
 
@@ -591,6 +641,7 @@ This file summarizes which subgroups show the strongest treatment effects (posit
 
 - For **External Collaboration (seller productivity):** Positive effects suggest Copilot helps people spend more time with customers/partners
 - For **After-Hours Collaboration (wellbeing):** Negative effects suggest Copilot helps reduce evening/weekend work
+- For **Employee Engagement (survey outcome):** Positive effects suggest Copilot usage is associated with higher engagement scores; note that effects are on an ordinal scale, so interpret magnitude relative to the survey's response range
 
 #### 2. Subgroup-Specific Directories
 

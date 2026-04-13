@@ -1,6 +1,6 @@
 # README for Causal Inference package
 
-Please use this README for instructions on how to run a causal inference analysis with Viva Insights data. The key scenarios covered in this documentation involve using Copilot usage (`Total_Copilot_actions_taken`) as a treatment variable, and evaluating the treatment effect of using Copilot on an outcome variable (e.g. external or after-hours collaboration hours). 
+Please use this README for instructions on how to run a causal inference analysis with Viva Insights data. The key scenarios covered in this documentation involve using Copilot usage (`Total_Copilot_actions_taken`) as a treatment variable, and evaluating the treatment effect of using Copilot on an outcome variable (e.g. external or after-hours collaboration hours, or a survey-based engagement metric). 
 
 **Python** and **Jupyter notebooks** (.ipynb) are used for running the analysis. It is therefore recommended that you read the pre-requisites section and ensure that all of these are satisfied. 
 
@@ -16,6 +16,7 @@ ci-package/
 ├── script/                        # Main analysis scripts and modules
 │   ├── CI-DML_AftCollabHours_PQ.ipynb     # After-hours collab analysis (Person Query)
 │   ├── CI-DML_AftCollabHours_SUR.ipynb    # After-hours collab analysis (Super Users Report)
+│   ├── CI-DML_Engagement_PQ.ipynb         # Employee engagement analysis (Person Query)
 │   ├── CI-DML_ExtCollabHours_PQ.ipynb     # External collab analysis (Person Query)
 │   ├── CI-DML_ExtCollabHours_SUR.ipynb    # External collab analysis (Super Users Report)
 │   └── modules/                   # Helper modules for DML analysis
@@ -40,15 +41,18 @@ ci-package/
 - `script/modules/`: Python modules with reusable functions for the analysis pipeline
 - `output/`: All analysis outputs (results tables, plots, HTML reports) are saved here
 
-This directory contains four main Jupyter notebooks (.ipynb) for running causal inference analysis on top of Viva Insights data. Two work directly with a Person Query (PQ) schema: 
+This directory contains five main Jupyter notebooks (.ipynb) for running causal inference analysis on top of Viva Insights data. Three work directly with a Person Query (PQ) schema: 
 
 * `CI-DML_AftCollabHours_PQ.ipynb` (Uses After-hours collaboration hours as outcome)
 * `CI-DML_ExtCollabHours_PQ.ipynb` (Uses External collaboration hours as outcome)
+* `CI-DML_Engagement_PQ.ipynb` (Uses an ordinal survey outcome, e.g. employee engagement)
 
 And two of these work from an output from the Super Users Report (SUR):
 
 * `CI-DML_AftCollabHours_SUR.ipynb` (Uses After-hours collaboration hours as outcome)
 * `CI-DML_ExtCollabHours_SUR.ipynb` (Uses External collaboration hours as outcome)
+
+**Note on the Employee Engagement notebook:** Unlike the Seller Productivity and Burnout Prevention notebooks which use continuous Viva Insights metrics as outcomes, `CI-DML_Engagement_PQ.ipynb` is designed for **ordinal survey outcomes** such as Glint survey metrics (e.g. `eSat`). Because Glint metrics vary by organization and can be custom-defined, this notebook is intended as a **template** — the analyst should update the outcome variable name, scale configuration, and confounder variables to match their specific survey data before running the analysis. Only the Person Query (PQ) version is available for this scenario. See [Import survey data from Viva Glint](https://learn.microsoft.com/en-us/viva/insights/advanced/admin/import-survey-glint) for instructions on ensuring Glint data is available in your Person Query export.
 
 We recommend creating a copy of the template that you wish to use and renaming them to match the scenario of your analysis. 
 
@@ -284,6 +288,30 @@ In this scenario, the goal is to understand how increasing Copilot usage increas
   - `Workweek_span` - Total hours between first and last work activity
   - Other relevant behavioral and network metrics from your Person Query
 * **Organizational attributes:** These are used for heterogeneity analysis (identifying which subgroups experience the largest changes in after-hours work). Include as many as possible, typically covering dimensions like `Organization`, `Function`, `Level`, `IsManager`, and `Area`. The exact names can differ based on your organization's HR data structure—just ensure the variable names in the notebook are updated accordingly in the configuration section.
+
+#### Columns to include: Employee Engagement Scenario
+
+In this scenario, the goal is to understand how increasing Copilot usage influences employee engagement as measured by an ordinal survey outcome (e.g. a Glint survey metric). Unlike the Seller Productivity and Wellbeing scenarios which use continuous Viva Insights metrics, this scenario uses a **survey-based ordinal variable** as the outcome.
+
+**Important:** This notebook is designed as a **template**. Because Glint metrics vary across organizations and can be custom-defined (e.g. differently named or scaled), the analyst should review and update the outcome variable, its scale, and the confounder variables to match their specific data before running the analysis.
+
+* **Outcome variable:** A Glint survey metric such as `eSat` (Employee Satisfaction) — this should be updated to whichever ordinal survey outcome the analyst intends to evaluate. Any valid ordinal survey outcome variable can be used here.
+* **Treatment variable:** `Total_Copilot_actions_taken` - Total number of Copilot interactions per person per week
+* **Outcome scale configuration:** Because the outcome is ordinal rather than continuous, the notebook includes scale parameters (`OUTCOME_SCALE_MIN`, `OUTCOME_SCALE_MAX`) that must be set to match the survey's response scale (e.g. 1–5, 1–7, or 1–10). These are used for ceiling/floor effect diagnostics and interpretation.
+* **Confounder variables (time-varying controls):** The default set of confounders is provided as a starting point, but should be revised depending on which outcome variable is selected:
+  - `Collaboration_hours` - Total collaboration time (meetings + emails + chats)
+  - `Available_to_focus_hours` - Time available for deep work without interruptions
+  - `Active_connected_hours` - Hours actively connected to work tools
+  - `Uninterrupted_hours` - Uninterrupted focus time
+  - `After_hours_collaboration_hours` - Time spent in work activities outside standard business hours
+  - `Collaboration_span` - Duration of collaboration window during the day
+  - `Meeting_and_call_hours_with_manager_1_1` - One-on-one time with direct manager
+  - Other relevant behavioral and network metrics from your Person Query
+* **Organizational attributes:** Same as the other scenarios — include dimensions like `Organization`, `Function`, `Level`, `IsManager`, and `Area` for subgroup/heterogeneity analysis.
+
+**Data requirement:** The Person Query must include Glint survey data. This requires a prior integration step — see [Import survey data from Viva Glint](https://learn.microsoft.com/en-us/viva/insights/advanced/admin/import-survey-glint) for setup instructions.
+
+**Note:** Only the Person Query (PQ) version of the notebook is available for this scenario. There is no Super Users Report (SUR) version.
 
 To examine the organizational or HR attributes you have in your dataset, you can run the following scripts to explore them: 
 ```python
