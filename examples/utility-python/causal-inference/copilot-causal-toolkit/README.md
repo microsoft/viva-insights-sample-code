@@ -271,7 +271,7 @@ In this scenario, the goal is to understand how increasing Copilot usage increas
   - Other relevant behavioral and network metrics from your Person Query
 * **Organizational attributes:** These are used for heterogeneity analysis (identifying which subgroups benefit most/least from Copilot). Include as many as possible, typically covering dimensions like `Organization`, `Function`, `Level`, `IsManager`, and `Area`. The exact names can differ based on your organization's HR data structure—just ensure the variable names in the notebook are updated accordingly in the configuration section.
 
-#### Columns to include: Wellbeing Scenario
+#### Columns to include: Burnout Prevention Scenario
 
 In this scenario, the goal is to understand how increasing Copilot usage increases or decreases after-hours work patterns, which can impact employee wellbeing and burnout risk.
 
