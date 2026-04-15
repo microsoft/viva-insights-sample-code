@@ -90,6 +90,9 @@ Collaboration network visualization and analysis scripts.
 - 🤖 [Copilot Analytics](copilot/)
 Analysis and visualization scripts specifically for Microsoft Copilot usage data.
 
+- 🚀 [Frontier Analytics](frontier-analytics/)
+Prompt libraries, starter kits, and schema docs for self-service analytics with coding agents.
+
 ---
 
 ## Contributing
