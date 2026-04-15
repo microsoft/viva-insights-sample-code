@@ -1,0 +1,52 @@
+{
+  "_note": "CONCEPTUAL EXAMPLE — This is not a functional configuration. No MCP server exists for Frontier Analytics yet. This file illustrates what an MCP client configuration might look like.",
+  "mcpServers": {
+    "frontier-analytics": {
+      "command": "node",
+      "args": [
+        "path/to/frontier-analytics-mcp-server/dist/server.js",
+        "--content-root",
+        "path/to/viva-insights-sample-code/frontier-analytics"
+      ],
+      "description": "Conceptual MCP server for the Frontier Analytics prompt library, schema documentation, and analysis tools",
+      "env": {
+        "FRONTIER_LOG_LEVEL": "info",
+        "FRONTIER_PRIVACY_THRESHOLD": "5"
+      },
+      "capabilities": {
+        "prompts": {
+          "enabled": true,
+          "description": "Serves prompt cards from frontier-analytics/prompts/ as MCP prompts",
+          "examples": [
+            "copilot-adoption/dashboard-overview",
+            "copilot-adoption/executive-summary",
+            "copilot-adoption/segmentation-and-churn",
+            "copilot-adoption/roi-estimation",
+            "purview-augmentation/agent-usage-analysis",
+            "purview-augmentation/audit-log-parsing"
+          ]
+        },
+        "resources": {
+          "enabled": true,
+          "description": "Exposes schema documentation and data dictionaries as queryable resources",
+          "examples": [
+            "schema://person-query",
+            "schema://purview-audit-log",
+            "dictionary://copilot-metrics",
+            "starterkit://copilot-adoption-analysis"
+          ]
+        },
+        "tools": {
+          "enabled": true,
+          "description": "Provides validation, computation, and generation tools",
+          "examples": [
+            "validate-schema",
+            "compute-adoption-metrics",
+            "check-privacy-thresholds",
+            "generate-dashboard-template"
+          ]
+        }
+      }
+    }
+  }
+}
