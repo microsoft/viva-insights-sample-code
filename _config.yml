@@ -43,3 +43,4 @@ exclude:
   - SUPPORT.md
   - "*.Rproj"
   - .gitignore
+  - frontier-analytics

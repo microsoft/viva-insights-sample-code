@@ -51,6 +51,10 @@ Explore the repo to discover sample code:
 - [Performing Pairwise Chi-square Tests for categorical variables in Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/pairwise-chisq.py)
 - [Extending Workplace Analytics with R](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/extending-wpa-with-R) - based on the legacy 'wpa' package
 
+### Frontier Analytics
+
+- [Frontier Analytics Starter Kit](frontier-analytics/) — prompt libraries, starter kits, schema documentation, and example output specifications for self-service analytics with coding agents
+
 ## Reference links
 
 - [Super Users Report for Copilot Analytics](https://aka.ms/DecodingSuperUsage)
