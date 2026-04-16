@@ -96,12 +96,18 @@ You are a people analytics engineer. Your task is to build a self-contained stat
 that visualizes Microsoft Copilot adoption from a Viva Insights person query export.
 
 DATA LOADING AND VALIDATION
-1. Load the person query CSV file into a DataFrame (use pandas in Python or readr/vroom in R).
-2. Parse the MetricDate column as a date type. Ensure PersonId is treated as a string.
-3. Verify the panel structure: each row should represent a unique PersonId × MetricDate combination.
+1. Load the person query CSV file using the `vivainsights` library:
+   - Python: `from vivainsights import import_query; df = import_query("<path to CSV>")`
+   - R: `library(vivainsights); df <- import_query("<path to CSV>")`
+   `import_query()` handles variable name cleaning and type parsing automatically.
+2. Ensure PersonId is treated as a string and MetricDate is parsed as a date type.
+3. Run `extract_hr(df)` from the `vivainsights` library to identify the available HR / organizational
+   attribute columns in the data. Use the returned list of HR attributes for all segmentation
+   breakdowns instead of hard-coding column names like Organization, FunctionType, or LevelDesignation.
+4. Verify the panel structure: each row should represent a unique PersonId × MetricDate combination.
    If there are duplicates, flag them and keep the first occurrence.
-4. Print the shape of the data, the date range covered, and the number of unique persons.
-5. List all column names so I can verify the Copilot metric columns and HR attribute columns
+5. Print the shape of the data, the date range covered, and the number of unique persons.
+6. List all column names so I can verify the Copilot metric columns and HR attribute columns
    match what is expected. Auto-detect columns that start with "Copilot_" as Copilot metric columns.
 
 IDENTIFYING LICENSED USERS
@@ -180,15 +186,15 @@ IMPORTANT NOTES
   Static images embedded as base64 are preferred.
 - Handle missing values gracefully: NaN in Copilot columns means the user is unlicensed that week.
 - If any HR attribute column is missing from the data, skip that segmentation chart and note it.
-- Use the vivainsights package for any helper functions it provides, but do not depend on it for
-  core logic — the dashboard should work with just pandas/matplotlib or base R/ggplot2.
+- Use the `vivainsights` package (R or Python) for data loading (`import_query()`) and HR attribute
+  discovery (`extract_hr()`). Use pandas/matplotlib or base R/ggplot2 for charting and analysis.
 - All charts should have clear titles, axis labels, and legends.
 - If any segment has fewer than 5 users, suppress it from charts to protect privacy.
 ```
 
 ### Adaptation notes
 
-- Adjust HR attribute column names to match your export (e.g., `Organization` vs `Org`). Prepend a note to the prompt specifying your actual column names.
+- The `extract_hr()` function auto-detects organizational attributes, so you typically do not need to manually specify HR column names. If your data has custom attribute columns that `extract_hr()` does not detect, add an instruction specifying them.
 - If your data is at person-day granularity, add an instruction: _"Aggregate person-day data to person-week by summing Copilot metrics per PersonId per week."_
 - For smaller organizations, increase the privacy threshold (e.g., from 5 to 10 users per segment) or remove segmentation breakdowns entirely.
 - Add custom Copilot metrics by extending the list in step 5 (e.g., `Copilot_Edited_Hours`, `Copilot_Rewritten_Hours`).
@@ -244,15 +250,21 @@ memo about Microsoft Copilot adoption, based on a Viva Insights person query exp
 be suitable for a VP or C-suite audience — concise, insight-driven, and action-oriented.
 
 DATA LOADING AND PREPARATION
-1. Load the person query CSV into a DataFrame. Parse MetricDate as a date. Treat PersonId as a string.
+1. Load the person query CSV using the `vivainsights` library:
+   - Python: `from vivainsights import import_query; df = import_query("<path to CSV>")`
+   - R: `library(vivainsights); df <- import_query("<path to CSV>")`
+   `import_query()` handles variable name cleaning and type parsing automatically.
 2. Auto-detect Copilot metric columns (columns starting with "Copilot_"). Print the detected columns
    and the date range for verification.
-3. Classify each person-week row:
+3. Run `extract_hr(df)` from the `vivainsights` library to identify available HR / organizational
+   attribute columns. Use the returned list for all organizational breakdowns instead of hard-coding
+   column names.
+4. Classify each person-week row:
    - "Licensed": has at least one non-null, non-zero Copilot metric value.
    - "Active": is licensed AND has Copilot_Actions > 0 (or the primary activity metric).
    - "Unlicensed": all Copilot metric values are null or zero.
-4. If any HR attribute columns (Organization, FunctionType, LevelDesignation) are missing, note which
-   ones are unavailable and proceed with what is present.
+5. If any expected HR attribute columns are not found by `extract_hr()`, note which ones are
+   unavailable and proceed with what is present.
 
 HEADLINE METRICS (compute these for the memo)
 5. Current adoption rate: In the most recent complete week, what percentage of licensed users were
@@ -401,14 +413,20 @@ analysis on Microsoft Copilot usage data from a Viva Insights person query expor
 classify users into usage-based segments, track transitions between segments, and quantify churn.
 
 DATA LOADING AND PREPARATION
-1. Load the person query CSV. Parse MetricDate as a date. Treat PersonId as a string.
+1. Load the person query CSV using the `vivainsights` library:
+   - Python: `from vivainsights import import_query; df = import_query("<path to CSV>")`
+   - R: `library(vivainsights); df <- import_query("<path to CSV>")`
+   `import_query()` handles variable name cleaning and type parsing automatically.
 2. Auto-detect Copilot metric columns (columns starting with "Copilot_"). Print detected columns
    and the date range.
-3. Classify each person-week:
+3. Run `extract_hr(df)` from the `vivainsights` library to identify available HR / organizational
+   attribute columns. Use the returned list for all segmentation breakdowns instead of hard-coding
+   column names.
+4. Classify each person-week:
    - "Licensed": at least one non-null, non-zero Copilot metric value.
    - "Unlicensed": all Copilot metrics are null or zero.
-4. Filter to only licensed person-weeks for the segmentation analysis.
-5. Fill any remaining NaN values in Copilot metric columns with 0 for licensed users (a licensed
+5. Filter to only licensed person-weeks for the segmentation analysis.
+6. Fill any remaining NaN values in Copilot metric columns with 0 for licensed users (a licensed
    user with a null action count in one metric likely had zero usage of that specific feature).
 
 USER SEGMENTATION
@@ -565,13 +583,19 @@ CONFIGURABLE ASSUMPTIONS (define as variables at the top of the script so they a
 - ANALYSIS_WEEKS = 4  # Number of recent weeks to use for annualized projections
 
 DATA LOADING AND PREPARATION
-1. Load the person query CSV. Parse MetricDate as a date. Treat PersonId as a string.
+1. Load the person query CSV using the `vivainsights` library:
+   - Python: `from vivainsights import import_query; df = import_query("<path to CSV>")`
+   - R: `library(vivainsights); df <- import_query("<path to CSV>")`
+   `import_query()` handles variable name cleaning and type parsing automatically.
 2. Auto-detect Copilot metric columns (columns starting with "Copilot_"). Print detected columns.
-3. Classify each person-week:
+3. Run `extract_hr(df)` from the `vivainsights` library to identify available HR / organizational
+   attribute columns. Use the returned list for all organizational breakdowns instead of hard-coding
+   column names.
+4. Classify each person-week:
    - "Licensed": at least one non-null, non-zero Copilot metric value.
    - "Active": licensed AND Copilot_Actions > 0.
    - "Unlicensed": all Copilot metric values are null or zero.
-4. Print: total persons, licensed persons, active persons (ever active), date range.
+5. Print: total persons, licensed persons, active persons (ever active), date range.
 
 TIME SAVINGS ESTIMATION
 5. For each active person-week, extract Copilot_Assisted_Hours (the primary time-savings metric).
