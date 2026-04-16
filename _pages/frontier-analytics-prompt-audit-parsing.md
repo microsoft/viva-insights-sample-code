@@ -241,5 +241,5 @@ IMPORTANT NOTES
 
 <div class="prompt-nav">
   <a href="{{ site.baseurl }}/frontier-analytics-prompt-agent-usage/">← Previous: Agent Usage Analysis</a>
-  <span class="nav-disabled">Next →</span>
+  <a href="{{ site.baseurl }}/frontier-analytics-prompt-causal-toolkit/">Next: Copilot Causal Toolkit →</a>
 </div>

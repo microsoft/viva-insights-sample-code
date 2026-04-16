@@ -56,6 +56,12 @@ Each prompt card includes the purpose, required inputs, assumptions, the full pr
 | [Agent Usage Analysis]({{ site.baseurl }}/frontier-analytics-prompt-agent-usage/) | Analyze Copilot agent and extension usage patterns from Purview audit logs. |
 | [Audit Log Parsing]({{ site.baseurl }}/frontier-analytics-prompt-audit-parsing/) | Parse and clean raw Purview audit log exports into analysis-ready flat tables. |
 
+### Causal Inference
+
+| Prompt Card | Description |
+|---|---|
+| [Copilot Causal Toolkit]({{ site.baseurl }}/frontier-analytics-prompt-causal-toolkit/) | Run a causal inference analysis using the Copilot Causal Toolkit, then interpret results for senior leadership. Two prompts: one to run the analysis, one to interpret outputs. |
+
 ---
 
 ## Tips for adapting prompts
