@@ -73,9 +73,9 @@ After exporting a person query with Copilot activity metrics spanning at least 8
 
 ### Required inputs
 
-- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Total_Copilot_actions_taken`, `Copilot_Assisted_Hours`, `Copilot_Chat_Queries`, `Copilot_Summarized_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
+- Person query CSV with Copilot metrics and HR attributes
 - At least 8 weeks of data recommended
-- HR attributes for segmentation (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
+- HR attributes for segmentation
 
 ### Assumptions
 
@@ -96,10 +96,8 @@ You are a people analytics engineer. Your task is to build a self-contained stat
 that visualizes Microsoft Copilot adoption from a Viva Insights person query export.
 
 DATA LOADING AND VALIDATION
-1. Load the person query CSV file using the `vivainsights` library:
-   - Python: `from vivainsights import import_query; df = import_query("<path to CSV>")`
-   - R: `library(vivainsights); df <- import_query("<path to CSV>")`
-   `import_query()` handles variable name cleaning and type parsing automatically.
+1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python).
+   This handles variable name cleaning and type parsing automatically.
 2. Ensure PersonId is treated as a string and MetricDate is parsed as a date type.
 3. Run `extract_hr(df)` from the `vivainsights` library to identify the available HR / organizational
    attribute columns in the data. Use the returned list of HR attributes for all segmentation
@@ -230,7 +228,7 @@ When you need to communicate Copilot adoption progress to senior leadership — 
 
 ### Required inputs
 
-- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Total_Copilot_actions_taken`, `Copilot_Assisted_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
+- Person query CSV with Copilot metrics and HR attributes
 - At least 8 weeks of data recommended (12+ weeks preferred for trend analysis)
 - HR attributes for organizational breakdowns
 
@@ -254,10 +252,8 @@ memo about Microsoft Copilot adoption, based on a Viva Insights person query exp
 be suitable for a VP or C-suite audience — concise, insight-driven, and action-oriented.
 
 DATA LOADING AND PREPARATION
-1. Load the person query CSV using the `vivainsights` library:
-   - Python: `from vivainsights import import_query; df = import_query("<path to CSV>")`
-   - R: `library(vivainsights); df <- import_query("<path to CSV>")`
-   `import_query()` handles variable name cleaning and type parsing automatically.
+1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python).
+   This handles variable name cleaning and type parsing automatically.
 2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their
    name. Reference the taxonomy at
    https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv
@@ -396,7 +392,7 @@ After at least 8–12 weeks of person query data have been collected, when you n
 
 ### Required inputs
 
-- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Total_Copilot_actions_taken`, `Copilot_Assisted_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
+- Person query CSV with Copilot metrics and HR attributes
 - At least 8 weeks of data (12+ weeks recommended for meaningful churn analysis)
 - HR attributes for segmentation breakdowns
 
@@ -420,10 +416,8 @@ analysis on Microsoft Copilot usage data from a Viva Insights person query expor
 classify users into usage-based segments, track transitions between segments, and quantify churn.
 
 DATA LOADING AND PREPARATION
-1. Load the person query CSV using the `vivainsights` library:
-   - Python: `from vivainsights import import_query; df = import_query("<path to CSV>")`
-   - R: `library(vivainsights); df <- import_query("<path to CSV>")`
-   `import_query()` handles variable name cleaning and type parsing automatically.
+1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python).
+   This handles variable name cleaning and type parsing automatically.
 2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their
    name. Reference the taxonomy at
    https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv
@@ -440,9 +434,7 @@ DATA LOADING AND PREPARATION
    user with a null action count in one metric likely had zero usage of that specific feature).
 
 USER SEGMENTATION
-6. Use `identify_usage_segments()` from the `vivainsights` library to classify users into segments:
-   - Python: `from vivainsights import identify_usage_segments; df = identify_usage_segments(df)`
-   - R: `df <- identify_usage_segments(df)`
+6. Use `identify_usage_segments()` from the `vivainsights` library to classify users into segments.
    This function uses `Total_Copilot_actions_taken` and classifies users based on both usage
    volume and consistency (habit formation over 12 weeks), producing segments such as Power Users
    and Habitual Users. It is preferred over manual percentile-based segmentation.
@@ -558,7 +550,7 @@ When stakeholders need a quantified business justification for Copilot investmen
 
 ### Required inputs
 
-- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Assisted_Hours`, `Total_Copilot_actions_taken`, `Copilot_Summarized_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
+- Person query CSV with Copilot metrics and HR attributes
 - At least 8 weeks of data recommended
 - Configurable assumptions: hourly cost of employee time (default: $75/hour), annual Copilot license cost per user (default: $360/year)
 - Optional: collaboration metrics for licensed vs. unlicensed comparison (e.g., `Collaboration_Hours`, `Meeting_Hours`, `Email_Hours`)
@@ -590,10 +582,8 @@ CONFIGURABLE ASSUMPTIONS (define as variables at the top of the script so they a
 - ANALYSIS_WEEKS = 4  # Number of recent weeks to use for annualized projections
 
 DATA LOADING AND PREPARATION
-1. Load the person query CSV using the `vivainsights` library:
-   - Python: `from vivainsights import import_query; df = import_query("<path to CSV>")`
-   - R: `library(vivainsights); df <- import_query("<path to CSV>")`
-   `import_query()` handles variable name cleaning and type parsing automatically.
+1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python).
+   This handles variable name cleaning and type parsing automatically.
 2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their
    name. Reference the taxonomy at
    https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv
