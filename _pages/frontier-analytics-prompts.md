@@ -47,6 +47,7 @@ Each prompt card includes the purpose, required inputs, assumptions, the full pr
 | [Executive Summary](#executive-summary--copilot-adoption) | Produce a concise executive memo summarizing Copilot adoption metrics for VP/C-suite audiences. |
 | [Segmentation & Churn](#segmentation--churn-analysis--copilot-adoption) | Classify users into usage segments, track transitions, and calculate churn rates. |
 | [ROI Estimation](#roi-estimation--copilot-adoption) | Estimate return on investment for Copilot by quantifying time savings and license costs. |
+| [Executive PowerPoint Deck](#executive-powerpoint-deck--copilot-adoption) | Generate an exec-ready 10–15 page PowerPoint deck with editable native charts. |
 
 ### Purview Augmentation
 
@@ -94,6 +95,9 @@ A self-contained static HTML file with embedded charts, suitable for sharing via
 ```
 You are a people analytics engineer. Your task is to build a self-contained static HTML dashboard
 that visualizes Microsoft Copilot adoption from a Viva Insights person query export.
+
+LANGUAGE CHOICE
+Choose R or Python based on what is already installed in your environment to minimize setup.
 
 DATA LOADING AND VALIDATION
 1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python).
@@ -153,12 +157,13 @@ SUMMARY STATISTICS PANEL
     f. Most active organization (highest adoption rate in the latest week)
 
 DASHBOARD GENERATION
-15. Generate a single self-contained HTML file. Do NOT use a web framework or server. All CSS and
-    JavaScript must be inline. Use one of these approaches:
-    - Python: use matplotlib/seaborn to create chart images, base64-encode them, and embed in HTML
-      using an HTML template string or Jinja2.
-    - R: use ggplot2 to create chart images, base64-encode them, and embed in an R Markdown document
-      rendered to self-contained HTML (self_contained: true), or build the HTML manually.
+15. Create the dashboard as an intermediary document first, then export to HTML:
+    - R: Create an RMarkdown file (.Rmd) with ggplot2 charts, then knit to a self-contained HTML
+      file (output: html_document, self_contained: true).
+    - Python: Create a Jupyter notebook (.ipynb) with matplotlib/seaborn charts, then export to
+      a self-contained HTML file (e.g., `jupyter nbconvert --to html`).
+    Keep the intermediary .Rmd or .ipynb file alongside the HTML output — it makes troubleshooting
+    and iteration easier. Do NOT use a web framework or server.
 
 16. The HTML dashboard should contain these sections in order:
     a. HEADER: Title ("Copilot Adoption Dashboard"), date range, generation timestamp.
@@ -180,16 +185,16 @@ DASHBOARD GENERATION
 17. Style the HTML with a clean, professional design. Use a sans-serif font, consistent color
     palette, and adequate whitespace. The dashboard should look presentable when opened in a browser.
 
-18. Save the HTML file to the working directory with a descriptive filename like
-    "copilot_adoption_dashboard_YYYYMMDD.html".
+18. Save the HTML file and the intermediary .Rmd or .ipynb to the working directory with descriptive
+    filenames like "copilot_adoption_dashboard_YYYYMMDD.html".
 
 IMPORTANT NOTES
 - Do NOT create interactive plots that require a running server (no plotly, no bokeh server).
-  Static images embedded as base64 are preferred.
+  Static charts embedded in the RMarkdown/Jupyter output are preferred.
 - Handle missing values gracefully: NaN in Copilot columns means the user is unlicensed that week.
 - If any HR attribute column is missing from the data, skip that segmentation chart and note it.
 - Use the `vivainsights` package (R or Python) for data loading (`import_query()`) and HR attribute
-  discovery (`extract_hr()`). Use pandas/matplotlib or base R/ggplot2 for charting and analysis.
+  discovery (`extract_hr()`). Use ggplot2 (R) or matplotlib/seaborn (Python) for charting.
 - All charts should have clear titles, axis labels, and legends.
 - If any segment has fewer than 5 users, suppress it from charts to protect privacy.
 ```
@@ -251,6 +256,9 @@ You are a senior people analytics consultant. Your task is to generate a polishe
 memo about Microsoft Copilot adoption, based on a Viva Insights person query export. The memo must
 be suitable for a VP or C-suite audience — concise, insight-driven, and action-oriented.
 
+LANGUAGE CHOICE
+Choose R or Python based on what is already installed in your environment to minimize setup.
+
 DATA LOADING AND PREPARATION
 1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python).
    This handles variable name cleaning and type parsing automatically.
@@ -310,8 +318,13 @@ AREAS OF CONCERN (flag 1-3 risks or issues)
     - Data quality issues (e.g., missing weeks, unexpected nulls)
 
 MEMO GENERATION
-15. Generate the executive summary as a well-formatted HTML file (or Markdown if specified). Use
-    the following structure:
+15. Create the executive summary as an intermediary document first, then export to HTML:
+    - R: Create an RMarkdown file (.Rmd), then knit to a self-contained HTML file
+      (output: html_document, self_contained: true).
+    - Python: Create a Jupyter notebook (.ipynb), then export to a self-contained HTML file
+      (e.g., `jupyter nbconvert --to html`).
+    Keep the intermediary .Rmd or .ipynb file alongside the HTML output — it makes troubleshooting
+    and iteration easier. Use the following structure:
 
     HEADER:
     - Title: "Copilot Adoption: Executive Summary"
@@ -415,6 +428,9 @@ You are a behavioral analytics specialist. Your task is to perform a user segmen
 analysis on Microsoft Copilot usage data from a Viva Insights person query export. The goal is to
 classify users into usage-based segments, track transitions between segments, and quantify churn.
 
+LANGUAGE CHOICE
+Choose R or Python based on what is already installed in your environment to minimize setup.
+
 DATA LOADING AND PREPARATION
 1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python).
    This handles variable name cleaning and type parsing automatically.
@@ -492,7 +508,11 @@ AT-RISK USER IDENTIFICATION
 22. Create a table of at-risk user counts by Organization and FunctionType.
 
 REPORT GENERATION
-23. Compile all outputs into a single HTML report or notebook with these sections:
+23. Compile all outputs into an intermediary document first, then export to HTML:
+    - R: Create an RMarkdown file (.Rmd), then knit to a self-contained HTML file.
+    - Python: Create a Jupyter notebook (.ipynb), then export to a self-contained HTML file.
+    Keep the intermediary file alongside the HTML output for troubleshooting.
+    The report should contain these sections:
     a. "Segment Definitions" — explain the four segments and thresholds used.
     b. "Segment Distribution" — charts from step 8 and summary table.
     c. "Segment Breakdown by Group" — charts from step 9, with leading/at-risk group callouts.
@@ -502,9 +522,9 @@ REPORT GENERATION
     g. "Key Takeaways" — 3-5 bullet points synthesizing the most important findings.
     h. "Methodology" — brief description of data source, segment definitions, churn definition.
 
-24. Use static charts (matplotlib/seaborn for Python or ggplot2 for R). Embed as base64 images
-    if generating a standalone HTML file.
-25. Save the report with a descriptive filename like "copilot_segmentation_churn_YYYYMMDD.html".
+24. Use static charts (matplotlib/seaborn for Python or ggplot2 for R).
+25. Save the report and intermediary file with descriptive filenames like
+    "copilot_segmentation_churn_YYYYMMDD.html".
 
 IMPORTANT NOTES
 - Segments are assigned by `identify_usage_segments()` based on both usage volume and consistency
@@ -574,6 +594,9 @@ An ROI summary report in HTML or Markdown, containing a value framework, sensiti
 You are a people analytics consultant specializing in technology ROI. Your task is to produce a
 defensible ROI estimate for Microsoft Copilot based on a Viva Insights person query export. The
 output should be suitable for inclusion in a business case presented to finance and IT leadership.
+
+LANGUAGE CHOICE
+Choose R or Python based on what is already installed in your environment to minimize setup.
 
 CONFIGURABLE ASSUMPTIONS (define as variables at the top of the script so they are easy to adjust)
 - HOURLY_RATE = 75  # Fully loaded cost per employee hour in USD
@@ -651,7 +674,11 @@ VALUE BY SEGMENT
     c. Identify organizations with negative net value (license cost exceeds estimated value).
 
 REPORT GENERATION
-16. Compile into a professional HTML report with these sections:
+16. Compile into a professional report. Create an intermediary document first, then export to HTML:
+    - R: Create an RMarkdown file (.Rmd), then knit to a self-contained HTML file.
+    - Python: Create a Jupyter notebook (.ipynb), then export to a self-contained HTML file.
+    Keep the intermediary file alongside the HTML output for troubleshooting.
+    The report should contain these sections:
 
     a. "Executive Summary" (3-4 sentences)
        - Lead with the headline ROI number.
@@ -724,6 +751,204 @@ IMPORTANT NOTES
 
 ---
 
+## Executive PowerPoint Deck — Copilot Adoption
+
+### Purpose
+
+Generate an exec-ready 10–15 page PowerPoint deck (.pptx) with editable native PowerPoint charts, summarizing Copilot adoption trends, organizational breakdowns, and key recommendations.
+
+### Audience
+
+VP/C-suite executives, board presentations, steering committee reviews
+
+### When to use
+
+When a static HTML report or memo is not suitable and stakeholders need a polished, editable PowerPoint deck — for example, for a live presentation, a board pack, or a document that will be further edited by others.
+
+### Required inputs
+
+- Person query CSV with Copilot metrics and HR attributes
+- At least 8 weeks of data recommended (12+ weeks preferred)
+- HR attributes for organizational breakdowns
+
+### Assumptions
+
+- Data is at person-week granularity
+- `PersonId` is a consistent anonymized identifier
+- `MetricDate` is a date field representing the start of each week
+- Rows with missing Copilot metric values likely represent unlicensed users
+- The `vivainsights` R or Python package is available in the environment
+- A package for creating PowerPoint files with native charts is available (e.g., `officer` + `mschart` in R, or `python-pptx` in Python)
+
+### Recommended output
+
+A .pptx file with 10–15 slides, using editable native PowerPoint charts (not pasted images) so that recipients can modify the deck as needed.
+
+### Prompt
+
+```
+You are a senior people analytics consultant. Your task is to generate a polished, exec-ready
+PowerPoint deck (.pptx) summarizing Microsoft Copilot adoption from a Viva Insights person query
+export. The deck must use editable native PowerPoint charts — NOT pasted images — so that
+recipients can modify charts and data as needed.
+
+LANGUAGE CHOICE
+Choose R or Python based on what is already installed in your environment to minimize setup.
+- R: Use the `officer` and `mschart` packages for native PowerPoint chart generation.
+- Python: Use the `python-pptx` package. Note that native chart support in python-pptx is more
+  limited — if advanced chart types are needed, R with `mschart` is recommended.
+
+DATA LOADING AND PREPARATION
+1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python).
+   This handles variable name cleaning and type parsing automatically.
+2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their
+   name. Reference the taxonomy at
+   https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv
+   to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary
+   activity metric.
+3. Run `extract_hr(df)` from the `vivainsights` library to identify available HR / organizational
+   attribute columns.
+4. Classify each person-week:
+   - "Licensed": at least one non-null, non-zero Copilot metric value.
+   - "Active": licensed AND Total_Copilot_actions_taken > 0.
+5. Print: date range, total persons, licensed persons, active persons.
+
+METRIC CALCULATIONS
+6. Compute the following metrics for the deck:
+
+   Headline metrics (latest 4 complete weeks vs. prior 4 weeks):
+   a. Current adoption rate (active / licensed in the latest week)
+   b. Adoption trend (percentage-point change between the two 4-week windows)
+   c. Average Total_Copilot_actions_taken per active user per week
+   d. Average Copilot_Assisted_Hours per active user per week (if available)
+   e. Total unique active users in the last 4 weeks
+
+   Trend data:
+   f. Weekly adoption rate over the full date range
+   g. Weekly mean Total_Copilot_actions_taken per active user
+
+   Segmentation data:
+   h. Adoption rate by each HR attribute (latest 4-week average)
+   i. Top 3 and bottom 3 organizations by adoption rate (minimum 10 licensed users)
+
+   ROI headline (if Copilot_Assisted_Hours is available):
+   j. Average weekly time saved per active user
+   k. Annualized estimated value (using $75/hour default, configurable)
+
+SLIDE DECK GENERATION
+7. Create a PowerPoint deck with the following slides. All charts must be native editable
+   PowerPoint charts (created with mschart/officer in R or python-pptx chart objects in Python),
+   NOT static images.
+
+   SLIDE 1: Title slide
+   - Title: "Copilot Adoption Review"
+   - Subtitle: Reporting period [start date] to [end date]
+   - Date generated
+
+   SLIDE 2: Executive summary
+   - 3-4 key bullet points summarizing the most important findings
+   - Lead with the headline adoption rate and trend direction
+   - Use bold text for key numbers
+
+   SLIDE 3: At a Glance — KPI cards
+   - Layout showing key metrics: adoption rate, trend, active users, avg actions/user, avg
+     assisted hours/user
+   - Use directional indicators (▲ ▼ ►) for trends
+   - Use text boxes with large numbers — these do not need to be charts
+
+   SLIDE 4: Adoption trend over time
+   - Native line chart: weekly adoption rate over the full period
+   - Clear axis labels, chart title, and a trend line if appropriate
+
+   SLIDE 5: Usage intensity over time
+   - Native line chart: weekly mean Total_Copilot_actions_taken per active user
+   - Optional second series for median if it adds insight
+
+   SLIDE 6: Copilot-assisted hours over time (if metric is available)
+   - Native line chart: weekly mean Copilot_Assisted_Hours per active user
+   - If this metric is not available, replace with a slide on another relevant metric or skip
+
+   SLIDES 7-9: Organizational breakdowns (one slide per HR attribute)
+   - Native horizontal bar chart: adoption rate by segment (latest 4-week average)
+   - Sort bars by adoption rate descending
+   - Suppress segments with fewer than 5 licensed users
+   - If there are more than 12 segments, show only the top and bottom 6
+
+   SLIDE 10: Top and bottom performers
+   - A table or two-column layout showing:
+     - Top 3 organizations by adoption rate (with their rates and user counts)
+     - Bottom 3 organizations by adoption rate
+   - Brief annotation on what distinguishes leading and lagging groups
+
+   SLIDE 11: ROI summary (if Copilot_Assisted_Hours is available)
+   - Average weekly time saved per active user
+   - Annualized value estimate and cost
+   - ROI ratio
+   - Break-even threshold
+   - Include a caveat that this is an estimation framework, not proven causal impact
+   - If ROI data is not available, replace with a usage depth slide
+
+   SLIDE 12: Key recommendations
+   - 3-4 specific, data-driven recommendations
+   - Each should reference a finding from the data with specific numbers
+   - Use action-oriented language
+
+   SLIDE 13: Risks and considerations
+   - 2-3 flagged risks or areas of concern
+   - Include data quality caveats if relevant
+
+   SLIDE 14: Methodology
+   - Brief description of data source, definitions (licensed, active), time period
+   - Privacy note on minimum group size suppression
+   - Caveat: correlation ≠ causation
+
+   SLIDE 15: Appendix (optional)
+   - Full segmentation tables with numbers
+   - Any suppressed data notes
+   - Data source details
+
+   Adjust the slide count as needed — aim for 10-15 slides total. Skip slides where data
+   is unavailable rather than leaving them blank.
+
+8. Design guidelines:
+   - Use a clean, professional layout with consistent fonts (e.g., Calibri or Segoe UI)
+   - Use a consistent color palette across all charts
+   - Keep text concise — use bullet points, not paragraphs
+   - Every chart must have a clear title and takeaway annotation
+   - Number all slides
+
+9. Save the deck as "copilot_adoption_deck_YYYYMMDD.pptx".
+
+IMPORTANT NOTES
+- All charts MUST be native editable PowerPoint chart objects, not static images. This is the
+  primary requirement — recipients need to be able to modify charts and update data.
+- Do NOT use RMarkdown or Jupyter notebook as an intermediary for this output. Generate the
+  .pptx file directly using the appropriate PowerPoint package.
+- Handle missing values correctly: null in Copilot columns = unlicensed, 0 = licensed but inactive.
+- Suppress segments with fewer than 5 users to protect privacy.
+- Do NOT fabricate numbers. Every statistic must be computed from the data.
+- If a chart type is not supported natively by the PowerPoint library, use the closest available
+  chart type and note the limitation.
+```
+
+### Adaptation notes
+
+- **R is recommended** for this prompt due to the `officer` + `mschart` packages, which provide excellent native PowerPoint chart support. Python's `python-pptx` has more limited chart types.
+- **Adjust the hourly rate** for ROI calculations by modifying the $75/hour default. Add _"Use $X/hour for the hourly rate assumption"_ to the prompt.
+- **Custom branding:** If your organization has a PowerPoint template (.potx), add: _"Use the template file at [path] as the base for the deck."_ The `officer` package in R supports applying templates.
+- **Additional slides:** Add or remove slides by modifying the slide list. For a shorter deck (board summary), keep only slides 1–5 and 12.
+- **Localization:** For non-English audiences, add: _"Generate all slide text and chart labels in [language]."_
+
+### Common failure modes
+
+- **Agent pastes images instead of creating native charts.** This is the most common failure. Verify that charts are editable by opening the .pptx and clicking on a chart — you should be able to edit the data. If the agent falls back to images, explicitly instruct it to use `mschart` (R) or chart objects in `python-pptx` (Python).
+- **Agent uses an R/Python → HTML → PPTX conversion pipeline.** This produces image-based slides, not native charts. The agent should create the .pptx directly using the PowerPoint package.
+- **Chart types not supported.** Some chart types (e.g., heatmaps) may not be available as native PowerPoint charts. The agent should substitute with a table or the closest available chart type.
+- **Slide layout is cluttered.** Review the deck for readability. Each slide should convey one main point. If a slide has too much content, ask the agent to split it.
+- **Agent does not handle missing metrics gracefully.** If `Copilot_Assisted_Hours` or other optional metrics are not in the data, the agent should skip those slides rather than error.
+
+---
+
 ## Agent Usage Analysis — Purview Audit Logs
 
 ### Purpose
@@ -768,6 +993,9 @@ the data structure before computing metrics.
 IMPORTANT CAVEAT: Purview audit log schemas are not standardized across tenants. Field names,
 operation types, and event structures may differ from what is described below. The first phase
 of this analysis must be data exploration and validation.
+
+LANGUAGE CHOICE
+Choose R or Python based on what is already installed in your environment to minimize setup.
 
 DATA LOADING AND EXPLORATION
 1. Load the audit log file. Support both CSV and JSON formats — detect the format automatically.
@@ -846,7 +1074,11 @@ AGENT/EXTENSION ANALYSIS (if data is available)
     If no agent/extension information is found, skip this section and note its absence.
 
 REPORT GENERATION
-21. Compile into an HTML report or notebook with these sections:
+21. Compile into an intermediary document first, then export to HTML:
+    - R: Create an RMarkdown file (.Rmd), then knit to a self-contained HTML file.
+    - Python: Create a Jupyter notebook (.ipynb), then export to a self-contained HTML file.
+    Keep the intermediary file alongside the HTML output for troubleshooting.
+    The report should contain these sections:
     a. "Data Overview" — schema summary, date range, total events, Copilot filter criteria used.
     b. "Usage Trends" — trend charts from step 12.
     c. "Operation Breakdown" — charts from steps 14-15.
@@ -856,8 +1088,9 @@ REPORT GENERATION
     g. "Data Notes" — document any field mapping decisions, filter criteria, and schema
        observations for reproducibility.
 
-22. Use static charts (matplotlib/seaborn or ggplot2). Embed as base64 for standalone HTML.
-23. Save as "purview_copilot_agent_analysis_YYYYMMDD.html".
+22. Use static charts (matplotlib/seaborn or ggplot2).
+23. Save the report and intermediary file as
+    "purview_copilot_agent_analysis_YYYYMMDD.html".
 
 IMPORTANT NOTES
 - This is an EXPLORATORY analysis. The Purview schema is not standardized — always start by
@@ -930,6 +1163,9 @@ schemas, so this task requires careful exploration, parsing, and normalization.
 
 IMPORTANT: Purview audit log schemas vary by tenant and event type. Do NOT assume specific field
 names in the AuditData JSON — explore the data first and adapt.
+
+LANGUAGE CHOICE
+Choose R or Python based on what is already installed in your environment to minimize setup.
 
 PHASE 1: INITIAL LOADING AND INSPECTION
 1. Load the raw audit log file. Auto-detect the format:
@@ -1086,7 +1322,8 @@ IMPORTANT NOTES
 - **Column names vary between tenants.** Always verify your actual column names against what the prompt expects. Prepend a note like _"In my data, the Organization column is called `Org`."_
 - **Granularity matters.** Most prompts assume person-week data. If your export is person-day, instruct the agent to aggregate first.
 - **Privacy thresholds.** For smaller organizations, add a note requesting minimum group sizes (e.g., suppress segments with fewer than 5 people).
-- **Language preference.** Prompts default to Python. If you prefer R, add _"Use R instead of Python"_ before the prompt.
+- **Language preference.** Prompts support both R and Python. Choose whichever is already installed in your environment to minimize setup. If you have a strong preference, add _"Use R"_ or _"Use Python"_ before the prompt.
+- **Intermediary files.** Prompts that produce HTML output instruct the agent to create an RMarkdown (.Rmd) or Jupyter notebook (.ipynb) first, then export to HTML. Keep these intermediary files — they make troubleshooting and iteration much easier.
 - **Package availability.** Prompts reference the [vivainsights R package](https://microsoft.github.io/vivainsights/) and [vivainsights Python package](https://microsoft.github.io/vivainsights-py/). Install them beforehand.
 
 ## Related resources
