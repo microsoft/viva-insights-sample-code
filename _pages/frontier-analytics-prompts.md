@@ -48,6 +48,7 @@ Each prompt card includes the purpose, required inputs, assumptions, the full pr
 | [Segmentation & Churn]({{ site.baseurl }}/frontier-analytics-prompt-segmentation/) | Classify users into usage segments, track transitions, and calculate churn rates. |
 | [ROI Estimation]({{ site.baseurl }}/frontier-analytics-prompt-roi/) | Estimate return on investment for Copilot by quantifying time savings and license costs. |
 | [Executive PowerPoint Deck]({{ site.baseurl }}/frontier-analytics-prompt-powerpoint/) | Generate an exec-ready 10–15 page PowerPoint deck with editable native charts. |
+| [Copilot Causal Toolkit]({{ site.baseurl }}/frontier-analytics-prompt-causal-toolkit/) | Run a causal inference analysis using the Copilot Causal Toolkit, then interpret results for senior leadership. Two prompts: one to run the analysis, one to interpret outputs. |
 
 ### Purview Augmentation
 
@@ -55,12 +56,6 @@ Each prompt card includes the purpose, required inputs, assumptions, the full pr
 |---|---|
 | [Agent Usage Analysis]({{ site.baseurl }}/frontier-analytics-prompt-agent-usage/) | Analyze Copilot agent and extension usage patterns from Purview audit logs. |
 | [Audit Log Parsing]({{ site.baseurl }}/frontier-analytics-prompt-audit-parsing/) | Parse and clean raw Purview audit log exports into analysis-ready flat tables. |
-
-### Causal Inference
-
-| Prompt Card | Description |
-|---|---|
-| [Copilot Causal Toolkit]({{ site.baseurl }}/frontier-analytics-prompt-causal-toolkit/) | Run a causal inference analysis using the Copilot Causal Toolkit, then interpret results for senior leadership. Two prompts: one to run the analysis, one to interpret outputs. |
 
 ---
 
