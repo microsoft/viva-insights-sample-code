@@ -73,7 +73,7 @@ After exporting a person query with Copilot activity metrics spanning at least 8
 
 ### Required inputs
 
-- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`, `Copilot_Chat_Queries`, `Copilot_Summarized_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
+- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Total_Copilot_actions_taken`, `Copilot_Assisted_Hours`, `Copilot_Chat_Queries`, `Copilot_Summarized_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
 - At least 8 weeks of data recommended
 - HR attributes for segmentation (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
 
@@ -108,13 +108,17 @@ DATA LOADING AND VALIDATION
    If there are duplicates, flag them and keep the first occurrence.
 5. Print the shape of the data, the date range covered, and the number of unique persons.
 6. List all column names so I can verify the Copilot metric columns and HR attribute columns
-   match what is expected. Auto-detect columns that start with "Copilot_" as Copilot metric columns.
+   match what is expected. Identify Copilot metric columns by checking for columns containing
+   the word "Copilot" in their name. Reference the taxonomy at
+   https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv
+   to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the
+   primary activity metric (it captures all Copilot usage across apps).
 
 IDENTIFYING LICENSED USERS
 6. A user is considered "Copilot-licensed" in a given week if they have a non-null, non-zero value
    in at least one Copilot metric column for that week. Create a boolean column `is_licensed` to
    flag these rows.
-7. Also flag "active" users: licensed users who have Copilot_Actions > 0 (or the equivalent primary
+7. Also flag "active" users: licensed users who have Total_Copilot_actions_taken > 0 (the primary
    activity metric) in that week. Create a boolean column `is_active`.
 8. Print a summary: total person-weeks, licensed person-weeks, active person-weeks.
 
@@ -123,9 +127,9 @@ METRIC CALCULATIONS
    a. Total licensed users (count of distinct PersonId where is_licensed == True)
    b. Total active users (count of distinct PersonId where is_active == True)
    c. Adoption rate = active users / licensed users (as a percentage)
-   d. Mean Copilot_Actions per active user
+   d. Mean Total_Copilot_actions_taken per active user
    e. Mean Copilot_Assisted_Hours per active user
-   f. Median Copilot_Actions per active user
+   f. Median Total_Copilot_actions_taken per active user
 10. Store these weekly aggregates in a summary DataFrame called `weekly_summary`.
 
 SEGMENTATION METRICS
@@ -133,12 +137,12 @@ SEGMENTATION METRICS
     a. Licensed user count
     b. Active user count
     c. Adoption rate
-    d. Mean Copilot_Actions per active user
+    d. Mean Total_Copilot_actions_taken per active user
 12. Store each in a separate DataFrame (e.g., `org_summary`, `function_summary`, `level_summary`).
 
 TOP USERS TABLE
-13. Compute a "top users" table: for each PersonId, calculate total Copilot_Actions across all weeks,
-    total active weeks, and average Copilot_Actions per active week. Rank by total actions descending.
+13. Compute a "top users" table: for each PersonId, calculate total Total_Copilot_actions_taken across all weeks,
+    total active weeks, and average Total_Copilot_actions_taken per active week. Rank by total actions descending.
     Keep the top 20. Include their HR attributes for context.
 
 SUMMARY STATISTICS PANEL
@@ -147,7 +151,7 @@ SUMMARY STATISTICS PANEL
     b. Trend direction: compare the last 4 weeks' average adoption rate to the prior 4 weeks
     c. Total unique licensed users across the entire period
     d. Total unique active users across the entire period
-    e. Average Copilot_Actions per active user per week (grand mean)
+    e. Average Total_Copilot_actions_taken per active user per week (grand mean)
     f. Most active organization (highest adoption rate in the latest week)
 
 DASHBOARD GENERATION
@@ -164,7 +168,7 @@ DASHBOARD GENERATION
        avg actions, top org). Use colored indicators (green for positive trend, red for negative).
     c. TREND CHARTS:
        - Line chart: Weekly adoption rate over time
-       - Line chart: Mean Copilot_Actions per active user over time
+       - Line chart: Mean Total_Copilot_actions_taken per active user over time
        - Line chart: Mean Copilot_Assisted_Hours per active user over time
     d. SEGMENTATION CHARTS:
        - Grouped bar chart: Adoption rate by Organization (latest 4-week average)
@@ -205,7 +209,7 @@ IMPORTANT NOTES
 - **Agent assumes all rows have Copilot data.** The prompt explicitly separates licensed vs. unlicensed users, but some agents may skip this. Verify that the `is_licensed` flag is computed before any metric calculations.
 - **Agent creates interactive plots that need a server.** The prompt specifies static HTML with base64-encoded images. If the agent uses plotly or bokeh, ask it to switch to matplotlib/seaborn or export static images.
 - **Agent ignores the panel structure and double-counts users.** Ensure adoption rate is calculated per week using distinct `PersonId` counts, not row counts.
-- **Metric column names differ between tenants.** The prompt includes an auto-detect step (columns starting with `Copilot_`), but always verify column names in your export before running.
+- **Metric column names differ between tenants.** Copilot metric columns generally contain the word "Copilot" but do not always start with `Copilot_`. Reference the [metrics taxonomy](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv) to validate detected columns.
 - **HTML file is not self-contained.** Check that the output HTML opens correctly with no external dependencies. If charts appear broken, ensure base64 encoding was applied.
 
 ---
@@ -226,7 +230,7 @@ When you need to communicate Copilot adoption progress to senior leadership — 
 
 ### Required inputs
 
-- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
+- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Total_Copilot_actions_taken`, `Copilot_Assisted_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
 - At least 8 weeks of data recommended (12+ weeks preferred for trend analysis)
 - HR attributes for organizational breakdowns
 
@@ -254,14 +258,17 @@ DATA LOADING AND PREPARATION
    - Python: `from vivainsights import import_query; df = import_query("<path to CSV>")`
    - R: `library(vivainsights); df <- import_query("<path to CSV>")`
    `import_query()` handles variable name cleaning and type parsing automatically.
-2. Auto-detect Copilot metric columns (columns starting with "Copilot_"). Print the detected columns
-   and the date range for verification.
+2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their
+   name. Reference the taxonomy at
+   https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv
+   to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary
+   activity metric. Print the detected columns and the date range for verification.
 3. Run `extract_hr(df)` from the `vivainsights` library to identify available HR / organizational
    attribute columns. Use the returned list for all organizational breakdowns instead of hard-coding
    column names.
 4. Classify each person-week row:
    - "Licensed": has at least one non-null, non-zero Copilot metric value.
-   - "Active": is licensed AND has Copilot_Actions > 0 (or the primary activity metric).
+   - "Active": is licensed AND has Total_Copilot_actions_taken > 0 (the primary activity metric).
    - "Unlicensed": all Copilot metric values are null or zero.
 5. If any expected HR attribute columns are not found by `extract_hr()`, note which ones are
    unavailable and proceed with what is present.
@@ -272,7 +279,7 @@ HEADLINE METRICS (compute these for the memo)
 6. Adoption trend: Compare the average weekly adoption rate over the last 4 complete weeks to the
    prior 4 weeks. Calculate the percentage-point change. Classify as "improving", "stable" (within
    ±2pp), or "declining".
-7. Usage intensity: Average Copilot_Actions per active user per week over the last 4 weeks.
+7. Usage intensity: Average Total_Copilot_actions_taken per active user per week over the last 4 weeks.
    Compare to the prior 4-week period. Report the direction and magnitude of change.
 8. Breadth of adoption: Total unique users who have been active at least once in the last 4 weeks
    as a percentage of all licensed users in that period.
@@ -389,7 +396,7 @@ After at least 8–12 weeks of person query data have been collected, when you n
 
 ### Required inputs
 
-- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
+- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Total_Copilot_actions_taken`, `Copilot_Assisted_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
 - At least 8 weeks of data (12+ weeks recommended for meaningful churn analysis)
 - HR attributes for segmentation breakdowns
 
@@ -417,8 +424,11 @@ DATA LOADING AND PREPARATION
    - Python: `from vivainsights import import_query; df = import_query("<path to CSV>")`
    - R: `library(vivainsights); df <- import_query("<path to CSV>")`
    `import_query()` handles variable name cleaning and type parsing automatically.
-2. Auto-detect Copilot metric columns (columns starting with "Copilot_"). Print detected columns
-   and the date range.
+2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their
+   name. Reference the taxonomy at
+   https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv
+   to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary
+   activity metric. Print detected columns and the date range.
 3. Run `extract_hr(df)` from the `vivainsights` library to identify available HR / organizational
    attribute columns. Use the returned list for all segmentation breakdowns instead of hard-coding
    column names.
@@ -430,15 +440,12 @@ DATA LOADING AND PREPARATION
    user with a null action count in one metric likely had zero usage of that specific feature).
 
 USER SEGMENTATION
-6. For each PersonId in each week, compute a primary usage score using Copilot_Actions (or the
-   main activity metric available). Then classify each person-week into one of four segments:
-   - "Power User": Copilot_Actions >= 75th percentile of all active person-weeks
-   - "Regular User": Copilot_Actions >= 25th percentile AND < 75th percentile
-   - "Light User": Copilot_Actions > 0 AND < 25th percentile
-   - "Inactive": Copilot_Actions == 0 (licensed but no activity)
-
-   Calculate the percentile thresholds from the distribution of Copilot_Actions across all
-   person-weeks where Copilot_Actions > 0. Print the thresholds used.
+6. Use `identify_usage_segments()` from the `vivainsights` library to classify users into segments:
+   - Python: `from vivainsights import identify_usage_segments; df = identify_usage_segments(df)`
+   - R: `df <- identify_usage_segments(df)`
+   This function uses `Total_Copilot_actions_taken` and classifies users based on both usage
+   volume and consistency (habit formation over 12 weeks), producing segments such as Power Users
+   and Habitual Users. It is preferred over manual percentile-based segmentation.
 
 7. Also compute a "stable segment" for each user based on their most frequent weekly segment
    over the entire period (mode). This gives a single label per person.
@@ -508,8 +515,8 @@ REPORT GENERATION
 25. Save the report with a descriptive filename like "copilot_segmentation_churn_YYYYMMDD.html".
 
 IMPORTANT NOTES
-- Segment thresholds are based on percentiles, not absolute numbers, so they adapt to your data.
-  Print the actual threshold values so the reader can interpret them.
+- Segments are assigned by `identify_usage_segments()` based on both usage volume and consistency
+  (habit formation over 12 weeks). Print the segment definitions used so the reader can interpret them.
 - Do NOT count unlicensed users in any denominator. They are excluded from the analysis entirely.
 - Suppress any HR attribute segment with fewer than 5 users in the visualizations.
 - The transition matrix should only include users who appear in both consecutive weeks.
@@ -519,7 +526,7 @@ IMPORTANT NOTES
 
 ### Adaptation notes
 
-- Adjust the percentile thresholds (75th/25th) if they do not produce meaningful segments for your data. For very skewed distributions, try 90th/50th instead, or define absolute thresholds (e.g., Power User ≥ 50 actions/week).
+- The `identify_usage_segments()` function provides sensible default thresholds. If the segments do not produce meaningful groupings for your data, consult the function documentation for available parameters to customize segmentation criteria.
 - If your organization has a specific definition of "churn" (e.g., 4 weeks of inactivity instead of 2), modify the churn definition in step 15.
 - For organizations with multiple Copilot products, consider segmenting by product (e.g., Copilot in Teams vs. Copilot in Word) by using product-specific metrics.
 - Add a "New User" segment by tracking each user's first active week and analyzing the onboarding trajectory separately.
@@ -551,7 +558,7 @@ When stakeholders need a quantified business justification for Copilot investmen
 
 ### Required inputs
 
-- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Assisted_Hours`, `Copilot_Actions`, `Copilot_Summarized_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
+- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Assisted_Hours`, `Total_Copilot_actions_taken`, `Copilot_Summarized_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
 - At least 8 weeks of data recommended
 - Configurable assumptions: hourly cost of employee time (default: $75/hour), annual Copilot license cost per user (default: $360/year)
 - Optional: collaboration metrics for licensed vs. unlicensed comparison (e.g., `Collaboration_Hours`, `Meeting_Hours`, `Email_Hours`)
@@ -587,20 +594,24 @@ DATA LOADING AND PREPARATION
    - Python: `from vivainsights import import_query; df = import_query("<path to CSV>")`
    - R: `library(vivainsights); df <- import_query("<path to CSV>")`
    `import_query()` handles variable name cleaning and type parsing automatically.
-2. Auto-detect Copilot metric columns (columns starting with "Copilot_"). Print detected columns.
+2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their
+   name. Reference the taxonomy at
+   https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv
+   to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary
+   activity metric. Print detected columns.
 3. Run `extract_hr(df)` from the `vivainsights` library to identify available HR / organizational
    attribute columns. Use the returned list for all organizational breakdowns instead of hard-coding
    column names.
 4. Classify each person-week:
    - "Licensed": at least one non-null, non-zero Copilot metric value.
-   - "Active": licensed AND Copilot_Actions > 0.
+   - "Active": licensed AND Total_Copilot_actions_taken > 0.
    - "Unlicensed": all Copilot metric values are null or zero.
 5. Print: total persons, licensed persons, active persons (ever active), date range.
 
 TIME SAVINGS ESTIMATION
 5. For each active person-week, extract Copilot_Assisted_Hours (the primary time-savings metric).
    If this column is not available, fall back to estimating from Copilot_Summarized_Hours or a
-   fraction of Copilot_Actions (note the assumption if using a proxy).
+   fraction of Total_Copilot_actions_taken (note the assumption if using a proxy).
 6. Compute per-user weekly time savings:
    a. Mean Copilot_Assisted_Hours per active user per week (over the last ANALYSIS_WEEKS weeks).
    b. Median Copilot_Assisted_Hours per active user per week.
