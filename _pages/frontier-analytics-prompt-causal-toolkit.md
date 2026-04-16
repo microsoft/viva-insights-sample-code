@@ -83,9 +83,7 @@ HR analytics leads, people analytics practitioners who want to evaluate the caus
 ## Prompt 1 — Run the Analysis
 
 ```
-You are a people analytics engineer helping a user run a causal inference analysis using the Copilot Causal Toolkit. The toolkit is located in the local repository at:
-
-  examples/utility-python/causal-inference/copilot-causal-toolkit/
+You are a people analytics engineer helping a user run a causal inference analysis using the Copilot Causal Toolkit. The toolkit documentation and notebooks are available at: https://microsoft.github.io/viva-insights-sample-code/copilot-causal-toolkit/
 
 The toolkit contains Jupyter notebooks that use Double Machine Learning (DML) from the `econml` package to estimate the causal effect of Copilot usage on business outcomes.
 
