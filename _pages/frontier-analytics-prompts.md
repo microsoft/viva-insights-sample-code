@@ -1093,7 +1093,6 @@ IMPORTANT NOTES
 
 - [Frontier Analytics Overview]({{ site.baseurl }}/frontier-analytics/)
 - [Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)
-- [Starter Kits]({{ site.baseurl }}/frontier-analytics-starter-kits/)
 - [vivainsights R package](https://microsoft.github.io/vivainsights/)
 - [vivainsights Python package](https://microsoft.github.io/vivainsights-py/)
 

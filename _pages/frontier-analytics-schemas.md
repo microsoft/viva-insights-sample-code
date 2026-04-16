@@ -47,9 +47,7 @@ This page consolidates the **data dictionaries and schema references** for the d
 **Related resources:**
 
 - [Prompt Card Library]({{ site.baseurl }}/frontier-analytics-prompts/) — ready-to-use prompts for coding agents
-- [Starter Kits]({{ site.baseurl }}/frontier-analytics-starter-kits/) — example output specifications and starter code
-- [Quickstart Guide]({{ site.baseurl }}/frontier-analytics-quickstart/) — get started with Frontier Analytics
-- [Frontier Analytics Landing Page]({{ site.baseurl }}/frontier-analytics/) — overview and navigation
+- [Frontier Analytics Overview]({{ site.baseurl }}/frontier-analytics/) — overview and getting started
 - [Viva Insights metric definitions (Microsoft Learn)](https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics)
 - [vivainsights R package](https://microsoft.github.io/vivainsights/)
 - [vivainsights Python package](https://microsoft.github.io/vivainsights-py/)
