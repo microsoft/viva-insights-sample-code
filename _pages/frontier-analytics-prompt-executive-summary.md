@@ -6,6 +6,7 @@ permalink: /frontier-analytics-prompt-executive-summary/
 
 {% include custom-navigation.html %}
 {% include floating-toc.html %}
+{% include prompt-styles.html %}
 
 <style>
 /* Hide any default Minima navigation that might appear */
