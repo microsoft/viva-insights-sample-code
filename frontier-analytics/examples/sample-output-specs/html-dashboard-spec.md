@@ -221,7 +221,7 @@ td { padding: 8px 12px; border-bottom: 1px solid #eee; }
     <footer id="methodology">
         <h2>Methodology</h2>
         <p><strong>Data source:</strong> Viva Insights person query export (person-week granularity).</p>
-        <p><strong>Definitions:</strong> "Licensed" = non-null Copilot metric in any column. "Active" = licensed with Copilot_Actions &gt; 0.</p>
+        <p><strong>Definitions:</strong> "Licensed" = non-null Copilot metric in any column. "Active" = licensed with Total_Copilot_actions_taken &gt; 0.</p>
         <p><strong>Privacy:</strong> Segments with fewer than 5 users are suppressed.</p>
     </footer>
 </body>
@@ -248,6 +248,8 @@ Structure the dashboard as:
 6. Methodology footer
 
 Use matplotlib or ggplot2 for charts. Convert to base64 PNG for embedding.
+Use import_query() from the vivainsights package to load CSV data.
+Use extract_hr() to identify organizational attribute columns.
 Style with a clean, professional design (Segoe UI font, blue/gray palette).
 Target file size under 5 MB. Suppress segments with < 5 users.
 Save as "copilot_dashboard_YYYYMMDD.html".

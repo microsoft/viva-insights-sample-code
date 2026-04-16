@@ -42,6 +42,7 @@ Load all required packages upfront. Pin versions if reproducibility is critical.
 
 **Python:**
 ```python
+import vivainsights as vi
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -73,18 +74,29 @@ DATA_PATH <- "./data/person_query.csv"
 
 ### Cell 3: Data loading (Code)
 
-Load the data and print basic information.
+Load the data using `import_query()` from the **vivainsights** package. This function reads in a Person Query CSV and cleans column names (replaces spaces and special characters with underscores), which helps handle localization differences.
 
+**Python:**
 ```python
-df = pd.read_csv(DATA_PATH)
-df['MetricDate'] = pd.to_datetime(df['MetricDate'])
-df['PersonId'] = df['PersonId'].astype(str)
+df = vi.import_query(DATA_PATH)
 
 print(f"Shape: {df.shape}")
 print(f"Date range: {df['MetricDate'].min()} to {df['MetricDate'].max()}")
 print(f"Unique persons: {df['PersonId'].nunique()}")
 print(f"Unique periods: {df['MetricDate'].nunique()}")
 print(f"\nColumn names:\n{list(df.columns)}")
+```
+
+**R:**
+```r
+df <- import_query(DATA_PATH)
+
+cat("Shape:", nrow(df), "x", ncol(df), "\n")
+cat("Date range:", as.character(min(df$MetricDate)), "to", as.character(max(df$MetricDate)), "\n")
+cat("Unique persons:", n_distinct(df$PersonId), "\n")
+cat("Unique periods:", n_distinct(df$MetricDate), "\n")
+cat("\nColumn names:\n")
+print(names(df))
 ```
 
 ### Cell 4: Data validation (Code + Markdown)
@@ -96,6 +108,7 @@ Verify the panel structure and data quality before any analysis. This cell shoul
 3. Check panel completeness
 4. Summarize missing values in key columns
 5. Identify licensed vs. unlicensed users
+6. Use `extract_hr()` to identify organizational attribute columns
 
 ```python
 # Panel structure check
@@ -112,18 +125,20 @@ expected = df['PersonId'].nunique() * df['MetricDate'].nunique()
 actual = len(df)
 print(f"Panel completeness: {actual/expected:.1%} ({actual}/{expected})")
 
-# Missing values in Copilot columns
+# Identify organizational attribute columns using extract_hr()
+hr_cols = vi.extract_hr(df)
+print(f"\nHR/organizational attributes: {hr_cols}")
+
+# Identify Copilot metric columns (columns containing 'Copilot')
 copilot_cols = [c for c in df.columns if 'Copilot' in c]
-print(f"\nCopilot columns found: {copilot_cols}")
+print(f"Copilot columns found: {copilot_cols}")
 for col in copilot_cols:
     null_pct = df[col].isna().mean()
     print(f"  {col}: {null_pct:.1%} null")
 
 # Licensed vs unlicensed
 df['is_licensed'] = df[copilot_cols].notna().any(axis=1)
-df['is_active'] = df['is_licensed'] & (df.get('Copilot_Actions', pd.Series(dtype=float)) > 0)
 print(f"\nLicensed person-weeks: {df['is_licensed'].sum()} ({df['is_licensed'].mean():.1%})")
-print(f"Active person-weeks: {df['is_active'].sum()} ({df['is_active'].mean():.1%})")
 ```
 
 **Follow with a Markdown cell** summarizing the validation findings:
@@ -287,19 +302,20 @@ OUTPUT FORMAT INSTRUCTIONS:
 Produce a Jupyter notebook (.ipynb) [or R Markdown (.Rmd)] with the following structure:
 
 1. Title cell (Markdown): title, author, date, data source, objective
-2. Setup cell (Code): imports, configuration, constants
-3. Data loading cell (Code): load CSV, parse dates, print shape and column names
+2. Setup cell (Code): imports (including vivainsights), configuration, constants
+3. Data loading cell (Code): load CSV with `import_query()` from vivainsights, print shape and column names
 4. Data validation section (Code + Markdown):
    - Check panel structure (unique PersonId × MetricDate)
    - Detect granularity (weekly vs daily)
    - Check panel completeness
    - Summarize missing values
-   - Create is_licensed and is_active flags
+   - Create is_licensed flag
+   - Use extract_hr() to identify organizational attribute columns
    - Markdown summary of validation findings
 5. Analysis sections (each = Markdown question → Code → Markdown interpretation):
    - Overall adoption trends (line chart)
    - Segmentation by Organization, FunctionType, LevelDesignation (bar charts)
-   - Usage depth (distribution of Copilot_Actions among active users)
+   - Usage depth (distribution of Copilot actions among active users)
    - Correlation with collaboration metrics (scatter plot)
 6. Key findings and next steps (Markdown): numbered findings, next steps checklist, caveats
 

@@ -196,5 +196,7 @@ Structure:
 
 Tone: professional, data-driven, actionable. Write for a VP/C-suite audience with no
 technical background. Lead with findings, not methodology. Use plain language.
+Use import_query() from the vivainsights package to load CSV data.
+Use extract_hr() to identify organizational attribute columns.
 Save as "copilot_executive_summary_YYYYMMDD.md".
 ```
