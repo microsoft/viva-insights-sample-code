@@ -58,6 +58,7 @@ These analytics are based on behavioral research and provide actionable insights
 
 ## Quick Links
 
+- [vivainsights-context.md](https://github.com/microsoft/viva-insights-sample-code/blob/main/vivainsights-context.md) — reusable context file for AI coding agents
 - [Viva Insights official documentation](https://learn.microsoft.com/en-us/viva/insights/introduction)
 - [vivainsights Python package](https://microsoft.github.io/vivainsights-py/)
 - [vivainsights R package](https://microsoft.github.io/vivainsights/)
