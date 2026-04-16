@@ -70,6 +70,7 @@ Each prompt card includes the purpose, required inputs, assumptions, the full pr
 
 ## Related resources
 
+- [vivainsights-context.md](https://github.com/microsoft/viva-insights-sample-code/blob/main/vivainsights-context.md) — reusable context file for AI coding agents (GitHub Copilot, Claude Code, etc.). Drop it into your project or paste it as context before a prompt so the agent understands your data without repeating setup instructions.
 - [Frontier Analytics Overview]({{ site.baseurl }}/frontier-analytics/)
 - [Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)
 - [vivainsights R package](https://microsoft.github.io/vivainsights/)
