@@ -82,27 +82,17 @@ A .pptx file with 10–15 slides, using editable native PowerPoint charts (not p
 ## Prompt
 
 ```
-You are a senior people analytics consultant. Your task is to generate a polished, exec-ready
-PowerPoint deck (.pptx) summarizing Microsoft Copilot adoption from a Viva Insights person query
-export. The deck must use editable native PowerPoint charts — NOT pasted images — so that
-recipients can modify charts and data as needed.
+You are a senior people analytics consultant. Your task is to generate a polished, exec-ready PowerPoint deck (.pptx) summarizing Microsoft Copilot adoption from a Viva Insights person query export. The deck must use editable native PowerPoint charts — NOT pasted images — so that recipients can modify charts and data as needed.
 
 LANGUAGE CHOICE
 Choose R or Python based on what is already installed in your environment to minimize setup.
 - R: Use the `officer` and `mschart` packages for native PowerPoint chart generation.
-- Python: Use the `python-pptx` package. Note that native chart support in python-pptx is more
-  limited — if advanced chart types are needed, R with `mschart` is recommended.
+- Python: Use the `python-pptx` package. Note that native chart support in python-pptx is more limited — if advanced chart types are needed, R with `mschart` is recommended.
 
 DATA LOADING AND PREPARATION
-1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python).
-   This handles variable name cleaning and type parsing automatically.
-2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their
-   name. Reference the taxonomy at
-   https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv
-   to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary
-   activity metric.
-3. Run `extract_hr(df)` from the `vivainsights` library to identify available HR / organizational
-   attribute columns.
+1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python). This handles variable name cleaning and type parsing automatically.
+2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity metric.
+3. Run `extract_hr(df)` from the `vivainsights` library to identify available HR / organizational attribute columns.
 4. Classify each person-week:
    - "Licensed": at least one non-null, non-zero Copilot metric value.
    - "Active": licensed AND Total_Copilot_actions_taken > 0.
@@ -131,9 +121,7 @@ METRIC CALCULATIONS
    k. Annualized estimated value (using $75/hour default, configurable)
 
 SLIDE DECK GENERATION
-7. Create a PowerPoint deck with the following slides. All charts must be native editable
-   PowerPoint charts (created with mschart/officer in R or python-pptx chart objects in Python),
-   NOT static images.
+7. Create a PowerPoint deck with the following slides. All charts must be native editable PowerPoint charts (created with mschart/officer in R or python-pptx chart objects in Python), NOT static images.
 
    SLIDE 1: Title slide
    - Title: "Copilot Adoption Review"
@@ -146,8 +134,7 @@ SLIDE DECK GENERATION
    - Use bold text for key numbers
 
    SLIDE 3: At a Glance — KPI cards
-   - Layout showing key metrics: adoption rate, trend, active users, avg actions/user, avg
-     assisted hours/user
+   - Layout showing key metrics: adoption rate, trend, active users, avg actions/user, avg assisted hours/user
    - Use directional indicators (▲ ▼ ►) for trends
    - Use text boxes with large numbers — these do not need to be charts
 
@@ -202,8 +189,7 @@ SLIDE DECK GENERATION
    - Any suppressed data notes
    - Data source details
 
-   Adjust the slide count as needed — aim for 10-15 slides total. Skip slides where data
-   is unavailable rather than leaving them blank.
+   Adjust the slide count as needed — aim for 10-15 slides total. Skip slides where data is unavailable rather than leaving them blank.
 
 8. Design guidelines:
    - Use a clean, professional layout with consistent fonts (e.g., Calibri or Segoe UI)
@@ -215,15 +201,12 @@ SLIDE DECK GENERATION
 9. Save the deck as "copilot_adoption_deck_YYYYMMDD.pptx".
 
 IMPORTANT NOTES
-- All charts MUST be native editable PowerPoint chart objects, not static images. This is the
-  primary requirement — recipients need to be able to modify charts and update data.
-- Do NOT use RMarkdown or Jupyter notebook as an intermediary for this output. Generate the
-  .pptx file directly using the appropriate PowerPoint package.
+- All charts MUST be native editable PowerPoint chart objects, not static images. This is the primary requirement — recipients need to be able to modify charts and update data.
+- Do NOT use RMarkdown or Jupyter notebook as an intermediary for this output. Generate the .pptx file directly using the appropriate PowerPoint package.
 - Handle missing values correctly: null in Copilot columns = unlicensed, 0 = licensed but inactive.
 - Suppress segments with fewer than 5 users to protect privacy.
 - Do NOT fabricate numbers. Every statistic must be computed from the data.
-- If a chart type is not supported natively by the PowerPoint library, use the closest available
-  chart type and note the limitation.
+- If a chart type is not supported natively by the PowerPoint library, use the closest available chart type and note the limitation.
 ```
 
 ## Adaptation notes

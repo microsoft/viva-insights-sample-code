@@ -81,35 +81,22 @@ A self-contained static HTML file with embedded charts, suitable for sharing via
 ## Prompt
 
 ```
-You are a people analytics engineer. Your task is to build a self-contained static HTML dashboard
-that visualizes Microsoft Copilot adoption from a Viva Insights person query export.
+You are a people analytics engineer. Your task is to build a self-contained static HTML dashboard that visualizes Microsoft Copilot adoption from a Viva Insights person query export.
 
 LANGUAGE CHOICE
 Choose R or Python based on what is already installed in your environment to minimize setup.
 
 DATA LOADING AND VALIDATION
-1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python).
-   This handles variable name cleaning and type parsing automatically.
+1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python). This handles variable name cleaning and type parsing automatically.
 2. Ensure PersonId is treated as a string and MetricDate is parsed as a date type.
-3. Run `extract_hr(df)` from the `vivainsights` library to identify the available HR / organizational
-   attribute columns in the data. Use the returned list of HR attributes for all segmentation
-   breakdowns instead of hard-coding column names like Organization, FunctionType, or LevelDesignation.
-4. Verify the panel structure: each row should represent a unique PersonId × MetricDate combination.
-   If there are duplicates, flag them and keep the first occurrence.
+3. Run `extract_hr(df)` from the `vivainsights` library to identify the available HR / organizational attribute columns in the data. Use the returned list of HR attributes for all segmentation breakdowns instead of hard-coding column names like Organization, FunctionType, or LevelDesignation.
+4. Verify the panel structure: each row should represent a unique PersonId × MetricDate combination. If there are duplicates, flag them and keep the first occurrence.
 5. Print the shape of the data, the date range covered, and the number of unique persons.
-6. List all column names so I can verify the Copilot metric columns and HR attribute columns
-   match what is expected. Identify Copilot metric columns by checking for columns containing
-   the word "Copilot" in their name. Reference the taxonomy at
-   https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv
-   to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the
-   primary activity metric (it captures all Copilot usage across apps).
+6. List all column names so I can verify the Copilot metric columns and HR attribute columns match what is expected. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity metric (it captures all Copilot usage across apps).
 
 IDENTIFYING LICENSED USERS
-6. A user is considered "Copilot-licensed" in a given week if they have a non-null, non-zero value
-   in at least one Copilot metric column for that week. Create a boolean column `is_licensed` to
-   flag these rows.
-7. Also flag "active" users: licensed users who have Total_Copilot_actions_taken > 0 (the primary
-   activity metric) in that week. Create a boolean column `is_active`.
+6. A user is considered "Copilot-licensed" in a given week if they have a non-null, non-zero value in at least one Copilot metric column for that week. Create a boolean column `is_licensed` to flag these rows.
+7. Also flag "active" users: licensed users who have Total_Copilot_actions_taken > 0 (the primary activity metric) in that week. Create a boolean column `is_active`.
 8. Print a summary: total person-weeks, licensed person-weeks, active person-weeks.
 
 METRIC CALCULATIONS
@@ -131,9 +118,7 @@ SEGMENTATION METRICS
 12. Store each in a separate DataFrame (e.g., `org_summary`, `function_summary`, `level_summary`).
 
 TOP USERS TABLE
-13. Compute a "top users" table: for each PersonId, calculate total Total_Copilot_actions_taken across all weeks,
-    total active weeks, and average Total_Copilot_actions_taken per active week. Rank by total actions descending.
-    Keep the top 20. Include their HR attributes for context.
+13. Compute a "top users" table: for each PersonId, calculate total Total_Copilot_actions_taken across all weeks, total active weeks, and average Total_Copilot_actions_taken per active week. Rank by total actions descending. Keep the top 20. Include their HR attributes for context.
 
 SUMMARY STATISTICS PANEL
 14. Calculate overall summary statistics for the dashboard header:
@@ -146,17 +131,12 @@ SUMMARY STATISTICS PANEL
 
 DASHBOARD GENERATION
 15. Create the dashboard as an intermediary document first, then export to HTML:
-    - R: Create an RMarkdown file (.Rmd) with ggplot2 charts, then knit to a self-contained HTML
-      file (output: html_document, self_contained: true).
-    - Python: Create a Jupyter notebook (.ipynb) with matplotlib/seaborn charts, then export to
-      a self-contained HTML file (e.g., `jupyter nbconvert --to html`).
-    Keep the intermediary .Rmd or .ipynb file alongside the HTML output — it makes troubleshooting
-    and iteration easier. Do NOT use a web framework or server.
+    - R: Create an RMarkdown file (.Rmd) with ggplot2 charts, then knit to a self-contained HTML file (output: html_document, self_contained: true).
+    - Python: Create a Jupyter notebook (.ipynb) with matplotlib/seaborn charts, then export to a self-contained HTML file (e.g., `jupyter nbconvert --to html`). Keep the intermediary .Rmd or .ipynb file alongside the HTML output — it makes troubleshooting and iteration easier. Do NOT use a web framework or server.
 
 16. The HTML dashboard should contain these sections in order:
     a. HEADER: Title ("Copilot Adoption Dashboard"), date range, generation timestamp.
-    b. SUMMARY PANEL: Cards showing the key metrics from step 14 (adoption rate, trend, total users,
-       avg actions, top org). Use colored indicators (green for positive trend, red for negative).
+    b. SUMMARY PANEL: Cards showing the key metrics from step 14 (adoption rate, trend, total users, avg actions, top org). Use colored indicators (green for positive trend, red for negative).
     c. TREND CHARTS:
        - Line chart: Weekly adoption rate over time
        - Line chart: Mean Total_Copilot_actions_taken per active user over time
@@ -167,22 +147,17 @@ DASHBOARD GENERATION
        - Grouped bar chart: Adoption rate by LevelDesignation (latest 4-week average)
        - Heatmap: Adoption rate by Organization × week (if number of orgs <= 15)
     e. TOP USERS TABLE: HTML table of top 20 users from step 13.
-    f. METHODOLOGY NOTE: Brief paragraph explaining how adoption rate is calculated, what
-       "licensed" and "active" mean, and the data source.
+    f. METHODOLOGY NOTE: Brief paragraph explaining how adoption rate is calculated, what "licensed" and "active" mean, and the data source.
 
-17. Style the HTML with a clean, professional design. Use a sans-serif font, consistent color
-    palette, and adequate whitespace. The dashboard should look presentable when opened in a browser.
+17. Style the HTML with a clean, professional design. Use a sans-serif font, consistent color palette, and adequate whitespace. The dashboard should look presentable when opened in a browser.
 
-18. Save the HTML file and the intermediary .Rmd or .ipynb to the working directory with descriptive
-    filenames like "copilot_adoption_dashboard_YYYYMMDD.html".
+18. Save the HTML file and the intermediary .Rmd or .ipynb to the working directory with descriptive filenames like "copilot_adoption_dashboard_YYYYMMDD.html".
 
 IMPORTANT NOTES
-- Do NOT create interactive plots that require a running server (no plotly, no bokeh server).
-  Static charts embedded in the RMarkdown/Jupyter output are preferred.
+- Do NOT create interactive plots that require a running server (no plotly, no bokeh server). Static charts embedded in the RMarkdown/Jupyter output are preferred.
 - Handle missing values gracefully: NaN in Copilot columns means the user is unlicensed that week.
 - If any HR attribute column is missing from the data, skip that segmentation chart and note it.
-- Use the `vivainsights` package (R or Python) for data loading (`import_query()`) and HR attribute
-  discovery (`extract_hr()`). Use ggplot2 (R) or matplotlib/seaborn (Python) for charting.
+- Use the `vivainsights` package (R or Python) for data loading (`import_query()`) and HR attribute discovery (`extract_hr()`). Use ggplot2 (R) or matplotlib/seaborn (Python) for charting.
 - All charts should have clear titles, axis labels, and legends.
 - If any segment has fewer than 5 users, suppress it from charts to protect privacy.
 ```

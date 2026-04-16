@@ -83,9 +83,7 @@ An ROI summary report in HTML or Markdown, containing a value framework, sensiti
 ## Prompt
 
 ```
-You are a people analytics consultant specializing in technology ROI. Your task is to produce a
-defensible ROI estimate for Microsoft Copilot based on a Viva Insights person query export. The
-output should be suitable for inclusion in a business case presented to finance and IT leadership.
+You are a people analytics consultant specializing in technology ROI. Your task is to produce a defensible ROI estimate for Microsoft Copilot based on a Viva Insights person query export. The output should be suitable for inclusion in a business case presented to finance and IT leadership.
 
 LANGUAGE CHOICE
 Choose R or Python based on what is already installed in your environment to minimize setup.
@@ -97,16 +95,9 @@ CONFIGURABLE ASSUMPTIONS (define as variables at the top of the script so they a
 - ANALYSIS_WEEKS = 4  # Number of recent weeks to use for annualized projections
 
 DATA LOADING AND PREPARATION
-1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python).
-   This handles variable name cleaning and type parsing automatically.
-2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their
-   name. Reference the taxonomy at
-   https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv
-   to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary
-   activity metric. Print detected columns.
-3. Run `extract_hr(df)` from the `vivainsights` library to identify available HR / organizational
-   attribute columns. Use the returned list for all organizational breakdowns instead of hard-coding
-   column names.
+1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python). This handles variable name cleaning and type parsing automatically.
+2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity metric. Print detected columns.
+3. Run `extract_hr(df)` from the `vivainsights` library to identify available HR / organizational attribute columns. Use the returned list for all organizational breakdowns instead of hard-coding column names.
 4. Classify each person-week:
    - "Licensed": at least one non-null, non-zero Copilot metric value.
    - "Active": licensed AND Total_Copilot_actions_taken > 0.
@@ -114,17 +105,14 @@ DATA LOADING AND PREPARATION
 5. Print: total persons, licensed persons, active persons (ever active), date range.
 
 TIME SAVINGS ESTIMATION
-5. For each active person-week, extract Copilot_Assisted_Hours (the primary time-savings metric).
-   If this column is not available, fall back to estimating from Copilot_Summarized_Hours or a
-   fraction of Total_Copilot_actions_taken (note the assumption if using a proxy).
+5. For each active person-week, extract Copilot_Assisted_Hours (the primary time-savings metric). If this column is not available, fall back to estimating from Copilot_Summarized_Hours or a fraction of Total_Copilot_actions_taken (note the assumption if using a proxy).
 6. Compute per-user weekly time savings:
    a. Mean Copilot_Assisted_Hours per active user per week (over the last ANALYSIS_WEEKS weeks).
    b. Median Copilot_Assisted_Hours per active user per week.
    c. Total Copilot_Assisted_Hours across all active users per week.
 7. Annualize the time savings:
    a. Per-user annualized hours saved = mean weekly hours × WEEKS_IN_YEAR.
-   b. Total annualized hours saved = total weekly hours × WEEKS_IN_YEAR.
-   Print both figures.
+   b. Total annualized hours saved = total weekly hours × WEEKS_IN_YEAR. Print both figures.
 
 MONETARY VALUE ESTIMATION
 8. Convert time savings to monetary value:
@@ -136,41 +124,33 @@ MONETARY VALUE ESTIMATION
 10. Compute ROI metrics:
     a. Net annual value = total annual value - total annual cost.
     b. ROI ratio = total annual value / total annual cost.
-    c. Break-even hours: the minimum weekly Copilot_Assisted_Hours per user needed for the
-       license to pay for itself = (ANNUAL_LICENSE_COST / WEEKS_IN_YEAR) / HOURLY_RATE.
+    c. Break-even hours: the minimum weekly Copilot_Assisted_Hours per user needed for the license to pay for itself = (ANNUAL_LICENSE_COST / WEEKS_IN_YEAR) / HOURLY_RATE.
     d. Percentage of licensed users exceeding the break-even threshold.
 
 SENSITIVITY ANALYSIS
-11. Compute ROI under different assumptions. Create a table with rows for different hourly rates
-    ($50, $75, $100, $125) and columns for different utilization scenarios:
+11. Compute ROI under different assumptions. Create a table with rows for different hourly rates ($50, $75, $100, $125) and columns for different utilization scenarios:
     a. "Current active users only" — value from only currently active users.
     b. "50% more adoption" — if 50% more licensed users become active at the current average.
     c. "Full adoption" — if all licensed users become active at the current average.
 12. This table shows leadership how ROI improves with higher adoption.
 
 LICENSED VS. UNLICENSED COMPARISON (if collaboration metrics are available)
-13. If collaboration metrics are present in the data (Collaboration_Hours, Meeting_Hours,
-    Email_Hours, Focus_Hours, or similar), compare licensed vs. unlicensed users:
-    a. For the most recent ANALYSIS_WEEKS weeks, compute the mean of each collaboration metric
-       for licensed-active users, licensed-inactive users, and unlicensed users.
+13. If collaboration metrics are present in the data (Collaboration_Hours, Meeting_Hours, Email_Hours, Focus_Hours, or similar), compare licensed vs. unlicensed users:
+    a. For the most recent ANALYSIS_WEEKS weeks, compute the mean of each collaboration metric for licensed-active users, licensed-inactive users, and unlicensed users.
     b. Present as a comparison table.
-    c. Include a caveat: this is an observational comparison, NOT a causal estimate. Differences
-       may reflect selection effects (e.g., more collaborative employees may adopt Copilot first).
+    c. Include a caveat: this is an observational comparison, NOT a causal estimate. Differences may reflect selection effects (e.g., more collaborative employees may adopt Copilot first).
 14. If collaboration metrics are not present, skip this section and note its absence.
 
 VALUE BY SEGMENT
 15. Break down the annual value estimate by Organization (or the primary HR attribute):
-    a. For each organization, compute: licensed users, active users, total Copilot_Assisted_Hours,
-       annualized value, license cost, net value.
+    a. For each organization, compute: licensed users, active users, total Copilot_Assisted_Hours, annualized value, license cost, net value.
     b. Present as a sorted table (by net value descending).
     c. Identify organizations with negative net value (license cost exceeds estimated value).
 
 REPORT GENERATION
 16. Compile into a professional report. Create an intermediary document first, then export to HTML:
     - R: Create an RMarkdown file (.Rmd), then knit to a self-contained HTML file.
-    - Python: Create a Jupyter notebook (.ipynb), then export to a self-contained HTML file.
-    Keep the intermediary file alongside the HTML output for troubleshooting.
-    The report should contain these sections:
+    - Python: Create a Jupyter notebook (.ipynb), then export to a self-contained HTML file. Keep the intermediary file alongside the HTML output for troubleshooting. The report should contain these sections:
 
     a. "Executive Summary" (3-4 sentences)
        - Lead with the headline ROI number.
@@ -200,27 +180,19 @@ REPORT GENERATION
        - Data source and time period.
        - How time savings are measured (Copilot_Assisted_Hours).
        - The hourly rate assumption and its basis.
-       - Explicit caveat: "This analysis estimates the potential value of time savings attributed
-         to Copilot-assisted work. It does not establish a causal relationship between Copilot
-         usage and productivity gains. Actual ROI depends on how saved time is reallocated.
-         Correlation between Copilot usage and collaboration patterns may reflect selection
-         effects rather than causal impact."
+       - Explicit caveat: "This analysis estimates the potential value of time savings attributed to Copilot-assisted work. It does not establish a causal relationship between Copilot usage and productivity gains. Actual ROI depends on how saved time is reallocated. Correlation between Copilot usage and collaboration patterns may reflect selection effects rather than causal impact."
        - Note: time savings represent Copilot-assisted work, not necessarily net new time freed.
        - Privacy note: segments with fewer than 5 users are suppressed.
 
     g. "Assumptions" — list all configurable assumptions and their values.
 
-17. Use a clean, professional design. Format currency values with dollar signs and commas.
-    Use bold text for headline numbers.
+17. Use a clean, professional design. Format currency values with dollar signs and commas. Use bold text for headline numbers.
 18. Save as "copilot_roi_estimation_YYYYMMDD.html".
 
 IMPORTANT NOTES
-- Do NOT overstate the ROI. This is an estimation framework, not a proven causal impact.
-  Every section should include appropriate caveats.
-- Handle missing Copilot_Assisted_Hours carefully. If null for a licensed user, treat as 0
-  (they are licensed but did not use Copilot-assisted features that week).
-- The break-even calculation is a useful framing device — it tells leadership the minimum
-  usage needed to justify the license cost.
+- Do NOT overstate the ROI. This is an estimation framework, not a proven causal impact. Every section should include appropriate caveats.
+- Handle missing Copilot_Assisted_Hours carefully. If null for a licensed user, treat as 0 (they are licensed but did not use Copilot-assisted features that week).
+- The break-even calculation is a useful framing device — it tells leadership the minimum usage needed to justify the license cost.
 - If the ROI is negative, report it honestly and frame recommendations around increasing adoption.
 - Suppress segments with fewer than 5 users.
 ```
