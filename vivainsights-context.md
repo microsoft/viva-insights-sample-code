@@ -12,6 +12,8 @@ Viva Insights exports **person query** data as CSV files at **person-week** gran
 - A balanced panel means every person appears in every week. Verify by checking that `PersonId × MetricDate` combinations are unique.
 - Super Users Report exports use `Date` instead of `MetricDate`.
 
+**Note:** Not all Viva Insights queries produce person-week panel data. Some exports (e.g., meeting queries, group-to-group queries) have different structures. This context file assumes person query format. If the data has a different structure, adapt the guidance accordingly or use a task-specific context prompt instead.
+
 ## Loading data
 
 Always use `import_query()` from the **vivainsights** package to load CSV data. This function:
@@ -48,6 +50,8 @@ Use the returned list for all segmentation and grouping operations instead of ha
 
 ## Copilot metrics
 
+Not all analyses involve Copilot data. If the dataset does not contain Copilot metric columns, skip this section and the sections on licensed/active classification and usage segmentation below.
+
 - Copilot metric columns usually contain the word **"Copilot"** in their name, but do not always start with `Copilot_`.
 - Identify them dynamically: filter columns where the name contains "Copilot".
 - The **primary activity metric** is `Total_Copilot_actions_taken` — it captures all Copilot usage across apps and is generally recommended.
@@ -74,6 +78,22 @@ df <- identify_usage_segments(df)
 
 This produces segments including **Power Users** and **Habitual Users**, which reflect sustained usage patterns rather than one-off spikes.
 
+## Holiday weeks
+
+Employee data is affected by holiday periods (e.g., summer breaks, Christmas, Lunar New Year) where collaboration drops significantly. These weeks can skew averages and trends if not handled.
+
+Use `identify_holidayweeks()` from the **vivainsights** package to detect holiday weeks based on `Collaboration_hours`:
+
+```python
+holiday_weeks = vi.identify_holidayweeks(df)
+```
+
+```r
+holiday_weeks <- identify_holidayweeks(df)
+```
+
+Offer the user the choice to exclude identified holiday weeks from the analysis — this can materially change results. If excluding, document which weeks were removed in the methodology or footnotes.
+
 ## Language choice
 
 Choose R or Python based on what is already installed in the user's environment to minimize setup:
@@ -88,6 +108,19 @@ Both packages provide the same core functions (`import_query`, `extract_hr`, `id
 - For **HTML outputs**: create an RMarkdown (`.Rmd`) or Jupyter notebook (`.ipynb`) first, then knit/export to HTML. Keep the intermediary file for troubleshooting.
 - For **PowerPoint outputs**: generate `.pptx` directly using specialized packages (`officer` + `mschart` in R, or `python-pptx` in Python). Do not use an intermediary notebook.
 - For **self-contained HTML**: all CSS, JS, fonts, and chart images must be inline or base64-encoded. No external dependencies.
+- **Always include base sizes (n) and date ranges** in captions, footnotes, or subtitles of all charts and tables. These are critical for interpretation — a trend based on 20 people reads very differently from one based on 2,000.
+
+## Exploratory data analysis
+
+For exploratory analysis, prefer built-in functions from the **vivainsights** package over writing custom code from scratch. Key functions include:
+
+- `create_bar()` — bar charts of metric averages by organizational attribute
+- `create_rank()` — ranked comparisons across groups
+- `create_trend()` — trend lines over time
+- `create_boxplot()` — distributions by group
+- `create_dist()` — distribution analysis
+
+These functions accept a `return` parameter (R: `return`, Python: `return_type`) that can be set to `"table"` or `"data"` to return a data frame instead of a plot, making it easy to reuse the output in further analysis.
 
 ## Privacy and minimum group sizes
 
