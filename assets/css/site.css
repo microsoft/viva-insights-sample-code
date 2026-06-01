@@ -192,3 +192,56 @@ a.post-link {
   color: var(--vi-purple);
   font-size: 0.9rem;
 }
+
+/* ---- Nav search link ---- */
+.custom-nav .vi-nav-search {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.5rem;
+}
+.custom-nav .vi-nav-search:hover {
+  color: var(--vi-purple) !important;
+}
+
+/* ---- Search page ---- */
+.vi-search {
+  max-width: 46rem;
+  margin: 1.5rem 0 2.5rem;
+}
+.vi-search-input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  font-size: 1.05rem;
+  border: 1px solid var(--vi-border);
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+.vi-search-input:focus {
+  outline: none;
+  border-color: var(--vi-purple);
+  box-shadow: 0 0 0 3px rgba(92, 45, 145, 0.15);
+}
+.vi-search-status {
+  margin: 0.8rem 0 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+.vi-search-results {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+.vi-search-result {
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--vi-border);
+}
+.page-content a.vi-search-link {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--vi-purple) !important;
+}
+.vi-search-snippet {
+  margin: 0.3rem 0 0;
+  color: #444;
+  font-size: 0.95rem;
+}
