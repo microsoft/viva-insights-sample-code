@@ -8,42 +8,6 @@ permalink: /frontier-analytics-prompt-roi/
 {% include floating-toc.html %}
 {% include prompt-styles.html %}
 
-<style>
-/* Hide any default Minima navigation that might appear */
-.site-header .site-nav,
-.trigger,
-.page-link:not(.dropdown-toggle):not(.btn) {
-  display: none !important;
-}
-
-/* Ensure our custom navigation is visible */
-.custom-nav {
-  display: block !important;
-}
-
-/* Prompt page navigation */
-.prompt-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e0e0e0;
-}
-.prompt-nav a {
-  text-decoration: none;
-  color: #0366d6;
-  font-weight: 500;
-}
-.prompt-nav a:hover {
-  text-decoration: underline;
-}
-.prompt-nav .nav-disabled {
-  color: #999;
-  pointer-events: none;
-}
-</style>
-
 # ROI Estimation — Copilot Adoption
 
 [← Back to Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/)

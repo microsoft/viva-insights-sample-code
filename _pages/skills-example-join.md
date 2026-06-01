@@ -7,20 +7,6 @@ permalink: /skills-data-join/
 {% include custom-navigation.html %}
 {% include floating-toc.html %}
 
-<style>
-/* Hide any default Minima navigation that might appear */
-.site-header .site-nav,
-.trigger,
-.page-link:not(.dropdown-toggle):not(.btn) {
-  display: none !important;
-}
-
-/* Ensure our custom navigation is visible */
-.custom-nav {
-  display: block !important;
-}
-</style>
-
 This comprehensive tutorial walks through how to join [People Skills](https://learn.microsoft.com/en-us/copilot/microsoft-365/people-skills-overview) data with [Viva Insights](https://learn.microsoft.com/en-us/viva/insights/introduction) to answer common business questions that analysts frequently encounter. We'll demonstrate practical scenarios using both R and Python, showing you how to transform raw skills data into actionable organizational insights.
 
 ## What You'll Learn
@@ -935,6 +921,4 @@ If you encounter issues or want to extend these analyses:
 ---
 
 *This tutorial provides a foundation for skills-based organizational analysis. The specific insights and actions will depend on your organization's context, but the analytical approaches demonstrated here are broadly applicable across industries and use cases.*
-
-
 

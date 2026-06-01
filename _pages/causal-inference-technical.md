@@ -9,15 +9,6 @@ permalink: /causal-inference-technical/
 {% include custom-navigation.html %}
 {% include floating-toc.html %}
 
-<style>
-/* Hide default Minima navigation to prevent duplicates */
-.site-header .site-nav,
-.site-header .trigger,
-.site-header .page-link {
-  display: none !important;
-}
-</style>
-
 ## Overview
 
 This technical guide provides detailed implementation instructions for applying causal inference methods to Copilot analytics data. It includes code examples, methodological details, and practical considerations for data scientists and analysts.

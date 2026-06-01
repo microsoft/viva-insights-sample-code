@@ -10,15 +10,6 @@ permalink: /causal-inference/
 {% include custom-navigation.html %}
 {% include floating-toc.html %}
 
-<style>
-/* Hide default Minima navigation to prevent duplicates */
-.site-header .site-nav,
-.site-header .trigger,
-.site-header .page-link {
-  display: none !important;
-}
-</style>
-
 ## Introduction
 
 Understanding the true impact of Microsoft Copilot on productivity and business outcomes requires more than simple correlation analysis. While it's easy to observe that teams using Copilot appear more productive, the critical question remains: **How much of this improvement is actually caused by Copilot itself?**

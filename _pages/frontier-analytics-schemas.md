@@ -7,20 +7,6 @@ permalink: /frontier-analytics-schemas/
 {% include custom-navigation.html %}
 {% include floating-toc.html %}
 
-<style>
-/* Hide any default Minima navigation that might appear */
-.site-header .site-nav,
-.trigger,
-.page-link:not(.dropdown-toggle):not(.btn) {
-  display: none !important;
-}
-
-/* Ensure our custom navigation is visible */
-.custom-nav {
-  display: block !important;
-}
-</style>
-
 This page provides **practical schema guidance** for working with Viva Insights data exports. It focuses on structural concepts, join patterns, and common pitfalls — things that are not obvious from the official documentation alone.
 
 For authoritative and up-to-date metric definitions and column references, see:

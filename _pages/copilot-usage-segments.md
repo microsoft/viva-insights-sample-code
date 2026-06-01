@@ -7,20 +7,6 @@ permalink: /copilot-usage-segments/
 {% include custom-navigation.html %}
 {% include floating-toc.html %}
 
-<style>
-/* Hide any default Minima navigation that might appear */
-.site-header .site-nav,
-.trigger,
-.page-link:not(.dropdown-toggle):not(.btn) {
-  display: none !important;
-}
-
-/* Ensure our custom navigation is visible */
-.custom-nav {
-  display: block !important;
-}
-</style>
-
 ## Why Copilot Usage Segments?
 
 The goal of this segmentation technique is to identify segments of users in an organization who are using Copilot more effectively than others, which can provide insights on how organizations can increase overall Copilot adoption and drive AI transformation.
@@ -172,7 +158,6 @@ To calculate the Copilot Usage Segments, you can use the `identify_usage_segment
 For an implementation in Power BI, have a look at [this guide]({{ site.baseurl }}/dax-calculated-columns/).
 
 ---
-
 
 ## Frequently Asked Questions
 

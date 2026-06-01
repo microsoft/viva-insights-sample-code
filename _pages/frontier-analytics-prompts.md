@@ -7,20 +7,6 @@ permalink: /frontier-analytics-prompts/
 {% include custom-navigation.html %}
 {% include floating-toc.html %}
 
-<style>
-/* Hide any default Minima navigation that might appear */
-.site-header .site-nav,
-.trigger,
-.page-link:not(.dropdown-toggle):not(.btn) {
-  display: none !important;
-}
-
-/* Ensure our custom navigation is visible */
-.custom-nav {
-  display: block !important;
-}
-</style>
-
 # Prompt Card Library
 
 This page contains **prompt cards** — ready-to-use prompts that you can paste directly into a coding agent (such as [GitHub Copilot](https://github.com/features/copilot), [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview), or similar tools) to generate analytics outputs from Viva Insights data.

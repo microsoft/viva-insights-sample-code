@@ -9,15 +9,6 @@ permalink: /causal-inference-regression/
 {% include custom-navigation.html %}
 {% include floating-toc.html %}
 
-<style>
-/* Hide default Minima navigation to prevent duplicates */
-.site-header .site-nav,
-.site-header .trigger,
-.site-header .page-link {
-  display: none !important;
-}
-</style>
-
 ## Overview
 
 Regression adjustment is the most straightforward causal inference method. It estimates the treatment effect by controlling for confounding variables through linear regression. The key insight is that if you can measure and control for all variables that influence both treatment and outcome, the remaining correlation between treatment and outcome represents the causal effect.

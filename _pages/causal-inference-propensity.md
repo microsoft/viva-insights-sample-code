@@ -9,15 +9,6 @@ permalink: /causal-inference-propensity/
 {% include custom-navigation.html %}
 {% include floating-toc.html %}
 
-<style>
-/* Hide default Minima navigation to prevent duplicates */
-.site-header .site-nav,
-.site-header .trigger,
-.site-header .page-link {
-  display: none !important;
-}
-</style>
-
 ## Overview
 
 Propensity score methods address selection bias by balancing groups on observed characteristics. Instead of controlling for confounders directly in the outcome model, we match treated and control units with similar probabilities of receiving treatment.

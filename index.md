@@ -6,20 +6,6 @@ description: "Sample code, tutorials, and AI prompt libraries for Microsoft Viva
 
 {% include custom-navigation.html %}
 
-<style>
-/* Hide any default Minima navigation that might appear */
-.site-header .site-nav,
-.trigger,
-.page-link:not(.dropdown-toggle):not(.btn) {
-  display: none !important;
-}
-
-/* Ensure our custom navigation is visible */
-.custom-nav {
-  display: block !important;
-}
-</style>
-
 This repository contains sample code for the Viva Insights open-source packages, including code that is used in tutorials or demos. The sample code shown here covers more elaborate scenarios and examples that leverage, but are not included in the R and Python packages themselves.
 
 ## Is this page for me?

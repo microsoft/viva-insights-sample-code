@@ -8,20 +8,6 @@ permalink: /network/
 {% include custom-navigation.html %}
 {% include floating-toc.html %}
 
-<style>
-/* Hide any default Minima navigation that might appear */
-.site-header .site-nav,
-.trigger,
-.page-link:not(.dropdown-toggle):not(.btn) {
-  display: none !important;
-}
-
-/* Ensure our custom navigation is visible */
-.custom-nav {
-  display: block !important;
-}
-</style>
-
 # Network Analysis Scripts
 
 This page covers collaboration network visualization and analysis scripts for understanding organizational connectivity, typically referred to as organizational network analysis (ONA). Viva Insights offers a unique data source to visualize information flow between people and groups in an organization, providing insights that traditional organizational charts cannot reveal.

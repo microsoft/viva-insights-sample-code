@@ -8,20 +8,6 @@ permalink: /frontier-analytics/
 {% include custom-navigation.html %}
 {% include floating-toc.html %}
 
-<style>
-/* Hide any default Minima navigation that might appear */
-.site-header .site-nav,
-.trigger,
-.page-link:not(.dropdown-toggle):not(.btn) {
-  display: none !important;
-}
-
-/* Ensure our custom navigation is visible */
-.custom-nav {
-  display: block !important;
-}
-</style>
-
 # Frontier Analytics
 
 Frontier Analytics is an **export-first, self-service analytics toolkit** for [Viva Insights](https://learn.microsoft.com/en-us/viva/insights/). It provides reusable prompts, schema documentation, and example specifications that you can combine with a coding agent to produce analytics outputs from exported Viva Insights data.

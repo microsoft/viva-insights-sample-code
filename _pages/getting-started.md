@@ -10,15 +10,6 @@ permalink: /getting-started/
 {% include custom-navigation.html %}
 {% include floating-toc.html %}
 
-<style>
-/* Hide default Minima navigation to prevent duplicates */
-.site-header .site-nav,
-.site-header .trigger,
-.site-header .page-link {
-  display: none !important;
-}
-</style>
-
 Welcome to Viva Insights sample code! This guide will help you set up your development environment and get started with analyzing Viva Insights data using R or Python.
 
 ---

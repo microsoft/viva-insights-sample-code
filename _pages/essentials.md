@@ -8,20 +8,6 @@ permalink: /essentials/
 {% include custom-navigation.html %}
 {% include floating-toc.html %}
 
-<style>
-/* Hide any default Minima navigation that might appear */
-.site-header .site-nav,
-.trigger,
-.page-link:not(.dropdown-toggle):not(.btn) {
-  display: none !important;
-}
-
-/* Ensure our custom navigation is visible */
-.custom-nav {
-  display: block !important;
-}
-</style>
-
 # Essential Viva Insights Scripts
 
 This page provides some essential scripts to let you get started with analysis in Viva Insights. Using the R and Python scripts below, you can: 

@@ -9,15 +9,6 @@ permalink: /causal-inference-data-prep/
 {% include custom-navigation.html %}
 {% include floating-toc.html %}
 
-<style>
-/* Hide default Minima navigation to prevent duplicates */
-.site-header .site-nav,
-.site-header .trigger,
-.site-header .page-link {
-  display: none !important;
-}
-</style>
-
 ## Overview
 
 Successful causal inference starts with properly structured data. Unlike simple correlation analysis, causal methods require specific data characteristics and measurement approaches. This guide covers essential data preparation steps before implementing any causal inference method.
