@@ -270,3 +270,39 @@ a.post-link {
   color: #444;
   font-size: 0.95rem;
 }
+
+/* ---- Per-page freshness signals (last updated + edit on GitHub) ---- */
+.page-meta {
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--vi-border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1.5rem;
+  font-size: 0.85rem;
+  color: #6b6b6b;
+}
+.page-meta-updated {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.page-content a.page-meta-edit,
+.page-meta-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--vi-purple) !important;
+  font-weight: 500;
+  text-decoration: none;
+}
+.page-content a.page-meta-edit:hover,
+.page-meta-edit:hover {
+  color: var(--vi-purple-dark) !important;
+  text-decoration: underline;
+}
+.page-meta svg {
+  flex: 0 0 auto;
+  opacity: 0.85;
+}

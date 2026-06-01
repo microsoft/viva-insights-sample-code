@@ -20,6 +20,7 @@ plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-seo-tag
+  - jekyll-last-modified-at
 
 # Navigation - Disabled default header_pages to use custom Bootstrap navigation
 # header_pages:
