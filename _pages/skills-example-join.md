@@ -922,3 +922,11 @@ If you encounter issues or want to extend these analyses:
 
 *This tutorial provides a foundation for skills-based organizational analysis. The specific insights and actions will depend on your organization's context, but the analytical approaches demonstrated here are broadly applicable across industries and use cases.*
 
+
+---
+
+## Related pages
+
+- [Skills Data Join Requirements]({{ site.baseurl }}/skills-data-join-requirements/) — developer prerequisites and setup
+- [Essentials]({{ site.baseurl }}/essentials/) — core Viva Insights analysis scripts
+- [Network Analysis]({{ site.baseurl }}/network/) — analyze collaboration alongside skills data

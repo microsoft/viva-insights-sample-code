@@ -426,3 +426,11 @@ CATE analysis identifies heterogeneous treatment effects across subgroups:
 - Monitor temporal patterns: Use ITSA results to understand optimal training timing and support needs.
 - Iterative refinement: Use initial results to inform subsequent analysis waves with better data or refined questions.
 - Stakeholder communication: Present results in business terms (e.g., "productivity gains") rather than statistical jargon.
+
+---
+
+## Related pages
+
+- [Causal Inference in Copilot Analytics]({{ site.baseurl }}/causal-inference/) — conceptual introduction and business context
+- [Technical Implementation Overview]({{ site.baseurl }}/causal-inference-technical/) - method selection and the full set of method-specific guides
+- [Copilot Causal Toolkit]({{ site.baseurl }}/copilot-causal-toolkit/) — a ready-to-run toolkit that automates much of this workflow

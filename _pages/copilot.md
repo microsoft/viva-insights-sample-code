@@ -108,6 +108,16 @@ For more inspiration on analyzing Copilot adoption and impact, have a look at ou
    - RL4W for pilot programs or short-term analysis
 4. **Run Analysis** using the appropriate script
 
+## Related pages
+
+- [Copilot Usage Segments]({{ site.baseurl }}/copilot-usage-segments/) — how Power, Habitual, and Novice segments are defined
+- [DAX Calculated Columns]({{ site.baseurl }}/dax-calculated-columns/) — ready-to-use Power BI formulas for segmentation
+- [Copilot Causal Toolkit]({{ site.baseurl }}/copilot-causal-toolkit/) — measure the causal impact of Copilot on business outcomes
+- [Causal Inference in Copilot Analytics]({{ site.baseurl }}/causal-inference/) — methods for isolating Copilot's true effect
+- [Frontier Analytics Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/) — generate Copilot reports and dashboards with coding agents
+
+---
+
 ## Need Help?
 
 - **Copilot Analytics Documentation**: [Viva Insights Copilot Guide](https://docs.microsoft.com/en-us/viva/insights/)

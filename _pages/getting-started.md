@@ -338,4 +338,12 @@ Once you have your environment set up:
 
 ---
 
-*Ready to dive deeper? Check out our [Essentials]({{ site.baseurl }}/essentials/) for basic analysis scripts, or jump into [Advanced Analytics]({{ site.baseurl }}/advanced/) for sophisticated modeling techniques.*
+## Related pages
+
+- [Essentials]({{ site.baseurl }}/essentials/) — core utility scripts, visualizations, and custom KPIs
+- [Advanced Analytics]({{ site.baseurl }}/advanced/) — machine learning, regression, and statistical testing
+- [Network Analysis]({{ site.baseurl }}/network/) — organizational network analysis (ONA)
+- [Copilot Analytics]({{ site.baseurl }}/copilot/) — measure Microsoft Copilot adoption and impact
+- [Frontier Analytics]({{ site.baseurl }}/frontier-analytics/) — self-service analytics with coding agents and prompt libraries
+
+*Ready to dive deeper? Start with [Essentials]({{ site.baseurl }}/essentials/) for basic analysis scripts, or jump into [Advanced Analytics]({{ site.baseurl }}/advanced/) for sophisticated modeling techniques.*

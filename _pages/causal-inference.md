@@ -200,6 +200,7 @@ For organizations just beginning their causal inference journey, we recommend st
 
 ### Detailed Technical Guides
 - [Technical Implementation Overview]({{ site.baseurl }}/causal-inference-technical/) - Method selection and workflow guide
+- [Experimentation Guide]({{ site.baseurl }}/causal-inference-experimentation-guide/) - End-to-end worked example of running a causal analysis
 - [Data Preparation]({{ site.baseurl }}/causal-inference-data-prep/) - Data validation and preprocessing
 - [Regression Adjustment]({{ site.baseurl }}/causal-inference-regression/) - Linear models and diagnostics
 - [Propensity Score Methods]({{ site.baseurl }}/causal-inference-propensity/) - Matching, weighting, and stratification

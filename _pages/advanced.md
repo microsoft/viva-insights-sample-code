@@ -140,6 +140,16 @@ install.packages(c("vivainsights", "dplyr", "ggplot2", "randomForest", "Informat
 
 ---
 
+## Related pages
+
+- [Causal Inference in Copilot Analytics]({{ site.baseurl }}/causal-inference/) — move beyond correlation to measure the true impact of an intervention
+- [Network Analysis]({{ site.baseurl }}/network/) — organizational network analysis (ONA) as a complementary advanced technique
+- [Copilot Analytics]({{ site.baseurl }}/copilot/) — adoption metrics and Power/Habitual user segmentation
+- [Essentials]({{ site.baseurl }}/essentials/) — utilities and visualizations to prepare your data
+- [Getting Started]({{ site.baseurl }}/getting-started/) — environment setup and first steps
+
+---
+
 ## Need Help?
 
 - **Machine Learning**: [Scikit-learn Documentation](https://scikit-learn.org/stable/)

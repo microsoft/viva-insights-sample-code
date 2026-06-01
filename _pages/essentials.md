@@ -68,6 +68,7 @@ Essential functions and utilities for Python-based analysis.
 - **Language**: R
 - **Format**: Markdown tutorial with code examples
 - **Prerequisites**: vivainsights R package
+- **📖 Full tutorial**: [Generate Custom KPIs in R]({{ site.baseurl }}/generate-custom-kpi/) — step-by-step walkthrough on this site
 - **[📥 Download Script](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/generate-custom-kpi/generate_kpis.R)**
 
 ---
@@ -85,6 +86,16 @@ Essential functions and utilities for Python-based analysis.
 **Included Notebooks:**
 - **[📓 demo-vivainsights-py.ipynb](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/intro-to-vivainsights-py/demo-vivainsights-py.ipynb)**: General introduction
 - **[📓 demo-ona-vivainsights-py.ipynb](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/intro-to-vivainsights-py/demo-ona-vivainsights-py.ipynb)**: Organizational Network Analysis
+
+---
+
+## Related pages
+
+- [Getting Started]({{ site.baseurl }}/getting-started/) — set up your R or Python environment and run your first analysis
+- [Generate Custom KPIs in R]({{ site.baseurl }}/generate-custom-kpi/) — full walkthrough of the custom-KPI workflow
+- [Joining People Skills Data]({{ site.baseurl }}/skills-data-join/) — combine People Skills data with Viva Insights metrics
+- [Advanced Analytics]({{ site.baseurl }}/advanced/) — machine learning, regression, and statistical testing
+- [Network Analysis]({{ site.baseurl }}/network/) — organizational network analysis (ONA)
 
 ---
 

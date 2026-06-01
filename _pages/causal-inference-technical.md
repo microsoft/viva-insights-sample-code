@@ -27,6 +27,9 @@ For a conceptual introduction to causal inference in Copilot analytics, see our 
 
 Each causal inference method has its own detailed implementation guide with code examples, diagnostics, and interpretation guidance:
 
+### [🧪 Experimentation Guide]({{ site.baseurl }}/causal-inference-experimentation-guide/)
+End-to-end worked example of running a causal analysis on Copilot data — a good starting point before the method-specific guides.
+
 ### [📊 Data Preparation & Setup]({{ site.baseurl }}/causal-inference-data-prep/)
 Essential data validation, variable definition, and quality checks before running any causal analysis.
 

@@ -200,6 +200,15 @@ install.packages(c("vivainsights", "igraph", "ggplot2", "dplyr", "visNetwork"))
 
 ---
 
+## Related pages
+
+- [Essentials]({{ site.baseurl }}/essentials/) — core utilities and visualizations to prepare your data
+- [Advanced Analytics]({{ site.baseurl }}/advanced/) — predictive modeling and statistical testing
+- [Joining People Skills Data]({{ site.baseurl }}/skills-data-join/) — enrich network analysis with People Skills data
+- [Getting Started]({{ site.baseurl }}/getting-started/) — environment setup and first steps
+
+---
+
 ## Need Help?
 
 - **Network Analysis**: [NetworkX Documentation](https://networkx.org/documentation/stable/) | [igraph R Documentation](https://igraph.org/r/)

@@ -469,3 +469,10 @@ You can find the full parameters json (`kpi-parameters.json`) and the full funct
 - **[📁 View on GitHub](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-r/generate-custom-kpi)**: Complete source code and files
 - **[📄 generate_kpis.R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/generate-custom-kpi/generate_kpis.R)**: Main R function
 - **[⚙️ kpi-parameters.json](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/generate-custom-kpi/kpi-parameters.json)**: Configuration file
+
+---
+
+## Related pages
+
+- [← Back to Essentials]({{ site.baseurl }}/essentials/) — more core scripts and utilities
+- [Getting Started]({{ site.baseurl }}/getting-started/) — set up your environment first
