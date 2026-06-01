@@ -169,7 +169,7 @@ However, the **Power Users framework is recommended for ongoing measurement** an
 
 To calculate the Copilot Usage Segments, you can use the `identify_usage_segments()` function from the R or Python libraries. 
 
-For an implementation in Power BI, have a look at [this guide](/dax-calculated-columns/).
+For an implementation in Power BI, have a look at [this guide]({{ site.baseurl }}/dax-calculated-columns/).
 
 ---
 
@@ -198,13 +198,13 @@ We found from the data that consistency predicts stickiness, and consistent user
 
 To implement these segments in your analysis, you can use our pre-built DAX calculations or Python/R scripts:
 
-- **[DAX Calculated Columns](/dax-calculated-columns/)** - Ready-to-use Power BI formulas
-- **[Copilot Analytics Scripts](/copilot/)** - Python and R implementation examples
+- **[DAX Calculated Columns]({{ site.baseurl }}/dax-calculated-columns/)** - Ready-to-use Power BI formulas
+- **[Copilot Analytics Scripts]({{ site.baseurl }}/copilot/)** - Python and R implementation examples
 
 ---
 
 ## Need Help?
 
 - **Methodology Questions**: Review the FAQ section above for common implementation questions
-- **Technical Implementation**: Visit our [Copilot Analytics](/copilot/) page for code examples
-- **Power BI Integration**: Check out our [DAX Calculated Columns](/dax-calculated-columns/) for ready-to-use formulas  
+- **Technical Implementation**: Visit our [Copilot Analytics]({{ site.baseurl }}/copilot/) page for code examples
+- **Power BI Integration**: Check out our [DAX Calculated Columns]({{ site.baseurl }}/dax-calculated-columns/) for ready-to-use formulas  

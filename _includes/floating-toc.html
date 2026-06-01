@@ -135,28 +135,22 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('TOC: Script loaded'); // Debug log
-  
   const toc = document.getElementById('floating-toc');
   const tocList = document.getElementById('toc-list');
   const tocToggle = document.getElementById('toc-toggle');
   
   if (!toc || !tocList || !tocToggle) {
-    console.error('TOC: Required elements not found');
     return;
   }
   
   // Only show TOC if there are headings
   const headings = document.querySelectorAll('h2, h3');
-  console.log('TOC: Found headings:', headings.length);
   
   if (headings.length < 2) {
-    console.log('TOC: Not enough headings, hiding TOC');
     return;
   }
   
   // Generate TOC
-  let tocItemsCreated = 0;
   headings.forEach(function(heading, index) {
     // Create ID if it doesn't exist
     if (!heading.id) {
@@ -186,18 +180,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     li.appendChild(a);
     tocList.appendChild(li);
-    tocItemsCreated++;
   });
-  
-  console.log('TOC: Created', tocItemsCreated, 'TOC items');
   
   // Show TOC using class instead of style
   toc.classList.add('show');
-  console.log('TOC: Should be visible now');
   
   // Toggle functionality
   tocToggle.addEventListener('click', function() {
-    console.log('TOC: Close button clicked');
     toc.style.display = 'none';
   });
   
@@ -229,12 +218,5 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  // Additional debug: Check if TOC is actually visible
-  setTimeout(function() {
-    const computedStyle = window.getComputedStyle(toc);
-    console.log('TOC: Final display value:', computedStyle.display);
-    console.log('TOC: Final position value:', computedStyle.position);
-    console.log('TOC: Final z-index value:', computedStyle.zIndex);
-  }, 1000);
 });
 </script>

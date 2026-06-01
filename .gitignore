@@ -48,3 +48,9 @@ examples/utility-r/_data/*.csv
 
 # Output files
 examples/utility-python/causal-inference/copilot-causal-toolkit/output/*
+
+# Jekyll build artifacts
+_site/
+.jekyll-cache/
+.jekyll-metadata
+Gemfile.lock

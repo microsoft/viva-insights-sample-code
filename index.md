@@ -47,7 +47,7 @@ These packages allow analysts to hit the ground running without writing data pro
 
 ## Special Focus: Copilot Analytics
 
-With the rapid adoption of Microsoft Copilot across organizations, understanding usage patterns and measuring impact has become critical. Our dedicated **[Copilot Analytics](/copilot/)** section provides specialized scripts and methodologies for:
+With the rapid adoption of Microsoft Copilot across organizations, understanding usage patterns and measuring impact has become critical. Our dedicated **[Copilot Analytics]({{ site.baseurl }}/copilot/)** section provides specialized scripts and methodologies for:
 
 - Measuring Copilot adoption rates and user segmentation
 - Identifying power users and building habit-based usage models  

@@ -6,12 +6,6 @@ permalink: /getting-started/
 
 # Getting Started with Viva Insights Analytics
 
----
-layout: page
-title: "Getting Started"
-permalink: /getting-started/
----
-
 {% include custom-navigation.html %}
 {% include floating-toc.html %}
 
