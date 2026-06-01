@@ -6,6 +6,15 @@ description: "Sample code, tutorials, and AI prompt libraries for Microsoft Viva
 
 {% include custom-navigation.html %}
 
+<div class="vi-hero">
+  <h1>Viva Insights Sample Code Library</h1>
+  <p>Sample code, tutorials, and AI prompt libraries for Microsoft Viva Insights analytics in R and Python — from Copilot adoption to organizational network analysis and causal inference.</p>
+  <div class="vi-cta-row">
+    <a class="vi-cta" href="{{ site.baseurl }}/getting-started/">Start here →</a>
+    <a class="vi-cta-secondary" href="#categories">Browse the library</a>
+  </div>
+</div>
+
 This repository contains sample code for the Viva Insights open-source packages, including code that is used in tutorials or demos. The sample code shown here covers more elaborate scenarios and examples that leverage, but are not included in the R and Python packages themselves.
 
 ## Is this page for me?
@@ -66,20 +75,44 @@ Browse the categories below to find sample code that matches your needs. Each sc
 
 ## Categories
 
-- 🔧 [Essentials](essentials/)
-Essential utility functions and visualizations for getting started with Viva Insights analysis.
-
-- 📊 [Advanced Analytics](advanced/)
-Regression models, machine learning, and statistical analysis techniques.
-
-- 🔗 [Network Analysis](network/)
-Collaboration network visualization and analysis scripts.
-
-- 🤖 [Copilot Analytics](copilot/)
-Analysis and visualization scripts specifically for Microsoft Copilot usage data.
-
-- 🚀 [Frontier Analytics](frontier-analytics/)
-Prompt libraries, starter kits, and schema docs for self-service analytics with coding agents.
+<div class="vi-card-grid">
+  <a class="vi-card" href="{{ site.baseurl }}/getting-started/">
+    <span class="vi-card-icon">🧭</span>
+    <span class="vi-card-title">Getting Started</span>
+    <span class="vi-card-desc">New here? Set up your environment and run your first Viva Insights analysis in R or Python.</span>
+    <span class="vi-card-more">Begin →</span>
+  </a>
+  <a class="vi-card" href="{{ site.baseurl }}/essentials/">
+    <span class="vi-card-icon">🔧</span>
+    <span class="vi-card-title">Essentials</span>
+    <span class="vi-card-desc">Core utility functions and visualizations for everyday Viva Insights analysis.</span>
+    <span class="vi-card-more">Explore →</span>
+  </a>
+  <a class="vi-card" href="{{ site.baseurl }}/advanced/">
+    <span class="vi-card-icon">📊</span>
+    <span class="vi-card-title">Advanced Analytics</span>
+    <span class="vi-card-desc">Regression models, machine learning, and statistical analysis techniques.</span>
+    <span class="vi-card-more">Explore →</span>
+  </a>
+  <a class="vi-card" href="{{ site.baseurl }}/network/">
+    <span class="vi-card-icon">🔗</span>
+    <span class="vi-card-title">Network Analysis</span>
+    <span class="vi-card-desc">Organizational network analysis (ONA) — visualize and quantify collaboration patterns.</span>
+    <span class="vi-card-more">Explore →</span>
+  </a>
+  <a class="vi-card" href="{{ site.baseurl }}/copilot/">
+    <span class="vi-card-icon">🤖</span>
+    <span class="vi-card-title">Copilot Analytics</span>
+    <span class="vi-card-desc">Measure Microsoft Copilot adoption, identify power users, and quantify productivity impact.</span>
+    <span class="vi-card-more">Explore →</span>
+  </a>
+  <a class="vi-card" href="{{ site.baseurl }}/frontier-analytics/">
+    <span class="vi-card-icon">🚀</span>
+    <span class="vi-card-title">Frontier Analytics</span>
+    <span class="vi-card-desc">Prompt libraries, starter kits, and schema docs for self-service analytics with coding agents.</span>
+    <span class="vi-card-more">Explore →</span>
+  </a>
+</div>
 
 ---
 

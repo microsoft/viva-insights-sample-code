@@ -82,3 +82,113 @@ a.post-link {
   background: var(--vi-purple-tint);
   color: var(--vi-purple-dark);
 }
+
+/* ---- Homepage hero ---- */
+/* Minima's home layout emits its own <h1 class="page-heading"> from page.title;
+   the hero below replaces it, so hide it to avoid a duplicate H1. */
+.home > .page-heading { display: none; }
+
+.vi-hero {
+  background: var(--vi-grad);
+  color: #fff;
+  border-radius: 14px;
+  padding: 2.6rem 2rem;
+  margin: 1.5rem 0 2.2rem;
+  text-align: center;
+}
+.vi-hero h1 {
+  color: #fff;
+  margin: 0 0 0.6rem;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1.15;
+}
+.vi-hero p {
+  margin: 0 auto 1.4rem;
+  max-width: 46rem;
+  font-size: 1.12rem;
+  color: rgba(255, 255, 255, 0.92);
+}
+.vi-cta-row {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.vi-cta,
+.vi-cta-secondary {
+  display: inline-block;
+  padding: 0.7rem 1.4rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+.page-content a.vi-cta {
+  background: #fff;
+  color: var(--vi-purple-dark) !important;
+}
+.page-content a.vi-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+.page-content a.vi-cta-secondary {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+.page-content a.vi-cta-secondary:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px);
+}
+
+/* ---- Category card grid ---- */
+.vi-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.1rem;
+  margin: 1.5rem 0 2rem;
+}
+.page-content a.vi-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.3rem;
+  border: 1px solid var(--vi-border);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--vi-ink) !important;
+  text-decoration: none !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+}
+.page-content a.vi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(92, 45, 145, 0.14);
+  border-color: var(--vi-purple);
+}
+.page-content a.vi-card:focus-visible {
+  outline: 2px solid var(--vi-purple);
+  outline-offset: 2px;
+}
+.vi-card .vi-card-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+  margin-bottom: 0.6rem;
+}
+.vi-card .vi-card-title {
+  font-weight: 700;
+  font-size: 1.12rem;
+  color: var(--vi-purple-dark);
+  margin-bottom: 0.35rem;
+}
+.vi-card .vi-card-desc {
+  font-size: 0.95rem;
+  color: #444;
+  flex: 1;
+  margin: 0;
+}
+.vi-card .vi-card-more {
+  margin-top: 0.8rem;
+  font-weight: 600;
+  color: var(--vi-purple);
+  font-size: 0.9rem;
+}
