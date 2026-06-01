@@ -42,6 +42,9 @@ vignettes/*.pdf
 
 # Output files
 *.html
+# ...but never ignore Jekyll template source (includes/layouts are .html)
+!_includes/*.html
+!_layouts/*.html
 
 # Data files
 examples/utility-r/_data/*.csv

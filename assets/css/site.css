@@ -1,0 +1,84 @@
+---
+---
+/*
+ * Viva Insights Sample Code Library — brand layer
+ * Loaded after Minima's main.css to apply Microsoft Viva Insights styling.
+ * Palette aligned to the Microsoft Viva Insights identity (purple/magenta).
+ */
+
+:root {
+  --vi-purple: #5C2D91;        /* primary (Microsoft brand purple, AA on white) */
+  --vi-purple-dark: #44216B;   /* hover/active */
+  --vi-magenta: #B4009E;       /* gradient accent */
+  --vi-purple-tint: #F3EEFA;   /* light surface */
+  --vi-ink: #242424;           /* body text */
+  --vi-border: #E6E1EF;
+  --vi-grad: linear-gradient(135deg, #5C2D91 0%, #B4009E 100%);
+}
+
+/* ---- Links ---- */
+.page-content a:not(.btn):not(.nav-link):not(.dropdown-item):not(.navbar-brand),
+a.post-link {
+  color: var(--vi-purple);
+  text-decoration-color: rgba(92, 45, 145, 0.35);
+}
+.page-content a:not(.btn):not(.nav-link):not(.dropdown-item):not(.navbar-brand):hover {
+  color: var(--vi-purple-dark);
+  text-decoration-color: var(--vi-purple-dark);
+}
+
+/* ---- Hide default Minima navigation site-wide ---- */
+/* (previously duplicated as an inline <style> on every page) */
+.site-header .site-nav,
+.site-header .trigger,
+.page-link:not(.dropdown-toggle):not(.btn) {
+  display: none !important;
+}
+.custom-nav { display: block !important; }
+
+/* ---- Brand navigation ---- */
+.custom-nav {
+  border-bottom: 2px solid transparent;
+  border-image: var(--vi-grad) 1;
+}
+.custom-nav .navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--vi-purple) !important;
+}
+.custom-nav .navbar-brand .vi-logo { height: 26px; width: 26px; flex: 0 0 auto; }
+.custom-nav .nav-link:hover,
+.custom-nav .dropdown-item:hover {
+  color: var(--vi-purple) !important;
+}
+.custom-nav .dropdown-item:hover {
+  background-color: var(--vi-purple-tint);
+}
+
+/* ---- Headings accent ---- */
+.page-content h1 {
+  color: var(--vi-purple-dark);
+}
+.page-content h2 {
+  border-bottom: 1px solid var(--vi-border);
+  padding-bottom: 0.3rem;
+}
+
+/* ---- Site name in Minima header (when shown) ---- */
+.site-title, .site-title:visited { color: var(--vi-purple) !important; }
+
+/* ---- Floating TOC active state uses brand colour ---- */
+.floating-toc #toc-list a:hover,
+.floating-toc #toc-list a.active {
+  border-left-color: var(--vi-purple) !important;
+  color: var(--vi-purple) !important;
+  background-color: var(--vi-purple-tint) !important;
+}
+
+/* ---- Tables ---- */
+.page-content table th {
+  background: var(--vi-purple-tint);
+  color: var(--vi-purple-dark);
+}

@@ -1,6 +1,7 @@
 ---
 layout: default
 title: "Getting Started"
+description: "How to get started with Viva Insights analytics in R and Python — set up the vivainsights packages, export query data, and run your first analysis."
 permalink: /getting-started/
 ---
 

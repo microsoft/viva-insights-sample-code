@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Network Analysis"
+description: "Organizational network analysis (ONA) with Viva Insights — visualize and analyze collaboration networks at the group-to-group and person-to-person level in R and Python."
 permalink: /network/
 ---
 

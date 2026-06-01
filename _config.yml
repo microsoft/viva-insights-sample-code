@@ -1,8 +1,18 @@
 # Jekyll configuration for GitHub Pages
 title: "Viva Insights Sample Code Library"
-description: "Sample code and tutorials for Microsoft Viva Insights analytics"
+description: "Sample code, tutorials, and AI prompt libraries for Microsoft Viva Insights analytics in R and Python."
 baseurl: "/viva-insights-sample-code"
 url: "https://microsoft.github.io"
+
+# Branding & social sharing (consumed by jekyll-seo-tag)
+logo: /assets/images/apple-touch-icon.png
+twitter:
+  card: summary_large_image
+defaults:
+  - scope:
+      path: ""
+    values:
+      image: /assets/images/og-image.png
 
 # Theme
 theme: minima

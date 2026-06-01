@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Frontier Analytics"
+description: "Export-first, self-service Viva Insights analytics with coding agents — reusable prompt cards, schema documentation, and example specs to generate dashboards, decks, and ROI analyses."
 permalink: /frontier-analytics/
 ---
 
