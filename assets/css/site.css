@@ -16,6 +16,26 @@
   --vi-grad: linear-gradient(135deg, #5C2D91 0%, #B4009E 100%);
 }
 
+/* ---- Layout width ----
+   Minima's default wrapper is only ~740px wide, which is too narrow for the
+   multi-item navigation, wide tables, and the homepage card grid — it forced a
+   horizontal scrollbar on desktop. Widen the container and allow the navbar to
+   wrap so it can never overflow the viewport horizontally. */
+.wrapper {
+  max-width: 1080px;
+}
+.custom-nav .navbar-collapse {
+  flex-wrap: wrap;
+  row-gap: 0.25rem;
+}
+.custom-nav .navbar-nav {
+  flex-wrap: wrap;
+}
+.custom-nav .nav-link {
+  padding-left: 0.65rem !important;
+  padding-right: 0.65rem !important;
+}
+
 /* ---- Links ---- */
 .page-content a:not(.btn):not(.nav-link):not(.dropdown-item):not(.navbar-brand),
 a.post-link {
