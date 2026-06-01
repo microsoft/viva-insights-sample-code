@@ -1,138 +1,110 @@
-<!-- Floating Table of Contents -->
-<div id="floating-toc" class="floating-toc" style="display: none;">
-  <div class="toc-header">
-    <h4>Contents</h4>
-    <button id="toc-toggle" class="toc-toggle" aria-label="Toggle TOC">×</button>
-  </div>
+<!-- Floating / collapsible Table of Contents -->
+<details id="floating-toc" class="floating-toc" style="display: none;">
+  <summary class="toc-summary">
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m-3 1a1 1 0 1 1 0-2 1 1 0 0 1 0 2m0 4a1 1 0 1 1 0-2 1 1 0 0 1 0 2m0 4a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/></svg>
+    <span>On this page</span>
+  </summary>
   <ul id="toc-list"></ul>
-</div>
+</details>
 
 <style>
-/* Floating TOC Styles - Higher specificity to override Bootstrap */
+/* Collapsible / floating TOC ----------------------------------------------- */
 .floating-toc {
-  position: fixed !important;
-  top: 20% !important;
-  left: 20px !important; /* Moved to left side to use empty white space */
-  width: 280px !important;
-  max-width: calc(100vw - 40px) !important; /* Adjusted for left position */
+  display: none; /* shown by JS once headings exist */
   background: rgba(255, 255, 255, 0.98) !important;
-  border: 1px solid #e8e8e8 !important;
+  border: 1px solid var(--vi-border, #e8e8e8) !important;
   border-radius: 8px !important;
-  padding: 0 !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
-  z-index: 9999 !important; /* Higher than Bootstrap modals */
-  max-height: 60vh !important;
-  overflow: hidden !important;
-  backdrop-filter: blur(10px) !important;
+  margin: 0 0 1.75rem !important;
+  max-width: 340px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-  display: none; /* Will be shown by JavaScript */
+  font-size: 14px;
+  overflow: hidden;
 }
+.floating-toc.show { display: block !important; }
 
-.floating-toc.show {
-  display: block !important;
+.floating-toc > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 0.9rem;
+  font-weight: 600;
+  color: var(--vi-purple-dark, #44216B);
+  user-select: none;
 }
-
-.floating-toc .toc-header {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  padding: 15px 20px 10px !important;
-  border-bottom: 1px solid #e8e8e8 !important;
-  background: rgba(248, 249, 250, 0.8) !important;
-  border-radius: 8px 8px 0 0 !important;
-  margin: 0 !important;
+.floating-toc > summary::-webkit-details-marker { display: none; }
+/* Disclosure caret (collapsible mode only) */
+.floating-toc:not(.is-fixed) > summary::after {
+  content: "";
+  margin-left: auto;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+  opacity: 0.7;
 }
-
-.floating-toc .toc-header h4 {
-  margin: 0 !important;
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  color: #333 !important;
-}
-
-.floating-toc .toc-toggle {
-  background: none !important;
-  border: none !important;
-  font-size: 18px !important;
-  cursor: pointer !important;
-  color: #666 !important;
-  padding: 0 !important;
-  width: 20px !important;
-  height: 20px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-.floating-toc .toc-toggle:hover {
-  color: #0066cc !important;
-}
+.floating-toc:not(.is-fixed)[open] > summary::after { transform: rotate(-135deg); }
+.floating-toc > summary svg { flex: 0 0 auto; opacity: 0.85; }
 
 .floating-toc #toc-list {
   list-style: none !important;
-  padding: 10px 0 !important;
   margin: 0 !important;
-  max-height: calc(60vh - 60px) !important;
-  overflow-y: auto !important;
+  padding: 0.25rem 0 0.5rem !important;
+  border-top: 1px solid var(--vi-border, #e8e8e8);
 }
-
-.floating-toc #toc-list li {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
+.floating-toc #toc-list li { margin: 0 !important; padding: 0 !important; }
 .floating-toc #toc-list a {
   color: #444 !important;
   text-decoration: none !important;
-  font-size: 14px !important;
+  font-size: 13.5px !important;
   line-height: 1.4 !important;
   display: block !important;
-  padding: 6px 20px !important;
+  padding: 6px 18px !important;
   border-left: 3px solid transparent !important;
-  transition: all 0.2s ease !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease !important;
 }
-
-.floating-toc #toc-list a:hover {
-  background-color: rgba(0, 102, 204, 0.08) !important;
-  border-left-color: #0066cc !important;
-  color: #0066cc !important;
-}
-
+.floating-toc #toc-list a:hover,
 .floating-toc #toc-list a.active {
-  background-color: rgba(0, 102, 204, 0.12) !important;
-  border-left-color: #0066cc !important;
-  color: #0066cc !important;
-  font-weight: 500 !important;
+  background-color: var(--vi-purple-tint, rgba(92,45,145,0.08)) !important;
+  border-left-color: var(--vi-purple, #5C2D91) !important;
+  color: var(--vi-purple-dark, #44216B) !important;
 }
-
+.floating-toc #toc-list a.active { font-weight: 600 !important; }
 /* Indent H3 items */
 .floating-toc #toc-list a.h3 {
-  padding-left: 35px !important;
-  font-size: 13px !important;
+  padding-left: 32px !important;
+  font-size: 12.5px !important;
   color: #666 !important;
 }
 
-/* Mobile responsiveness */
-/* Switch to an inline (static) TOC whenever the side gutter is too narrow to
-   hold the floating panel without overlapping the content column. The 1080px
-   content column only leaves enough gutter for the 280px panel at ~1700px+. */
-@media (max-width: 1700px) {
-  .floating-toc {
-    position: static !important;
-    width: 100% !important;
-    margin: 20px 0 !important;
-    max-height: none !important;
+/* Wide screens: dock the TOC in the left gutter as a fixed panel.
+   The 1080px content column only leaves room at ~1700px+. */
+@media (min-width: 1701px) {
+  .floating-toc.show.is-fixed {
+    position: fixed !important;
+    top: 110px !important;
+    left: 24px !important;
+    width: 280px !important;
+    max-width: calc((100vw - 1080px) / 2 - 32px) !important;
+    max-height: 72vh !important;
+    margin: 0 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10) !important;
+    z-index: 500 !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
-  
-  .floating-toc #toc-list {
-    max-height: 300px !important;
+  .floating-toc.is-fixed > summary { cursor: default; }
+  .floating-toc.is-fixed #toc-list {
+    overflow-y: auto !important;
+    max-height: calc(72vh - 48px) !important;
   }
 }
 
 @media (max-width: 768px) {
-  .floating-toc {
-    display: none !important;
-  }
+  .floating-toc { display: none !important; }
 }
 </style>
 
@@ -140,86 +112,67 @@
 document.addEventListener('DOMContentLoaded', function() {
   const toc = document.getElementById('floating-toc');
   const tocList = document.getElementById('toc-list');
-  const tocToggle = document.getElementById('toc-toggle');
-  
-  if (!toc || !tocList || !tocToggle) {
-    return;
-  }
-  
-  // Only show TOC if there are headings
-  const headings = document.querySelectorAll('h2, h3');
-  
-  if (headings.length < 2) {
-    return;
-  }
-  
-  // Generate TOC
-  headings.forEach(function(heading, index) {
-    // Create ID if it doesn't exist
+  if (!toc || !tocList) return;
+
+  const headings = document.querySelectorAll('.page-content h2, .page-content h3');
+  if (headings.length < 2) return;
+
+  headings.forEach(function(heading) {
     if (!heading.id) {
       heading.id = heading.textContent.toLowerCase()
         .replace(/[^\w\s-]/g, '')
         .replace(/\s+/g, '-')
         .replace(/^-+|-+$/g, '');
     }
-    
     const li = document.createElement('li');
     const a = document.createElement('a');
     a.href = '#' + heading.id;
-    a.textContent = heading.textContent.replace(/^[\d\.\s]+/, ''); // Remove numbering
+    a.textContent = heading.textContent.replace(/^[\d\.\s]+/, '');
     a.className = heading.tagName.toLowerCase();
-    
-    // Smooth scrolling
     a.addEventListener('click', function(e) {
       e.preventDefault();
-      const targetElement = document.getElementById(heading.id);
-      if (targetElement) {
-        targetElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
+      const target = document.getElementById(heading.id);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
-    
     li.appendChild(a);
     tocList.appendChild(li);
   });
-  
-  // Show TOC using class instead of style
+
   toc.classList.add('show');
-  
-  // Toggle functionality
-  tocToggle.addEventListener('click', function() {
-    toc.style.display = 'none';
-  });
-  
-  // Highlight current section on scroll
-  let isScrolling = false;
+
+  // Float (open) in the gutter on wide screens; collapse inline otherwise.
+  const wideQuery = window.matchMedia('(min-width: 1701px)');
+  function syncMode() {
+    if (wideQuery.matches) {
+      toc.classList.add('is-fixed');
+      toc.open = true;
+    } else {
+      toc.classList.remove('is-fixed');
+    }
+  }
+  syncMode();
+  if (wideQuery.addEventListener) {
+    wideQuery.addEventListener('change', syncMode);
+  } else if (wideQuery.addListener) {
+    wideQuery.addListener(syncMode);
+  }
+
+  // Highlight the current section on scroll.
+  let ticking = false;
   window.addEventListener('scroll', function() {
-    if (isScrolling) return;
-    isScrolling = true;
-    
+    if (ticking) return;
+    ticking = true;
     requestAnimationFrame(function() {
       const scrollPos = window.scrollY + 100;
       let current = '';
-      
       headings.forEach(function(heading) {
-        if (heading.offsetTop <= scrollPos) {
-          current = heading.id;
-        }
+        if (heading.offsetTop <= scrollPos) current = heading.id;
       });
-      
-      // Update active states
       tocList.querySelectorAll('a').forEach(function(link) {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === '#' + current) {
-          link.classList.add('active');
-        }
+        link.classList.toggle('active', link.getAttribute('href') === '#' + current);
       });
-      
-      isScrolling = false;
+      ticking = false;
     });
   });
-  
 });
 </script>

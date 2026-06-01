@@ -52,11 +52,10 @@ a.post-link {
   text-decoration-color: var(--vi-purple-dark);
 }
 
-/* ---- Hide default Minima navigation site-wide ---- */
-/* (previously duplicated as an inline <style> on every page) */
-.site-header .site-nav,
-.site-header .trigger,
-.page-link:not(.dropdown-toggle):not(.btn) {
+/* ---- Hide default Minima header & navigation site-wide ---- */
+/* We render our own Bootstrap nav (.custom-nav) inside the page content, so the
+   entire Minima header — including its duplicate linked site title — is hidden. */
+.site-header {
   display: none !important;
 }
 .custom-nav { display: block !important; }
