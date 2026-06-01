@@ -113,7 +113,10 @@
 }
 
 /* Mobile responsiveness */
-@media (max-width: 1280px) {
+/* Switch to an inline (static) TOC whenever the side gutter is too narrow to
+   hold the floating panel without overlapping the content column. The 1080px
+   content column only leaves enough gutter for the 280px panel at ~1700px+. */
+@media (max-width: 1700px) {
   .floating-toc {
     position: static !important;
     width: 100% !important;
