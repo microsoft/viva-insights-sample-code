@@ -5,6 +5,8 @@
 
   <body class="article-mode">
 
+    <a class="article-skiplink" href="#article-content">Skip to article</a>
+
     {%- comment -%} Reading-progress bar (filled via JS on scroll) {%- endcomment -%}
     <div class="article-progress" aria-hidden="true"><span id="article-progress-bar"></span></div>
 
@@ -13,6 +15,27 @@
     <main class="page-content article-page" aria-label="Content">
 
       <header class="article-hero">
+        <svg class="article-hero-motif" aria-hidden="true" focusable="false" viewBox="0 0 600 600" preserveAspectRatio="xMaxYMin slice">
+          <defs>
+            <radialGradient id="art-hero-glow" cx="80%" cy="20%" r="60%">
+              <stop offset="0%" stop-color="#E9C877" stop-opacity="0.55"/>
+              <stop offset="60%" stop-color="#2E5C8A" stop-opacity="0.18"/>
+              <stop offset="100%" stop-color="#0C2740" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <circle cx="480" cy="120" r="240" fill="url(#art-hero-glow)"/>
+          <g stroke="rgba(255,255,255,0.08)" fill="none" stroke-width="1">
+            <circle cx="480" cy="120" r="80"/>
+            <circle cx="480" cy="120" r="140"/>
+            <circle cx="480" cy="120" r="200"/>
+            <circle cx="480" cy="120" r="260"/>
+          </g>
+          <g stroke="rgba(233,200,119,0.25)" fill="none" stroke-width="1">
+            <line x1="200" y1="0" x2="600" y2="400"/>
+            <line x1="280" y1="0" x2="600" y2="320"/>
+            <line x1="360" y1="0" x2="600" y2="240"/>
+          </g>
+        </svg>
         <div class="article-hero-inner">
           {%- if page.eyebrow -%}
           <p class="article-eyebrow">{{ page.eyebrow }}</p>
@@ -28,9 +51,34 @@
         </div>
       </header>
 
-      <article class="article-body">
-        {{ content }}
-      </article>
+      <div class="article-shell">
+        <aside class="article-toc-rail" aria-label="On this page">
+          <p class="article-toc-rail-label">On this page</p>
+          <ol id="article-toc-rail-list"></ol>
+        </aside>
+
+        <article class="article-body" id="article-content">
+          {{ content }}
+        </article>
+      </div>
+
+      <nav class="article-end-nav" aria-label="Article navigation">
+        <div class="article-end-nav-inner">
+          <a class="article-end-back" href="{{ '/articles/' | relative_url }}">
+            <span aria-hidden="true">←</span> Back to Articles
+          </a>
+          <div class="article-share" aria-label="Share">
+            <span class="article-share-label">Share</span>
+            <a class="article-share-btn"
+               href="https://www.linkedin.com/sharing/share-offsite/?url={{ page.url | absolute_url | url_encode }}"
+               target="_blank" rel="noopener"
+               aria-label="Share on LinkedIn">LinkedIn</a>
+            <button type="button" class="article-share-btn article-share-copy"
+                    data-share-url="{{ page.url | absolute_url }}"
+                    aria-label="Copy link to clipboard">Copy link</button>
+          </div>
+        </div>
+      </nav>
 
       {%- include page-meta.html -%}
     </main>
@@ -63,6 +111,45 @@
           document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
         } else {
           document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-revealed'); });
+        }
+
+        // Build sticky desktop TOC from inline contents nav, with scroll-spy.
+        var rail = document.getElementById('article-toc-rail-list');
+        var inlineToc = document.querySelector('.article-contents ol');
+        if (rail && inlineToc) {
+          var anchors = [];
+          inlineToc.querySelectorAll('a[href^="#"]').forEach(function (a) {
+            var li = document.createElement('li');
+            var clone = a.cloneNode(true);
+            li.appendChild(clone);
+            rail.appendChild(li);
+            var id = a.getAttribute('href').slice(1);
+            var target = document.getElementById(id);
+            if (target) anchors.push({ id: id, link: clone, target: target });
+          });
+          var spy = function () {
+            var pos = (window.pageYOffset || document.documentElement.scrollTop) + 140;
+            var current = null;
+            for (var i = 0; i < anchors.length; i++) {
+              if (anchors[i].target.offsetTop <= pos) current = anchors[i];
+            }
+            anchors.forEach(function (a) { a.link.classList.toggle('is-current', a === current); });
+          };
+          window.addEventListener('scroll', spy, { passive: true });
+          spy();
+        }
+
+        // Copy-link share button.
+        var copyBtn = document.querySelector('.article-share-copy');
+        if (copyBtn && navigator.clipboard) {
+          copyBtn.addEventListener('click', function () {
+            navigator.clipboard.writeText(copyBtn.getAttribute('data-share-url') || window.location.href)
+              .then(function () {
+                var original = copyBtn.textContent;
+                copyBtn.textContent = 'Copied ✓';
+                setTimeout(function () { copyBtn.textContent = original; }, 1800);
+              });
+          });
         }
       })();
     </script>

@@ -12,7 +12,7 @@
   --art-navy-deep: #0C2740;
   --art-navy-soft: #2E5C8A;
   --art-ink: #1f2a33;
-  --art-muted: #5B6573;
+  --art-muted: #4A5562;
   --art-line: #e4e9f0;
   --art-tint: #EAF1F8;
   --art-tint-line: #B9C8D8;
@@ -21,8 +21,23 @@
   --art-gold: #C79A3A;
   --art-serif: Georgia, Cambria, "Times New Roman", serif;
   --art-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --art-measure: 42rem; /* ~672px reading column */
+  --art-measure: 38rem; /* ~608px reading column */
 }
+
+/* ---- Skip link (keyboard accessibility) ---- */
+.article-skiplink {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--art-navy);
+  color: #fff;
+  padding: 0.6rem 0.9rem;
+  font-family: var(--art-sans);
+  font-size: 0.9rem;
+  z-index: 2000;
+  border-radius: 0 0 6px 0;
+}
+.article-skiplink:focus { left: 0; outline: 2px solid var(--art-gold); }
 
 /* ---- Reading-progress bar ---- */
 .article-progress {
@@ -50,6 +65,8 @@
 
 /* ---- Hero ---- */
 .article-hero {
+  position: relative;
+  overflow: hidden;
   background:
     radial-gradient(1200px 380px at 78% -10%, rgba(46, 92, 138, 0.55), transparent 60%),
     linear-gradient(160deg, var(--art-navy) 0%, var(--art-navy-deep) 100%);
@@ -58,7 +75,17 @@
   margin-bottom: clamp(2rem, 5vw, 3.5rem);
   border-bottom: 3px solid var(--art-gold);
 }
+.article-hero-motif {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 60%;
+  max-width: 720px;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.85;
+}
 .article-hero-inner {
+  position: relative;
   max-width: 50rem;
   margin: 0 auto;
 }
@@ -101,6 +128,16 @@
   align-items: center;
 }
 .article-byline-sep { opacity: 0.5; }
+
+/* ---- Body shell with optional sticky TOC rail ---- */
+.article-shell {
+  position: relative;
+  max-width: 84rem;
+  margin: 0 auto;
+}
+.article-toc-rail {
+  display: none; /* hidden until viewport is wide enough */
+}
 
 /* ---- Body: centred reading column; wide blocks break out ---- */
 .article-body {
@@ -158,8 +195,19 @@
 
 /* ---- Part headings ---- */
 .part-head {
-  margin: clamp(2.8rem, 6vw, 4rem) auto clamp(1.2rem, 3vw, 1.8rem);
+  position: relative;
+  margin: clamp(3.2rem, 7vw, 4.8rem) auto clamp(1.4rem, 3vw, 2rem);
   text-align: left;
+  padding-top: 1.4rem;
+  border-top: 2px solid var(--art-navy);
+}
+.part-head::after {
+  content: "";
+  position: absolute;
+  top: -2px; left: 0;
+  width: 4rem;
+  height: 2px;
+  background: var(--art-gold);
 }
 .part-kicker {
   display: inline-block;
@@ -305,10 +353,7 @@
 }
 .article-body table.is-wide {
   max-width: 60rem;
-  width: min(60rem, calc(100vw - 2.8rem));
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
+  width: 100%;
 }
 .article-body th {
   background: var(--art-navy);
@@ -330,10 +375,7 @@
 .article-figure {
   max-width: 62rem;
   margin: clamp(1.8rem, 4vw, 2.8rem) auto;
-  width: min(62rem, calc(100vw - 2.8rem));
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
+  width: 100%;
 }
 .article-figure svg { width: 100%; height: auto; display: block; }
 .article-figure figcaption {
@@ -394,26 +436,170 @@
 .article-page .page-meta { max-width: var(--art-measure); margin-left: auto; margin-right: auto; }
 
 @media (max-width: 900px) {
-  .article-figure {
-    left: auto;
-    transform: none;
-    width: 100%;
-    max-width: 100%;
-  }
+  .article-figure { width: 100%; max-width: 100%; }
   .article-body table {
     display: block;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
-  .article-body table.is-wide {
-    left: auto;
-    transform: none;
-    width: 100%;
-  }
+  .article-body table.is-wide { width: 100%; }
 }
 
 /* ---- Figure helper palette classes (used inside SVG/HTML figures) ---- */
 .fig-card {
   border-radius: 12px;
   padding: 1.1rem 1.2rem;
+}
+
+/* ---- Figure caption polish: bold "Figure N — " prefix ---- */
+.article-figure figcaption {
+  font-style: italic;
+}
+.article-figure figcaption strong,
+.article-figure figcaption b {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--art-navy);
+  margin-right: 0.3rem;
+}
+
+/* ---- Sticky desktop TOC rail (≥1280px) ---- */
+@media (min-width: 1280px) {
+  .article-shell {
+    display: grid;
+    grid-template-columns: minmax(200px, 240px) minmax(0, 1fr);
+    column-gap: 3rem;
+    padding: 0 2rem;
+  }
+  .article-toc-rail {
+    display: block;
+    position: sticky;
+    top: 2rem;
+    align-self: start;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+    padding: 0.6rem 0 0.6rem 0.8rem;
+    border-left: 2px solid var(--art-line);
+    font-family: var(--art-sans);
+    font-size: 0.86rem;
+  }
+  .article-toc-rail-label {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--art-muted);
+    margin: 0 0 0.7rem;
+  }
+  .article-toc-rail ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .article-toc-rail li { margin-bottom: 0.55rem; line-height: 1.35; }
+  .article-toc-rail a {
+    color: var(--art-muted);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    margin-left: -0.85rem;
+    padding-left: 0.7rem;
+    display: block;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .article-toc-rail a:hover { color: var(--art-navy); }
+  .article-toc-rail a.is-current {
+    color: var(--art-navy);
+    border-left-color: var(--art-gold);
+    font-weight: 600;
+  }
+  /* On wide screens, hide the inline contents block since the rail covers it. */
+  .article-contents { display: none; }
+  /* Centre the body within its grid cell while preserving the measure. */
+  .article-body { margin-left: auto; margin-right: auto; }
+}
+
+/* ---- End-of-article navigation: back-to-articles + share ---- */
+.article-end-nav {
+  max-width: 50rem;
+  margin: clamp(2.4rem, 5vw, 3.4rem) auto 0;
+  padding: 1.4rem 1.4rem 0;
+  border-top: 1px solid var(--art-line);
+}
+.article-end-nav-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.article-end-back {
+  font-family: var(--art-sans);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--art-navy);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+.article-end-back:hover { color: var(--art-navy-soft); text-decoration: underline; }
+.article-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--art-sans);
+  font-size: 0.86rem;
+}
+.article-share-label {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--art-muted);
+  margin-right: 0.2rem;
+}
+.article-share-btn {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--art-line);
+  background: #fff;
+  border-radius: 999px;
+  color: var(--art-navy);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.article-share-btn:hover {
+  background: var(--art-navy);
+  color: #fff;
+  border-color: var(--art-navy);
+}
+
+/* ---- Print stylesheet ---- */
+@media print {
+  .article-progress,
+  .article-skiplink,
+  .article-toc-rail,
+  .article-end-nav,
+  .site-header,
+  .site-footer,
+  .article-hero-motif { display: none !important; }
+  .article-mode { color: #000; background: #fff; }
+  .article-hero {
+    background: none;
+    color: #000;
+    padding: 0 0 1rem;
+    border-bottom: 1px solid #000;
+  }
+  .article-page .article-title,
+  .article-dek,
+  .article-byline,
+  .article-eyebrow { color: #000 !important; }
+  .article-body { max-width: none; }
+  .article-body p, .article-body li { font-size: 11pt; line-height: 1.45; }
+  .article-figure { break-inside: avoid; page-break-inside: avoid; }
+  .reveal { opacity: 1 !important; transform: none !important; }
+  a { color: #000; text-decoration: underline; }
+  .callout, .pull-quote { break-inside: avoid; }
 }

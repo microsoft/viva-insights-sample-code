@@ -65,7 +65,7 @@ AI does not fix meeting culture. It amplifies the culture already present. Organ
   </g>
   <text x="48" y="334" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">Lower drift risk → Higher drift risk when purpose, cadence, and attendee list are not actively managed.</text>
 </svg>
-<figcaption>Figure 1. Meeting quality is mostly about design fit: right size, right duration, right cadence.</figcaption>
+<figcaption><strong>Figure 1 —</strong> Meeting quality is mostly about design fit: right size, right duration, right cadence.</figcaption>
 </figure>
 
 <table class="is-wide reveal">
@@ -114,13 +114,15 @@ AI does not fix meeting culture. It amplifies the culture already present. Organ
   </g>
   <text x="48" y="398" font-size="13" fill="#5B6573" font-family="Segoe UI, Arial">Interpretation should be structural: high multitasking rates across a series often indicate meeting design debt, not individual failure.</text>
 </svg>
-<figcaption>Figure 2. Productive and distracted multitasking are analytically distinct and should be diagnosed differently.</figcaption>
+<figcaption><strong>Figure 2 —</strong> Productive and distracted multitasking are analytically distinct and should be diagnosed differently.</figcaption>
 </figure>
 
 <aside class="callout reveal" markdown="1">
 <span class="callout-label">Supporting evidence</span>
 In Org B, meeting duration was the strongest predictor of distraction signal, and meetings 60+ minutes accounted for a majority of meeting hours despite minority share by count.
 </aside>
+
+<blockquote class="pull-quote reveal">AI does not fix meeting culture. It amplifies the culture already present.</blockquote>
 
 <section id="part-3" class="part-head">
 <span class="part-kicker">Part 3</span>
@@ -181,7 +183,7 @@ In Org B, meeting duration was the strongest predictor of distraction signal, an
   </text>
   <text x="48" y="398" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">Sources: Microsoft WorkLab/WTI, Atlassian State of Teams, New Future of Work synthesis.</text>
 </svg>
-<figcaption>Figure 3. Individual gains are real; collective gains depend on team operating norms.</figcaption>
+<figcaption><strong>Figure 3 —</strong> Individual gains are real; collective gains depend on team operating norms.</figcaption>
 </figure>
 
 <section id="part-4" class="part-head">
@@ -225,13 +227,15 @@ In Org B, meeting duration was the strongest predictor of distraction signal, an
     <tspan fill="#1f2a33"> while shrinking long, large, low-contribution recurring meetings.</tspan>
   </text>
 </svg>
-<figcaption>Figure 4. Meeting reduction without design precision can unintentionally weaken networks, leadership visibility, and career mobility pathways.</figcaption>
+<figcaption><strong>Figure 4 —</strong> Meeting reduction without design precision can unintentionally weaken networks, leadership visibility, and career mobility pathways.</figcaption>
 </figure>
 
 <aside class="callout reveal" markdown="1">
 <span class="callout-label">Practical implication</span>
 Aim reduction at long, large, recurring sessions with low contribution density — not at 1:1s, mentoring, and cross-team contexts that create social and decision value.
 </aside>
+
+<blockquote class="pull-quote reveal">The meetings worth keeping build people. The meetings worth shrinking drain attention.</blockquote>
 
 <section id="part-5" class="part-head">
 <span class="part-kicker">Part 5</span>
@@ -257,7 +261,7 @@ Aim reduction at long, large, recurring sessions with low contribution density �
     </text>
   </g>
 </svg>
-<figcaption>Figure 5. These practices are designed to reduce bad meetings while preserving high-value collaboration contexts.</figcaption>
+<figcaption><strong>Figure 5 —</strong> These practices are designed to reduce bad meetings while preserving high-value collaboration contexts.</figcaption>
 </figure>
 
 ### Practice 1 · Use recap routinely
@@ -286,7 +290,7 @@ Aim reduction at long, large, recurring sessions with low contribution density �
   <rect x="48" y="474" width="884" height="30" rx="8" fill="#EAF1F8" stroke="#B9C8D8"/>
   <text x="62" y="494" font-family="Segoe UI, Arial" font-size="14" fill="#11365A"><tspan font-weight="700">Overall Org B baseline: 5.3%</tspan><tspan fill="#1f2a33"> regular usage. Technology is deployed; behavior is uneven.</tspan></text>
 </svg>
-<figcaption>Figure 6. Function labels are intentionally anonymized. Core signal retained: low baseline adoption and material variance across functions.</figcaption>
+<figcaption><strong>Figure 6 —</strong> Function labels are intentionally anonymized. Core signal retained: low baseline adoption and material variance across functions.</figcaption>
 </figure>
 
 <aside class="callout reveal" markdown="1">
@@ -326,7 +330,7 @@ In Org B, only **5.3% of users** regularly used recap. Adoption variance by func
     </g>
   </g>
 </svg>
-<figcaption>Figure 7. A simple before/during/after scaffold helps teams operationalize recap, follow, and hygiene practices consistently.</figcaption>
+<figcaption><strong>Figure 7 —</strong> A simple before/during/after scaffold helps teams operationalize recap, follow, and hygiene practices consistently.</figcaption>
 </figure>
 
 <section id="part-6" class="part-head">
@@ -343,27 +347,27 @@ In Org B, only **5.3% of users** regularly used recap. Adoption variance by func
 <h3>7) Use structural levers: defaults, meeting-free windows, and organizer targeting.</h3>
 
 <figure class="article-figure reveal">
-<svg viewBox="0 0 980 420" role="img" aria-labelledby="fig8-title fig8-desc">
+<svg viewBox="0 0 980 500" role="img" aria-labelledby="fig8-title fig8-desc">
   <title id="fig8-title">Norms versus no norms trajectories</title>
   <desc id="fig8-desc">Two lines showing diverging outcomes after AI deployment with and without norms.</desc>
-  <rect width="980" height="420" rx="16" fill="#F7FAFD"/>
+  <rect width="980" height="500" rx="16" fill="#F7FAFD"/>
   <text x="48" y="54" font-size="28" fill="#11365A" font-family="Segoe UI, Arial" font-weight="700">Two trajectories after AI deployment</text>
-  <line x1="120" y1="340" x2="900" y2="340" stroke="#B9C8D8"/>
-  <line x1="120" y1="100" x2="120" y2="340" stroke="#B9C8D8"/>
-  <text x="84" y="344" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">Low</text>
-  <text x="82" y="108" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">High</text>
-  <text x="120" y="374" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">Q1</text>
-  <text x="320" y="374" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">Q2</text>
-  <text x="520" y="374" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">Q3</text>
-  <text x="720" y="374" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">Q4</text>
-  <polyline points="120,190 320,210 520,230 720,255 900,280" fill="none" stroke="#C0392B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="120,190 320,180 520,165 720,150 900,132" fill="none" stroke="#2E7D4F" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="746" y="287" font-family="Segoe UI, Arial" font-size="15" fill="#C0392B">AI without norms → meeting debt increases</text>
-  <text x="692" y="126" font-family="Segoe UI, Arial" font-size="15" fill="#2E7D4F">AI + norms → better meetings, lower load</text>
-  <rect x="48" y="24" width="14" height="14" fill="#2E7D4F"/><text x="68" y="36" font-family="Segoe UI, Arial" font-size="13" fill="#1f2a33">Collective productivity</text>
-  <rect x="252" y="24" width="14" height="14" fill="#C0392B"/><text x="272" y="36" font-family="Segoe UI, Arial" font-size="13" fill="#1f2a33">Calendar burden</text>
+  <line x1="120" y1="390" x2="900" y2="390" stroke="#B9C8D8"/>
+  <line x1="120" y1="110" x2="120" y2="390" stroke="#B9C8D8"/>
+  <text x="84" y="394" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">Low</text>
+  <text x="82" y="118" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">High</text>
+  <text x="120" y="424" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">Q1</text>
+  <text x="320" y="424" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">Q2</text>
+  <text x="520" y="424" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">Q3</text>
+  <text x="720" y="424" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">Q4</text>
+  <polyline points="120,200 320,230 520,260 720,300 900,335" fill="none" stroke="#C0392B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="120,200 320,185 520,165 720,145 900,126" fill="none" stroke="#2E7D4F" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="700" y="342" font-family="Segoe UI, Arial" font-size="15" fill="#C0392B">AI without norms → meeting debt increases</text>
+  <text x="668" y="122" font-family="Segoe UI, Arial" font-size="15" fill="#2E7D4F">AI + norms → better meetings, lower load</text>
+  <rect x="48" y="456" width="14" height="14" fill="#2E7D4F"/><text x="68" y="468" font-family="Segoe UI, Arial" font-size="13" fill="#1f2a33">Collective productivity</text>
+  <rect x="252" y="456" width="14" height="14" fill="#C0392B"/><text x="272" y="468" font-family="Segoe UI, Arial" font-size="13" fill="#1f2a33">Calendar burden</text>
 </svg>
-<figcaption>Figure 8. The divergence appears after deployment: norms determine whether AI time savings become collective gains or additional meeting load.</figcaption>
+<figcaption><strong>Figure 8 —</strong> The divergence appears after deployment: norms determine whether AI time savings become collective gains or additional meeting load.</figcaption>
 </figure>
 
 <section id="measurement" class="part-head">
