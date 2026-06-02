@@ -51,6 +51,7 @@ import numpy as np
 from scipy import stats
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
+from linearmodels.iv import IV2SLS  # pip install linearmodels
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -293,39 +294,40 @@ def two_stage_least_squares(df, instrument_col, treatment_col, outcome_col, conf
     iv_effect = stage2_model.params['predicted_treatment']
     iv_se_naive = stage2_model.bse['predicted_treatment']  # This is incorrect - need IV standard errors
     
-    # Proper IV standard errors using instrumental variables regression
-    # Using statsmodels IV2SLS for correct standard errors
-    from statsmodels.sandbox.regression.gmm import IV2SLS
-    
+    # Proper IV standard errors using a single-step 2SLS estimator.
+    # linearmodels.IV2SLS(dependent, exog, endog, instruments) returns
+    # correct (IV-adjusted) standard errors, unlike the naive Stage-2 OLS above.
+    from linearmodels.iv import IV2SLS
+
     # Prepare variables for IV2SLS
-    y = df_iv[outcome_col].values
-    X_endog = df_iv[treatment_col].values.reshape(-1, 1)  # Endogenous variable
-    X_instruments = df_iv[instrument_col].values.reshape(-1, 1)  # Instrument
-    
+    y = df_iv[outcome_col]
+    X_endog = df_iv[[treatment_col]]  # Endogenous variable
+    X_instruments = df_iv[[instrument_col]]  # Instrument
+
     if control_vars:
-        X_exog = df_iv[control_vars].values  # Exogenous controls
-        X_exog = np.column_stack([np.ones(len(X_exog)), X_exog])  # Add constant
+        X_exog = df_iv[control_vars].copy()  # Exogenous controls
+        X_exog.insert(0, 'const', 1.0)  # Add constant
     else:
-        X_exog = np.ones((len(y), 1))  # Just constant
-    
+        X_exog = pd.DataFrame({'const': np.ones(len(df_iv))}, index=df_iv.index)
+
     # IV estimation with correct standard errors
     iv_model = IV2SLS(y, X_exog, X_endog, X_instruments).fit()
-    
-    iv_effect_correct = iv_model.params[-1]  # Treatment effect (last parameter)
-    iv_se_correct = iv_model.bse[-1]  # Correct standard error
-    
-    # Confidence interval
-    ci_lower = iv_effect_correct - 1.96 * iv_se_correct
-    ci_upper = iv_effect_correct + 1.96 * iv_se_correct
-    
+
+    iv_effect_correct = iv_model.params[treatment_col]  # Treatment effect
+    iv_se_correct = iv_model.std_errors[treatment_col]  # Correct standard error
+
+    # Confidence interval (from the fitted model)
+    ci = iv_model.conf_int().loc[treatment_col]
+    ci_lower, ci_upper = ci['lower'], ci['upper']
+
     print(f"IV effect estimate: {iv_effect_correct:.3f}")
     print(f"Standard error: {iv_se_correct:.3f}")
     print(f"95% CI: [{ci_lower:.3f}, {ci_upper:.3f}]")
-    
-    # T-statistic and p-value
-    t_stat = iv_effect_correct / iv_se_correct
-    p_value = 2 * (1 - stats.norm.cdf(abs(t_stat)))
-    
+
+    # T-statistic and p-value (reported by the estimator)
+    t_stat = iv_model.tstats[treatment_col]
+    p_value = iv_model.pvalues[treatment_col]
+
     print(f"T-statistic: {t_stat:.2f}")
     print(f"P-value: {p_value:.4f}")
     
@@ -738,24 +740,24 @@ def multiple_instruments_analysis(df, instruments, treatment_col, outcome_col, c
     # 3. Two-Stage Least Squares with multiple instruments
     print(f"\n=== 2SLS WITH MULTIPLE INSTRUMENTS ===")
     
-    from statsmodels.sandbox.regression.gmm import IV2SLS
-    
+    from linearmodels.iv import IV2SLS
+
     # Prepare variables
-    y = df_multi[outcome_col].values
-    X_endog = df_multi[treatment_col].values.reshape(-1, 1)
-    X_instruments = df_multi[instruments].values
-    
+    y = df_multi[outcome_col]
+    X_endog = df_multi[[treatment_col]]
+    X_instruments = df_multi[instruments]
+
     if confounders:
-        X_exog = df_multi[confounders].values
-        X_exog = np.column_stack([np.ones(len(X_exog)), X_exog])
+        X_exog = df_multi[confounders].copy()
+        X_exog.insert(0, 'const', 1.0)
     else:
-        X_exog = np.ones((len(y), 1))
-    
+        X_exog = pd.DataFrame({'const': np.ones(len(df_multi))}, index=df_multi.index)
+
     # IV estimation
     iv_multi_model = IV2SLS(y, X_exog, X_endog, X_instruments).fit()
-    
-    iv_effect = iv_multi_model.params[-1]
-    iv_se = iv_multi_model.bse[-1]
+
+    iv_effect = iv_multi_model.params[treatment_col]
+    iv_se = iv_multi_model.std_errors[treatment_col]
     
     print(f"IV effect: {iv_effect:.3f}")
     print(f"Standard error: {iv_se:.3f}")
