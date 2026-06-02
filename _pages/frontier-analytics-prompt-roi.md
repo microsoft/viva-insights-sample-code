@@ -155,7 +155,7 @@ REPORT GENERATION
 
 IMPORTANT NOTES
 - Do NOT overstate the ROI. This is an estimation framework, not a proven causal impact. Every section should include appropriate caveats.
-- Handle missing Copilot_Assisted_Hours carefully. If null for a licensed user, treat as 0 (they are licensed but did not use Copilot-assisted features that week).
+- Handle missing `Copilot_Assisted_Hours` **by licensing state** — this is not a blanket "treat null as 0" rule. Licensing/active status is determined from the *full set* of Copilot metrics in step 4, not from `Copilot_Assisted_Hours` alone. For a person-week already classified as **licensed/active**, a null `Copilot_Assisted_Hours` means the person did not use Copilot-assisted features that week, so treat it as 0. For **unlicensed** person-weeks (all Copilot metrics null or zero), do **not** impute 0 — exclude them from the ROI population entirely, since they are not licensed users.
 - The break-even calculation is a useful framing device — it tells leadership the minimum usage needed to justify the license cost.
 - If the ROI is negative, report it honestly and frame recommendations around increasing adoption.
 - Suppress segments with fewer than 5 users.
