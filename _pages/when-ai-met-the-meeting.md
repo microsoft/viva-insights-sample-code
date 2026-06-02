@@ -130,21 +130,56 @@ In Org B, meeting duration was the strongest predictor of distraction signal, an
 <p>Recent research converges on a common pattern: AI speeds task execution but often increases total work throughput and parallelism <a href="#ref-13">[13]</a> <a href="#ref-14">[14]</a> <a href="#ref-17">[17]</a>. In calendars, this frequently appears as more meetings, more overlap, and more recap-mediated catch-up behavior.</p>
 
 <figure class="article-figure reveal">
-<svg viewBox="0 0 980 360" role="img" aria-labelledby="fig3-title fig3-desc">
+<svg viewBox="0 0 980 430" role="img" aria-labelledby="fig3-title fig3-desc">
   <title id="fig3-title">Signals of AI impact on meetings</title>
   <desc id="fig3-desc">Five headline statistics presented as cards.</desc>
-  <rect width="980" height="360" rx="16" fill="#F7FAFD"/>
+  <rect width="980" height="430" rx="16" fill="#F7FAFD"/>
   <text x="48" y="54" font-size="28" fill="#11365A" font-family="Segoe UI, Arial" font-weight="700">Signals in the field</text>
   <g font-family="Segoe UI, Arial">
-    <rect x="48" y="88" width="170" height="104" rx="12" fill="#11365A"/><text x="64" y="130" fill="#fff" font-size="30" font-weight="700">+252%</text><text x="64" y="160" fill="#D7E4F1" font-size="13">Teams meeting time vs. Feb 2020</text>
-    <rect x="236" y="88" width="170" height="104" rx="12" fill="#2E5C8A"/><text x="252" y="130" fill="#fff" font-size="30" font-weight="700">62/mo</text><text x="252" y="160" fill="#D7E4F1" font-size="13">Average meetings per worker</text>
-    <rect x="424" y="88" width="170" height="104" rx="12" fill="#4C8C65"/><text x="440" y="130" fill="#fff" font-size="30" font-weight="700">40-60</text><text x="440" y="160" fill="#D7E4F1" font-size="13">minutes/day individual AI savings</text>
-    <rect x="612" y="88" width="170" height="104" rx="12" fill="#C79A3A"/><text x="628" y="130" fill="#fff" font-size="30" font-weight="700">8h/mo</text><text x="628" y="160" fill="#FFF3DA" font-size="13">meeting content summarized async</text>
-    <rect x="800" y="88" width="132" height="104" rx="12" fill="#2E7D4F"/><text x="816" y="130" fill="#fff" font-size="30" font-weight="700">37%</text><text x="816" y="160" fill="#DDF2E4" font-size="13">sustained users report fewer meetings</text>
+    <rect x="48" y="88" width="166" height="128" rx="12" fill="#11365A"/>
+    <text x="64" y="130" fill="#fff" font-size="30" font-weight="700">+252%</text>
+    <text x="64" y="160" fill="#D7E4F1" font-size="13">
+      <tspan x="64" dy="0">Teams meeting time</tspan>
+      <tspan x="64" dy="16">vs. Feb 2020</tspan>
+    </text>
+
+    <rect x="228" y="88" width="166" height="128" rx="12" fill="#2E5C8A"/>
+    <text x="244" y="130" fill="#fff" font-size="30" font-weight="700">62/mo</text>
+    <text x="244" y="160" fill="#D7E4F1" font-size="13">
+      <tspan x="244" dy="0">Average meetings</tspan>
+      <tspan x="244" dy="16">per worker</tspan>
+    </text>
+
+    <rect x="408" y="88" width="166" height="128" rx="12" fill="#4C8C65"/>
+    <text x="424" y="130" fill="#fff" font-size="30" font-weight="700">40-60</text>
+    <text x="424" y="160" fill="#D7E4F1" font-size="13">
+      <tspan x="424" dy="0">minutes/day</tspan>
+      <tspan x="424" dy="16">individual AI savings</tspan>
+    </text>
+
+    <rect x="588" y="88" width="166" height="128" rx="12" fill="#C79A3A"/>
+    <text x="604" y="130" fill="#fff" font-size="30" font-weight="700">8h/mo</text>
+    <text x="604" y="160" fill="#FFF3DA" font-size="13">
+      <tspan x="604" dy="0">Meeting content</tspan>
+      <tspan x="604" dy="16">summarized async</tspan>
+    </text>
+
+    <rect x="768" y="88" width="166" height="128" rx="12" fill="#2E7D4F"/>
+    <text x="784" y="130" fill="#fff" font-size="30" font-weight="700">37%</text>
+    <text x="784" y="160" fill="#DDF2E4" font-size="13">
+      <tspan x="784" dy="0">Sustained users report</tspan>
+      <tspan x="784" dy="16">attending fewer meetings</tspan>
+    </text>
   </g>
-  <text x="48" y="238" font-family="Segoe UI, Arial" font-size="17" fill="#1f2a33">Interpretation: both growth and reduction signals can be true at once — they represent different sub-populations and different norm maturity.</text>
-  <text x="48" y="268" font-family="Segoe UI, Arial" font-size="17" fill="#1f2a33">AI deployment alone does not reduce meetings. Team norms determine whether saved time becomes better collaboration or more calendar load.</text>
-  <text x="48" y="328" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">Sources: Microsoft WorkLab/WTI, Atlassian State of Teams, New Future of Work synthesis.</text>
+  <text x="48" y="266" font-family="Segoe UI, Arial" font-size="17" fill="#1f2a33">
+    <tspan x="48" dy="0">Interpretation: growth and reduction signals can both be true at once.</tspan>
+    <tspan x="48" dy="24">They usually describe different sub-populations and different norm maturity levels.</tspan>
+  </text>
+  <text x="48" y="332" font-family="Segoe UI, Arial" font-size="17" fill="#1f2a33">
+    <tspan x="48" dy="0">AI deployment alone does not reduce meetings.</tspan>
+    <tspan x="48" dy="24">Team norms determine whether saved time becomes better collaboration or more calendar load.</tspan>
+  </text>
+  <text x="48" y="398" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">Sources: Microsoft WorkLab/WTI, Atlassian State of Teams, New Future of Work synthesis.</text>
 </svg>
 <figcaption>Figure 3. Individual gains are real; collective gains depend on team operating norms.</figcaption>
 </figure>
@@ -157,22 +192,38 @@ In Org B, meeting duration was the strongest predictor of distraction signal, an
 <p>Calls to “reduce meetings” often cut the wrong layer. Three research streams show why: weak ties support mobility <a href="#ref-6">[6]</a> <a href="#ref-15">[15]</a>, remote work can harden network silos <a href="#ref-7">[7]</a> <a href="#ref-22">[22]</a>, and informal communication supports leadership and satisfaction <a href="#ref-8">[8]</a> <a href="#ref-18">[18]</a>. Good meeting policy protects those mechanisms while reducing structural waste.</p>
 
 <figure class="article-figure reveal">
-<svg viewBox="0 0 980 390" role="img" aria-labelledby="fig4-title fig4-desc">
+<svg viewBox="0 0 980 460" role="img" aria-labelledby="fig4-title fig4-desc">
   <title id="fig4-title">Three benefits worth protecting</title>
   <desc id="fig4-desc">Triad diagram showing weak ties, network bridging, and informal communication.</desc>
-  <rect width="980" height="390" rx="16" fill="#F7FAFD"/>
+  <rect width="980" height="460" rx="16" fill="#F7FAFD"/>
   <text x="48" y="54" font-size="28" fill="#11365A" font-family="Segoe UI, Arial" font-weight="700">What meetings protect when designed well</text>
-  <circle cx="320" cy="220" r="110" fill="#EAF1F8" stroke="#B9C8D8"/>
-  <circle cx="500" cy="145" r="110" fill="#E9F4EC" stroke="#BCDCC6"/>
-  <circle cx="680" cy="220" r="110" fill="#FFF5E5" stroke="#EFD9AD"/>
-  <text x="264" y="210" font-size="19" fill="#11365A" font-family="Segoe UI, Arial" font-weight="700">Weak ties</text>
-  <text x="230" y="236" font-size="14" fill="#1f2a33" font-family="Segoe UI, Arial">Career mobility and opportunity</text>
-  <text x="436" y="136" font-size="19" fill="#2E7D4F" font-family="Segoe UI, Arial" font-weight="700">Network bridging</text>
-  <text x="418" y="162" font-size="14" fill="#1f2a33" font-family="Segoe UI, Arial">Cross-boundary collaboration</text>
-  <text x="616" y="210" font-size="19" fill="#C79A3A" font-family="Segoe UI, Arial" font-weight="700">Informal exchange</text>
-  <text x="595" y="236" font-size="14" fill="#1f2a33" font-family="Segoe UI, Arial">Leadership and trust signals</text>
-  <text x="435" y="238" font-size="18" fill="#11365A" font-family="Segoe UI, Arial" font-weight="700">Keep these</text>
-  <text x="416" y="262" font-size="14" fill="#1f2a33" font-family="Segoe UI, Arial">while shrinking structural meeting debt</text>
+  <rect x="48" y="92" width="280" height="280" rx="14" fill="#EAF1F8" stroke="#B9C8D8"/>
+  <rect x="350" y="92" width="280" height="280" rx="14" fill="#E9F4EC" stroke="#BCDCC6"/>
+  <rect x="652" y="92" width="280" height="280" rx="14" fill="#FFF5E5" stroke="#EFD9AD"/>
+
+  <text x="72" y="138" font-size="23" fill="#11365A" font-family="Segoe UI, Arial" font-weight="700">Weak ties</text>
+  <text x="72" y="168" font-size="15" fill="#1f2a33" font-family="Segoe UI, Arial">
+    <tspan x="72" dy="0">Career mobility and opportunity</tspan>
+    <tspan x="72" dy="22">depend on cross-network contact.</tspan>
+  </text>
+
+  <text x="374" y="138" font-size="23" fill="#2E7D4F" font-family="Segoe UI, Arial" font-weight="700">Network bridging</text>
+  <text x="374" y="168" font-size="15" fill="#1f2a33" font-family="Segoe UI, Arial">
+    <tspan x="374" dy="0">Cross-boundary collaboration</tspan>
+    <tspan x="374" dy="22">is easier in well-run sync contexts.</tspan>
+  </text>
+
+  <text x="676" y="138" font-size="23" fill="#C79A3A" font-family="Segoe UI, Arial" font-weight="700">Informal exchange</text>
+  <text x="676" y="168" font-size="15" fill="#1f2a33" font-family="Segoe UI, Arial">
+    <tspan x="676" dy="0">Leadership trust and social glue</tspan>
+    <tspan x="676" dy="22">often emerge around meetings.</tspan>
+  </text>
+
+  <rect x="48" y="392" width="884" height="42" rx="9" fill="#F2F7FC" stroke="#B9C8D8"/>
+  <text x="68" y="418" font-size="16" fill="#11365A" font-family="Segoe UI, Arial">
+    <tspan font-weight="700">Protect these mechanisms</tspan>
+    <tspan fill="#1f2a33"> while shrinking long, large, low-contribution recurring meetings.</tspan>
+  </text>
 </svg>
 <figcaption>Figure 4. Meeting reduction without design precision can unintentionally weaken networks, leadership visibility, and career mobility pathways.</figcaption>
 </figure>
@@ -199,7 +250,11 @@ Aim reduction at long, large, recurring sessions with low contribution density �
     <rect x="48" y="88" width="884" height="68" rx="12" fill="#11365A"/><text x="72" y="130" fill="#fff" font-size="20" font-weight="700">1. Use recap routinely across all meeting types</text>
     <rect x="48" y="170" width="884" height="68" rx="12" fill="#2E5C8A"/><text x="72" y="212" fill="#fff" font-size="20" font-weight="700">2. Accept one meeting, follow the conflicting one</text>
     <rect x="48" y="252" width="884" height="68" rx="12" fill="#4C8C65"/><text x="72" y="294" fill="#fff" font-size="20" font-weight="700">3. Use focus blocks for recap catch-up and follow-through</text>
-    <rect x="48" y="334" width="884" height="68" rx="12" fill="#C79A3A"/><text x="72" y="376" fill="#fff" font-size="20" font-weight="700">4. Meeting hygiene: right-size, right-length, recurring audit, notice discipline</text>
+    <rect x="48" y="334" width="884" height="68" rx="12" fill="#C79A3A"/>
+    <text x="72" y="368" fill="#fff" font-size="20" font-weight="700">
+      <tspan x="72" dy="0">4. Meeting hygiene: right-size, right-length, recurring audit,</tspan>
+      <tspan x="72" dy="24">notice discipline</tspan>
+    </text>
   </g>
 </svg>
 <figcaption>Figure 5. These practices are designed to reduce bad meetings while preserving high-value collaboration contexts.</figcaption>

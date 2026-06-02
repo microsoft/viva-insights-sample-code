@@ -80,6 +80,7 @@
   margin: 0 0 1.1rem;
   letter-spacing: -0.01em;
 }
+.article-page .article-title { color: #fff; } /* override .page-content h1 site rule */
 .article-dek {
   font-family: var(--art-serif);
   font-style: italic;
@@ -104,9 +105,11 @@
 /* ---- Body: centred reading column; wide blocks break out ---- */
 .article-body {
   padding: 0 1.4rem;
+  max-width: var(--art-measure);
+  margin: 0 auto;
 }
 .article-body > * {
-  max-width: var(--art-measure);
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -300,7 +303,13 @@
   font-size: 0.96rem;
   margin: 1.8rem auto;
 }
-.article-body table.is-wide { max-width: 60rem; }
+.article-body table.is-wide {
+  max-width: 60rem;
+  width: min(60rem, calc(100vw - 2.8rem));
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
 .article-body th {
   background: var(--art-navy);
   color: #fff;
@@ -321,6 +330,10 @@
 .article-figure {
   max-width: 62rem;
   margin: clamp(1.8rem, 4vw, 2.8rem) auto;
+  width: min(62rem, calc(100vw - 2.8rem));
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .article-figure svg { width: 100%; height: auto; display: block; }
 .article-figure figcaption {
@@ -379,6 +392,25 @@
 
 /* ---- page-meta spacing inside article ---- */
 .article-page .page-meta { max-width: var(--art-measure); margin-left: auto; margin-right: auto; }
+
+@media (max-width: 900px) {
+  .article-figure {
+    left: auto;
+    transform: none;
+    width: 100%;
+    max-width: 100%;
+  }
+  .article-body table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .article-body table.is-wide {
+    left: auto;
+    transform: none;
+    width: 100%;
+  }
+}
 
 /* ---- Figure helper palette classes (used inside SVG/HTML figures) ---- */
 .fig-card {
