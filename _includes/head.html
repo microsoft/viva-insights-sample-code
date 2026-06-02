@@ -5,6 +5,9 @@
   {%- seo -%}
   <link rel="stylesheet" href="{{ "/assets/main.css" | relative_url }}">
   <link rel="stylesheet" href="{{ "/assets/css/site.css" | relative_url }}">
+  {%- if page.css -%}
+  <link rel="stylesheet" href="{{ page.css | relative_url }}">
+  {%- endif -%}
 
   {%- comment -%} Viva Insights branding: favicon + theme colour {%- endcomment -%}
   <link rel="icon" type="image/svg+xml" href="{{ "/assets/images/favicon.svg" | relative_url }}">

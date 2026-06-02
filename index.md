@@ -123,6 +123,12 @@ Browse the categories below to find sample code that matches your needs. Each sc
     <span class="vi-card-desc">Turn a Viva Insights export into a dashboard, exec deck, or ROI analysis with a coding agent — plus prompt libraries and schema docs.</span>
     <span class="vi-card-more">Explore →</span>
   </a>
+  <a class="vi-card" href="{{ site.baseurl }}/articles/">
+    <span class="vi-card-icon">📰</span>
+    <span class="vi-card-title">Articles</span>
+    <span class="vi-card-desc">Read long-form editorials and research briefs on meeting culture, Copilot adoption, and AI-enabled collaboration practices.</span>
+    <span class="vi-card-more">Read →</span>
+  </a>
 </div>
 
 ---

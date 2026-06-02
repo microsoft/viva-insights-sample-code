@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+
+  {%- include head.html -%}
+
+  <body class="article-mode">
+
+    {%- comment -%} Reading-progress bar (filled via JS on scroll) {%- endcomment -%}
+    <div class="article-progress" aria-hidden="true"><span id="article-progress-bar"></span></div>
+
+    {%- include custom-navigation.html -%}
+
+    <main class="page-content article-page" aria-label="Content">
+
+      <header class="article-hero">
+        <div class="article-hero-inner">
+          {%- if page.eyebrow -%}
+          <p class="article-eyebrow">{{ page.eyebrow }}</p>
+          {%- endif -%}
+          <h1 class="article-title">{{ page.title }}</h1>
+          {%- if page.dek -%}
+          <p class="article-dek">{{ page.dek }}</p>
+          {%- endif -%}
+          <div class="article-byline">
+            {%- if page.byline -%}<span class="article-byline-author">{{ page.byline }}</span>{%- endif -%}
+            {%- if page.read_time -%}<span class="article-byline-sep" aria-hidden="true">·</span><span class="article-readtime">{{ page.read_time }}</span>{%- endif -%}
+          </div>
+        </div>
+      </header>
+
+      <article class="article-body">
+        {{ content }}
+      </article>
+
+      {%- include page-meta.html -%}
+    </main>
+
+    {%- include footer.html -%}
+
+    <script>
+      (function () {
+        var bar = document.getElementById('article-progress-bar');
+        var ticking = false;
+        function update() {
+          var h = document.documentElement;
+          var max = (h.scrollHeight - h.clientHeight) || 1;
+          var pct = Math.min(100, Math.max(0, (h.scrollTop || window.pageYOffset) / max * 100));
+          if (bar) bar.style.width = pct + '%';
+          ticking = false;
+        }
+        window.addEventListener('scroll', function () {
+          if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
+        }, { passive: true });
+        update();
+
+        // Toned-down reveal-on-scroll for figures and callouts.
+        if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+              if (e.isIntersecting) { e.target.classList.add('is-revealed'); io.unobserve(e.target); }
+            });
+          }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+          document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+        } else {
+          document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-revealed'); });
+        }
+      })();
+    </script>
+
+  </body>
+
+</html>
