@@ -139,16 +139,39 @@
   display: none; /* hidden until viewport is wide enough */
 }
 
-/* ---- Body: centred reading column; wide blocks break out ---- */
+/*
+ * Body uses a 3-column "breakout" grid:
+ *   [1fr gutter] [reading column = 38rem] [1fr gutter]
+ * Prose stays in the reading column for comfortable line length, while
+ * figures and wide tables break out across all three columns to use the
+ * full body width — keeping cards visually generous without making body
+ * text uncomfortably long.
+ */
 .article-body {
-  padding: 0 1.4rem;
-  max-width: var(--art-measure);
+  max-width: 64rem;
   margin: 0 auto;
+  padding: 0 1.4rem;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, var(--art-measure))
+    minmax(0, 1fr);
+  column-gap: 0;
 }
 .article-body > * {
+  grid-column: 2;
+  min-width: 0;
   max-width: 100%;
-  margin-left: auto;
-  margin-right: auto;
+}
+.article-body > .article-figure,
+.article-body > table.is-wide,
+.article-body > figure,
+.article-body > .references {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
 }
 .article-body p {
   font-size: 1.16rem;
@@ -389,10 +412,10 @@
 
 /* ---- References ---- */
 .references {
-  max-width: 50rem;
   margin: clamp(2.4rem, 5vw, 3.4rem) auto 0;
   padding-top: 1.4rem;
   border-top: 2px solid var(--art-navy);
+  max-width: 50rem;
 }
 .references h2 {
   font-family: var(--art-serif);
@@ -443,6 +466,16 @@
     -webkit-overflow-scrolling: touch;
   }
   .article-body table.is-wide { width: 100%; }
+}
+
+/* On narrow viewports, fade the hero motif so it doesn't compete with text. */
+@media (max-width: 720px) {
+  .article-hero-motif { width: 80%; opacity: 0.35; }
+}
+@media (max-width: 480px) {
+  .article-hero-motif { display: none; }
+  .article-body { padding: 0 1.1rem; }
+  .article-body p, .article-body ul, .article-body ol { font-size: 1.08rem; }
 }
 
 /* ---- Figure helper palette classes (used inside SVG/HTML figures) ---- */
