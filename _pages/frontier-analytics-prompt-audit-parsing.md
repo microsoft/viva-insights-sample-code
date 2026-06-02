@@ -191,6 +191,8 @@ IMPORTANT NOTES
 - **Copilot event filtering is too narrow or too broad.** If zero events match, the prompt instructs the agent to show all Operation values for manual inspection. If too many match, review the filter criteria and narrow them.
 - **Encoding issues.** Purview CSV exports may use UTF-8 BOM encoding. If the agent encounters parsing errors on the first column name, instruct it to use `utf-8-sig` encoding.
 
+{% include responsible-use.html %}
+
 <div class="prompt-nav">
   <a href="{{ site.baseurl }}/frontier-analytics-prompt-agent-usage/">← Previous: Agent Usage Analysis</a>
   <a href="{{ site.baseurl }}/frontier-analytics-prompt-causal-toolkit/">Next: Copilot Causal Toolkit →</a>

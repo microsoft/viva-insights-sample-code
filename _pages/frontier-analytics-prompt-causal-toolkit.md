@@ -234,6 +234,8 @@ IMPORTANT NOTES
 - **Agent ignores sensitivity analysis.** The E-values are critical for assessing robustness. If the agent skips this section, prompt it: _"Also interpret the sensitivity analysis results from the JSON file."_
 - **No significant results found.** This is a valid outcome. The agent should not treat it as a failure, but rather frame it constructively with suggestions for next steps (more data, different outcome, qualitative complement).
 
+{% include responsible-use.html %}
+
 <div class="prompt-nav">
   <a href="{{ site.baseurl }}/frontier-analytics-prompt-audit-parsing/">← Previous: Audit Log Parsing</a>
   <span class="nav-disabled">Next →</span>

@@ -200,6 +200,8 @@ IMPORTANT NOTES
 - **Slide layout is cluttered.** Review the deck for readability. Each slide should convey one main point. If a slide has too much content, ask the agent to split it.
 - **Agent does not handle missing metrics gracefully.** If `Copilot_Assisted_Hours` or other optional metrics are not in the data, the agent should skip those slides rather than error.
 
+{% include responsible-use.html %}
+
 <div class="prompt-nav">
   <a href="{{ site.baseurl }}/frontier-analytics-prompt-roi/">← Previous: ROI Estimation</a>
   <a href="{{ site.baseurl }}/frontier-analytics-prompt-agent-usage/">Next: Agent Usage Analysis →</a>

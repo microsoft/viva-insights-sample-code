@@ -156,6 +156,8 @@ IMPORTANT NOTES
 - **Agent conflates week-level segments with user-level segments.** The report uses both: per-week segments for trends and a "stable segment" (mode) for HR attribute breakdowns. Ensure both are present.
 - **Churn definition is too aggressive.** Two weeks of inactivity may include holidays or vacation. Consider extending to 3–4 weeks for more conservative churn estimates.
 
+{% include responsible-use.html %}
+
 <div class="prompt-nav">
   <a href="{{ site.baseurl }}/frontier-analytics-prompt-executive-summary/">← Previous: Executive Summary</a>
   <a href="{{ site.baseurl }}/frontier-analytics-prompt-roi/">Next: ROI Estimation →</a>

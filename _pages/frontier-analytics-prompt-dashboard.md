@@ -153,6 +153,8 @@ IMPORTANT NOTES
 - **Metric column names differ between tenants.** Copilot metric columns generally contain the word "Copilot" but do not always start with `Copilot_`. Reference the [metrics taxonomy](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv) to validate detected columns.
 - **HTML file is not self-contained.** Check that the output HTML opens correctly with no external dependencies. If charts appear broken, ensure base64 encoding was applied.
 
+{% include responsible-use.html %}
+
 <div class="prompt-nav">
   <span class="nav-disabled">← Previous</span>
   <a href="{{ site.baseurl }}/frontier-analytics-prompt-executive-summary/">Next: Executive Summary →</a>

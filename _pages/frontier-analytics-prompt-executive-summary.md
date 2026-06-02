@@ -164,6 +164,8 @@ IMPORTANT NOTES
 - **Agent treats missing Copilot values as zero.** This would inflate denominators and deflate adoption rates. Verify the licensed user logic.
 - **Recommendations are too generic.** If the agent produces vague advice ("increase adoption"), ask it to regenerate with specific org names and numbers from the data.
 
+{% include responsible-use.html %}
+
 <div class="prompt-nav">
   <a href="{{ site.baseurl }}/frontier-analytics-prompt-dashboard/">← Previous: Dashboard Overview</a>
   <a href="{{ site.baseurl }}/frontier-analytics-prompt-segmentation/">Next: Segmentation & Churn →</a>

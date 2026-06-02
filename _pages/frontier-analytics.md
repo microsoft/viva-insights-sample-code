@@ -16,6 +16,8 @@ Frontier is a collection of ready-to-use prompts, schema guides, and example out
 
 > **Note:** Everything in this section is sample code and starter assets — not production software. Outputs require review, validation, and adaptation to your environment before use.
 
+{% include responsible-use.html %}
+
 ---
 
 ## Who is this for?

@@ -25,6 +25,8 @@ Each prompt card includes the purpose, required inputs, assumptions, the full pr
 
 > **📋 Review the schema first.** Before running any prompt, check the **[Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)** to confirm which columns exist in your export and what they mean. Column names, granularity, and the Copilot/agent action taxonomy vary between tenants — validating the schema first prevents the most common failure mode, where a prompt silently runs against the wrong or missing columns.
 
+{% include responsible-use.html %}
+
 ## Available prompts
 
 ### Copilot Adoption

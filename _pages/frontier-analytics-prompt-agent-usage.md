@@ -168,6 +168,8 @@ IMPORTANT NOTES
 - **Copilot events are not clearly labeled.** In some tenants, Copilot interactions are logged under generic operation names. You may need to inspect AuditData contents to identify them.
 - **Agent treats all events equally.** Some operations may be system-level events or duplicates. Review the Operation values to determine which represent genuine user interactions.
 
+{% include responsible-use.html %}
+
 <div class="prompt-nav">
   <a href="{{ site.baseurl }}/frontier-analytics-prompt-powerpoint/">← Previous: Executive PowerPoint Deck</a>
   <a href="{{ site.baseurl }}/frontier-analytics-prompt-audit-parsing/">Next: Audit Log Parsing →</a>

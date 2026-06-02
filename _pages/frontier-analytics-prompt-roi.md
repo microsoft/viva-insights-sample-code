@@ -188,6 +188,8 @@ IMPORTANT NOTES
 - **Agent reports ROI without caveats.** Senior leadership will scrutinize the methodology. Ensure every value estimate is accompanied by its assumptions and limitations.
 - **Currency formatting issues.** Verify that dollar amounts are formatted with commas and two decimal places for large figures.
 
+{% include responsible-use.html %}
+
 <div class="prompt-nav">
   <a href="{{ site.baseurl }}/frontier-analytics-prompt-segmentation/">← Previous: Segmentation & Churn</a>
   <a href="{{ site.baseurl }}/frontier-analytics-prompt-powerpoint/">Next: Executive PowerPoint Deck →</a>

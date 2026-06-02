@@ -1,0 +1,35 @@
+<!-- Consolidated responsible-use & data-privacy callout for Frontier pages. -->
+<style>
+.responsible-use {
+  margin: 1.75rem 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border-color, #e3dcec);
+  border-left: 4px solid #5C2D91;
+  border-radius: 8px;
+  background: var(--code-background-color, #f7f5fb);
+}
+.responsible-use h4 {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.responsible-use ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+.responsible-use li { margin: 0.35rem 0; line-height: 1.45; }
+.responsible-use li:first-child { margin-top: 0; }
+.responsible-use li:last-child { margin-bottom: 0; }
+</style>
+
+<div class="responsible-use" role="note" aria-label="Responsible use and data privacy">
+  <h4><span aria-hidden="true">🔒</span> Responsible use &amp; data privacy</h4>
+  <ul>
+    <li><strong>Suppress small groups.</strong> Apply a minimum group-size threshold to every breakdown, segment, and chart — Viva Insights typically uses 5–10. Raise it for smaller organizations.</li>
+    <li><strong>Never expose individuals.</strong> Do not print raw UPNs or email addresses; hash, truncate, or report only aggregates. Person query <code>PersonId</code> is already de-identified, but Purview <code>UserId</code> is not.</li>
+    <li><strong>Analyze groups, not individuals.</strong> These outputs are for understanding cohorts and trends — not for evaluating, ranking, or monitoring named employees.</li>
+    <li><strong>Keep data in approved environments.</strong> Don't paste sensitive HR data into cloud agents unless your organization's policies allow it; prefer local or enterprise-hosted tools. Validate every agent output before sharing.</li>
+  </ul>
+</div>
