@@ -196,24 +196,15 @@ generate_kpis <- function(
   
   # Metrics requiring separate calculation ----------------------------------
   # Multitasking: % Spend > 15% of meeting time doing emails or chatting outside of the meeting 
-  # Weekend: email, chat, call, two or more weekends per month
+  # Weekend collaboration (two or more weekends per month) is computed separately below.
   sep_metric_list <- c(
     "Multitasking_hours",
-    "Meeting_hours",
-    "IsWeekendCollab" # Compute below
+    "Meeting_hours"
   )
   
   # Person level calculations for separate metrics
   sep_metric_tb_person <-
     weekly_pq %>%
-    mutate(IsWeekendCollab =
-             select(., 
-                    Weekend_channel_message_posts,
-                    Weekend_emails_sent,
-                    Weekend_meetings,
-                    Unscheduled_weekend_calls) %>%
-             apply(1, function(x) any(x > 0))
-    ) %>%
     group_by(PersonId, !!sym(hrvar)) %>%
     summarise(
       across(
@@ -237,11 +228,30 @@ generate_kpis <- function(
     select(Metric, !!sym(hrvar), Value = "Pct_IsMultitasking15pct")
   
   # Table for Weekend Collaboration
+  # KPI #14: % who are active on weekends in two or more weekends per month.
+  # We flag each person-WEEK as weekend-active (any weekend signal > 0), then
+  # COUNT the distinct active weekends within each calendar month per person.
+  # A person-month qualifies if it has 2+ active weekends; the reported value is
+  # the share of person-months that qualify. (The previous version averaged the
+  # weekly flag and thresholded the mean at 0.5, which does not count weekends
+  # per month and mislabels people with bursty months.)
   tb_weekendcollab <-
-    sep_metric_tb_person %>%
-    mutate(WeekendCollabMoreThanTwiceMonthly = ifelse(IsWeekendCollab >= 0.5, TRUE, FALSE)) %>%
+    weekly_pq %>%
+    mutate(
+      IsWeekendActive =
+        select(.,
+               Weekend_channel_message_posts,
+               Weekend_emails_sent,
+               Weekend_meetings,
+               Unscheduled_weekend_calls) %>%
+        apply(1, function(x) any(x > 0, na.rm = TRUE)),
+      Month = format(as.Date(MetricDate), "%Y-%m")
+    ) %>%
+    group_by(!!sym(hrvar), PersonId, Month) %>%
+    summarise(WeekendsActive = sum(IsWeekendActive), .groups = "drop") %>%
+    mutate(TwoPlusWeekends = WeekendsActive >= 2) %>%
     group_by(!!sym(hrvar)) %>%
-    summarise(Pct_WeekendCollabMoreThanTwiceMonthly = mean(WeekendCollabMoreThanTwiceMonthly)) %>%
+    summarise(Pct_WeekendCollabMoreThanTwiceMonthly = mean(TwoPlusWeekends)) %>%
     mutate(Metric = "WeekendCollabMoreThanTwiceMonthly") %>%
     select(Metric, !!sym(hrvar), Value = "Pct_WeekendCollabMoreThanTwiceMonthly")
   
@@ -298,13 +308,16 @@ generate_kpis <- function(
     mutate(StartHour = as.numeric(StartHour),
            EndHour = as.numeric(EndHour)) 
   
-  # Extract only first and last active hours
+  # Extract first and last active hours of the day.
+  # An hour is "active" if ANY collaboration signal occurs in it (the rows that
+  # survive the Volume > 0 filter above). The first/last active hour is therefore
+  # the minimum start hour and maximum end hour across those active blocks - this
+  # does not depend on row ordering or which activity type happens to be last.
   hour_df_summary <-
     hour_df %>%
-    arrange(StartHour) %>% 
-    group_by(PersonId, !!sym(hrvar), MetricDate) %>% # Whichever signal
-    summarise(FirstHourOfDay = first(StartHour),
-              LastHourOfDay = last(EndHour),
+    group_by(PersonId, !!sym(hrvar), MetricDate) %>%
+    summarise(FirstHourOfDay = min(StartHour),
+              LastHourOfDay = max(EndHour),
               .groups = "drop")
   
   # Extract only first and last hours as a row
