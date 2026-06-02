@@ -46,6 +46,7 @@ The propensity score e(x) = P(Treatment = 1 | X = x) is the probability of treat
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
 import numpy as np
@@ -69,15 +70,17 @@ def estimate_propensity_scores(df, treatment_col, confounder_cols, method='logis
     print(f"Covariates: {len(confounder_cols)}")
     
     if method == 'logistic':
-        # Standardize features for logistic regression
-        scaler = StandardScaler()
-        X_scaled = scaler.fit_transform(X)
-        model = LogisticRegression(random_state=42, max_iter=1000)
-        model.fit(X_scaled, y)
-        propensity_scores = model.predict_proba(X_scaled)[:, 1]
+        # Standardize features inside a Pipeline so the scaler is fit only on
+        # the training fold during cross-validation (prevents data leakage).
+        model = Pipeline([
+            ('scaler', StandardScaler()),
+            ('clf', LogisticRegression(random_state=42, max_iter=1000))
+        ])
+        model.fit(X, y)
+        propensity_scores = model.predict_proba(X)[:, 1]
         
-        # Model performance
-        cv_scores = cross_val_score(model, X_scaled, y, cv=5, scoring='roc_auc')
+        # Model performance (scaler is re-fit within each CV fold)
+        cv_scores = cross_val_score(model, X, y, cv=5, scoring='roc_auc')
         print(f"Cross-validation AUC: {cv_scores.mean():.3f} ± {cv_scores.std():.3f}")
         
     elif method == 'random_forest':
@@ -157,16 +160,24 @@ df_with_ps, ps_model, overlap_stats = estimate_propensity_scores(
 ```
 
 **Interpreting Propensity Score Quality:**
-- **AUC 0.6-0.8**: Good discrimination, sufficient variation in treatment probability
-- **AUC > 0.9**: Excellent prediction but may indicate poor overlap
-- **Common Support**: Should include most observations (>80%)
-- **Extreme Scores**: Values near 0 or 1 suggest deterministic assignment
+
+A high AUC is *not* the goal. The propensity model exists to balance covariates and
+create overlap between groups — not to predict treatment as accurately as possible.
+A very high AUC usually means the groups are easy to tell apart, i.e. **poor overlap**,
+which is bad for causal inference. Prioritise balance and common-support diagnostics
+over discrimination metrics.
+
+- **AUC ≈ 0.5-0.7**: Often *desirable* — treatment is hard to predict from covariates, implying good overlap.
+- **AUC 0.7-0.8**: Acceptable, but inspect overlap carefully.
+- **AUC > 0.8-0.9**: **Warning sign** — strong separation typically means limited common support; many units may have no comparable counterpart.
+- **Common Support**: Should include most observations (>80%). This matters far more than AUC.
+- **Extreme Scores**: Values near 0 or 1 suggest near-deterministic assignment and should be trimmed.
 
 ---
 
 ## Propensity Score Matching
 
-Once we have good propensity scores, we match treated units to similar control units. This creates a balanced dataset where treatment assignment appears "as good as random" within matched pairs.
+Once we have good propensity scores, we match treated units to similar control units. This creates a dataset that is **more comparable on observed covariates** within matched pairs. Note that matching only balances the covariates you include — it cannot remove bias from unobserved confounders, so residual confounding may remain.
 
 ```python
 from scipy.spatial.distance import cdist
