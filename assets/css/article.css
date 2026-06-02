@@ -436,12 +436,14 @@
 .references li { margin-bottom: 0.5rem; }
 .references li a { color: var(--art-navy); word-break: break-word; }
 .article-end-note {
-  max-width: 50rem;
-  margin: 1.6rem auto 0;
+  margin: 1.4rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--art-line);
   font-family: var(--art-sans);
-  font-size: 0.82rem;
+  font-size: 0.74rem;
   font-style: italic;
   color: var(--art-muted);
+  line-height: 1.5;
 }
 
 /* ---- Reveal-on-scroll (toned-down) ---- */

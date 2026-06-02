@@ -360,10 +360,12 @@ In Org B, only **5.3% of users** regularly used recap. Adoption variance by func
   <text x="320" y="424" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">Q2</text>
   <text x="520" y="424" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">Q3</text>
   <text x="720" y="424" font-family="Segoe UI, Arial" font-size="13" fill="#5B6573">Q4</text>
-  <polyline points="120,200 320,230 520,260 720,300 900,335" fill="none" stroke="#C0392B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="120,200 320,185 520,165 720,145 900,126" fill="none" stroke="#2E7D4F" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="700" y="342" font-family="Segoe UI, Arial" font-size="15" fill="#C0392B">AI without norms → meeting debt increases</text>
-  <text x="668" y="122" font-family="Segoe UI, Arial" font-size="15" fill="#2E7D4F">AI + norms → better meetings, lower load</text>
+  <polyline points="120,200 320,230 520,260 720,300 880,340" fill="none" stroke="#C0392B" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="120,200 320,185 520,165 720,145 880,120" fill="none" stroke="#2E7D4F" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="880" cy="340" r="5" fill="#C0392B"/>
+  <circle cx="880" cy="120" r="5" fill="#2E7D4F"/>
+  <text x="876" y="100" text-anchor="end" font-family="Segoe UI, Arial" font-size="14" font-weight="600" fill="#2E7D4F">AI + norms → better meetings, lower load</text>
+  <text x="876" y="365" text-anchor="end" font-family="Segoe UI, Arial" font-size="14" font-weight="600" fill="#C0392B">AI without norms → meeting debt increases</text>
   <rect x="48" y="456" width="14" height="14" fill="#2E7D4F"/><text x="68" y="468" font-family="Segoe UI, Arial" font-size="13" fill="#1f2a33">Collective productivity</text>
   <rect x="252" y="456" width="14" height="14" fill="#C0392B"/><text x="272" y="468" font-family="Segoe UI, Arial" font-size="13" fill="#1f2a33">Calendar burden</text>
 </svg>
@@ -419,6 +421,5 @@ In Org B, only **5.3% of users** regularly used recap. Adoption variance by func
   <li id="ref-21">Mark, G., Gudith, D., & Klocke, U. (2008). The cost of interrupted work. CHI.</li>
   <li id="ref-22">Olson, G. M., & Olson, J. S. (2000). Distance matters. <em>HCI</em>.</li>
 </ol>
-</section>
-
 <p class="article-end-note">Org A = anonymized European mobility/IT enterprise diagnostic. Org B = anonymized global luxury brand diagnostic. Metrics shown in aggregate only.</p>
+</section>
