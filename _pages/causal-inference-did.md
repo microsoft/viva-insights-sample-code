@@ -142,6 +142,8 @@ df_did = prepare_did_data(
 
 The key assumption in DiD is **parallel trends** - that treated and control groups would have followed similar trends in the absence of treatment.
 
+> **How to assess parallel trends (and what it can't prove).** Parallel trends is fundamentally *untestable* — it concerns the counterfactual post-period trend of the treated group, which we never observe. We can only **diagnose** it using pre-treatment data. Do not reduce this to a single pass/fail p-value: a high p-value does **not** prove parallel trends (it may just reflect low power), and a low p-value is a genuine red flag. Best practice is to (1) plot an **event-study** of period-by-period lead/lag coefficients relative to an omitted reference period, (2) eyeball whether the **pre-period leads** hug zero, and (3) back this with a **joint Wald/F-test** that all leads are zero — then combine that statistical read with substantive, economic discussion of the pre-period (e.g. were the groups comparable, were there anticipation effects or other shocks?). The linear-trend check below is a quick first screen; the [event-study](#event-study-analysis) further down is the primary diagnostic.
+
 ```python
 def test_parallel_trends(df_did, unit_col, time_col, treatment_col, outcome_col, 
                         treatment_date, periods_before=6):
@@ -197,12 +199,14 @@ def test_parallel_trends(df_did, unit_col, time_col, treatment_col, outcome_col,
     interaction_coef = trend_model.params.get(f'time_trend:{treatment_col}', 0)
     interaction_pvalue = trend_model.pvalues.get(f'time_trend:{treatment_col}', 1)
     
-    print(f"\n=== PARALLEL TRENDS TEST ===")
+    print(f"\n=== PARALLEL TRENDS LINEAR SCREEN ===")
     print(f"Time trend interaction coefficient: {interaction_coef:.4f}")
     print(f"P-value: {interaction_pvalue:.4f}")
     
     if interaction_pvalue > 0.05:
-        print("✅ PASS: No evidence against parallel trends (p > 0.05)")
+        print("➡️  No evidence of differential linear pre-trend (p > 0.05).")
+        print("   This is a DIAGNOSTIC, not proof: a high p-value can also reflect")
+        print("   low power. Confirm with the event-study plot and joint lead test.")
         trends_valid = True
     else:
         print("⚠️  CONCERN: Evidence of different pre-trends (p ≤ 0.05)")
@@ -363,14 +367,19 @@ def event_study_analysis(df_did, time_col, treatment_col, outcome_col, unit_col,
     df_event = df_event[event_window].copy()
     
     # Create period-specific treatment indicators
-    # Omit t=-1 as reference period
+    # Omit t=-1 as reference period. Use hyphen-free names (e.g. treat_pre6,
+    # treat_post0) so they are valid patsy/formula identifiers - a name like
+    # "treat_t-6" would be parsed as the subtraction "treat_t - 6".
+    def event_var_name(t):
+        return f'treat_pre{-t}' if t < 0 else f'treat_post{t}'
+
     for t in range(-periods_before, periods_after + 1):
         if t != -1:  # Reference period
-            df_event[f'treat_t{t}'] = ((df_event['event_time'] == t) & 
+            df_event[event_var_name(t)] = ((df_event['event_time'] == t) & 
                                       (df_event[treatment_col] == 1)).astype(int)
     
     # Event study regression
-    treatment_vars = [f'treat_t{t}' for t in range(-periods_before, periods_after + 1) if t != -1]
+    treatment_vars = [event_var_name(t) for t in range(-periods_before, periods_after + 1) if t != -1]
     formula = f'{outcome_col} ~ {" + ".join(treatment_vars)} + C({unit_col}) + C(event_time)'
     
     print(f"=== EVENT STUDY ANALYSIS ===")
@@ -388,7 +397,7 @@ def event_study_analysis(df_did, time_col, treatment_col, outcome_col, unit_col,
             # Reference period
             coef, se, ci_low, ci_high = 0, 0, 0, 0
         else:
-            var_name = f'treat_t{t}'
+            var_name = event_var_name(t)
             if var_name in event_model.params:
                 coef = event_model.params[var_name]
                 se = event_model.bse[var_name]
@@ -422,20 +431,36 @@ def event_study_analysis(df_did, time_col, treatment_col, outcome_col, unit_col,
     plt.tight_layout()
     plt.show()
     
-    # Pre-treatment effects test (should be zero)
-    pre_treatment_effects = event_df[event_df['event_time'] < 0]['coefficient']
-    pre_treatment_test = stats.ttest_1samp(pre_treatment_effects, 0)
-    
-    print(f"\n=== PRE-TREATMENT EFFECTS TEST ===")
-    print(f"Mean pre-treatment effect: {pre_treatment_effects.mean():.4f}")
-    print(f"T-statistic: {pre_treatment_test.statistic:.3f}")
-    print(f"P-value: {pre_treatment_test.pvalue:.4f}")
-    
-    if pre_treatment_test.pvalue > 0.05:
-        print("✅ PASS: No significant pre-treatment effects")
+    # Pre-treatment (lead) coefficients should be JOINTLY zero under parallel
+    # trends. A one-sample t-test on the point estimates is invalid: it treats
+    # the coefficients as i.i.d. observations and ignores their standard errors
+    # and covariance. Use a joint Wald/F-test on the lead terms from the fitted
+    # event-study model instead, excluding the omitted reference period (t = -1).
+    pre_lead_vars = [event_var_name(t) for t in range(-periods_before, -1)
+                     if event_var_name(t) in event_model.params]
+
+    print(f"\n=== PRE-TRENDS JOINT TEST (event-study leads) ===")
+    if pre_lead_vars:
+        hypotheses = ', '.join(f'{v} = 0' for v in pre_lead_vars)
+        pre_treatment_test = event_model.f_test(hypotheses)
+        pre_trends_fstat = float(np.squeeze(pre_treatment_test.fvalue))
+        pre_trends_pvalue = float(np.squeeze(pre_treatment_test.pvalue))
+
+        print(f"Lead terms tested: {', '.join(pre_lead_vars)} (reference: t-1)")
+        print(f"Joint F-statistic: {pre_trends_fstat:.3f}")
+        print(f"P-value: {pre_trends_pvalue:.4f}")
+
+        if pre_trends_pvalue > 0.05:
+            print("➡️  Leads are jointly indistinguishable from zero.")
+            print("   Failing to reject is NOT proof of parallel trends - inspect")
+            print("   the event-study plot and the pre-period context as well.")
+        else:
+            print("⚠️  CONCERN: pre-treatment leads are jointly non-zero")
+            print("   Parallel trends is questionable; consider alternative designs.")
     else:
-        print("⚠️  CONCERN: Significant pre-treatment effects detected")
-        print("   May indicate parallel trends violation")
+        pre_treatment_test = None
+        pre_trends_pvalue = None
+        print("Not enough pre-treatment lead periods to run a joint test.")
     
     # Post-treatment effects summary
     post_effects = event_df[event_df['event_time'] >= 0]['coefficient']
@@ -450,6 +475,7 @@ def event_study_analysis(df_did, time_col, treatment_col, outcome_col, unit_col,
         'event_results': event_df,
         'model': event_model,
         'pre_treatment_test': pre_treatment_test,
+        'pre_trends_pvalue': pre_trends_pvalue,
         'immediate_effect': event_df[event_df['event_time']==0]['coefficient'].iloc[0],
         'average_post_effect': post_effects.mean()
     }
@@ -825,8 +851,9 @@ def did_diagnostic_summary(trends_test, event_study_results, robustness_results)
     if not trends_test['trends_valid']:
         issues.append("Parallel trends assumption violated")
     
-    # 2. Pre-treatment effects in event study
-    if event_study_results['pre_treatment_test'].pvalue < 0.05:
+    # 2. Pre-treatment effects in event study (joint lead test)
+    pre_trends_p = event_study_results.get('pre_trends_pvalue')
+    if pre_trends_p is not None and pre_trends_p < 0.05:
         issues.append("Significant pre-treatment effects detected")
     
     # 3. Placebo test
