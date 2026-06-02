@@ -61,7 +61,7 @@ DATA LOADING AND PREPARATION
 6. Fill any remaining NaN values in Copilot metric columns with 0 for licensed users (a licensed user with a null action count in one metric likely had zero usage of that specific feature).
 
 USER SEGMENTATION
-6. Use `identify_usage_segments()` from the `vivainsights` library to classify users into segments. This function uses `Total_Copilot_actions_taken` and classifies users based on both usage volume and consistency (habit formation over 12 weeks), producing segments such as Power Users and Habitual Users. It is preferred over manual percentile-based segmentation.
+6. Use `identify_usage_segments()` from the `vivainsights` library to classify users into segments. This function uses `Total_Copilot_actions_taken` and classifies users based on both usage volume and consistency (habit formation over 12 weeks), producing the canonical **mutually-exclusive** ladder — Power Users → Habitual Users → Novice Users → Low Users → Non-users (see the [Copilot Usage Segments definitions]({{ site.baseurl }}/copilot-usage-segments/#formal-definitions)). It is preferred over manual percentile-based segmentation. Use these exact segment names consistently throughout the report.
 
 7. Also compute a "stable segment" for each user based on their most frequent weekly segment over the entire period (mode). This gives a single label per person.
 
@@ -84,8 +84,8 @@ TRANSITION ANALYSIS
 14. Highlight key transitions of interest:
     - "Activation": Inactive → any active segment
     - "Churning": any active segment → Inactive
-    - "Deepening": Light User → Regular User or Regular User → Power User
-    - "Declining": Power User → Regular User or Regular User → Light User
+    - "Deepening": a move up the ladder, e.g. Low User → Novice User, Novice User → Habitual User, or Habitual User → Power User
+    - "Declining": a move down the ladder, e.g. Power User → Habitual User, Habitual User → Novice User, or Novice User → Low User
 
 CHURN ANALYSIS
 15. Define "churn" as: a user who was active (in any active segment) for at least 2 consecutive weeks, then became Inactive for 2 or more consecutive weeks. The churn date is the first week of inactivity.

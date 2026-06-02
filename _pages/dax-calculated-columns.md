@@ -28,11 +28,13 @@ This page provides DAX scripts for calculated columns used to segment users by t
 
 ### Definitions
 
-- **Power User**: average 15+ weekly total Copilot actions and any use of Copilot in 9 of the last 12 weeks.
-- **Habitual User**: any use of Copilot in 9 of the last 12 weeks.
-- **Novice User**: average 1+ weekly Copilot actions over the past 12 weeks.
-- **Low User**: at least one Copilot action in the past 12 weeks.
-- **Non−user**: zero Copilot actions in the past 12 weeks.
+The segment column applies a **mutually-exclusive ladder**, evaluated top-down (first match wins), so each user gets exactly one label:
+
+1. **Power User**: habitual (9 of the last 12 weeks) **and** averaging 15+ weekly total Copilot actions.
+2. **Habitual User**: habitual (9 of the last 12 weeks) but averaging < 15 weekly actions.
+3. **Novice User**: not habitual, averaging 1+ weekly Copilot actions over the past 12 weeks.
+4. **Low User**: not habitual, with some usage but averaging < 1 weekly action.
+5. **Non−user**: zero Copilot actions in the past 12 weeks.
 
 ---
 
@@ -51,11 +53,13 @@ This page provides DAX scripts for calculated columns used to segment users by t
 
 ### Definitions
 
-- **Power User**: average 15+ weekly total Copilot actions and any use of Copilot in all of the last 4 weeks.
-- **Habitual User**: any use of Copilot in all of the last 4 weeks.
-- **Novice User**: average 1+ weekly Copilot actions over the past 4 weeks.
-- **Low User**: at least one Copilot action in the past 4 weeks.
-- **Non−user**: zero Copilot actions in the past 4 weeks.
+The same mutually-exclusive, top-down ladder applies; only the habit window changes (all of the last 4 weeks):
+
+1. **Power User**: habitual (all of the last 4 weeks) **and** averaging 15+ weekly total Copilot actions.
+2. **Habitual User**: habitual (all of the last 4 weeks) but averaging < 15 weekly actions.
+3. **Novice User**: not habitual, averaging 1+ weekly Copilot actions over the past 4 weeks.
+4. **Low User**: not habitual, with some usage but averaging < 1 weekly action.
+5. **Non−user**: zero Copilot actions in the past 4 weeks.
 
 ---
 

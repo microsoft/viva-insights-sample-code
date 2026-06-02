@@ -80,11 +80,13 @@ For more inspiration on analyzing Copilot adoption and impact, have a look at ou
 
 ### User Segments Defined
 
-**Power Users**: 15+ average weekly Copilot actions + habitual usage
-**Habitual Users**: Consistent usage patterns (9+ weeks in RL12W, all weeks in RL4W)
-**Novice Users**: 1+ average weekly Copilot actions
-**Low Users**: Some Copilot usage but below novice threshold
-**Non-users**: No Copilot usage in the measurement period
+These five segments form a **single mutually-exclusive ladder**, evaluated top-down so every user falls into exactly one tier (full definitions and decision tree on the [Copilot Usage Segments]({{ site.baseurl }}/copilot-usage-segments/#formal-definitions) page):
+
+1. **Power Users**: Habitual **and** averaging 15+ weekly Copilot actions
+2. **Habitual Users**: Habitual (9+ of 12 weeks in RL12W, all weeks in RL4W) but averaging < 15 weekly actions
+3. **Novice Users**: Not habitual, averaging 1+ weekly Copilot actions
+4. **Low Users**: Not habitual, some usage but averaging < 1 weekly action
+5. **Non-users**: No Copilot usage in the measurement period
 
 ---
 

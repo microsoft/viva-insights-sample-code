@@ -39,13 +39,34 @@ Power and Habitual Users represent a success measure. The higher the incidence o
 
 ## Formal Definitions
 
-| Segment | Definition |
-|---------|------------|
-| **Power Users** | Averaging 15+ weekly total Copilot actions **AND** any use of Copilot in at least 9 out of past 12 weeks |
-| **Habitual Users** | Any use of Copilot in at least 9 out of past 12 weeks |
-| **Novice Users** | Averaging at least one Copilot action over the last 12 weeks |
-| **Low Users** | Having any Copilot action in the past 12 weeks |
-| **Non-users** | Zero Copilot actions in the last 12 weeks |
+The five segments form a **single mutually-exclusive ladder**. Every licensed user falls into exactly one segment. The rules are evaluated **top-down (highest tier first)**, and each lower tier therefore *excludes* everyone already captured above it. Two inputs are computed over a rolling 12-week window:
+
+- **Average weekly actions** — average weekly `Total Copilot actions` over the window.
+- **Habitual** — any use of Copilot in **at least 9 of the past 12 weeks** (see the rolling-window rationale below).
+
+| Priority | Segment | Condition (first match wins) |
+|:--------:|---------|------------------------------|
+| 1 | **Power Users** | Habitual **AND** averaging **15+** weekly actions |
+| 2 | **Habitual Users** | Habitual (and averaging **< 15** weekly actions) |
+| 3 | **Novice Users** | **Not** habitual **AND** averaging **1+** weekly actions |
+| 4 | **Low Users** | **Not** habitual **AND** averaging **>0 but <1** weekly actions |
+| 5 | **Non-users** | **Zero** Copilot actions in the window |
+
+Because the tiers are evaluated in order, the segments never overlap: a habitual, high-volume user is a Power User (not also counted as Habitual/Novice/Low), and Novice/Low users are by construction *not* habitual.
+
+### Decision tree
+
+```text
+Any Copilot actions in the window?
+├─ No  → Non-user
+└─ Yes → Habitual? (used Copilot in 9 of the last 12 weeks)
+         ├─ Yes → Averaging 15+ weekly actions?
+         │        ├─ Yes → Power User
+         │        └─ No  → Habitual User
+         └─ No  → Averaging 1+ weekly actions?
+                  ├─ Yes → Novice User
+                  └─ No  → Low User
+```
 
 ---
 
@@ -79,13 +100,15 @@ While the standard definitions above work well for most organizations, you may n
 
 **Trade-offs**: While this variation identifies similar user segments, it provides a less accurate measure of true habit formation since it doesn't observe the extended period typically required for behavioral consistency.
 
-| Segment | Definition (4-Week Window) |
-|---------|------------|
-| **Power Users** | Averaging 15+ weekly total Copilot actions **AND** any use of Copilot in all 4 weeks |
-| **Habitual Users** | Any use of Copilot in all 4 weeks |
-| **Novice Users** | Averaging at least one Copilot action over the last 4 weeks |
-| **Low Users** | Having any Copilot action in the past 4 weeks |
-| **Non-users** | Zero Copilot actions in the last 4 weeks |
+The same mutually-exclusive, top-down ladder applies — only the habit window changes (all 4 of the last 4 weeks instead of 9 of 12):
+
+| Priority | Segment | Definition (4-Week Window) |
+|:--------:|---------|------------|
+| 1 | **Power Users** | Habitual (used Copilot in all 4 weeks) **AND** averaging 15+ weekly actions |
+| 2 | **Habitual Users** | Habitual (all 4 weeks) and averaging < 15 weekly actions |
+| 3 | **Novice Users** | Not habitual **AND** averaging 1+ weekly actions over the last 4 weeks |
+| 4 | **Low Users** | Not habitual **AND** averaging >0 but <1 weekly actions |
+| 5 | **Non-users** | Zero Copilot actions in the last 4 weeks |
 
 ---
 
@@ -100,13 +123,15 @@ While the standard definitions above work well for most organizations, you may n
 
 **Benefits**: This variation helps identify truly advanced users and provides more meaningful segmentation when basic adoption has already been achieved organization-wide.
 
-| Segment | Definition (Enhanced Thresholds) |
-|---------|------------|
-| **Power Users** | Averaging 50+ weekly total Copilot actions **AND** 25+ actions in at least 9 out of past 12 weeks |
-| **Habitual Users** | 25+ actions in at least 9 out of past 12 weeks |
-| **Novice Users** | Averaging at least one Copilot action over the last 12 weeks |
-| **Low Users** | Having any Copilot action in the past 12 weeks |
-| **Non-users** | Zero Copilot actions in the last 12 weeks |
+The ladder is identical to the standard one; only the volume thresholds are raised. Tiers are still evaluated top-down and remain mutually exclusive:
+
+| Priority | Segment | Definition (Enhanced Thresholds) |
+|:--------:|---------|------------|
+| 1 | **Power Users** | 25+ actions in at least 9 of the past 12 weeks **AND** averaging 50+ weekly actions |
+| 2 | **Habitual Users** | 25+ actions in at least 9 of the past 12 weeks (and averaging < 50 weekly actions) |
+| 3 | **Novice Users** | Below the habitual threshold **AND** averaging 1+ weekly actions over the last 12 weeks |
+| 4 | **Low Users** | Below the habitual threshold **AND** averaging >0 but <1 weekly actions |
+| 5 | **Non-users** | Zero Copilot actions in the last 12 weeks |
 
 ---
 
