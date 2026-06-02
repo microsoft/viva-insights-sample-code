@@ -2,6 +2,13 @@
 layout: page
 title: "Prompt — Executive Summary"
 permalink: /frontier-analytics-prompt-executive-summary/
+badges:
+  data_source: "Person Query"
+  min_data: "8+ weeks"
+  language: "R or Python"
+  output: "HTML / Markdown memo"
+  difficulty: "Beginner"
+  est_time: "~20 min"
 ---
 
 {% include custom-navigation.html %}
@@ -13,6 +20,8 @@ permalink: /frontier-analytics-prompt-executive-summary/
 [← Back to Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/)
 
 > **📋 Review the schema first.** Before running this prompt, confirm your column names and the Copilot/agent action taxonomy against the **[Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)**.
+
+{% include prompt-badges.html %}
 
 ## Purpose
 

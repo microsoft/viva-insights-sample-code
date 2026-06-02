@@ -2,6 +2,13 @@
 layout: page
 title: "Prompt — Audit Log Parsing"
 permalink: /frontier-analytics-prompt-audit-parsing/
+badges:
+  data_source: "Purview audit log"
+  min_data: "Any export"
+  language: "R or Python"
+  output: "Cleaned flat CSV"
+  difficulty: "Beginner"
+  est_time: "~20 min"
 ---
 
 {% include custom-navigation.html %}
@@ -13,6 +20,8 @@ permalink: /frontier-analytics-prompt-audit-parsing/
 [← Back to Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/)
 
 > **📋 Review the schema first.** Before running this prompt, confirm your column names and the Copilot/agent action taxonomy against the **[Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)**.
+
+{% include prompt-badges.html %}
 
 ## Purpose
 

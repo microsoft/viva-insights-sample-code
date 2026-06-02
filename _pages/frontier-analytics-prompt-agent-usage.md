@@ -2,6 +2,13 @@
 layout: page
 title: "Prompt — Agent Usage Analysis"
 permalink: /frontier-analytics-prompt-agent-usage/
+badges:
+  data_source: "Purview audit log"
+  min_data: "4+ weeks"
+  language: "R or Python"
+  output: "HTML report / notebook"
+  difficulty: "Intermediate"
+  est_time: "~30 min"
 ---
 
 {% include custom-navigation.html %}
@@ -13,6 +20,8 @@ permalink: /frontier-analytics-prompt-agent-usage/
 [← Back to Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/)
 
 > **📋 Review the schema first.** Before running this prompt, confirm your column names and the Copilot/agent action taxonomy against the **[Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)**.
+
+{% include prompt-badges.html %}
 
 ## Purpose
 

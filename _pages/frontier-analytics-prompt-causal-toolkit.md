@@ -2,6 +2,13 @@
 layout: page
 title: "Prompt — Copilot Causal Toolkit"
 permalink: /frontier-analytics-prompt-causal-toolkit/
+badges:
+  data_source: "Person Query / Super Users Report"
+  min_data: "12+ weeks"
+  language: "Python only"
+  output: "Notebooks + interpretation"
+  difficulty: "Advanced"
+  est_time: "~60 min"
 ---
 
 {% include custom-navigation.html %}
@@ -13,6 +20,8 @@ permalink: /frontier-analytics-prompt-causal-toolkit/
 [← Back to Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/)
 
 > **📋 Review the schema first.** Before running this prompt, confirm your column names and the Copilot/agent action taxonomy against the **[Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)**.
+
+{% include prompt-badges.html %}
 
 ## Purpose
 

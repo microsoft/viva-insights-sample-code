@@ -1,0 +1,58 @@
+<!-- Metadata badges for Frontier prompt pages. Driven by `badges:` front matter. -->
+{% if page.badges %}
+<style>
+.prompt-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 1.5rem;
+  padding: 0;
+}
+.prompt-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  line-height: 1.25;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--code-background-color, #f5f2f9);
+  border: 1px solid var(--border-color, #e3dcec);
+  color: var(--text-color, #2b2b2b);
+  white-space: nowrap;
+}
+.prompt-badge .pb-icon { font-size: 0.85em; opacity: 0.85; }
+.prompt-badge .pb-key {
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 0.68rem;
+  opacity: 0.6;
+}
+.prompt-badge .pb-val { font-weight: 600; }
+/* Difficulty colour coding */
+.prompt-badge--beginner    { background: #e8f5ec; border-color: #bfe3c9; }
+.prompt-badge--intermediate{ background: #fff4e3; border-color: #f3dcb0; }
+.prompt-badge--advanced    { background: #fdeaea; border-color: #f3c2c2; }
+</style>
+
+<div class="prompt-badges" role="list" aria-label="Prompt metadata">
+  {% if page.badges.data_source %}
+  <span class="prompt-badge" role="listitem"><span class="pb-icon">🗂️</span><span class="pb-key">Data</span><span class="pb-val">{{ page.badges.data_source }}</span></span>
+  {% endif %}
+  {% if page.badges.min_data %}
+  <span class="prompt-badge" role="listitem"><span class="pb-icon">📅</span><span class="pb-key">Min data</span><span class="pb-val">{{ page.badges.min_data }}</span></span>
+  {% endif %}
+  {% if page.badges.language %}
+  <span class="prompt-badge" role="listitem"><span class="pb-icon">💻</span><span class="pb-key">Language</span><span class="pb-val">{{ page.badges.language }}</span></span>
+  {% endif %}
+  {% if page.badges.output %}
+  <span class="prompt-badge" role="listitem"><span class="pb-icon">📦</span><span class="pb-key">Output</span><span class="pb-val">{{ page.badges.output }}</span></span>
+  {% endif %}
+  {% if page.badges.difficulty %}
+  <span class="prompt-badge prompt-badge--{{ page.badges.difficulty | downcase }}" role="listitem"><span class="pb-icon">🎯</span><span class="pb-key">Level</span><span class="pb-val">{{ page.badges.difficulty }}</span></span>
+  {% endif %}
+  {% if page.badges.est_time %}
+  <span class="prompt-badge" role="listitem"><span class="pb-icon">⏱️</span><span class="pb-key">Est. time</span><span class="pb-val">{{ page.badges.est_time }}</span></span>
+  {% endif %}
+</div>
+{% endif %}
