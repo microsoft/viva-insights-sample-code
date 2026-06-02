@@ -12,6 +12,8 @@ permalink: /frontier-analytics-prompt-powerpoint/
 
 [← Back to Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/)
 
+> **📋 Review the schema first.** Before running this prompt, confirm your column names and the Copilot/agent action taxonomy against the **[Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)**.
+
 ## Purpose
 
 Generate an exec-ready 10–15 page PowerPoint deck (.pptx) with editable native PowerPoint charts, summarizing Copilot adoption trends, organizational breakdowns, and key recommendations.
@@ -85,7 +87,7 @@ METRIC CALCULATIONS
    k. Annualized estimated value (using $75/hour default, configurable)
 
 SLIDE DECK GENERATION
-7. Create a PowerPoint deck with the following slides. All charts must be native editable PowerPoint charts (created with mschart/officer in R or python-pptx chart objects in Python), NOT static images.
+7. Create a PowerPoint deck with the following slides. **Prefer R (mschart/officer)** for the charts: it produces genuinely native, editable PowerPoint chart objects across the full range of chart types used here. If you must use Python (python-pptx), be aware its native-chart support is more limited — restrict yourself to the chart types python-pptx supports as native charts (e.g., clustered/stacked bar and column, line, and pie charts) and avoid combo charts, secondary axes, or annotations it cannot render natively. For any chart type that python-pptx cannot create natively, either simplify it to a supported type or fall back to a high-resolution embedded image, and note in the output which slides use images rather than editable charts.
 
    SLIDE 1: Title slide
    - Title: "Copilot Adoption Review"

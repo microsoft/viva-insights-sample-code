@@ -12,6 +12,8 @@ permalink: /frontier-analytics-prompt-audit-parsing/
 
 [← Back to Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/)
 
+> **📋 Review the schema first.** Before running this prompt, confirm your column names and the Copilot/agent action taxonomy against the **[Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)**.
+
 ## Purpose
 
 Parse and clean raw Microsoft Purview audit log exports into a flat, analysis-ready dataset. This is a data engineering prompt that prepares audit log data for downstream analytics (such as the [Agent Usage Analysis]({{ site.baseurl }}/frontier-analytics-prompt-agent-usage/) prompt).

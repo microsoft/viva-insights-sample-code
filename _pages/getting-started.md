@@ -59,7 +59,7 @@ help(package = "vivainsights")
 ## 🐍 Setting Up Python
 
 ### Prerequisites
-- **Python 3.7 or higher** - [Download Python](https://www.python.org/downloads/)
+- **Python 3.9 or higher** - [Download Python](https://www.python.org/downloads/) (Python 3.7 and 3.8 have reached end-of-life and are no longer supported)
 - **pip** (usually included with Python)
 - **Virtual environment** (recommended)
 
@@ -268,6 +268,8 @@ vi.network_g2g(g2g_data, primary="Organization", secondary="LevelDesignation")
    ```
 
 ### Advanced Integration Techniques
+
+> **Note:** The snippets in this section are **R-only**. The same results are achievable in Python with pandas (`groupby`/`merge`/`assign`) and the vivainsights Python package's `create_bar`/`create_trend` helpers; Python equivalents are not reproduced here.
 
 #### Custom Metrics and KPIs
 ```r

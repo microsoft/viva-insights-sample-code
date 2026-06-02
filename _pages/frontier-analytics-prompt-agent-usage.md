@@ -12,6 +12,8 @@ permalink: /frontier-analytics-prompt-agent-usage/
 
 [← Back to Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/)
 
+> **📋 Review the schema first.** Before running this prompt, confirm your column names and the Copilot/agent action taxonomy against the **[Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)**.
+
 ## Purpose
 
 Analyze Copilot agent and extension usage patterns from Microsoft Purview audit logs to understand which Copilot features and agents are being used, by whom, and how usage trends over time.
@@ -74,6 +76,8 @@ COPILOT EVENT FILTERING
    - Workload values containing "Copilot", "Microsoft365", "M365" (case-insensitive) Print the number of matching events and the operation/workload values that matched.
 9. If the filtered dataset is empty, expand the filter or report that no Copilot events were found and list all unique Operation and Workload values for manual inspection.
 10. If an AuditData column exists and the initial filtering is too broad, parse the JSON in AuditData for a sample of 100 rows and look for additional fields that indicate Copilot usage (e.g., "AppName", "CopilotEventType", "AgentName", "ExtensionName").
+
+    What a successful Copilot event looks like: a matched row typically has an Operation such as `CopilotInteraction` (or a workload-specific variant) and a Workload like `Copilot` or `Microsoft365`, with a populated user identifier and timestamp — for example, `Operation = "CopilotInteraction"`, `Workload = "Microsoft365"`, `UserId = "user@contoso.com"`, `CreationTime = "2024-05-01T14:22:31Z"`. When AuditData is parsed, a genuine Copilot event usually carries an `AppHost`/`AppName` (e.g., "Teams", "Word") and a `CopilotEventType` field. Print 1–2 such example rows so the user can confirm the filter is capturing real Copilot activity and not unrelated events.
 
 USAGE METRICS
 11. Using the filtered Copilot events, compute:

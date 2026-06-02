@@ -12,6 +12,8 @@ permalink: /frontier-analytics-prompt-segmentation/
 
 [← Back to Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/)
 
+> **📋 Review the schema first.** Before running this prompt, confirm your column names and the Copilot/agent action taxonomy against the **[Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)**.
+
 ## Purpose
 
 Classify Copilot users into behavioral segments based on usage intensity, track how users move between segments over time, and quantify churn — the rate at which users disengage from Copilot after initial adoption.

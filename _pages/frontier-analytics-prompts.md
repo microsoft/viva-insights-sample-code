@@ -23,6 +23,8 @@ Each prompt card includes the purpose, required inputs, assumptions, the full pr
 
 > **Tip:** You can prepend context to any prompt. For example: _"My CSV is at `./data/person-query.csv`. The Organization column is called `Org`."_ followed by the full prompt text.
 
+> **📋 Review the schema first.** Before running any prompt, check the **[Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)** to confirm which columns exist in your export and what they mean. Column names, granularity, and the Copilot/agent action taxonomy vary between tenants — validating the schema first prevents the most common failure mode, where a prompt silently runs against the wrong or missing columns.
+
 ## Available prompts
 
 ### Copilot Adoption

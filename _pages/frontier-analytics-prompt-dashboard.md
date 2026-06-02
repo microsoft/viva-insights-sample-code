@@ -12,6 +12,8 @@ permalink: /frontier-analytics-prompt-dashboard/
 
 [← Back to Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/)
 
+> **📋 Review the schema first.** Before running this prompt, confirm your column names and the Copilot/agent action taxonomy against the **[Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)**.
+
 ## Purpose
 
 Generate a comprehensive static HTML dashboard showing Copilot adoption trends, usage patterns, and organizational breakdowns.

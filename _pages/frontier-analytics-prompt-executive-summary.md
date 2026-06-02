@@ -12,6 +12,8 @@ permalink: /frontier-analytics-prompt-executive-summary/
 
 [← Back to Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/)
 
+> **📋 Review the schema first.** Before running this prompt, confirm your column names and the Copilot/agent action taxonomy against the **[Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)**.
+
 ## Purpose
 
 Generate a concise executive summary memo that distills Copilot adoption metrics into key findings, trend analysis, and actionable recommendations for senior leadership.
@@ -93,7 +95,8 @@ AREAS OF CONCERN (flag 1-3 risks or issues)
 MEMO GENERATION
 15. Create the executive summary as an intermediary document first, then export to HTML:
     - R: Create an RMarkdown file (.Rmd), then knit to a self-contained HTML file (output: html_document, self_contained: true).
-    - Python: Create a Jupyter notebook (.ipynb), then export to a self-contained HTML file (e.g., `jupyter nbconvert --to html`). Keep the intermediary .Rmd or .ipynb file alongside the HTML output — it makes troubleshooting and iteration easier. Use the following structure:
+    - Python: Create a Jupyter notebook (.ipynb), then export to a self-contained HTML file (e.g., `jupyter nbconvert --to html`). Keep the intermediary .Rmd or .ipynb file alongside the HTML output — it makes troubleshooting and iteration easier.
+    - Fallback: if you cannot create or execute a notebook/RMarkdown in this environment (e.g., the toolchain is unavailable), generate a single self-contained **HTML or Markdown report directly** instead — write the computed numbers into a plain `.html` or `.md` file. A direct report is preferable to failing; just note in the output that the intermediary notebook step was skipped. Use the following structure:
 
     HEADER:
     - Title: "Copilot Adoption: Executive Summary"

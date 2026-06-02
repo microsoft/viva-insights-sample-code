@@ -52,6 +52,17 @@ With the rapid adoption of Microsoft Copilot across organizations, understanding
 
 These analytics are based on behavioral research and provide actionable insights for maximizing your Copilot investment.
 
+## Special Focus: Frontier Analytics
+
+As organizations move from measuring Copilot adoption to measuring the impact of AI **agents**, a new class of analysis is required. Our **[Frontier Analytics]({{ site.baseurl }}/frontier-analytics-prompts/)** section provides ready-to-use analyst prompts and worked examples for:
+
+- Profiling agent and Copilot usage across the organization
+- Estimating the ROI and time savings of AI investments
+- Building executive summaries, dashboards, and PowerPoint-ready outputs
+- Validating findings against the underlying Copilot/agent data taxonomy before reporting
+
+Each prompt is designed to be run with an AI coding agent against your own Viva Insights exports, with guidance on reviewing the data schema first.
+
 ## Quick Links
 
 - [vivainsights-context.md](https://github.com/microsoft/viva-insights-sample-code/blob/main/vivainsights-context.md) — reusable context file for AI coding agents

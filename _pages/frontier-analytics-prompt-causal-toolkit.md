@@ -12,6 +12,8 @@ permalink: /frontier-analytics-prompt-causal-toolkit/
 
 [← Back to Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/)
 
+> **📋 Review the schema first.** Before running this prompt, confirm your column names and the Copilot/agent action taxonomy against the **[Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)**.
+
 ## Purpose
 
 Help users run a causal inference analysis using the [Copilot Causal Toolkit]({{ site.baseurl }}/copilot-causal-toolkit/) with their own data, and then interpret the results in a non-technical, business-ready format. This page contains **two prompts**:
