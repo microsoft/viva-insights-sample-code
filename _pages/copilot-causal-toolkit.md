@@ -17,6 +17,18 @@ The [Copilot Causal Toolkit](https://github.com/microsoft/viva-insights-sample-c
 
 Three key scenarios - Seller Productivity, Burnout Prevention, and Employee Engagement - are covered in this toolkit. All three involve using Copilot usage (`Total_Copilot_actions_taken`) as a treatment variable, and evaluating the treatment effect of using Copilot on an outcome variable (e.g. external or after-hours collaboration hours, or a survey-based engagement metric). 
 
+Each scenario maps to exactly one outcome variable and one (or two) notebook(s):
+
+| Scenario | Outcome variable | Notebook(s) |
+|---|---|---|
+| **Seller Productivity** | External collaboration hours | `CI-DML_ExtCollabHours_PQ.ipynb` (Person Query), `CI-DML_ExtCollabHours_SUR.ipynb` (Super Users Report) |
+| **Burnout Prevention** | After-hours collaboration hours | `CI-DML_AftCollabHours_PQ.ipynb` (Person Query), `CI-DML_AftCollabHours_SUR.ipynb` (Super Users Report) |
+| **Employee Engagement** | Ordinal survey metric (e.g. `eSat`) | `CI-DML_Engagement_PQ.ipynb` (Person Query only) |
+
+The notebook file names describe the **outcome** (e.g. `AftCollabHours`) rather than the scenario label, so use this table to pick the right notebook for your question.
+
+> **What this analysis can and cannot prove.** This toolkit estimates the causal effect of Copilot usage on an outcome **under the assumptions of double machine learning** — chiefly *unconfoundedness* (all relevant confounders are measured and included), *overlap* (both Copilot users and comparable non/low-users exist across covariate values), and a correctly handled treatment definition. When those hold, it can support statements like "for comparable employees, higher Copilot usage is associated with a change of X in the outcome that is plausibly causal." It **cannot** prove causation if important confounders are unobserved (e.g. unmeasured motivation or role changes), if there is no overlap between treated and untreated groups, or if Copilot usage is itself driven by the outcome (reverse causality). Treat the estimates as decision-support evidence to be triangulated with experiments and domain knowledge, not as definitive proof. The [Interpretation Guide]({{ site.baseurl }}/copilot-causal-toolkit-interpretation-guide/) discusses these caveats per output.
+
 You can access the toolkit [here](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/causal-inference/copilot-causal-toolkit) on GitHub.
 
 **Python** and **Jupyter notebooks** (.ipynb) are used for running the analysis. It is therefore recommended that you read the pre-requisites section and ensure that all of these are satisfied. Once you have results, see the [Interpretation Guide]({{ site.baseurl }}/copilot-causal-toolkit-interpretation-guide/) for detailed guidance on reading every output.

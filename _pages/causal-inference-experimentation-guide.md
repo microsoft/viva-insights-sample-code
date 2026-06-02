@@ -121,6 +121,8 @@ Before running any causal analysis, it's essential to validate that your data me
 
 ## Techniques 
 
+> **How this guide relates to the method pages.** This guide is a **distinct, end-to-end worked-example track**: it walks through one concrete Copilot analysis (estimating the effect of Copilot licensing on collaboration hours) using a fixed three-method toolkit — DiD, ITSA, and CausalForestDML. It is **not** an exhaustive catalogue of causal methods. The broader method library is documented on its own pages — see [Regression Adjustment]({{ site.baseurl }}/causal-inference-regression/), [Instrumental Variables]({{ site.baseurl }}/causal-inference-iv/), [Propensity Scores]({{ site.baseurl }}/causal-inference-propensity/), [Difference-in-Differences]({{ site.baseurl }}/causal-inference-did/), and [Doubly Robust / Double ML]({{ site.baseurl }}/causal-inference-doubly-robust/). Where this guide and a method page overlap (notably DiD), the dedicated method page is the more detailed reference for assumptions and diagnostics.
+
 There are many different types of causal inference techniques. In this analysis, we will be focusing on: 
 
 1. **Difference in differences (DiD)**

@@ -86,7 +86,17 @@ The notebook aggregates the longitudinal (person-week) data into a cross-section
 - The grouping variables used (e.g., `PersonId`, `Organization`, `FunctionType`)
 - The metrics averaged (collaboration, network, treatment, and outcome variables)
 
-**What to check:** Ensure all expected variables are present and no critical variables are listed as missing.
+The table below summarizes how each variable type is handled during aggregation and what happens to missing values:
+
+| Variable type | Examples | Aggregation (person-week → person) | Missing-data handling |
+|---|---|---|---|
+| **Treatment** | `Total_Copilot_actions_taken` | Mean across all weeks | Rows missing the treatment, outcome, or a required control are dropped (`dropna`) before aggregation when the "drop" strategy is used |
+| **Outcome** | After-hours / external collaboration hours, survey metric | Mean across all weeks | Same as above — a person with no non-missing outcome weeks is excluded |
+| **Numeric controls** | Network size, collaboration metrics | Mean across all weeks | Missing weeks are ignored by the mean; persons missing a required control are dropped |
+| **Categorical controls** | `Organization`, `FunctionType`, `IsManager` | First observed value (assumed time-invariant) | If the first value is missing, the attribute may be blank — verify these are populated |
+| **Date / week** | `MetricDate` | Dropped after aggregation | n/a (not carried into the person-level model) |
+
+**What to check:** Ensure all expected variables are present and no critical variables are listed as missing. Because categorical attributes use the *first* observed value, confirm they are genuinely time-invariant for each person; and because missing key values cause whole-person row drops, check how many persons were removed so the analysis sample still represents the population.
 
 ### Subgroup combinations
 
@@ -136,7 +146,7 @@ This is the most important summary file. It lists **all statistically significan
 | `val1` | The value of the first grouping variable for this subgroup |
 | `var2` | The second grouping variable name |
 | `val2` | The value of the second grouping variable for this subgroup |
-| `mean_effect` | The **average treatment effect** (ATE) in hours — the estimated change in the outcome when moving from 0 to the average Copilot usage level |
+| `mean_effect` | The **average treatment effect** in hours — the mean across individuals in the subgroup of each person's estimated effect of moving Copilot usage from 0 to the dataset's *average* usage level (`T0=0`, `T1=mean(Total_Copilot_actions_taken)`) |
 | `std_effect` | Standard deviation of individual treatment effects within the subgroup |
 | `p_value` | Statistical significance (values < 0.05 are considered significant) |
 | `n_observations` | Number of person-level observations in this subgroup |
@@ -145,7 +155,7 @@ This is the most important summary file. It lists **all statistically significan
 
 ### How to read `mean_effect`
 
-The `mean_effect` represents the **estimated causal change** in the outcome variable (in hours per week) when an individual moves from zero Copilot usage to the dataset's average usage level.
+The `mean_effect` represents the **estimated causal change** in the outcome variable (in hours per week) averaged over the individuals in the subgroup, where each person's effect is the model's estimate of moving their Copilot usage from zero to the dataset's average usage level (the notebook computes individual effects with `effect(X, T0=0, T1=Total_Copilot_actions_taken.mean())`).
 
 - **Negative values** (e.g., `-0.224`) mean Copilot usage is associated with a **reduction** in the outcome. For after-hours collaboration, this is the desirable direction (less burnout risk).
 - **Positive values** (e.g., `+0.101`) mean Copilot usage is associated with an **increase** in the outcome. For external collaboration, this is the desirable direction (more customer engagement).
