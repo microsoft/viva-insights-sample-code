@@ -33,7 +33,8 @@ from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 import warnings
 
-def comprehensive_assumption_testing(df, treatment_col, outcome_col, confounders, method='regression'):
+def comprehensive_assumption_testing(df, treatment_col, outcome_col, confounders,
+                                     method='regression', post_col=None, date_col='date'):
     """
     Comprehensive assumption testing framework for causal inference
     
@@ -42,6 +43,12 @@ def comprehensive_assumption_testing(df, treatment_col, outcome_col, confounders
     - No unmeasured confounding (indirect tests)
     - Correct functional form
     - Stable unit treatment value assumption (SUTVA)
+
+    post_col : name of the 0/1 post-intervention indicator column. Required for
+        the placebo test under 'difference_in_differences'/'event_study' so the
+        intervention timing is passed explicitly rather than assumed to live in a
+        hard-coded 'post_treatment' column.
+    date_col : name of the date column used to split pre/post periods.
     """
     
     print(f"=== COMPREHENSIVE ASSUMPTION TESTING ===")
@@ -196,16 +203,20 @@ def comprehensive_assumption_testing(df, treatment_col, outcome_col, confounders
     print(f"\n4. PLACEBO TESTING")
     
     if method in ['difference_in_differences', 'event_study']:
-        # Test with fake treatment date
-        if 'date' in df.columns:
+        # Test with fake treatment date. The real post-intervention indicator is
+        # passed in via post_col so we never assume a hard-coded column name.
+        if post_col is None or post_col not in df.columns:
+            print(f"   ⚠️  Skipping placebo test: pass post_col (the 0/1 post-"
+                  f"intervention indicator) to run it.")
+        elif date_col in df.columns:
             # Create fake treatment date earlier in time
-            fake_treatment_date = df['date'].min() + (df['date'].max() - df['date'].min()) / 3
+            fake_treatment_date = df[date_col].min() + (df[date_col].max() - df[date_col].min()) / 3
             
-            pre_treatment_data = df[df['date'] < df[df['post_treatment'] == 1]['date'].min()]
+            pre_treatment_data = df[df[date_col] < df[df[post_col] == 1][date_col].min()]
             
             if len(pre_treatment_data) > 0:
                 pre_treatment_data = pre_treatment_data.copy()
-                pre_treatment_data['fake_post'] = (pre_treatment_data['date'] >= fake_treatment_date).astype(int)
+                pre_treatment_data['fake_post'] = (pre_treatment_data[date_col] >= fake_treatment_date).astype(int)
                 pre_treatment_data['fake_interaction'] = (pre_treatment_data[treatment_col] * 
                                                         pre_treatment_data['fake_post'])
                 

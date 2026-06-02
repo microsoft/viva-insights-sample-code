@@ -187,7 +187,6 @@ if validation_results['recommendations']:
 - `outcome_completeness`: High missing data can bias results
 - `sufficient_sample`: Small samples lead to unreliable estimates
 - `panel_balance`: Balanced panels enable stronger causal identification
-```
 
 ### Defining Treatment and Outcome Variables
 

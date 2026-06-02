@@ -13,6 +13,13 @@ permalink: /causal-inference-doubly-robust/
 
 Doubly Robust methods combine regression adjustment and propensity score methods to provide protection against model misspecification. These methods remain consistent if either the outcome model OR the propensity score model is correctly specified, but not necessarily both.
 
+> **Doubly robust (DR) vs. double machine learning (DML) — they are related but not the same.**
+>
+> - **Doubly robust (DR)** refers to the *estimator's consistency property*: an augmented-IPW / AIPW-style estimator stays consistent if **either** the outcome model **or** the propensity model is correct. DR says nothing about *how* those two nuisance models are fit — they could be simple parametric models.
+> - **Double / debiased machine learning (DML)** is a *framework* (Chernozhukov et al., 2018) for using flexible ML models to estimate those nuisance functions while still obtaining valid confidence intervals. It relies on two ingredients: a **Neyman-orthogonal** score (the AIPW score is one such DR score) **and cross-fitting** (out-of-fold nuisance predictions) to remove overfitting/regularization bias.
+>
+> In short: DR is the *robustness property of the score*; DML is the *recipe (orthogonal score + cross-fitting)* that makes ML-based nuisance estimation safe. Many DML estimators are built on a DR score, but you can be doubly robust without cross-fitting, and the two terms should not be used interchangeably.
+
 **Navigation:**
 - [← Back to Instrumental Variables]({{ site.baseurl }}/causal-inference-iv/)
 - [Next: Validation & Testing →]({{ site.baseurl }}/causal-inference-validation/)
