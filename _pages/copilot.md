@@ -116,7 +116,7 @@ These five segments form a **single mutually-exclusive ladder**, evaluated top-d
 - [DAX Calculated Columns]({{ site.baseurl }}/dax-calculated-columns/) — ready-to-use Power BI formulas for segmentation
 - [Copilot Causal Toolkit]({{ site.baseurl }}/copilot-causal-toolkit/) — measure the causal impact of Copilot on business outcomes
 - [Causal Inference in Copilot Analytics]({{ site.baseurl }}/causal-inference/) — methods for isolating Copilot's true effect
-- [Frontier Analytics Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/) — generate Copilot reports and dashboards with coding agents
+- [Frontier Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/) — generate Copilot reports and dashboards with coding agents
 
 ---
 

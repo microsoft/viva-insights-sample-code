@@ -1,6 +1,6 @@
 ---
 layout: page
-title: "Frontier Analytics — Schema Documentation"
+title: "Frontier — Schema Documentation"
 permalink: /frontier-analytics-schemas/
 ---
 
@@ -26,7 +26,7 @@ For authoritative and up-to-date metric definitions and column references, see:
 **Related resources:**
 
 - [Prompt Card Library]({{ site.baseurl }}/frontier-analytics-prompts/) — ready-to-use prompts for coding agents
-- [Frontier Analytics Overview]({{ site.baseurl }}/frontier-analytics/) — overview and getting started
+- [Frontier Overview]({{ site.baseurl }}/frontier-analytics/) — overview and getting started
 - [vivainsights R package](https://microsoft.github.io/vivainsights/)
 - [vivainsights Python package](https://microsoft.github.io/vivainsights-py/)
 

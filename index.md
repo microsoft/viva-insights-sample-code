@@ -52,9 +52,9 @@ With the rapid adoption of Microsoft Copilot across organizations, understanding
 
 These analytics are based on behavioral research and provide actionable insights for maximizing your Copilot investment.
 
-## Special Focus: Frontier Analytics
+## Special Focus: Frontier
 
-As organizations move from measuring Copilot adoption to measuring the impact of AI **agents**, a new class of analysis is required. Our **[Frontier Analytics]({{ site.baseurl }}/frontier-analytics-prompts/)** section provides ready-to-use analyst prompts and worked examples for:
+As organizations move from measuring Copilot adoption to measuring the impact of AI **agents**, a new class of analysis is required. Our **[Frontier]({{ site.baseurl }}/frontier-analytics/)** section turns a Viva Insights export into a finished dashboard, executive deck, or ROI analysis — by pasting a ready-made prompt into a coding agent. It provides analyst prompts, schema guides, and worked examples for:
 
 - Profiling agent and Copilot usage across the organization
 - Estimating the ROI and time savings of AI investments
@@ -119,8 +119,8 @@ Browse the categories below to find sample code that matches your needs. Each sc
   </a>
   <a class="vi-card" href="{{ site.baseurl }}/frontier-analytics/">
     <span class="vi-card-icon">🚀</span>
-    <span class="vi-card-title">Frontier Analytics</span>
-    <span class="vi-card-desc">Prompt libraries, starter kits, and schema docs for self-service analytics with coding agents.</span>
+    <span class="vi-card-title">Frontier</span>
+    <span class="vi-card-desc">Turn a Viva Insights export into a dashboard, exec deck, or ROI analysis with a coding agent — plus prompt libraries and schema docs.</span>
     <span class="vi-card-more">Explore →</span>
   </a>
 </div>

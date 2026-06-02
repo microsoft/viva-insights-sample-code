@@ -1,16 +1,18 @@
 ---
 layout: page
-title: "Frontier Analytics"
-description: "Export-first, self-service Viva Insights analytics with coding agents — reusable prompt cards, schema documentation, and example specs to generate dashboards, decks, and ROI analyses."
+title: "Frontier"
+description: "Turn a Viva Insights export into a finished dashboard, executive deck, or ROI analysis by pasting a prompt into a coding agent — with reusable prompts, schema guides, and example outputs."
 permalink: /frontier-analytics/
 ---
 
 {% include custom-navigation.html %}
 {% include floating-toc.html %}
 
-# Frontier Analytics
+# Frontier
 
-Frontier Analytics is an **export-first, self-service analytics toolkit** for [Viva Insights](https://learn.microsoft.com/en-us/viva/insights/). It provides reusable prompts, schema documentation, and example specifications that you can combine with a coding agent to produce analytics outputs from exported Viva Insights data.
+**Turn a Viva Insights export into a finished dashboard, executive deck, or ROI analysis — by pasting a prompt into a coding agent.**
+
+Frontier is a collection of ready-to-use prompts, schema guides, and example outputs for [Viva Insights](https://learn.microsoft.com/en-us/viva/insights/). Instead of writing analysis code from scratch, you export your data, pick a prompt, and let a coding agent — such as [GitHub Copilot](https://github.com/features/copilot) or [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview) — generate the deliverable for you to review and adapt.
 
 > **Note:** Everything in this section is sample code and starter assets — not production software. Outputs require review, validation, and adaptation to your environment before use.
 
