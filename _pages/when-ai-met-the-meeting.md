@@ -8,6 +8,7 @@ dek: "Meetings are not broken, but meeting culture is uneven. Two years into ent
 byline: "By the PANDAS team · A Copilot Analytics Lab brief"
 read_time: "22 min read"
 css: "/assets/css/article.css"
+image: /assets/images/articles/when-ai-met-the-meeting-card.png
 ---
 
 <nav class="article-contents reveal" aria-label="Article contents">
