@@ -54,4 +54,23 @@ If not, you can install them in the Command Prompt with:
 pip install vivainsights pandas numpy plotly scipy
 ```
 
-Once the developer pre-requisites are satisfied, see [how to load and join data]({{ site.baseurl }}/skills-data-join/#data-loading-and-joining). 
+Once the developer pre-requisites are satisfied, see [how to load and join data]({{ site.baseurl }}/skills-data-join/#data-loading-and-joining).
+
+### Required Viva Insights schema and join keys
+
+Before running the joins, confirm each input table is present and contains its join key(s). Missing or non-unique keys are the most common cause of failed or exploded joins:
+
+| Table | Role | Required key column(s) | Notes |
+|-------|------|------------------------|-------|
+| `MetricOutput` (Person Query) | Main / left table | `PersonId`, `MetricDate`, `MetricPrimaryKey`, `PeopleHistoricalId` | Add any outcome metrics (e.g. `Collaboration_hours`, `Total_Copilot_actions_taken`) here. One row per person-week. |
+| `HR` | Org attributes | `PeopleHistoricalId` | One row per person-history; should be unique on the key. |
+| `PersonSkillsMappingMetadata` | Bridge | `MetricPrimaryKey`, `SkillHistoricalId` | One-to-many: expands rows to person-skill grain. |
+| `PersonSkills` | Skill instances | `SkillHistoricalId`, `SkillId` | Links a person's skill record to the skills catalog. |
+| `SkillsLibrary` | Skills catalog | `SkillId` | One row per skill; should be unique on `SkillId`. |
+
+Minimal pre-join checklist:
+
+- ✅ Every table above loaded without error and is non-empty.
+- ✅ Each join key column exists and has no unexpected `NA`s.
+- ✅ The "one" side of each join (`HR`, `SkillsLibrary`) is **unique** on its key (`df %>% count(key) %>% filter(n > 1)` returns no rows).
+- ✅ You have recorded the row count of `MetricOutput` so you can verify expected row growth after each join. 

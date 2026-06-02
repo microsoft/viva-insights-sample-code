@@ -201,7 +201,12 @@ Python options:
 
 Once all the data has been loaded in successfully, the key step is joining all tables to create a comprehensive dataset where each row represents a person-skill combination.
 
+> ⚠️ **Cardinality / row expansion warning.** The person → skills relationship is **one-to-many**: each person typically maps to several skills. Joining `df_PersonSkillsMap` (and the skills tables) therefore *multiplies* rows — a 10,000-row Person Query joined to an average of 8 skills per person yields roughly **80,000** rows. Before aggregating any person-level metric (e.g. collaboration hours or Copilot actions), de-duplicate back to one row per person, or weight appropriately, so you don't double-count. Always check `nrow()` / `.shape[0]` before and after each join and confirm the growth matches your expected skills-per-person cardinality. Joining on the wrong key (or a non-unique key on the "one" side) can silently produce a many-to-many explosion.
+
 **R Implementation:**
+
+> 🧪 **Demo data only.** The Skills landscape tables do **not** contain collaboration or Copilot outcome metrics. The `After_hours_collaboration_hours` and `Total_Copilot_actions_taken` columns added below are **randomly generated placeholders** so the tutorial runs end-to-end. They carry no real signal — any downstream averages, correlations, or "findings" computed from them are illustrative of the *mechanics* only. In a real analysis, add these metrics to your Person Query (`MetricOutput`) before joining, and remove the simulation block.
+
 ```r
 # Perform the complete join to create master skills dataset
 df_combined_skills <-
