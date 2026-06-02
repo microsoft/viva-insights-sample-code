@@ -60,7 +60,7 @@ STEP 1: ENVIRONMENT CHECK
 
 STEP 2: DATA INSPECTION
 1. Ask the user where their CSV data file is located.
-2. Load the data using `import_query()` from the `vivainsights` package: import vivainsights as vi data = vi.import_query("path/to/data.csv")
+2. Load the data using `import_query()` from the `vivainsights` package — i.e. import the package (`import vivainsights as vi`) and then call `data = vi.import_query("path/to/data.csv")`.
 3. Print the shape, date range (MetricDate or Date column), and number of unique PersonIds.
 4. Run `vi.extract_hr(data)` to identify available HR/organizational attribute columns.
 5. List all columns containing "Copilot" to confirm Copilot metrics are present.
