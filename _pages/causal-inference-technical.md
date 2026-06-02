@@ -151,28 +151,59 @@ def validate_causal_data(df):
     Comprehensive validation of data quality for causal inference
     Returns a dictionary of checks and recommendations
     """
+    # Per-unit temporal ordering: panel data interleaves units, so a global
+    # is_monotonic_increasing check spuriously fails. Sort within each unit and
+    # require strictly increasing periods (no duplicate periods per unit).
+    if 'user_id' in df.columns and 'time_period' in df.columns:
+        temporal_ok = (
+            df.sort_values(['user_id', 'time_period'])
+              .groupby('user_id')['time_period']
+              .apply(lambda s: s.is_monotonic_increasing and not s.duplicated().any())
+              .all()
+        )
+    else:
+        temporal_ok = df['time_period'].sort_values().is_monotonic_increasing
+
     checks = {
-        'temporal_ordering': df['time_period'].is_monotonic_increasing,
+        'temporal_ordering': bool(temporal_ok),
         'treatment_variation': df['treatment'].nunique() > 1,
         'outcome_completeness': df['outcome'].notna().mean() > 0.8,
         'sufficient_sample': len(df) > 100,
-        'panel_balance': len(df['user_id'].unique()) * len(df['time_period'].unique()) == len(df)
     }
+
+    # Panel structure: an *unbalanced* panel is still perfectly valid for most
+    # methods, so we do not flag it as a failure. The genuine data-quality
+    # problem is duplicate (user_id, time_period) rows; balance is reported as
+    # information only.
+    panel_info = {}
+    if {'user_id', 'time_period'}.issubset(df.columns):
+        dup_rows = int(df.duplicated(subset=['user_id', 'time_period']).sum())
+        n_users = df['user_id'].nunique()
+        n_periods = df['time_period'].nunique()
+        checks['no_duplicate_user_periods'] = dup_rows == 0
+        panel_info = {
+            'balanced': bool(n_users * n_periods == len(df)) and dup_rows == 0,
+            'n_users': n_users,
+            'n_periods': n_periods,
+            'duplicate_user_periods': dup_rows,
+        }
     
     # Generate recommendations based on failed checks
     recommendations = []
     if not checks['temporal_ordering']:
-        recommendations.append("Sort data by time_period to ensure proper temporal ordering")
+        recommendations.append("Sort each user's records by time_period; some units are out of order or have duplicate periods")
     if not checks['treatment_variation']:
         recommendations.append("Treatment variable shows no variation - check data quality")
     if not checks['outcome_completeness']:
         recommendations.append("High missing data in outcome - consider imputation or data cleaning")
     if not checks['sufficient_sample']:
         recommendations.append("Sample size may be too small for reliable causal inference")
-    if not checks['panel_balance']:
-        recommendations.append("Unbalanced panel - some users missing observations in some periods")
+    if not checks.get('no_duplicate_user_periods', True):
+        recommendations.append("Duplicate user-period rows found - aggregate or de-duplicate before analysis")
+    if panel_info and not panel_info['balanced']:
+        recommendations.append("Panel is unbalanced (this is acceptable); ensure your method handles missing user-periods")
     
-    return {'checks': checks, 'recommendations': recommendations}
+    return {'checks': checks, 'panel_info': panel_info, 'recommendations': recommendations}
 
 # Run validation
 validation_results = validate_causal_data(df)
@@ -182,11 +213,12 @@ if validation_results['recommendations']:
 ```
 
 **Understanding the Output:**
-- `temporal_ordering`: Ensures time flows correctly (critical for causal ordering)
+- `temporal_ordering`: Ensures each unit's periods are strictly increasing (critical for causal ordering)
 - `treatment_variation`: Confirms we have both treated and untreated observations
 - `outcome_completeness`: High missing data can bias results
 - `sufficient_sample`: Small samples lead to unreliable estimates
-- `panel_balance`: Balanced panels enable stronger causal identification
+- `no_duplicate_user_periods`: Flags duplicate (user, period) rows — the real panel data-quality issue
+- `panel_info`: Reports whether the panel is balanced (informational — unbalanced panels are still valid)
 
 ### Defining Treatment and Outcome Variables
 
