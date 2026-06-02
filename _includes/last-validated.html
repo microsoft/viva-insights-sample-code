@@ -1,0 +1,16 @@
+<!-- "Last validated" trust stamp for Frontier prompt pages. Driven by page.last_validated. -->
+{% if page.last_validated %}
+<style>
+.last-validated {
+  font-size: 0.8rem;
+  color: var(--text-color, #555);
+  opacity: 0.75;
+  margin: -0.5rem 0 1.5rem;
+}
+.last-validated .lv-icon { color: #2e7d32; margin-right: 0.3rem; }
+</style>
+
+<p class="last-validated">
+  <span class="lv-icon" aria-hidden="true">✓</span>Last validated {{ page.last_validated | date: "%B %-d, %Y" }} against vivainsights R {{ site.frontier.vivainsights_r_version }} / Python {{ site.frontier.vivainsights_py_version }}.
+</p>
+{% endif %}

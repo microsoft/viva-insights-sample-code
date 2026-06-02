@@ -14,6 +14,11 @@ defaults:
     values:
       image: /assets/images/og-image.png
 
+# Frontier prompt validation metadata (update when prompts are re-validated)
+frontier:
+  vivainsights_r_version: "0.7.2"
+  vivainsights_py_version: "0.4.2"
+
 # Theme
 theme: minima
 plugins:

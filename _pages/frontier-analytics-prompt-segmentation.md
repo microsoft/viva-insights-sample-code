@@ -2,6 +2,7 @@
 layout: page
 title: "Prompt — Segmentation & Churn"
 permalink: /frontier-analytics-prompt-segmentation/
+last_validated: 2026-06-02
 badges:
   data_source: "Person Query"
   min_data: "8–12+ weeks"
@@ -22,6 +23,8 @@ badges:
 > **📋 Review the schema first.** Before running this prompt, confirm your column names and the Copilot/agent action taxonomy against the **[Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)**.
 
 {% include prompt-badges.html %}
+
+{% include last-validated.html %}
 
 ## Purpose
 
