@@ -132,6 +132,7 @@ def regression_diagnostics(model, df, outcome_col, treatment_col):
     import matplotlib.pyplot as plt
     import seaborn as sns
     from scipy import stats
+    from statsmodels.stats.diagnostic import het_breuschpagan
     
     diagnostics = {}
     
@@ -148,7 +149,7 @@ def regression_diagnostics(model, df, outcome_col, treatment_col):
     }
     
     # Homoscedasticity test
-    _, het_p, _, _ = stats.diagnostic.het_breuschpagan(residuals, model.model.exog)
+    _, het_p, _, _ = het_breuschpagan(residuals, model.model.exog)
     diagnostics['homoscedasticity_test'] = {
         'p_value': het_p,
         'homoscedastic': het_p > 0.05
