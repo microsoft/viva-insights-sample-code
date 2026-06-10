@@ -638,3 +638,39 @@
   a { color: #000; text-decoration: underline; }
   .callout, .pull-quote { break-inside: avoid; }
 }
+
+/* ---- Markdown utility grids used inside articles ---- */
+.three-up,
+.four-up {
+  display: grid;
+  gap: 1.1rem;
+  margin: 1.4rem 0 1.8rem;
+}
+.three-up { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.four-up  { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.three-up > p,
+.four-up > p {
+  margin: 0;
+  padding: 1.1rem 1.2rem;
+  background: #F7FAFD;
+  border: 1px solid #E2EAF3;
+  border-radius: 12px;
+  font-size: 0.97rem;
+  line-height: 1.5;
+}
+.three-up > p strong:first-child,
+.four-up > p strong:first-child {
+  display: block;
+  color: #11365A;
+  font-size: 1.02rem;
+  margin-bottom: 0.35rem;
+}
+.three-up > p em,
+.four-up > p em {
+  color: #5B6573;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 0.88rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}

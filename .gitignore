@@ -57,3 +57,8 @@ _site/
 .jekyll-cache/
 .jekyll-metadata
 Gemfile.lock
+
+# Local-only source decks and documents (do not publish)
+assets/decks/
+*.pptx
+*.docx
