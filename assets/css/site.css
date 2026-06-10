@@ -305,37 +305,3 @@ a.post-link {
   flex: 0 0 auto;
   opacity: 0.85;
 }
-
-/* ---- Featured article card (articles hub) ---- */
-.vi-card-grid--featured {
-  grid-template-columns: 1fr;
-  margin-bottom: 2.5rem;
-}
-.page-content a.vi-card--featured {
-  padding: 1.8rem 1.9rem;
-  border-width: 1px;
-  border-color: var(--vi-purple);
-  background: linear-gradient(135deg, #faf7ff 0%, #fff 60%);
-  box-shadow: 0 4px 18px rgba(92, 45, 145, 0.10);
-}
-.page-content a.vi-card--featured:hover {
-  box-shadow: 0 10px 28px rgba(92, 45, 145, 0.18);
-}
-.vi-card .vi-card-eyebrow {
-  display: inline-block;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--vi-purple);
-  margin-bottom: 0.55rem;
-}
-.vi-card--featured .vi-card-title {
-  font-size: 1.45rem;
-  line-height: 1.25;
-  margin-bottom: 0.5rem;
-}
-.vi-card--featured .vi-card-desc {
-  font-size: 1rem;
-  max-width: 60ch;
-}
