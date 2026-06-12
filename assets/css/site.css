@@ -7,13 +7,98 @@
  */
 
 :root {
-  --vi-purple: #5C2D91;        /* primary (Microsoft brand purple, AA on white) */
-  --vi-purple-dark: #44216B;   /* hover/active */
-  --vi-magenta: #B4009E;       /* gradient accent */
-  --vi-purple-tint: #F3EEFA;   /* light surface */
-  --vi-ink: #242424;           /* body text */
+  /* ---- Viva Insights brand identity (logo / wordmark / accents only) ---- */
+  --vi-purple: #5C2D91;
+  --vi-purple-dark: #44216B;
+  --vi-magenta: #B4009E;
+  --vi-purple-tint: #F3EEFA;
   --vi-border: #E6E1EF;
   --vi-grad: linear-gradient(135deg, #5C2D91 0%, #B4009E 100%);
+
+  /* ---- Primary interaction colour (CTAs, focus, active states) ---- */
+  --primary: #335CCC;
+  --primary-h: #294DAE;
+  --primary-tint: #EBF0FB;
+
+  /* ---- Neutrals ---- */
+  --ink: #0E1726;
+  --text: #242424;
+  --muted: #616161;
+  --rule: #E0E0E0;
+  --surface: #FFFFFF;
+  --surface-alt: #FAF9F8;
+
+  /* ---- Status / badge tones ---- */
+  --tone-green-fg: #0E700E;
+  --tone-green-bg: #F1FAF1;
+  --tone-rose-fg:  #B33A55;
+  --tone-rose-bg:  #FDEBF1;
+  --tone-blue-fg:  #0F6CBD;
+  --tone-blue-bg:  #EBF3FC;
+
+  /* ---- Accent gradients (eyebrows / illustrations only — not buttons) ---- */
+  --grad-cool: linear-gradient(96.15deg, #764FF5 12.38%, #3F6CE9 39.4%, #20BBC6 96.13%);
+  --grad-warm: linear-gradient(96.15deg, #E76633 -1.08%, #9D68E3 14.88%, #20BBC6 96.13%);
+
+  /* ---- Section background gradients ---- */
+  --grad-section-lav: linear-gradient(113deg, rgba(240,231,255,0.7) 0%, rgba(255,255,255,1) 40%, rgba(228,243,255,0.9) 100%);
+  --grad-section-warm: linear-gradient(90deg, #F0F0E9 0%, #FFFDF0 100%);
+
+  /* ---- Card / surface system ---- */
+  --shadow-card: 0 0 2px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-card-hover: 0 0 2px rgba(0,0,0,0.14), 0 12px 28px rgba(14,23,38,0.14);
+  --radius-card: 16px;
+  --radius-pill: 9999px;
+
+  /* ---- Layout rail + sticky stack offsets (consumed by nav, tab rail, TOC, scroll-margin) ---- */
+  --rail-max: 928px;
+  --nav-h: 48px;
+  --home-tab-h: 44px;
+  --sticky-offset: calc(var(--nav-h) + var(--home-tab-h) + 8px);
+
+  /* ---- Focus ring ---- */
+  --focus-ring: 0 0 0 3px rgba(51, 92, 204, 0.35);
+}
+
+/* ---- Typography baseline ----
+   Match the Labs aesthetic: Segoe UI throughout, tight letter-spacing on
+   display headings, dark ink for body. Scoped to the page so we don't
+   override Bootstrap navbar font sizing globally. */
+body,
+.page-content {
+  font-family: "Segoe UI", "Segoe UI Web (West European)", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: var(--text);
+}
+.page-content h1 {
+  font-size: clamp(28px, 4.4vw, 40px);
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.page-content h2 {
+  font-size: clamp(22px, 3vw, 32px);
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.page-content h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ---- Global focus ring (applies to interactive elements) ---- */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+.btn:focus-visible,
+.nav-link:focus-visible,
+.dropdown-item:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 4px;
 }
 
 /* ---- Layout width ----
@@ -41,15 +126,17 @@
   margin-left: 0.4rem;
 }
 
-/* ---- Links ---- */
-.page-content a:not(.btn):not(.nav-link):not(.dropdown-item):not(.navbar-brand),
+/* ---- Links ----
+   Strict role split: body links use the primary blue (interactive),
+   never the brand purple. Purple is reserved for logo/identity. */
+.page-content a:not(.btn):not(.nav-link):not(.dropdown-item):not(.navbar-brand):not(.vi-card):not(.vi-cta):not(.vi-cta-secondary):not(.page-meta-edit):not(.vi-search-link),
 a.post-link {
-  color: var(--vi-purple);
-  text-decoration-color: rgba(92, 45, 145, 0.35);
+  color: var(--primary);
+  text-decoration-color: rgba(51, 92, 204, 0.35);
 }
-.page-content a:not(.btn):not(.nav-link):not(.dropdown-item):not(.navbar-brand):hover {
-  color: var(--vi-purple-dark);
-  text-decoration-color: var(--vi-purple-dark);
+.page-content a:not(.btn):not(.nav-link):not(.dropdown-item):not(.navbar-brand):not(.vi-card):not(.vi-cta):not(.vi-cta-secondary):not(.page-meta-edit):not(.vi-search-link):hover {
+  color: var(--primary-h);
+  text-decoration-color: var(--primary-h);
 }
 
 /* ---- Hide default Minima header & navigation site-wide ---- */
@@ -81,12 +168,11 @@ a.post-link {
   background-color: var(--vi-purple-tint);
 }
 
-/* ---- Headings accent ---- */
-.page-content h1 {
-  color: var(--vi-purple-dark);
-}
+/* ---- Headings accent ----
+   H2 keeps a subtle bottom rule for in-content section separation;
+   colour comes from the new --ink token, set above. */
 .page-content h2 {
-  border-bottom: 1px solid var(--vi-border);
+  border-bottom: 1px solid var(--rule);
   padding-bottom: 0.3rem;
 }
 
@@ -179,18 +265,18 @@ a.post-link {
   border: 1px solid var(--vi-border);
   border-radius: 12px;
   background: #fff;
-  color: var(--vi-ink) !important;
+  color: var(--text) !important;
   text-decoration: none !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
 }
 .page-content a.vi-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 22px rgba(92, 45, 145, 0.14);
-  border-color: var(--vi-purple);
+  box-shadow: 0 8px 22px rgba(14, 23, 38, 0.14);
+  border-color: var(--primary);
 }
 .page-content a.vi-card:focus-visible {
-  outline: 2px solid var(--vi-purple);
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 .vi-card .vi-card-icon {
@@ -201,19 +287,19 @@ a.post-link {
 .vi-card .vi-card-title {
   font-weight: 700;
   font-size: 1.12rem;
-  color: var(--vi-purple-dark);
+  color: var(--ink);
   margin-bottom: 0.35rem;
 }
 .vi-card .vi-card-desc {
   font-size: 0.95rem;
-  color: #444;
+  color: var(--muted);
   flex: 1;
   margin: 0;
 }
 .vi-card .vi-card-more {
   margin-top: 0.8rem;
   font-weight: 600;
-  color: var(--vi-purple);
+  color: var(--primary);
   font-size: 0.9rem;
 }
 
@@ -242,8 +328,8 @@ a.post-link {
 }
 .vi-search-input:focus {
   outline: none;
-  border-color: var(--vi-purple);
-  box-shadow: 0 0 0 3px rgba(92, 45, 145, 0.15);
+  border-color: var(--primary);
+  box-shadow: var(--focus-ring);
 }
 .vi-search-status {
   margin: 0.8rem 0 0;
@@ -262,7 +348,7 @@ a.post-link {
 .page-content a.vi-search-link {
   font-weight: 600;
   font-size: 1.1rem;
-  color: var(--vi-purple) !important;
+  color: var(--primary) !important;
 }
 .vi-search-snippet {
   margin: 0.3rem 0 0;
@@ -292,13 +378,13 @@ a.post-link {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  color: var(--vi-purple) !important;
+  color: var(--primary) !important;
   font-weight: 500;
   text-decoration: none;
 }
 .page-content a.page-meta-edit:hover,
 .page-meta-edit:hover {
-  color: var(--vi-purple-dark) !important;
+  color: var(--primary-h) !important;
   text-decoration: underline;
 }
 .page-meta svg {

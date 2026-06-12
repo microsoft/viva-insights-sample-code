@@ -85,7 +85,7 @@
 @media (min-width: 1701px) {
   .floating-toc.show.is-fixed {
     position: fixed !important;
-    top: 110px !important;
+    top: var(--sticky-offset, 110px) !important;
     left: 24px !important;
     width: 280px !important;
     max-width: calc((100vw - 1080px) / 2 - 32px) !important;
