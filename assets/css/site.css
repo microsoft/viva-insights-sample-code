@@ -470,6 +470,208 @@ a.post-link {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
+
+/* =======================================================================
+   Homepage v2 — white hero with decorative ribbon, frosted-glass values
+   panel, and three full-bleed sections (Overview / Sample Code / Research)
+   anchored by the sticky tab rail introduced in Phase 2.
+   ======================================================================= */
+.home > .page-heading { display: none; }
+.home .wrapper { max-width: none; padding: 0; }
+.home .page-content { padding-top: 0; padding-bottom: 0; }
+
+.vi-home-hero {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  padding: 64px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+.vi-home-hero-ribbon {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.vi-home-hero-ribbon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.vi-home-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+.vi-home-hero-inner h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(28px, 5vw, 44px);
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.vi-home-hero-inner p.vi-hero-lede {
+  margin: 0;
+  max-width: 640px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.vi-cta-row-v2 {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+.page-content a.vi-cta-primary,
+.page-content a.vi-cta-on-light {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  text-decoration: none !important;
+  transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+}
+.page-content a.vi-cta-primary {
+  background: var(--primary);
+  color: #fff !important;
+  border: 1px solid var(--primary);
+}
+.page-content a.vi-cta-primary:hover {
+  background: var(--primary-h);
+  border-color: var(--primary-h);
+}
+.page-content a.vi-cta-on-light {
+  background: #fff;
+  color: var(--text) !important;
+  border: 1px solid #D1D1D1;
+}
+.page-content a.vi-cta-on-light:hover {
+  background: #F7F7F7;
+}
+
+.vi-values {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 928px;
+  padding: 16px;
+  border-radius: 24px;
+  background: rgba(210, 225, 255, 0.5);
+  box-sizing: border-box;
+}
+.vi-values-panel {
+  background: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+@media (max-width: 900px) {
+  .vi-values-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .vi-home-hero { padding: 40px 16px 16px; gap: 20px; }
+  .vi-values { border-radius: 16px; padding: 10px; }
+  .vi-values-panel { grid-template-columns: 1fr; gap: 16px; padding: 16px; }
+}
+.vi-value {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+.vi-value-icon {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+}
+.vi-value h3 {
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.vi-value p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--muted);
+}
+
+/* Section wrappers — sticky-tab-rail anchors. */
+section.vi-section {
+  padding: 56px 24px;
+  scroll-margin-top: var(--sticky-offset);
+}
+.vi-section-inner {
+  max-width: var(--rail-max);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.vi-section-lav { background: var(--grad-section-lav); }
+.vi-section-warm { background: var(--grad-section-warm); }
+
+.vi-eyebrow {
+  width: fit-content;
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background-image: var(--grad-cool);
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.vi-eyebrow-warm { background-image: var(--grad-warm); }
+
+.vi-section h2.vi-section-heading {
+  margin: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+  font-size: clamp(24px, 3.4vw, 32px);
+  line-height: 1.2;
+  color: var(--ink);
+}
+.vi-section .vi-section-desc {
+  margin: 0;
+  max-width: 720px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.vi-section h3 {
+  margin-top: 1.4rem;
+  color: var(--ink);
+}
+.vi-section ul, .vi-section ol { padding-left: 1.4rem; }
 .vi-card .vi-card-icon {
   font-size: 1.8rem;
   line-height: 1;
