@@ -160,6 +160,42 @@ description: "Sample code, tutorials, and AI prompt libraries for Microsoft Viva
     <h2 class="vi-section-heading">Special focus areas</h2>
     <p class="vi-section-desc">Two areas where this library goes deeper than the standard packages: measuring Copilot adoption and impact, and using AI coding agents to turn raw Viva Insights exports into finished outputs.</p>
 
+    <a class="vi-featured-card" href="{{ site.baseurl }}/frontier-analytics/">
+      <div class="vi-featured-card-body">
+        <div class="vi-badge-row">
+          <span class="vi-badge vi-badge-green">Featured</span>
+          <span class="vi-badge vi-badge-blue">Prompt library</span>
+          <span class="vi-badge vi-badge-purple">Agent-ready</span>
+        </div>
+        <h3 class="vi-featured-card-title">Frontier — turn a Viva Insights export into a finished output</h3>
+        <p>Paste a ready-made analyst prompt into a coding agent and produce a dashboard, executive summary, ROI estimate, or PowerPoint-ready deck from your own Viva Insights data — with schema docs and worked examples to validate against.</p>
+        <span class="vi-featured-card-cta">Open the prompt library →</span>
+      </div>
+      <div class="vi-featured-art" aria-hidden="true">
+        <svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="vi-feat-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#764FF5"/>
+              <stop offset="0.5" stop-color="#3F6CE9"/>
+              <stop offset="1" stop-color="#20BBC6"/>
+            </linearGradient>
+          </defs>
+          <rect x="20" y="22" width="200" height="140" rx="10" fill="#fff" stroke="#D1D1D1" stroke-width="1.5"/>
+          <rect x="32" y="38" width="80" height="8" rx="3" fill="#0E1726" opacity="0.7"/>
+          <rect x="32" y="54" width="120" height="6" rx="2" fill="#616161" opacity="0.5"/>
+          <rect x="32" y="80" width="36" height="60" rx="3" fill="url(#vi-feat-grad)" opacity="0.85"/>
+          <rect x="76" y="100" width="36" height="40" rx="3" fill="url(#vi-feat-grad)" opacity="0.65"/>
+          <rect x="120" y="90" width="36" height="50" rx="3" fill="url(#vi-feat-grad)" opacity="0.75"/>
+          <rect x="164" y="110" width="36" height="30" rx="3" fill="url(#vi-feat-grad)" opacity="0.55"/>
+          <rect x="170" y="70" width="120" height="120" rx="10" fill="#fff" stroke="#D1D1D1" stroke-width="1.5"/>
+          <circle cx="230" cy="120" r="32" fill="none" stroke="url(#vi-feat-grad)" stroke-width="6"/>
+          <path d="M230 88 A32 32 0 0 1 261 130 L230 120 Z" fill="url(#vi-feat-grad)" opacity="0.85"/>
+          <rect x="186" y="160" width="88" height="6" rx="2" fill="#616161" opacity="0.4"/>
+          <rect x="186" y="172" width="60" height="6" rx="2" fill="#616161" opacity="0.3"/>
+        </svg>
+      </div>
+    </a>
+
     <h3>Copilot analytics</h3>
     <p>With the rapid adoption of Microsoft Copilot, understanding usage patterns and measuring impact has become critical. Our dedicated <a href="{{ site.baseurl }}/copilot/">Copilot Analytics</a> section provides specialized scripts and methodologies for:</p>
     <ul>

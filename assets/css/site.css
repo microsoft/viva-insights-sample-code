@@ -109,12 +109,12 @@ button:focus-visible,
 /* ---- Links ----
    Strict role split: body links use the primary blue (interactive),
    never the brand purple. Purple is reserved for logo/identity. */
-.page-content a:not(.btn):not(.nav-link):not(.dropdown-item):not(.navbar-brand):not(.vi-card):not(.vi-cta):not(.vi-cta-secondary):not(.page-meta-edit):not(.vi-search-link),
+.page-content a:not(.btn):not(.nav-link):not(.dropdown-item):not(.navbar-brand):not(.vi-card):not(.vi-featured-card):not(.vi-cta):not(.vi-cta-secondary):not(.vi-cta-primary):not(.vi-cta-on-light):not(.page-meta-edit):not(.vi-search-link):not(.vi-tab):not(.vi-nav-link):not(.vi-nav-brand):not(.vi-nav-icon):not(.vi-mega-trigger),
 a.post-link {
   color: var(--primary);
   text-decoration-color: rgba(51, 92, 204, 0.35);
 }
-.page-content a:not(.btn):not(.nav-link):not(.dropdown-item):not(.navbar-brand):not(.vi-card):not(.vi-cta):not(.vi-cta-secondary):not(.page-meta-edit):not(.vi-search-link):hover {
+.page-content a:not(.btn):not(.nav-link):not(.dropdown-item):not(.navbar-brand):not(.vi-card):not(.vi-featured-card):not(.vi-cta):not(.vi-cta-secondary):not(.vi-cta-primary):not(.vi-cta-on-light):not(.page-meta-edit):not(.vi-search-link):not(.vi-tab):not(.vi-nav-link):not(.vi-nav-brand):not(.vi-nav-icon):not(.vi-mega-trigger):hover {
   color: var(--primary-h);
   text-decoration-color: var(--primary-h);
 }
@@ -442,29 +442,28 @@ a.post-link {
   transform: translateY(-2px);
 }
 
-/* ---- Category card grid ---- */
+/* ---- Category card grid (refreshed in Phase 4) ---- */
 .vi-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.1rem;
+  gap: 24px;
   margin: 1.5rem 0 2rem;
 }
 .page-content a.vi-card {
   display: flex;
   flex-direction: column;
-  padding: 1.3rem;
-  border: 1px solid var(--vi-border);
-  border-radius: 12px;
+  padding: 24px;
+  border: none;
+  border-radius: var(--radius-card);
   background: #fff;
   color: var(--text) !important;
   text-decoration: none !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
 }
 .page-content a.vi-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 22px rgba(14, 23, 38, 0.14);
-  border-color: var(--primary);
+  box-shadow: var(--shadow-card-hover);
 }
 .page-content a.vi-card:focus-visible {
   outline: 2px solid var(--primary);
@@ -672,6 +671,108 @@ section.vi-section {
   color: var(--ink);
 }
 .vi-section ul, .vi-section ol { padding-left: 1.4rem; }
+
+/* =======================================================================
+   Badges — small pill tags for cards, list items, and the featured card.
+   Tone tokens defined in :root (Phase 1).
+   ======================================================================= */
+.vi-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.vi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+.vi-badge-green  { color: var(--tone-green-fg); background: var(--tone-green-bg); }
+.vi-badge-rose   { color: var(--tone-rose-fg);  background: var(--tone-rose-bg); }
+.vi-badge-blue   { color: var(--tone-blue-fg);  background: var(--tone-blue-bg); }
+.vi-badge-purple { color: var(--vi-purple-dark); background: var(--vi-purple-tint); }
+
+/* =======================================================================
+   Featured card — 2-column variant with side illustration. Used at the
+   top of the Sample Code section to spotlight the highest-value template.
+   ======================================================================= */
+.page-content a.vi-featured-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 42%);
+  gap: 28px;
+  align-items: stretch;
+  background: #fff;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 28px;
+  margin: 0 0 24px;
+  text-decoration: none !important;
+  color: var(--text) !important;
+  transition: box-shadow 0.14s ease, transform 0.14s ease;
+}
+.page-content a.vi-featured-card:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
+}
+.vi-featured-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.vi-featured-card-body h3.vi-featured-card-title {
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-size: 20px;
+  line-height: 1.25;
+  color: var(--ink);
+  font-weight: 600;
+}
+.vi-featured-card-body p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.vi-featured-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  color: var(--primary);
+  font-size: 14px;
+  margin-top: auto;
+}
+.vi-featured-art {
+  position: relative;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #EEF2FF 0%, #F3EEFA 60%, #E7F8FA 100%);
+  min-height: 200px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.vi-featured-art svg {
+  width: 78%;
+  height: auto;
+  display: block;
+}
+@media (max-width: 700px) {
+  .page-content a.vi-featured-card {
+    grid-template-columns: 1fr;
+    padding: 20px;
+    gap: 20px;
+  }
+  .vi-featured-art { min-height: 160px; }
+}
 .vi-card .vi-card-icon {
   font-size: 1.8rem;
   line-height: 1;
