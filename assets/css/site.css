@@ -139,6 +139,19 @@ a.post-link {
   height: var(--nav-h);
   font-family: "Segoe UI", "Segoe UI Web (West European)", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
+/* Defensive resets — the nav lives inside Minima's .page-content, so its
+   default ul/li/svg styles can leak in (bullets, full-width images, list
+   margins). Reset them explicitly inside .vi-nav. */
+.vi-nav ul,
+.vi-nav ol,
+.vi-nav li {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.vi-nav svg { max-width: none; display: inline-block; vertical-align: middle; }
+.vi-nav-brand .vi-logo { width: 24px !important; height: 24px !important; }
+.vi-mega-trigger .vi-caret { width: 10px !important; height: 6px !important; }
 .vi-nav-inner {
   display: flex;
   align-items: center;

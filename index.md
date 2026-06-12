@@ -48,7 +48,7 @@ description: "Sample code, tutorials, and AI prompt libraries for Microsoft Viva
   <div class="vi-values">
     <div class="vi-values-panel">
       <div class="vi-value">
-        <svg class="vi-value-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <svg class="vi-value-icon" width="56" height="56" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
             <linearGradient id="vi-val-1" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0" stop-color="#335CCC"/>
@@ -64,7 +64,7 @@ description: "Sample code, tutorials, and AI prompt libraries for Microsoft Viva
         <p>Working R and Python scripts built on the official Viva Insights packages.</p>
       </div>
       <div class="vi-value">
-        <svg class="vi-value-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <svg class="vi-value-icon" width="56" height="56" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
             <linearGradient id="vi-val-2" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0" stop-color="#5C2D91"/>
@@ -78,7 +78,7 @@ description: "Sample code, tutorials, and AI prompt libraries for Microsoft Viva
         <p>Paste a Frontier prompt into a coding agent and get a dashboard, exec summary, or ROI analysis.</p>
       </div>
       <div class="vi-value">
-        <svg class="vi-value-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <svg class="vi-value-icon" width="56" height="56" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
             <linearGradient id="vi-val-3" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0" stop-color="#20BBC6"/>
