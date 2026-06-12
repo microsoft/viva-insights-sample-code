@@ -1,0 +1,62 @@
+<!-- Homepage section tab rail.
+     Anchors to <section id="overview|sample-code|research"> wrappers
+     rendered later on the homepage. Falls back to display:none if no
+     target sections exist on the current page. Styles live in site.css. -->
+<nav class="vi-tab-rail" aria-label="On this page">
+  <div class="vi-tab-rail-inner">
+    <a class="vi-tab" href="#overview" data-vi-tab>Overview</a>
+    <a class="vi-tab" href="#sample-code" data-vi-tab>Sample Code</a>
+    <a class="vi-tab" href="#research" data-vi-tab>Research</a>
+  </div>
+</nav>
+
+<script>
+(function () {
+  var rail = document.querySelector('.vi-tab-rail');
+  if (!rail) return;
+
+  var tabs = Array.prototype.slice.call(rail.querySelectorAll('[data-vi-tab]'));
+  // Drop tabs whose target sections do not exist on this page.
+  tabs = tabs.filter(function (t) {
+    var href = t.getAttribute('href');
+    var target = href && document.querySelector(href);
+    if (!target) { t.remove(); return false; }
+    return true;
+  });
+  if (tabs.length === 0) { rail.style.display = 'none'; return; }
+
+  function offsetPx() {
+    var v = getComputedStyle(document.documentElement).getPropertyValue('--sticky-offset').trim();
+    var n = parseInt(v, 10);
+    return isFinite(n) ? n : 100;
+  }
+
+  function setActive(id) {
+    tabs.forEach(function (t) {
+      t.classList.toggle('is-active', t.getAttribute('href') === '#' + id);
+    });
+  }
+
+  // IntersectionObserver-based scroll spy. Section is "active" when its top
+  // crosses below the sticky offset.
+  var sections = tabs.map(function (t) { return document.querySelector(t.getAttribute('href')); });
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '-' + (offsetPx() + 1) + 'px 0px -55% 0px', threshold: 0 });
+  sections.forEach(function (s) { io.observe(s); });
+
+  // Smooth-scroll with offset on click; update hash without page jump.
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function (e) {
+      var target = document.querySelector(t.getAttribute('href'));
+      if (!target) return;
+      e.preventDefault();
+      var top = target.getBoundingClientRect().top + window.scrollY - offsetPx() + 1;
+      window.scrollTo({ top: top, behavior: 'smooth' });
+      history.replaceState(null, '', t.getAttribute('href'));
+    });
+  });
+})();
+</script>

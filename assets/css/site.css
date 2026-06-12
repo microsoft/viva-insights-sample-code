@@ -101,29 +101,9 @@ button:focus-visible,
   border-radius: 4px;
 }
 
-/* ---- Layout width ----
-   Minima's default wrapper is only ~740px wide, which is too narrow for the
-   multi-item navigation, wide tables, and the homepage card grid — it forced a
-   horizontal scrollbar on desktop. Widen the container and allow the navbar to
-   wrap so it can never overflow the viewport horizontally. */
+/* ---- Layout width ---- */
 .wrapper {
   max-width: 1080px;
-}
-.custom-nav .navbar-collapse {
-  flex-wrap: wrap;
-  row-gap: 0.25rem;
-}
-.custom-nav .navbar-nav {
-  flex-wrap: wrap;
-  align-items: center;
-  row-gap: 0.25rem;
-}
-.custom-nav .nav-link {
-  padding-left: 0.65rem !important;
-  padding-right: 0.65rem !important;
-}
-.custom-nav .vi-nav-github {
-  margin-left: 0.4rem;
 }
 
 /* ---- Links ----
@@ -140,32 +120,243 @@ a.post-link {
 }
 
 /* ---- Hide default Minima header & navigation site-wide ---- */
-/* We render our own Bootstrap nav (.custom-nav) inside the page content, so the
-   entire Minima header — including its duplicate linked site title — is hidden. */
 .site-header {
   display: none !important;
 }
-.custom-nav { display: block !important; }
 
-/* ---- Brand navigation ---- */
-.custom-nav {
-  border-bottom: 2px solid transparent;
-  border-image: var(--vi-grad) 1;
+/* =======================================================================
+   Primary navigation (vi-nav) — 48px sticky bar with accessible mega-menus
+   Replaces the old Bootstrap .custom-nav dropdown system. The legacy
+   .custom-nav rules below are retained only for graceful fall-back if any
+   inner page still references the older markup, but new markup is .vi-nav.
+   ======================================================================= */
+.vi-nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+  height: var(--nav-h);
+  font-family: "Segoe UI", "Segoe UI Web (West European)", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
-.custom-nav .navbar-brand {
+.vi-nav-inner {
+  display: flex;
+  align-items: center;
+  height: var(--nav-h);
+  padding: 0 24px;
+  gap: 16px;
+}
+.vi-nav-brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 10px;
   font-weight: 600;
-  color: var(--vi-purple) !important;
+  font-size: 14px;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
 }
-.custom-nav .navbar-brand .vi-logo { height: 26px; width: 26px; flex: 0 0 auto; }
-.custom-nav .nav-link:hover,
-.custom-nav .dropdown-item:hover {
-  color: var(--vi-purple) !important;
+.vi-nav-brand:hover { color: var(--ink); }
+.vi-nav-brand .vi-logo { width: 24px; height: 24px; flex: 0 0 auto; }
+
+.vi-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  justify-content: flex-end;
 }
-.custom-nav .dropdown-item:hover {
-  background-color: var(--vi-purple-tint);
+.vi-nav-list {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.vi-nav-link,
+.vi-mega-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--nav-h);
+  padding: 0 12px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.vi-nav-link:hover,
+.vi-mega-trigger:hover { color: var(--ink); background: rgba(0, 0, 0, 0.03); }
+.vi-mega-trigger[aria-expanded="true"] { color: var(--ink); background: rgba(0, 0, 0, 0.04); }
+.vi-mega-trigger .vi-caret { width: 10px; height: 10px; transition: transform 0.15s ease; }
+.vi-mega-trigger[aria-expanded="true"] .vi-caret { transform: rotate(180deg); }
+
+.vi-mega-item { position: relative; }
+.vi-mega-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  min-width: 280px;
+  max-width: min(720px, calc(100vw - 32px));
+  background: #fff;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px 24px;
+  z-index: 1200;
+}
+.vi-mega-panel[hidden] { display: none; }
+.vi-mega-col { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.vi-mega-col h3 {
+  font-size: 11px;
+  line-height: 1.2;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 4px 0 6px;
+  padding: 0;
+  border: none;
+}
+.vi-mega-col a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  color: var(--text);
+  text-decoration: none;
+}
+.vi-mega-col a:hover { background: var(--primary-tint); color: var(--ink); }
+.vi-mega-col a.external::after { content: " \2197"; font-size: 0.8em; opacity: 0.6; }
+
+.vi-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+}
+.vi-nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--text);
+  text-decoration: none;
+}
+.vi-nav-icon:hover { background: rgba(0, 0, 0, 0.06); color: var(--ink); }
+
+.vi-nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  padding: 4px 10px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .vi-nav-inner { padding: 0 16px; }
+  .vi-nav-toggle { display: inline-flex; align-items: center; }
+  .vi-nav-links {
+    position: absolute;
+    top: var(--nav-h);
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    background: #fff;
+    padding: 8px 12px 16px;
+    border-bottom: 1px solid var(--rule);
+    gap: 4px;
+    max-height: calc(100vh - var(--nav-h));
+    overflow-y: auto;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  }
+  .vi-nav-links[hidden] { display: none; }
+  .vi-nav-list { flex-direction: column; align-items: stretch; gap: 0; width: 100%; }
+  .vi-nav-link,
+  .vi-mega-trigger { width: 100%; justify-content: space-between; height: 44px; padding: 0 8px; }
+  .vi-mega-panel {
+    position: static;
+    margin: 0;
+    box-shadow: none;
+    padding: 4px 12px 12px;
+    grid-template-columns: 1fr;
+    gap: 4px;
+    min-width: 0;
+    max-width: none;
+    border-radius: 0;
+  }
+  .vi-nav-actions {
+    padding-top: 8px;
+    border-top: 1px solid var(--rule);
+    justify-content: flex-start;
+    margin-left: 0;
+  }
+}
+
+/* =======================================================================
+   Homepage section tab rail — sticks just below the primary nav.
+   Anchors to in-page <section id> wrappers added in Phase 3.
+   ======================================================================= */
+.vi-tab-rail {
+  position: sticky;
+  top: var(--nav-h);
+  z-index: 100;
+  background: #fff;
+  background-image: linear-gradient(96.15deg, rgba(118, 79, 245, 0.08) 12%, rgba(63, 108, 233, 0.08) 39%, rgba(32, 187, 198, 0.08) 96%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.vi-tab-rail-inner {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: var(--rail-max);
+  margin: 0 auto;
+  padding: 0 24px;
+  overflow-x: auto;
+  height: var(--home-tab-h);
+  scrollbar-width: thin;
+}
+.vi-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 12px;
+  font-size: 14px;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.vi-tab:hover { color: var(--ink); }
+.vi-tab.is-active { color: var(--ink); font-weight: 600; }
+.vi-tab.is-active::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 0;
+  height: 3px;
+  border-radius: 9999px;
+  background: var(--primary);
 }
 
 /* ---- Headings accent ----
@@ -176,7 +367,7 @@ a.post-link {
   padding-bottom: 0.3rem;
 }
 
-/* ---- Site name in Minima header (when shown) ---- */
+/* ---- Site name in Minima header (legacy fallback, header hidden site-wide) ---- */
 .site-title, .site-title:visited { color: var(--vi-purple) !important; }
 
 /* ---- Floating TOC active state uses brand colour ---- */
@@ -301,16 +492,6 @@ a.post-link {
   font-weight: 600;
   color: var(--primary);
   font-size: 0.9rem;
-}
-
-/* ---- Nav search link ---- */
-.custom-nav .vi-nav-search {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 0.5rem;
-}
-.custom-nav .vi-nav-search:hover {
-  color: var(--vi-purple) !important;
 }
 
 /* ---- Search page ---- */

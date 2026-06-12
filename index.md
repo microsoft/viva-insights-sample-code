@@ -5,6 +5,7 @@ description: "Sample code, tutorials, and AI prompt libraries for Microsoft Viva
 ---
 
 {% include custom-navigation.html %}
+{% include homepage-tab-rail.html %}
 
 <div class="vi-hero">
   <h1>Viva Insights Sample Code Library</h1>
