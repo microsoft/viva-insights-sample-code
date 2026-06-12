@@ -50,11 +50,23 @@
   --radius-card: 16px;
   --radius-pill: 9999px;
 
-  /* ---- Layout rail + sticky stack offsets (consumed by nav, tab rail, TOC, scroll-margin) ---- */
+  /* ---- Layout rail + sticky stack offsets ----
+     --sticky-offset is the scroll-margin / TOC-top used on inner pages
+     (just the 48px nav + 8px breathing room). The homepage overrides it
+     below to also account for the 44px tab rail. */
   --rail-max: 928px;
   --nav-h: 48px;
   --home-tab-h: 44px;
+  --sticky-offset: calc(var(--nav-h) + 8px);
+}
+
+/* Homepage adds the tab rail underneath the primary nav. */
+body:has(.home) {
   --sticky-offset: calc(var(--nav-h) + var(--home-tab-h) + 8px);
+}
+
+/* Re-open :root for the focus ring so the cascade is unchanged. */
+:root {
 
   /* ---- Focus ring ---- */
   --focus-ring: 0 0 0 3px rgba(51, 92, 204, 0.35);
@@ -101,9 +113,24 @@ button:focus-visible,
   border-radius: 4px;
 }
 
-/* ---- Layout width ---- */
+/* ---- Layout width ----
+   Inner pages use a 928px rail to match the homepage section rhythm.
+   The homepage layout (which wraps its sections in <div class="home">)
+   opts out of both the rail and the wrapper padding so its hero and
+   section gradients can run full-bleed against the sticky tab rail. */
 .wrapper {
-  max-width: 1080px;
+  max-width: 928px;
+}
+.wrapper:has(> .home) {
+  max-width: none;
+  padding: 0;
+}
+.home > .page-heading { display: none; }
+.home .page-content { padding-top: 0; padding-bottom: 0; }
+/* Inner pages — extra breathing room above the first H1 so it doesn't
+   sit flush under the 48px sticky nav. */
+body:not(:has(.home)) main.page-content {
+  padding-top: 24px;
 }
 
 /* ---- Links ----
@@ -391,10 +418,59 @@ a.post-link {
   background-color: var(--vi-purple-tint) !important;
 }
 
-/* ---- Tables ---- */
+/* ---- Tables — softer borders, generous padding, identity-purple header
+   (kept as a brand moment per the Phase 1 colour-role split). */
+.page-content table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 1.25rem 0 1.5rem;
+}
+.page-content table th,
+.page-content table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  vertical-align: top;
+}
 .page-content table th {
   background: var(--vi-purple-tint);
   color: var(--vi-purple-dark);
+  font-weight: 600;
+  border-bottom: 1px solid var(--vi-border);
+}
+.page-content table tbody tr:nth-child(2n) td {
+  background: rgba(0, 0, 0, 0.015);
+}
+.page-content table tbody tr:hover td {
+  background: var(--primary-tint);
+}
+
+/* ---- Inner-page title block.
+   The first H1 inside an inner page (not on the homepage, where .home
+   replaces the heading with the hero) gets the Labs-style heavy display
+   treatment + a thin gradient rule below. */
+body:not(:has(.home)) .page-content > .wrapper > h1:first-child,
+body:not(:has(.home)) .page-content > .wrapper > h1.page-heading:first-child {
+  font-size: clamp(30px, 4.4vw, 40px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 8px 0 18px;
+  padding-bottom: 14px;
+  position: relative;
+}
+body:not(:has(.home)) .page-content > .wrapper > h1:first-child::after,
+body:not(:has(.home)) .page-content > .wrapper > h1.page-heading:first-child::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 64px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--grad-cool);
 }
 
 /* ---- Homepage hero ---- */
@@ -483,14 +559,10 @@ a.post-link {
   outline-offset: 2px;
 }
 
-/* =======================================================================
-   Homepage v2 — white hero with decorative ribbon, frosted-glass values
+/* ---- Homepage v2 — white hero with decorative ribbon, frosted-glass values
    panel, and three full-bleed sections (Overview / Sample Code / Research)
    anchored by the sticky tab rail introduced in Phase 2.
    ======================================================================= */
-.home > .page-heading { display: none; }
-.home .wrapper { max-width: none; padding: 0; }
-.home .page-content { padding-top: 0; padding-bottom: 0; }
 
 .vi-home-hero {
   position: relative;
@@ -855,15 +927,15 @@ section.vi-section {
 
 /* ---- Per-page freshness signals (last updated + edit on GitHub) ---- */
 .page-meta {
-  margin-top: 2.5rem;
+  margin-top: 3rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--vi-border);
+  border-top: 1px solid var(--rule);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.4rem 1.5rem;
-  font-size: 0.85rem;
-  color: #6b6b6b;
+  font-size: 0.875rem;
+  color: var(--muted);
 }
 .page-meta-updated {
   display: inline-flex;
