@@ -1,0 +1,31 @@
+---
+layout: default
+---
+{%- comment -%}
+  Local override of minima's _layouts/page.html.
+
+  Renders a Labs-style page header (eyebrow + title + lede) above the
+  user's markdown content. Drops minima's .post-header wrapper to
+  eliminate the duplicate H1 (front-matter title vs the markdown `# Heading`
+  most authors also include). CSS hides the redundant markdown H1 via:
+    .vi-page-header + .vi-page-body > h1:first-of-type { display: none }
+{%- endcomment -%}
+<article class="vi-page">
+  <header class="vi-page-header">
+    {%- if page.eyebrow -%}
+    <p class="vi-page-eyebrow">{{ page.eyebrow }}</p>
+    {%- elsif page.section -%}
+    <p class="vi-page-eyebrow">{{ page.section }}</p>
+    {%- else -%}
+    <p class="vi-page-eyebrow">Viva Insights Sample Code</p>
+    {%- endif -%}
+    <h1 class="vi-page-title">{{ page.title | escape }}</h1>
+    {%- if page.description -%}
+    <p class="vi-page-lede">{{ page.description }}</p>
+    {%- endif -%}
+  </header>
+
+  <div class="vi-page-body">
+    {{ content }}
+  </div>
+</article>
