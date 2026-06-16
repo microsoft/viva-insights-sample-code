@@ -5,9 +5,11 @@
 
   <body>
 
+    <a class="vi-skip-link" href="#main-content">Skip to main content</a>
+
     {%- include header.html -%}
 
-    <main class="page-content" aria-label="Content">
+    <main id="main-content" class="page-content" aria-label="Content" tabindex="-1">
       <div class="wrapper">
         {{ content }}
         {%- include page-meta.html -%}

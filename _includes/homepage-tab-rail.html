@@ -33,7 +33,10 @@
 
   function setActive(id) {
     tabs.forEach(function (t) {
-      t.classList.toggle('is-active', t.getAttribute('href') === '#' + id);
+      var active = t.getAttribute('href') === '#' + id;
+      t.classList.toggle('is-active', active);
+      if (active) t.setAttribute('aria-current', 'location');
+      else t.removeAttribute('aria-current');
     });
   }
 
