@@ -3,10 +3,6 @@ layout: page
 title: "Copilot Usage Segments"
 permalink: /copilot-usage-segments/
 ---
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 ## Why Copilot Usage Segments?
 
 The goal of this segmentation technique is to identify segments of users in an organization who are using Copilot more effectively than others, which can provide insights on how organizations can increase overall Copilot adoption and drive AI transformation.

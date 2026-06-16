@@ -5,10 +5,6 @@ permalink: /causal-inference-validation/
 ---
 
 # Validation & Testing Framework
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 ## Overview
 
 This comprehensive validation framework helps ensure your causal inference results are robust, reliable, and ready for business decision-making. We cover assumption testing, robustness checks, sensitivity analysis, and comprehensive reporting standards.

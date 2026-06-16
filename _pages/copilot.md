@@ -4,10 +4,6 @@ title: "Copilot Analytics"
 description: "Analyze Microsoft 365 Copilot usage from Viva Insights — adoption metrics, Power User and Habitual User segmentation, and habit-based behavioral models in R, Python, and Power BI."
 permalink: /copilot/
 ---
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 # Copilot Analytics Scripts
 
 This page contains specialized scripts for analyzing Microsoft Copilot usage data from Viva Insights.

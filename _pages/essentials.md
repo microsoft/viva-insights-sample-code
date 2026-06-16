@@ -4,10 +4,6 @@ title: "Essentials"
 description: "Essential R and Python scripts for getting started with Viva Insights: utilities, custom visualizations, and custom KPI generation."
 permalink: /essentials/
 ---
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 # Essential Viva Insights Scripts
 
 This page provides some essential scripts to let you get started with analysis in Viva Insights. Using the R and Python scripts below, you can: 

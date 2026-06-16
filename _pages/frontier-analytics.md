@@ -4,10 +4,6 @@ title: "Frontier"
 description: "Turn a Viva Insights export into a finished dashboard, executive deck, or ROI analysis by pasting a prompt into a coding agent — with reusable prompts, schema guides, and example outputs."
 permalink: /frontier-analytics/
 ---
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 # Frontier
 
 **Turn a Viva Insights export into a finished dashboard, executive deck, or ROI analysis — by pasting a prompt into a coding agent.**

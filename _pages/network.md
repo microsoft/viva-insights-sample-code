@@ -4,10 +4,6 @@ title: "Network Analysis"
 description: "Organizational network analysis (ONA) with Viva Insights — visualize and analyze collaboration networks at the group-to-group and person-to-person level in R and Python."
 permalink: /network/
 ---
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 # Network Analysis Scripts
 
 This page covers collaboration network visualization and analysis scripts for understanding organizational connectivity, typically referred to as organizational network analysis (ONA). Viva Insights offers a unique data source to visualize information flow between people and groups in an organization, providing insights that traditional organizational charts cannot reveal.

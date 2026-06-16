@@ -4,9 +4,6 @@ title: "Articles"
 description: "Long-form Viva Insights and Copilot Analytics editorials."
 permalink: /articles/
 ---
-
-{% include custom-navigation.html %}
-
 # Articles
 
 Long-form editorials and research-led perspectives on Viva Insights, meeting culture, and AI-enabled collaboration.
@@ -25,5 +22,4 @@ Long-form editorials and research-led perspectives on Viva Insights, meeting cul
     <span class="vi-card-more">Read article →</span>
   </a>
 </div>
-
 

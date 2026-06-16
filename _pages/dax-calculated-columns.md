@@ -5,10 +5,6 @@ permalink: /dax-calculated-columns/
 ---
 
 # Calculated Columns for Copilot Usage Segmentation
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 This page provides DAX scripts for calculated columns used to segment users by their Copilot usage patterns in Power BI.
 
 ---

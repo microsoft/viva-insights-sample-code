@@ -11,9 +11,6 @@ badges:
   difficulty: "Advanced"
   est_time: "~45 min"
 ---
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
 {% include prompt-styles.html %}
 
 # Executive PowerPoint Deck — Copilot Adoption

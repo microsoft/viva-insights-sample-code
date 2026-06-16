@@ -5,10 +5,6 @@ permalink: /causal-inference-did/
 ---
 
 # Method 3: Difference-in-Differences (DiD)
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 ## Overview
 
 Difference-in-Differences (DiD) exploits variation in the timing of treatment implementation across groups or regions. By comparing changes over time between treated and control groups, DiD controls for time-invariant confounders that affect both groups equally.

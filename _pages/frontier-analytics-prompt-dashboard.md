@@ -11,9 +11,6 @@ badges:
   difficulty: "Intermediate"
   est_time: "~30 min"
 ---
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
 {% include prompt-styles.html %}
 
 # Dashboard Overview — Copilot Adoption

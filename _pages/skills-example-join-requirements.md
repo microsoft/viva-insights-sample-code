@@ -3,10 +3,6 @@ layout: page
 title: "Skills data join requirements"
 permalink: /skills-data-join-requirements/
 ---
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 ### Development Environment Setup
 
 For performing data joins and analyses, this tutorial covers example scripts in both the R and Python analysis environments. Here are the pre-requisites for them respectively: 

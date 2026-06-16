@@ -5,10 +5,6 @@ permalink: /causal-inference-propensity/
 ---
 
 # Method 2: Propensity Score Methods
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 ## Overview
 
 Propensity score methods address selection bias by balancing groups on observed characteristics. Instead of controlling for confounders directly in the outcome model, we match treated and control units with similar probabilities of receiving treatment.

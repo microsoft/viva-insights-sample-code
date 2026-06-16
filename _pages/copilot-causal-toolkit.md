@@ -5,10 +5,6 @@ permalink: /copilot-causal-toolkit/
 ---
 
 # Copilot Causal Toolkit
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 The [Copilot Causal Toolkit](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/causal-inference/copilot-causal-toolkit) enables you to run causal inference analysis with Viva Insights data. For example, this can be used to address: 
 
 * Does Copilot usage increase the time that our sellers spend with our customers?

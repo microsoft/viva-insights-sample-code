@@ -5,10 +5,6 @@ permalink: /generate-custom-kpi/
 ---
 
 # Generate Custom KPIs from Viva Insights Metrics in R
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 ## Overview
 
 This document walks through an example on how to set up a workflow to compute custom KPIs from Viva Insights metrics in R. 

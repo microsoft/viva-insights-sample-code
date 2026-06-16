@@ -3,8 +3,6 @@ layout: home
 title: "Viva Insights Sample Code Library"
 description: "Sample code, tutorials, and AI prompt libraries for Microsoft Viva Insights analytics in R and Python — from Copilot adoption and organizational network analysis to causal inference and AI-agent analytics."
 ---
-
-{% include custom-navigation.html %}
 {% include homepage-tab-rail.html %}
 
 <header class="vi-home-hero">

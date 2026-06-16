@@ -6,10 +6,6 @@ permalink: /causal-inference/
 ---
 
 # Causal Inference in Copilot Analytics
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 ## Introduction
 
 Understanding the true impact of Microsoft Copilot on productivity and business outcomes requires more than simple correlation analysis. While it's easy to observe that teams using Copilot appear more productive, the critical question remains: **How much of this improvement is actually caused by Copilot itself?**

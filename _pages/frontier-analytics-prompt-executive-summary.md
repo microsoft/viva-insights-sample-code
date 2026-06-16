@@ -11,9 +11,6 @@ badges:
   difficulty: "Beginner"
   est_time: "~20 min"
 ---
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
 {% include prompt-styles.html %}
 
 # Executive Summary — Copilot Adoption

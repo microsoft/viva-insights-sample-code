@@ -5,10 +5,6 @@ permalink: /causal-inference-doubly-robust/
 ---
 
 # Method 5: Doubly Robust Methods & Double Machine Learning
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 ## Overview
 
 Doubly Robust methods combine regression adjustment and propensity score methods to provide protection against model misspecification. These methods remain consistent if either the outcome model OR the propensity score model is correctly specified, but not necessarily both.

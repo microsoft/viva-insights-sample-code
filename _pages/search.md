@@ -7,9 +7,6 @@ search_exclude: true
 ---
 
 # Search
-
-{% include custom-navigation.html %}
-
 <p class="vi-search-lede">Find sample scripts, tutorials, and prompt examples across R, Python, Copilot, network analysis, and causal inference. Press <kbd>/</kbd> from anywhere on this page to focus the search box.</p>
 
 <div class="vi-search">

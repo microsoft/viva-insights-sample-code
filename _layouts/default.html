@@ -8,9 +8,13 @@
     <a class="vi-skip-link" href="#main-content">Skip to main content</a>
 
     {%- include header.html -%}
+    {%- include custom-navigation.html -%}
 
     <main id="main-content" class="page-content" aria-label="Content" tabindex="-1">
       <div class="wrapper">
+        {%- unless page.url == "/" or page.hide_toc -%}
+        {%- include floating-toc.html -%}
+        {%- endunless -%}
         {{ content }}
         {%- include page-meta.html -%}
       </div>

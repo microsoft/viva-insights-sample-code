@@ -6,10 +6,6 @@ permalink: /getting-started/
 ---
 
 # Getting Started with Viva Insights Analytics
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 Welcome to Viva Insights sample code! This guide will help you set up your development environment and get started with analyzing Viva Insights data using R or Python.
 
 ---

@@ -3,10 +3,6 @@ layout: page
 title: "Frontier — Schema Documentation"
 permalink: /frontier-analytics-schemas/
 ---
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 This page provides **practical schema guidance** for working with Viva Insights data exports. It focuses on structural concepts, join patterns, and common pitfalls — things that are not obvious from the official documentation alone.
 
 For authoritative and up-to-date metric definitions and column references, see:

@@ -5,10 +5,6 @@ permalink: /causal-inference-iv/
 ---
 
 # Method 4: Instrumental Variables (IV)
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 ## Overview
 
 Instrumental Variables (IV) address endogeneity by using variation that affects treatment assignment but only influences outcomes through the treatment itself. This powerful technique can recover causal effects even with unmeasured confounders.

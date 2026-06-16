@@ -4,10 +4,6 @@ title: "Advanced Analytics"
 description: "Machine learning, regression, and statistical analysis for Viva Insights data — random forest top-performer models, information value, and pairwise chi-square tests in R and Python."
 permalink: /advanced/
 ---
-
-{% include custom-navigation.html %}
-{% include floating-toc.html %}
-
 # Advanced Analytics Scripts
 
 This page covers machine learning, regression models, and statistical analysis techniques for Viva Insights data.
