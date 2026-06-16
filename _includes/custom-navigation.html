@@ -215,8 +215,17 @@
     var panel = panelFor(trigger);
     if (!panel) return;
     closeAll(trigger);
+    panel.classList.remove('is-right-anchored');
     panel.hidden = false;
     trigger.setAttribute('aria-expanded', 'true');
+    // Flip anchor if the panel would overflow the viewport's right edge.
+    // Mobile (< 900px) renders panels as a static accordion, so skip there.
+    if (!isMobile()) {
+      var rect = panel.getBoundingClientRect();
+      if (rect.right > window.innerWidth - 8) {
+        panel.classList.add('is-right-anchored');
+      }
+    }
   }
   function closePanel(trigger) {
     var panel = panelFor(trigger);

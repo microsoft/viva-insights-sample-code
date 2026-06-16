@@ -113,6 +113,12 @@ body,
   font-family: "Segoe UI", "Segoe UI Web (West European)", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   color: var(--text);
 }
+/* Defensive: prevent absolutely-positioned overlays (mega panels, tooltips,
+   illustrations) from spawning a horizontal scrollbar on the document.
+   Vertical sticky still works under overflow-x: clip (unlike overflow: hidden). */
+html, body {
+  overflow-x: clip;
+}
 .page-content h1 {
   font-size: clamp(28px, 4.4vw, 40px);
   line-height: 1.2;
@@ -276,7 +282,7 @@ a.post-link {
   left: 0;
   margin-top: 4px;
   min-width: 280px;
-  max-width: min(720px, calc(100vw - 32px));
+  max-width: min(720px, calc(100vw - 24px));
   background: #fff;
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
@@ -285,6 +291,13 @@ a.post-link {
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px 24px;
   z-index: 1200;
+}
+/* When the panel would overflow the right edge of the viewport, flip its
+   anchor so the right edge of the panel lines up with the right edge of
+   the trigger. Toggled by the nav JS on open. */
+.vi-mega-panel.is-right-anchored {
+  left: auto;
+  right: 0;
 }
 .vi-mega-panel[hidden] { display: none; }
 .vi-mega-col { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
