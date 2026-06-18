@@ -18,19 +18,24 @@
         <svg class="article-hero-motif" aria-hidden="true" focusable="false" viewBox="0 0 600 600" preserveAspectRatio="xMaxYMin slice">
           <defs>
             <radialGradient id="art-hero-glow" cx="80%" cy="20%" r="60%">
-              <stop offset="0%" stop-color="#E9C877" stop-opacity="0.55"/>
-              <stop offset="60%" stop-color="#2E5C8A" stop-opacity="0.18"/>
-              <stop offset="100%" stop-color="#0C2740" stop-opacity="0"/>
+              <stop offset="0%" stop-color="#764FF5" stop-opacity="0.28"/>
+              <stop offset="55%" stop-color="#3F6CE9" stop-opacity="0.14"/>
+              <stop offset="100%" stop-color="#20BBC6" stop-opacity="0"/>
             </radialGradient>
+            <linearGradient id="art-hero-arc" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#764FF5" stop-opacity="0.55"/>
+              <stop offset="50%" stop-color="#3F6CE9" stop-opacity="0.45"/>
+              <stop offset="100%" stop-color="#20BBC6" stop-opacity="0.35"/>
+            </linearGradient>
           </defs>
           <circle cx="480" cy="120" r="240" fill="url(#art-hero-glow)"/>
-          <g stroke="rgba(255,255,255,0.08)" fill="none" stroke-width="1">
+          <g stroke="rgba(51, 92, 204, 0.18)" fill="none" stroke-width="1">
             <circle cx="480" cy="120" r="80"/>
             <circle cx="480" cy="120" r="140"/>
             <circle cx="480" cy="120" r="200"/>
             <circle cx="480" cy="120" r="260"/>
           </g>
-          <g stroke="rgba(233,200,119,0.25)" fill="none" stroke-width="1">
+          <g stroke="url(#art-hero-arc)" fill="none" stroke-width="1.4">
             <line x1="200" y1="0" x2="600" y2="400"/>
             <line x1="280" y1="0" x2="600" y2="320"/>
             <line x1="360" y1="0" x2="600" y2="240"/>
