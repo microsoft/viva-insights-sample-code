@@ -24,7 +24,7 @@
   --art-gold: var(--vi-magenta, #B4009E);
   --art-sans: "Segoe UI", "Segoe UI Web (West European)", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --art-serif: var(--art-sans); /* unified to Segoe UI; alias kept for back-compat */
-  --art-measure: 38rem; /* ~608px reading column */
+  --art-measure: 52rem; /* unified content rail: prose + figures share this width for perfect left-edge alignment */
 }
 
 /* ---- Skip link (keyboard accessibility) ---- */
@@ -162,15 +162,14 @@
 }
 
 /*
- * Body uses a 3-column "breakout" grid:
- *   [1fr gutter] [reading column = 38rem] [1fr gutter]
- * Prose stays in the reading column for comfortable line length, while
- * figures and wide tables break out across all three columns to use the
- * full body width — keeping cards visually generous without making body
- * text uncomfortably long.
+ * Unified content rail (per PANDAS design review): prose and figures
+ * share the same max-width (--art-measure) so their left edges align.
+ * The 3-column grid is retained so wide tables (table.is-wide) can still
+ * break out slightly when needed, but the default prose column and the
+ * breakout column are now equal width.
  */
 .article-body {
-  max-width: 64rem;
+  max-width: var(--art-measure);
   margin: 0 auto;
   padding: 0 1.4rem;
   display: grid;
@@ -433,7 +432,7 @@
   margin: clamp(2.4rem, 5vw, 3.4rem) auto 0;
   padding-top: 1.4rem;
   border-top: 2px solid var(--art-navy);
-  max-width: 50rem;
+  max-width: var(--art-measure);
 }
 .references h2 {
   font-family: var(--art-serif);
@@ -573,7 +572,7 @@
 
 /* ---- End-of-article navigation: back-to-articles + share ---- */
 .article-end-nav {
-  max-width: 50rem;
+  max-width: var(--art-measure);
   margin: clamp(2.4rem, 5vw, 3.4rem) auto 0;
   padding: 1.4rem 1.4rem 0;
   border-top: 1px solid var(--art-line);
