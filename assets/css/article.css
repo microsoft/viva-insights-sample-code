@@ -4,7 +4,8 @@
  * Article layout — editorial long-read styling for `layout: article`.
  * Loaded only on article pages via the `css` front-matter hook.
  * Aligned to the site palette (Labs blue + VI magenta accent) in
- * 2026-06; retains the Georgia serif body for editorial register.
+ * 2026-06; switched to Segoe UI throughout for Microsoft brand consistency
+ * and cohesion with embedded image typography (per design review).
  */
 
 .article-mode {
@@ -21,8 +22,8 @@
   --art-green: #0E700E;
   --art-red: #B33A55;
   --art-gold: var(--vi-magenta, #B4009E);
-  --art-serif: Georgia, Cambria, "Times New Roman", serif;
   --art-sans: "Segoe UI", "Segoe UI Web (West European)", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --art-serif: var(--art-sans); /* unified to Segoe UI; alias kept for back-compat */
   --art-measure: 38rem; /* ~608px reading column */
 }
 
@@ -222,19 +223,15 @@
 .article-body li { margin-bottom: 0.5rem; }
 .article-body strong { color: var(--art-navy-deep); }
 
-/* Drop cap on the opening paragraph */
-.article-body > .lead::first-letter,
-.article-body > p.lead:first-letter {
-  initial-letter: 3;
-  -webkit-initial-letter: 3;
-  font-family: var(--art-serif);
-  font-weight: 700;
-  color: var(--art-navy);
-  margin-right: 0.6rem;
-  float: left;
-  font-size: 3.4rem;
-  line-height: 0.82;
-  padding-top: 0.2rem;
+/* Lead paragraph emphasis (was a drop cap when body was serif;
+   drop caps don't render cleanly in Segoe UI, so we use a slightly
+   larger, semibold first line instead). */
+.article-body > .lead,
+.article-body > p.lead {
+  font-size: 1.32rem;
+  line-height: 1.55;
+  font-weight: 400;
+  color: var(--art-ink);
 }
 
 /* ---- Part headings ---- */
