@@ -1,6 +1,7 @@
 ---
 layout: default
 title: "Causal Inference: Validation & Testing"
+eyebrow: "Causal inference"
 permalink: /causal-inference-validation/
 ---
 

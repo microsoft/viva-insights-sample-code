@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Frontier — Schema Documentation"
+eyebrow: "Frontier"
 permalink: /frontier-analytics-schemas/
 ---
 This page provides **practical schema guidance** for working with Viva Insights data exports. It focuses on structural concepts, join patterns, and common pitfalls — things that are not obvious from the official documentation alone.

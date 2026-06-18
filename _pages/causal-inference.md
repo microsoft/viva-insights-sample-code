@@ -1,6 +1,7 @@
 ---
 layout: default
 title: "Causal Inference in Copilot Analytics"
+eyebrow: "Causal inference"
 description: "Measure the true impact of Microsoft Copilot with causal inference — difference-in-differences, propensity scoring, instrumental variables, and doubly-robust methods applied to Viva Insights data."
 permalink: /causal-inference/
 ---

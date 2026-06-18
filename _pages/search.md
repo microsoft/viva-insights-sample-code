@@ -1,6 +1,7 @@
 ---
 layout: default
 title: "Search"
+eyebrow: "Search"
 permalink: /search/
 description: "Search the Viva Insights Sample Code Library — find sample scripts, tutorials, and AI prompt examples across R, Python, Copilot, network, and causal-inference content."
 search_exclude: true

@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Prompt — Segmentation & Churn"
+eyebrow: "Frontier · Prompt library"
 permalink: /frontier-analytics-prompt-segmentation/
 last_validated: 2026-06-02
 badges:

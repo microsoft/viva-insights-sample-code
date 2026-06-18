@@ -1,6 +1,7 @@
 ---
 layout: default
 title: "Generate Custom KPIs from Viva Insights Metrics in R"
+eyebrow: "Essentials"
 permalink: /generate-custom-kpi/
 ---
 

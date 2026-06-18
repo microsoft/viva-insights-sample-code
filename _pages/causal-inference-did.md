@@ -1,6 +1,7 @@
 ---
 layout: default
 title: "Causal Inference: Difference-in-Differences"
+eyebrow: "Causal inference"
 permalink: /causal-inference-did/
 ---
 

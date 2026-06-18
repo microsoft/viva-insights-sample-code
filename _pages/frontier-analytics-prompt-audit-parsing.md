@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Prompt — Audit Log Parsing"
+eyebrow: "Frontier · Prompt library"
 permalink: /frontier-analytics-prompt-audit-parsing/
 last_validated: 2026-06-02
 badges:

@@ -1,6 +1,7 @@
 ---
 layout: default
 title: "Causal Inference: Doubly Robust Methods"
+eyebrow: "Causal inference"
 permalink: /causal-inference-doubly-robust/
 ---
 

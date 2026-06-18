@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Prompt — Agent Usage Analysis"
+eyebrow: "Frontier · Prompt library"
 permalink: /frontier-analytics-prompt-agent-usage/
 last_validated: 2026-06-02
 badges:

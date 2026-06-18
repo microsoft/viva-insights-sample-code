@@ -1,6 +1,7 @@
 ---
 layout: default
 title: "Causal Inference: Propensity Score Methods"
+eyebrow: "Causal inference"
 permalink: /causal-inference-propensity/
 ---
 

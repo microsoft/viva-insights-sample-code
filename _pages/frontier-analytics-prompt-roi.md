@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Prompt — ROI Estimation"
+eyebrow: "Frontier · Prompt library"
 permalink: /frontier-analytics-prompt-roi/
 last_validated: 2026-06-02
 badges:

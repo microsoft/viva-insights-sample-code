@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Copilot Usage Segments"
+eyebrow: "Copilot analytics"
 permalink: /copilot-usage-segments/
 ---
 ## Why Copilot Usage Segments?

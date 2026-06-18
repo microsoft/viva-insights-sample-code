@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Essentials"
+eyebrow: "Essentials"
 description: "Essential R and Python scripts for getting started with Viva Insights: utilities, custom visualizations, and custom KPI generation."
 permalink: /essentials/
 ---

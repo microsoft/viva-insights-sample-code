@@ -1,6 +1,7 @@
 ---
 layout: default
 title: "Causal Inference Technical Implementation"
+eyebrow: "Causal inference"
 permalink: /causal-inference-technical/
 ---
 

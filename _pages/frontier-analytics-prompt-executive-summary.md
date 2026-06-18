@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Prompt — Executive Summary"
+eyebrow: "Frontier · Prompt library"
 permalink: /frontier-analytics-prompt-executive-summary/
 last_validated: 2026-06-02
 badges:

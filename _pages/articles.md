@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Articles"
+eyebrow: "Articles"
 description: "Long-form Viva Insights and Copilot Analytics editorials."
 permalink: /articles/
 ---

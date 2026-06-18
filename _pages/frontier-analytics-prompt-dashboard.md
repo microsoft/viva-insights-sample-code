@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Prompt — Dashboard Overview"
+eyebrow: "Frontier · Prompt library"
 permalink: /frontier-analytics-prompt-dashboard/
 last_validated: 2026-06-02
 badges:

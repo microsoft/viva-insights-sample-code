@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Advanced Analytics"
+eyebrow: "Advanced analytics"
 description: "Machine learning, regression, and statistical analysis for Viva Insights data — random forest top-performer models, information value, and pairwise chi-square tests in R and Python."
 permalink: /advanced/
 ---

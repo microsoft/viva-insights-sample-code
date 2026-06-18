@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Copilot Analytics"
+eyebrow: "Copilot analytics"
 description: "Analyze Microsoft 365 Copilot usage from Viva Insights — adoption metrics, Power User and Habitual User segmentation, and habit-based behavioral models in R, Python, and Power BI."
 permalink: /copilot/
 ---

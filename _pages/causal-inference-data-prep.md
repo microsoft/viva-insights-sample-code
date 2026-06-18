@@ -1,6 +1,7 @@
 ---
 layout: default
 title: "Causal Inference: Data Preparation & Setup"
+eyebrow: "Causal inference"
 permalink: /causal-inference-data-prep/
 ---
 

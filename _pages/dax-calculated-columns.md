@@ -1,6 +1,7 @@
 ---
 layout: default
 title: "Calculated Columns for Copilot Usage Segmentation"
+eyebrow: "Copilot analytics · Power BI"
 permalink: /dax-calculated-columns/
 ---
 

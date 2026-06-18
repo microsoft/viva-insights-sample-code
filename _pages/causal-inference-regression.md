@@ -1,6 +1,7 @@
 ---
 layout: default
 title: "Causal Inference: Regression Adjustment"
+eyebrow: "Causal inference"
 permalink: /causal-inference-regression/
 ---
 

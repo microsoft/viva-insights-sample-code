@@ -1,6 +1,7 @@
 ---
 layout: default
 title: "Causal Inference: Instrumental Variables"
+eyebrow: "Causal inference"
 permalink: /causal-inference-iv/
 ---
 

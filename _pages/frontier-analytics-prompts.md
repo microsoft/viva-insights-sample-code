@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Frontier — Prompt Library"
+eyebrow: "Frontier"
 permalink: /frontier-analytics-prompts/
 ---
 # Prompt Card Library

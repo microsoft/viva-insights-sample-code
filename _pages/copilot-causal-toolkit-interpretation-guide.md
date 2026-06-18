@@ -1,6 +1,7 @@
 ---
 layout: default
 title: "Copilot Causal Toolkit - Interpretation Guide"
+eyebrow: "Causal inference · Toolkit"
 permalink: /copilot-causal-toolkit-interpretation-guide/
 ---
 

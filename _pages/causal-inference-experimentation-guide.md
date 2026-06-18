@@ -1,6 +1,7 @@
 ---
 layout: default
 title: "Causal Inference: Experimentation Guide"
+eyebrow: "Causal inference"
 permalink: /causal-inference-experimentation-guide/
 ---
 

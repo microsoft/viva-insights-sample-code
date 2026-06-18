@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Prompt — Copilot Causal Toolkit"
+eyebrow: "Frontier · Prompt library"
 permalink: /frontier-analytics-prompt-causal-toolkit/
 last_validated: 2026-06-02
 badges:
