@@ -1,5 +1,6 @@
-# Prevent accidental committing data files
+# Prevent accidental committing data files (case-insensitive extension)
 *.csv
+*.[cC][sS][vV]
 
 # Developer notes
 DEV_NOTES.md

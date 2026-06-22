@@ -35,7 +35,7 @@ Update the data file path to match your CSV filename:
 
 ```python
 # Update this line to match your data file name
-data_file_path = os.path.join(script_dir, '..', 'data', 'PersonQuery.Csv')
+data_file_path = os.path.join(script_dir, '..', 'data', 'PersonQuery.csv')
 # For example:
 # data_file_path = os.path.join(script_dir, '..', 'data', 'MyCompany_PersonQuery_2025.csv')
 ```

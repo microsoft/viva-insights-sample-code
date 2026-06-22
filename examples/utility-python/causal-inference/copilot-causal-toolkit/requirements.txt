@@ -2,7 +2,7 @@
 # Install with: pip install -r requirements.txt
 
 # Core data manipulation
-numpy>=1.21.0
+numpy>=1.21.0,<2.0  # econml (<0.16) is incompatible with numpy 2.x
 pandas>=1.3.0
 
 # Visualization

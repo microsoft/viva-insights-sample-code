@@ -185,6 +185,23 @@ python -c "import numpy, pandas, matplotlib, scipy, sklearn, econml, vivainsight
 If this runs without error, you're ready. You can run it in a terminal or a notebook cell.
 
 <details class="ct-details">
+<summary>If install or import fails (numpy / econml)</summary>
+<div markdown="1">
+
+The most common failure is a **numpy version clash**: `econml` (the causal-inference engine) is not compatible with **numpy 2.x**, so a fresh install can fail at `import econml`. If you see numpy- or econml-related errors, pin numpy to the 1.x line and reinstall:
+
+```bash
+pip install "numpy<2.0"
+pip install --force-reinstall econml
+```
+
+A clean [virtual environment](#step-3--install-the-prerequisites) avoids clashes with other projects. On Windows, if `econml` fails to build, install the **Microsoft C++ Build Tools** and retry. Installing `econml` can take several minutes — let it finish.
+
+</div>
+</details>
+
+
+<details class="ct-details">
 <summary>Recommended: use a virtual environment</summary>
 <div markdown="1">
 

@@ -31,6 +31,12 @@ We generally recommend **Method 1 (Person Query)** — it guarantees comprehensi
 
 Whichever you choose, save the resulting CSV into the toolkit's **`data/`** folder.
 
+<div class="ct-callout is-tip" markdown="1">
+<span class="ct-callout-label">Your data stays local</span>
+The analysis runs entirely on your machine — no data is uploaded anywhere. The `data/` folder is covered by a `.gitignore` rule (`*.csv`), so your exports won't be committed if you're working inside a Git clone. Keep filenames ending in `.csv` (lower-case) so that rule reliably applies on every operating system.
+</div>
+
+
 ## Method 1 — Export a Person Query from Viva Insights
 
 1. Open the [Viva Insights analysis page](https://analysis.insights.viva.office.com/Analysis/CreateAnalysis).
