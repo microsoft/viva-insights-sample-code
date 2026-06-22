@@ -1,9 +1,20 @@
 ---
 layout: default
 title: "Copilot Causal Toolkit - Interpretation Guide"
-eyebrow: "Causal inference · Toolkit"
+eyebrow: "Causal inference · Toolkit · Step 5"
 permalink: /copilot-causal-toolkit-interpretation-guide/
+css: "/assets/css/causal-toolkit.css"
 ---
+
+<nav class="ct-series-nav" aria-label="Toolkit steps">
+  <a class="ct-chip" href="{{ site.baseurl }}/copilot-causal-toolkit/">Overview</a>
+  <a class="ct-chip" href="{{ site.baseurl }}/copilot-causal-toolkit-setup/"><span class="ct-chip-step">1</span>Set up</a>
+  <a class="ct-chip" href="{{ site.baseurl }}/copilot-causal-toolkit-data/"><span class="ct-chip-step">2</span>Data</a>
+  <a class="ct-chip" href="{{ site.baseurl }}/copilot-causal-toolkit-configure/"><span class="ct-chip-step">3</span>Configure</a>
+  <a class="ct-chip" href="{{ site.baseurl }}/copilot-causal-toolkit-run/"><span class="ct-chip-step">4</span>Run</a>
+  <a class="ct-chip is-current" href="{{ site.baseurl }}/copilot-causal-toolkit-interpretation-guide/"><span class="ct-chip-step">5</span>Interpret</a>
+  <a class="ct-chip" href="{{ site.baseurl }}/copilot-causal-toolkit-methodology/">How it works</a>
+</nav>
 
 # Copilot Causal Toolkit: Interpretation Guide
 Now that you have successfully run the Copilot Causal Toolkit notebooks, you should see results appear in your Jupyter notebook and in your output directory (and with no errors). This document provides detailed guidance on how to interpret every output the toolkit produces, and what actions you should consider as a result.
@@ -634,3 +645,14 @@ Prepare your findings for stakeholders:
 | **SplineTransformer** | A feature transformation that models non-linear relationships using piecewise polynomials with smooth joins |
 | **Transition matrix** | A descriptive comparison of raw outcome differences across treatment intensity buckets |
 | **Winsorization** | Capping extreme values at a percentile threshold (e.g., 95th) to reduce the influence of outliers |
+
+<nav class="ct-pager" aria-label="Toolkit pagination">
+  <a class="ct-pager-link" href="{{ site.baseurl }}/copilot-causal-toolkit-run/">
+    <span class="ct-pager-dir">← Back</span>
+    <span class="ct-pager-title">4 · Running &amp; troubleshooting</span>
+  </a>
+  <a class="ct-pager-link is-next" href="{{ site.baseurl }}/copilot-causal-toolkit-methodology/">
+    <span class="ct-pager-dir">Next →</span>
+    <span class="ct-pager-title">How it works (methodology)</span>
+  </a>
+</nav>

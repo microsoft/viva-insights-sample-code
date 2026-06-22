@@ -1,0 +1,224 @@
+/* ------------------------------------------------------------------
+   Copilot Causal Toolkit — page components
+   Loaded per-page via `css: "/assets/css/causal-toolkit.css"` front matter.
+   Relies on the shared design tokens defined in site.css
+   (--primary, --ink, --text, --primary-tint, --radius-card, --shadow-card).
+   ------------------------------------------------------------------ */
+
+:root {
+  --ct-border: #e6e6ef;
+  --ct-muted: #5b5b6b;
+  --ct-note: #335ccc;
+  --ct-tip: #2e7d32;
+  --ct-warning: #b3531d;
+  --ct-important: #5c2d91;
+}
+
+/* ---- TL;DR / summary callouts ---- */
+.ct-callout {
+  border: 1px solid var(--ct-border);
+  border-left: 4px solid var(--ct-note);
+  background: #fff;
+  border-radius: var(--radius-card, 12px);
+  padding: 16px 20px;
+  margin: 1.5rem 0;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.06));
+}
+.ct-callout > :first-child { margin-top: 0; }
+.ct-callout > :last-child { margin-bottom: 0; }
+.ct-callout .ct-callout-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ct-note);
+  margin-bottom: 0.4rem;
+}
+.ct-callout.is-tip { border-left-color: var(--ct-tip); }
+.ct-callout.is-tip .ct-callout-label { color: var(--ct-tip); }
+.ct-callout.is-warning { border-left-color: var(--ct-warning); }
+.ct-callout.is-warning .ct-callout-label { color: var(--ct-warning); }
+.ct-callout.is-important { border-left-color: var(--ct-important); }
+.ct-callout.is-important .ct-callout-label { color: var(--ct-important); }
+
+/* ---- Numbered step list (the "happy path") ---- */
+.ct-steps {
+  list-style: none;
+  counter-reset: ct-step;
+  padding: 0;
+  margin: 1.5rem 0 2rem;
+  display: grid;
+  gap: 14px;
+}
+.ct-steps > li {
+  counter-increment: ct-step;
+  position: relative;
+  padding: 16px 18px 16px 60px;
+  border: 1px solid var(--ct-border);
+  border-radius: var(--radius-card, 12px);
+  background: #fff;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.06));
+}
+.ct-steps > li::before {
+  content: counter(ct-step);
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--primary, #335ccc);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ct-steps > li > :first-child { margin-top: 0; }
+.ct-steps > li > :last-child { margin-bottom: 0; }
+.ct-steps .ct-step-title { font-weight: 600; display: block; margin-bottom: 0.25rem; }
+
+/* ---- Scenario cards ---- */
+.ct-scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+  margin: 1.5rem 0 2rem;
+}
+.ct-scenario-card {
+  border: 1px solid var(--ct-border);
+  border-radius: var(--radius-card, 12px);
+  background: #fff;
+  padding: 20px;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.06));
+}
+.ct-scenario-card h3 { margin-top: 0; font-size: 1.05rem; }
+.ct-scenario-card .ct-scenario-icon { font-size: 1.6rem; line-height: 1; }
+.ct-scenario-card .ct-scenario-outcome {
+  font-size: 0.85rem;
+  color: var(--ct-muted);
+  margin: 0.35rem 0 0.75rem;
+}
+.ct-scenario-card code { font-size: 0.82em; }
+
+/* ---- OS / variant tabs ---- */
+.ct-tabs { margin: 1.25rem 0 1.75rem; }
+.ct-tablist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  border-bottom: 1px solid var(--ct-border);
+  margin-bottom: 0;
+}
+.ct-tab {
+  appearance: none;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--ct-muted);
+  padding: 8px 14px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.ct-tab:hover { color: var(--ink, #1b1b24); }
+.ct-tab.is-active {
+  color: var(--ink, #1b1b24);
+  font-weight: 600;
+  border-bottom-color: var(--primary, #335ccc);
+}
+.ct-tab:focus-visible {
+  outline: 2px solid var(--primary, #335ccc);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.ct-panel { padding-top: 14px; }
+.ct-panel[hidden] { display: none; }
+
+/* ---- Collapsible details ---- */
+details.ct-details {
+  border: 1px solid var(--ct-border);
+  border-radius: var(--radius-card, 12px);
+  background: #fff;
+  padding: 0 18px;
+  margin: 1rem 0;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.06));
+}
+details.ct-details > summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 14px 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+details.ct-details > summary::-webkit-details-marker { display: none; }
+details.ct-details > summary::before {
+  content: "▸";
+  color: var(--primary, #335ccc);
+  transition: transform 0.15s ease;
+}
+details.ct-details[open] > summary::before { transform: rotate(90deg); }
+details.ct-details[open] > summary { border-bottom: 1px solid var(--ct-border); }
+details.ct-details > summary + * { margin-top: 14px; }
+details.ct-details > :last-child { margin-bottom: 16px; }
+
+/* ---- Prev / next pager + "in this series" ---- */
+.ct-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 2.5rem 0 0;
+  border-top: 1px solid var(--ct-border);
+  padding-top: 1.25rem;
+}
+.page-content a.ct-pager-link {
+  display: flex;
+  flex-direction: column;
+  max-width: 48%;
+  padding: 12px 16px;
+  border: 1px solid var(--ct-border);
+  border-radius: var(--radius-card, 12px);
+  text-decoration: none !important;
+  color: var(--text, #1b1b24) !important;
+  background: #fff;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
+}
+.page-content a.ct-pager-link:hover {
+  border-color: var(--primary, #335ccc);
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.06));
+}
+.ct-pager-link.is-next { margin-left: auto; text-align: right; align-items: flex-end; }
+.ct-pager-dir { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ct-muted); }
+.ct-pager-title { font-weight: 600; }
+
+/* ---- Series breadcrumb chips ---- */
+.ct-series-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 1.5rem;
+  font-size: 0.82rem;
+}
+.page-content a.ct-chip,
+.ct-chip {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--ct-border);
+  background: #fff;
+  color: var(--ct-muted) !important;
+  text-decoration: none !important;
+}
+.page-content a.ct-chip:hover { border-color: var(--primary, #335ccc); color: var(--ink, #1b1b24) !important; }
+.ct-chip.is-current {
+  background: var(--primary, #335ccc);
+  border-color: var(--primary, #335ccc);
+  color: #fff !important;
+  font-weight: 600;
+}
+.ct-chip-step { opacity: 0.7; margin-right: 4px; }
