@@ -52,16 +52,26 @@ All three use Copilot usage (`Total_Copilot_actions_taken`) as the **treatment**
 ## The path to a result
 
 <ol class="ct-steps">
-  <li markdown="1"><span class="ct-step-title">Set up your environment</span>
-  Download the toolkit, install Python + the required packages, and open the folder in your editor. → [Setup &amp; installation]({{ site.baseurl }}/copilot-causal-toolkit-setup/)</li>
-  <li markdown="1"><span class="ct-step-title">Prepare your data</span>
-  Export a Person Query (recommended) or a Super Users Report, and include the columns your scenario needs. → [Preparing your data]({{ site.baseurl }}/copilot-causal-toolkit-data/)</li>
-  <li markdown="1"><span class="ct-step-title">Configure the notebook</span>
-  Edit a handful of parameters in the notebook cells — file paths, attributes, and date range. → [Configuring the notebook]({{ site.baseurl }}/copilot-causal-toolkit-configure/)</li>
-  <li markdown="1"><span class="ct-step-title">Run the analysis</span>
-  Run cell-by-cell the first time, then all at once. Troubleshoot common errors. → [Running &amp; troubleshooting]({{ site.baseurl }}/copilot-causal-toolkit-run/)</li>
-  <li markdown="1"><span class="ct-step-title">Interpret the outputs</span>
-  Read every plot, table, and sensitivity metric the toolkit produces. → [Interpretation Guide]({{ site.baseurl }}/copilot-causal-toolkit-interpretation-guide/)</li>
+  <li>
+    <span class="ct-step-title">Set up your environment</span>
+    Download the toolkit, install Python + the required packages, and open the folder in your editor. → <a href="{{ site.baseurl }}/copilot-causal-toolkit-setup/">Setup &amp; installation</a>
+  </li>
+  <li>
+    <span class="ct-step-title">Prepare your data</span>
+    Export a Person Query (recommended) or a Super Users Report, and include the columns your scenario needs. → <a href="{{ site.baseurl }}/copilot-causal-toolkit-data/">Preparing your data</a>
+  </li>
+  <li>
+    <span class="ct-step-title">Configure the notebook</span>
+    Edit a handful of parameters in the notebook cells — file paths, attributes, and date range. → <a href="{{ site.baseurl }}/copilot-causal-toolkit-configure/">Configuring the notebook</a>
+  </li>
+  <li>
+    <span class="ct-step-title">Run the analysis</span>
+    Run cell-by-cell the first time, then all at once. Troubleshoot common errors. → <a href="{{ site.baseurl }}/copilot-causal-toolkit-run/">Running &amp; troubleshooting</a>
+  </li>
+  <li>
+    <span class="ct-step-title">Interpret the outputs</span>
+    Read every plot, table, and sensitivity metric the toolkit produces. → <a href="{{ site.baseurl }}/copilot-causal-toolkit-interpretation-guide/">Interpretation Guide</a>
+  </li>
 </ol>
 
 ## Continue reading
