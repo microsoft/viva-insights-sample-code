@@ -21,6 +21,97 @@ css: "/assets/css/causal-toolkit.css"
 
 With your data in `data/` and the [parameters configured]({{ site.baseurl }}/copilot-causal-toolkit-configure/), you can run the notebook either cell-by-cell or all at once. When it finishes, head to the [Interpretation Guide]({{ site.baseurl }}/copilot-causal-toolkit-interpretation-guide/) for a walkthrough of every output.
 
+## Pre-flight: check your data first
+
+A run can take 10–30 minutes, so it's worth a 5-second sanity check before you start. Paste the snippet below into a **new cell right after your data loads** — i.e. after the `data` DataFrame is created and your [configuration cells]({{ site.baseurl }}/copilot-causal-toolkit-configure/) have run.
+
+<div class="ct-callout is-tip" markdown="1">
+<span class="ct-callout-label">Flexible by design</span>
+This check is **warn-only** and **locale-agnostic**. It doesn't assume any fixed column names — it simply compares the variable names *you* configured (`TREATMENT_VAR`, `OUTCOME_VAR`, `PERSON_ID_VAR`, `SUBGROUP_VARS`, and your confounder lists) against the columns actually in your export. If a name doesn't match — common with non-English locales or custom HR attributes — it suggests the closest column instead of failing deep in the run. It never changes your data.
+</div>
+
+```python
+# --- Pre-flight data check (flexible, warn-only) --------------------------
+# Run AFTER your data is loaded (`data` exists) and the config cells have run.
+import difflib
+import pandas as pd
+
+try:
+    data
+except NameError:
+    raise NameError("Load your data into `data` first (run the data-loading cell), then re-run this check.")
+
+cols = list(data.columns)
+
+def _resolve(name, role, required=False):
+    if not name:
+        return None
+    if name in cols:
+        return name
+    near = difflib.get_close_matches(name, cols, n=3, cutoff=0.6)
+    flag = "[X]" if required else "[!]"
+    print(f"{flag} {role} '{name}' not found in your data.")
+    if near:
+        print(f"     closest columns: {near}")
+    print("     -> update this name in your config, or remove it.")
+    return None
+
+# Names you configured (fall back gracefully if a list isn't defined)
+treatment = globals().get('TREATMENT_VAR')
+outcome   = globals().get('OUTCOME_VAR')
+person    = globals().get('PERSON_ID_VAR', 'PersonId')
+controls  = []
+for listname in ('SUBGROUP_VARS', 'NETWORK_VARS', 'COLLABORATION_VARS'):
+    controls += list(globals().get(listname, []) or [])
+controls = list(dict.fromkeys(controls))
+
+print(f"Rows: {len(data):,} | Columns: {len(cols)}")
+if person in cols:
+    print(f"Unique persons ({person}): {data[person].nunique():,}")
+date_col = next((c for c in ('MetricDate', 'Date') if c in cols), None)
+if date_col:
+    print(f"Distinct dates ({date_col}): {data[date_col].nunique():,}")
+
+# Essentials the run truly needs
+t = _resolve(treatment, "Treatment", required=True)
+y = _resolve(outcome,   "Outcome",   required=True)
+p = person if person in cols else _resolve(person, "Person ID", required=True)
+
+# Treatment variation & spread
+if t:
+    s = pd.to_numeric(data[t], errors='coerce')
+    print(f"[ok] Treatment '{t}': min {s.min():g}, median {s.median():g}, max {s.max():g}")
+    top_share = s.value_counts(normalize=True, dropna=True).max() if s.notna().any() else 1.0
+    if s.nunique(dropna=True) <= 1:
+        print("     [!] no variation in treatment - DML cannot estimate an effect.")
+    elif top_share > 0.95:
+        print(f"     [!] {top_share:.0%} of rows share one value - limited spread; "
+              "check you have both low and high Copilot users.")
+
+# Outcome sanity
+if y:
+    s = pd.to_numeric(data[y], errors='coerce')
+    print(f"[ok] Outcome '{y}': {s.isna().mean()*100:.1f}% missing/non-numeric")
+
+# Confounders / subgroup vars you configured
+for name in controls:
+    _resolve(name, "Configured variable")
+
+# Missing-value summary for configured columns that exist
+present = [c for c in [treatment, outcome, person, *controls] if c and c in cols]
+miss = (data[present].isna().mean() * 100).round(1)
+miss = miss[miss > 0]
+if len(miss):
+    print("[!] Missing values (these rows are dropped later):")
+    print(miss.to_string())
+
+# Available columns, to help you correct any name
+print(f"\nAvailable columns ({len(cols)}): {', '.join(cols)}")
+print("\n[i] Advisory only. Fix any [X] before running; [!] are safe to review and ignore.")
+```
+
+**How to read it:** `[X]` marks an essential variable (treatment, outcome, person ID) that the run genuinely can't proceed without — fix these first. `[!]` is a heads-up (a misnamed confounder, missing values, or thin treatment spread) that's safe to review and continue past. When a name isn't found, the **closest columns** line usually points straight at the fix — for example, a French-locale export might show `'Collaboration_hours' not found → closest: ['Heures_de_collaboration']`, so you update that one name in your config cell.
+
 ## Recommended: run cell-by-cell
 
 <div class="ct-callout is-tip" markdown="1">
