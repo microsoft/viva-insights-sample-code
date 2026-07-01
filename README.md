@@ -33,6 +33,15 @@ Explore the repo to discover sample code:
 - [Information Value with Viva Insights in Python](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/information-value.ipynb)
 - [Information Value with Viva Insights in R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/information-value.Rmd)
 
+### Behavioral and program analysis
+
+- [Collaboration by Time of Day with Viva Insights in Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/collaboration-by-time-of-day.py)
+- [Collaboration by Time of Day with Viva Insights in R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/collaboration-by-time-of-day.Rmd)
+- [Evaluating a Workplace Intervention with Viva Insights in Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/evaluate-intervention.py)
+- [Evaluating a Workplace Intervention with Viva Insights in R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/evaluate-intervention.Rmd)
+- [Meeting Engagement Drivers with Viva Insights in Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/meeting-engagement-drivers.py)
+- [Meeting Engagement Drivers with Viva Insights in R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/meeting-engagement-drivers.Rmd)
+
 ### Network analysis
 
 - [Customizing Group-to-group network visuals - Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/custom-network-g2g.py)

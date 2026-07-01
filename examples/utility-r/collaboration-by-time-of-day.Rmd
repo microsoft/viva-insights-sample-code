@@ -1,0 +1,177 @@
+---
+title: "Collaboration by Time of Day with Viva Insights in R"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: "lumen"
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+library(tidyverse)
+library(vivainsights)
+library(lubridate)
+```
+
+# Collaboration by Time of Day
+
+## Introduction
+
+A common question is: *"what time does the typical person start and end their
+working day, and how does that differ by team, region, or role?"* Viva Insights
+exposes hourly **collaboration by time of day** metrics, which count the emails
+and chats sent and the fractions of the hour spent in meetings and unscheduled
+calls for each hour of the day, and these let us answer it.
+
+This document shows how to turn those hourly buckets into a typical **start** and
+**end** of day, using the same definition of an "active hour" as the Microsoft
+product: an hour is active if **any** of chats sent, emails sent, meetings, or
+unscheduled calls is greater than zero.
+
+The package's sample datasets do not include the hourly "by time of day" columns,
+so we **simulate** a person-by-day dataset with those columns, named as an
+`import_query()` of a Person or Daily query would name them. To run on your own
+data, select the *Emails sent*, *Chats sent*, *Meetings*, and *Unscheduled calls*
+time-of-day metrics in a Person or Daily query, import it, and replace the
+`simulate_time_of_day()` call below, and the downstream code is unchanged.
+
+## Simulate a person-by-day dataset
+
+Each person has a latent start and end of day (managers end later); activity is
+generated per hour, denser inside working hours and sparse outside them.
+
+```{r}
+simulate_time_of_day <- function(n_person = 200, n_days = 20, seed = 7) {
+  set.seed(seed)
+  persons    <- sprintf("P%03d", seq_len(n_person) - 1)
+  is_manager <- runif(n_person) < 0.25
+  start_true <- pmin(pmax(rnorm(n_person, 8.5, 0.7), 6), 10)
+  end_true   <- pmin(pmax(rnorm(n_person, 18.0, 1.0) + is_manager * 1.0, 15), 22)
+
+  # One row per person-day (weekdays only)
+  all_dates <- seq(as.Date("2024-01-01"), by = "day", length.out = 40)
+  dates     <- all_dates[!(lubridate::wday(all_dates) %in% c(1, 7))][seq_len(n_days)]
+
+  grid <- expand.grid(PersonId = persons, MetricDate = dates,
+                      stringsAsFactors = FALSE)
+  m   <- nrow(grid)
+  pos <- match(grid$PersonId, persons)
+
+  # m x 24 hour grid; comparison recycles the length-m person vectors down columns
+  hours   <- matrix(0:23, nrow = m, ncol = 24, byrow = TRUE)
+  in_work <- (hours >= start_true[pos]) & (hours < end_true[pos])
+  active  <- matrix(runif(m * 24), nrow = m) < ifelse(in_work, 0.85, 0.02)
+
+  out <- grid
+  for (h in 0:23) {
+    a   <- active[, h + 1]
+    col <- sprintf("%02d_%02d", h, h + 1)
+    out[[paste0("Chats_sent_", col)]]        <- a * rpois(m, 1.0)
+    out[[paste0("Emails_sent_", col)]]       <- a * rpois(m, 0.6)
+    out[[paste0("Meetings_", col)]]          <- a * runif(m) * 0.5   # fraction of hour
+    out[[paste0("Unscheduled_calls_", col)]] <- a * (runif(m) < 0.1) * runif(m)
+  }
+  out$IsManager <- is_manager[pos]
+  tibble::as_tibble(out)
+}
+
+# On your own data, replace this with vivainsights::import_query("your_query.csv").
+df <- simulate_time_of_day()
+dim(df)
+```
+
+## Build the activity matrix and find first / last active hour
+
+An hour is active if any of the four metrics is greater than zero in that bucket.
+We use a fast vectorised approach: build a logical matrix of active hours, then use
+`max.col()` to locate the first and last active hour in each row.
+
+```{r}
+METRICS <- c("Chats_sent", "Emails_sent", "Meetings", "Unscheduled_calls")
+hour_columns <- function(prefix) sprintf("%s_%02d_%02d", prefix, 0:23, 1:24)
+
+active_matrix <- matrix(FALSE, nrow = nrow(df), ncol = 24)
+for (metric in METRICS) {
+  active_matrix <- active_matrix | (as.matrix(df[hour_columns(metric)]) > 0)
+}
+
+has_any  <- rowSums(active_matrix) > 0
+first_hr <- max.col(active_matrix, ties.method = "first") - 1L
+last_hr  <- 24L - max.col(active_matrix[, 24:1, drop = FALSE], ties.method = "first")
+
+# Start = bucket start hour; End = bucket end hour (+1). Drop days with no activity.
+day_level <- df %>%
+  transmute(PersonId, MetricDate, IsManager,
+            start = ifelse(has_any, first_hr, NA_real_),
+            end   = ifelse(has_any, last_hr + 1, NA_real_)) %>%
+  drop_na(start, end)
+
+head(day_level)
+```
+
+## A typical start and end of day
+
+We aggregate in **two stages**: each person's median across their days, then the
+mean across people. This picks up sub-hour shifts a single pooled median would
+miss, while staying robust to a few unusual days per person. We format decimal
+hours as `HH:MM`.
+
+```{r}
+hhmm <- function(x) {
+  ifelse(is.na(x), NA_character_,
+         sprintf("%02d:%02d", floor(x), round((x - floor(x)) * 60)))
+}
+
+person_med <- day_level %>%
+  group_by(PersonId) %>%
+  summarise(start = median(start), end = median(end), .groups = "drop")
+
+typical <- person_med %>% summarise(start = mean(start), end = mean(end))
+pooled  <- day_level  %>% summarise(start = median(start), end = median(end))
+
+tibble(
+  measure = c("Typical (two-stage)", "Pooled median (check)"),
+  start   = c(hhmm(typical$start), hhmm(pooled$start)),
+  end     = c(hhmm(typical$end),   hhmm(pooled$end))
+)
+```
+
+## Cuts by day of week and by role
+
+```{r}
+# Derive weekday numerically then map to labels (label = TRUE is unreliable on
+# some platforms).
+day_level <- day_level %>%
+  mutate(weekday = factor(lubridate::wday(MetricDate, week_start = 1),
+                          levels = 1:7,
+                          labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")))
+
+two_stage_by <- function(data, group_cols) {
+  data %>%
+    group_by(across(all_of(c("PersonId", group_cols)))) %>%
+    summarise(start = median(start), end = median(end), .groups = "drop") %>%
+    group_by(across(all_of(group_cols))) %>%
+    summarise(start = mean(start), end = mean(end), .groups = "drop") %>%
+    mutate(start = hhmm(start), end = hhmm(end))
+}
+
+two_stage_by(day_level, "weekday")
+```
+
+```{r}
+two_stage_by(day_level, "IsManager") %>%
+  mutate(role = ifelse(IsManager, "Manager", "Non-manager")) %>%
+  select(role, start, end)
+```
+
+## Notes
+
+- The two-stage (person-median then mean-across-people) metric picks up sub-hour
+  shifts that a single pooled median would miss, while staying robust to a few
+  unusual days per person.
+- Days with no recorded activity are excluded rather than counted as a `00:00`
+  start, which would badly bias the result.
+- On real data, be careful about the timezone basis of the hourly buckets for a
+  globally distributed population, and compare within a region where possible.

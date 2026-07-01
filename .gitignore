@@ -40,11 +40,13 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-# Output files
-*.html
-# ...but never ignore Jekyll template source (includes/layouts are .html)
-!_includes/*.html
-!_layouts/*.html
+# Rendered HTML output
+# Jekyll's own build output is ignored via _site/ below, and package vignettes
+# via vignettes/*.html above. We intentionally do NOT blanket-ignore *.html, so
+# that the published example outputs under examples/ (linked from the docs) are
+# tracked. Ignore only the specific rendered HTML that should not be committed:
+examples/network_g2g 1.html
+examples/utility-python/causal-inference/did-itsa/*.html
 
 # Data files
 examples/utility-r/_data/*.csv

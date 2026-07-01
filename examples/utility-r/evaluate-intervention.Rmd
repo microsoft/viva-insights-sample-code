@@ -1,0 +1,177 @@
+---
+title: "Evaluating a Workplace Intervention with Viva Insights in R"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: "lumen"
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+library(tidyverse)
+library(vivainsights)
+```
+
+# Evaluating a Workplace Intervention
+
+## Introduction
+
+Organisations frequently run interventions aimed at improving how people work: a
+protected "focus day", a meeting-reduction push, or a Microsoft 365 Copilot
+enablement wave for one team. The natural question is *did it actually work?* -
+and, just as importantly, *did anything simply move somewhere else?*
+
+Answering this credibly needs more than a before-and-after comparison for the
+group that took part. A company-wide trend, a seasonal effect, or a change in how
+a metric is calculated can all masquerade as a programme effect. The antidote is a
+simple **quasi-experiment**:
+
+- Compare a **treated** group (who received the intervention) against a **control**
+  group (who did not).
+- Split time into **Before**, **During**, and **After** windows.
+- Use a **difference-in-differences** read: the treated group's change minus the
+  control group's change.
+- **Discount any signal that moves the same way in the control group**, because a
+  change that shows up where there was no intervention cannot have been caused by it.
+
+We demonstrate this on the built-in `pq_data` sample Person Query.
+
+## Data preparation
+
+`pq_data` is a weekly Person Query. We assign a treated group (here, one
+organisation that we imagine received the intervention) and a control group
+(everyone else), then split the weeks into three equal windows.
+
+```{r}
+data("pq_data", package = "vivainsights")
+
+pq <- pq_data %>% mutate(MetricDate = as.Date(MetricDate))
+
+# Treated vs control. In practice you would flag the population that actually
+# received the intervention; here we use one organisation for illustration.
+TREATED_ORG <- "IT"
+pq <- pq %>%
+  mutate(group = ifelse(Organization == TREATED_ORG, "Treated", "Control"))
+
+# Before / During / After as three equal windows across the date range.
+rng  <- range(pq$MetricDate)
+cuts <- rng[1] + diff(rng) * c(1/3, 2/3)
+pq <- pq %>%
+  mutate(period = factor(
+    case_when(
+      MetricDate <  cuts[1] ~ "Before",
+      MetricDate <  cuts[2] ~ "During",
+      TRUE                  ~ "After"
+    ),
+    levels = c("Before", "During", "After")
+  ))
+
+count(pq, group, period)
+```
+
+The sample data contains no real intervention, so purely for demonstration we
+inject a modest, clearly labelled reduction in multitasking for the treated group
+during and after the programme. **Delete this block when using your own data**; it
+exists only so the method has a real effect to detect.
+
+```{r}
+pq <- pq %>%
+  mutate(Multitasking_hours = case_when(
+    group == "Treated" & period == "During" ~ Multitasking_hours * 0.92,
+    group == "Treated" & period == "After"  ~ Multitasking_hours * 0.80,
+    TRUE                                     ~ Multitasking_hours
+  ))
+```
+
+## Two-stage aggregation
+
+A robust group summary aggregates in **two stages**: first to a typical value per
+person (so a few very heavy or very light weeks do not dominate), then to a mean
+across people within each group and period. We wrap this in a small reusable
+function.
+
+```{r}
+two_stage_summary <- function(data, metric,
+                              id = "PersonId", group = "group",
+                              period = "period") {
+  # Stage 1: person-level mean within each period
+  s1 <- data %>%
+    group_by(.data[[id]], .data[[group]], .data[[period]]) %>%
+    summarise(person_mean = mean(.data[[metric]], na.rm = TRUE), .groups = "drop")
+
+  # Stage 2: group mean across persons within each period
+  s1 %>%
+    group_by(.data[[group]], .data[[period]]) %>%
+    summarise(value = mean(person_mean, na.rm = TRUE),
+              n_persons = n(), .groups = "drop")
+}
+
+summ <- two_stage_summary(pq, metric = "Multitasking_hours")
+summ
+```
+
+## Difference-in-differences
+
+Now the key comparison. We look at each group's change from Before to After, and
+take the difference between them. The control group's change captures whatever was
+happening anyway; subtracting it isolates the treated-specific effect.
+
+```{r}
+wide <- summ %>%
+  select(group, period, value) %>%
+  pivot_wider(names_from = period, values_from = value) %>%
+  mutate(change_before_after = After - Before)
+
+wide
+
+did <- wide$change_before_after[wide$group == "Treated"] -
+       wide$change_before_after[wide$group == "Control"]
+
+did  # difference-in-differences (treated change minus control change)
+```
+
+A picture makes the story immediate: the treated line should step down while the
+control line stays broadly flat.
+
+```{r}
+ggplot(summ, aes(x = period, y = value, colour = group, group = group)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "Weekly multitasking hours by period",
+    subtitle = "Treated vs control, two-stage person-then-group means",
+    x = NULL, y = "Multitasking hours / person / week", colour = NULL
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+## Reading the result honestly
+
+The **difference-in-differences** is the number to trust, not the treated group's
+before/after change on its own. If the control group had moved by a similar amount,
+we would conclude the shift was an organisation-wide or seasonal effect (or even a
+change in how the metric is computed) and **discount it**, regardless of how good
+the treated group's raw change looked. A change that appears equally in a group
+that received no intervention cannot have been caused by the intervention.
+
+Two further checks are worth building in as a habit:
+
+- **Look for displacement.** Re-run the same summary on adjacent behaviours (for a
+  meeting-reduction programme: after-hours and weekend collaboration hours) to
+  confirm the load did not simply move elsewhere. "It went down and did not come
+  back somewhere else" is the claim a leader actually needs.
+- **Prefer two-stage aggregation.** Person-then-group means stop a handful of
+  extreme individuals or unequal week counts from skewing the comparison.
+
+Transferable practices: always include a control population; structure the data as
+Before / During / After from the weekly person query; aggregate in two stages; and
+discount any signal that also moves in the control.
+
+This design is reusable for any workplace intervention, including an AI-adoption
+programme. Framing a Copilot enablement wave as the "treated" group and measuring
+the difference-in-differences against a comparable control is a clean way to show
+whether adoption is associated with real shifts in collaboration or wellbeing
+signals, rather than relying on a simple before-and-after that a company-wide trend
+could easily confound.

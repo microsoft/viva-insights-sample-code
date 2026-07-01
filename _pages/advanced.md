@@ -2,7 +2,7 @@
 layout: page
 title: "Advanced Analytics"
 eyebrow: "Advanced analytics"
-description: "Machine learning, regression, and statistical analysis for Viva Insights data — random forest top-performer models, information value, and pairwise chi-square tests in R and Python."
+description: "Machine learning, regression, and statistical analysis for Viva Insights data, including random forest top-performer models, information value, pairwise chi-square tests, difference-in-differences intervention evaluation, meeting engagement drivers, and collaboration by time of day in R and Python."
 permalink: /advanced/
 ---
 # Advanced Analytics Scripts
@@ -16,6 +16,8 @@ The **information value** use case is used for feature selection and understandi
 When choosing which technique to use, consider if you need to build a predictive model that can handle complex, non-linear relationships and you want to make actual predictions on new data (e.g., predicting which employees are likely to be top performers). Random Forest is ideal when you have sufficient sample size (typically 100+ observations) and want robust predictions with feature importance rankings. Use information value when you need to perform initial feature selection, have limited sample sizes, or want to understand the univariate predictive power of individual variables before building more complex models. IV is particularly valuable for preprocessing large numbers of potential predictors and identifying which variables are worth including in downstream modeling efforts.
 
 The **pairwise chi-square tests** use case is used for statistical hypothesis testing to determine if there are significant associations between categorical variables - typically organizational attributes or survey attributes - in your Viva Insights data. This technique is particularly valuable when you want to understand relationships between different organizational attributes (such as department, level, or location) and collaboration patterns or behaviors. The scripts include multiple testing corrections to control for false discovery rates when performing many simultaneous comparisons, ensuring reliable statistical conclusions. 
+
+The **behavioral and program analysis** examples move from modelling attributes to answering practical workplace questions. The *collaboration by time of day* scripts estimate a typical start and end of day from the hourly collaboration metrics, and they show how those hours shift by weekday and by role. The *evaluating a workplace intervention* scripts set up a treated-versus-control, difference-in-differences design so that a genuine programme effect can be separated from a company-wide or seasonal trend, which makes them directly applicable to measuring the impact of a Microsoft 365 Copilot enablement wave. The *meeting engagement drivers* scripts model in-meeting messaging as a proxy for disengagement and rank the meeting characteristics that drive it, and they then take a closer look at meeting duration to separate a real effect from simple exposure. Because the sample datasets do not contain the hourly buckets, a real intervention, or enough multi-person meetings, these examples generate small, clearly labelled simulated datasets that share the column names of a real query, so that the same downstream code runs unchanged on your own export.
 
 ## Machine Learning & Predictive Modeling
 
@@ -77,6 +79,68 @@ The **pairwise chi-square tests** use case is used for statistical hypothesis te
 - **Key Features**: Multiple testing correction, p-value adjustment, significance testing
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/pairwise_chisq.Rmd)**
 - **[🌐 View HTML Output](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/pairwise_chisq.html)**
+
+---
+
+## Behavioral & Program Analysis
+
+### Collaboration by Time of Day (Python)
+**📄 [collaboration-by-time-of-day.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/collaboration-by-time-of-day.py)**
+- **Purpose**: Estimate a typical start and end of day from hourly collaboration metrics
+- **Language**: Python
+- **Prerequisites**: vivainsights Python package, pandas, numpy
+- **Key Features**: Hourly activity matrix, two-stage aggregation, cuts by weekday and role
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/collaboration-by-time-of-day.py)**
+
+### Collaboration by Time of Day (R)
+**📄 [collaboration-by-time-of-day.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/collaboration-by-time-of-day.Rmd)**
+- **Purpose**: Estimate a typical start and end of day from hourly collaboration metrics
+- **Language**: R
+- **Format**: R Markdown
+- **Prerequisites**: vivainsights R package, tidyverse, lubridate
+- **Key Features**: Hourly activity matrix, two-stage aggregation, cuts by weekday and role
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/collaboration-by-time-of-day.Rmd)**
+- **[🌐 View HTML Output](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/collaboration-by-time-of-day.html)**
+
+---
+
+### Evaluating a Workplace Intervention (Python)
+**📄 [evaluate-intervention.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/evaluate-intervention.py)**
+- **Purpose**: Measure a workplace intervention with a treated-vs-control difference-in-differences design
+- **Language**: Python
+- **Prerequisites**: vivainsights Python package, pandas, numpy
+- **Key Features**: Before/During/After windows, difference-in-differences, two-stage aggregation, displacement checks
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/evaluate-intervention.py)**
+
+### Evaluating a Workplace Intervention (R)
+**📄 [evaluate-intervention.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/evaluate-intervention.Rmd)**
+- **Purpose**: Measure a workplace intervention with a treated-vs-control difference-in-differences design
+- **Language**: R
+- **Format**: R Markdown
+- **Prerequisites**: vivainsights R package, tidyverse
+- **Key Features**: Before/During/After windows, difference-in-differences, two-stage aggregation, displacement checks
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/evaluate-intervention.Rmd)**
+- **[🌐 View HTML Output](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/evaluate-intervention.html)**
+
+---
+
+### Meeting Engagement Drivers (Python)
+**📄 [meeting-engagement-drivers.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/meeting-engagement-drivers.py)**
+- **Purpose**: Rank the meeting characteristics that drive in-meeting messaging as a proxy for disengagement
+- **Language**: Python
+- **Prerequisites**: vivainsights Python package, scikit-learn, pandas, numpy
+- **Key Features**: Meeting-level modelling, random forest permutation importance, rate-vs-exposure duration analysis
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/meeting-engagement-drivers.py)**
+
+### Meeting Engagement Drivers (R)
+**📄 [meeting-engagement-drivers.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/meeting-engagement-drivers.Rmd)**
+- **Purpose**: Rank the meeting characteristics that drive in-meeting messaging as a proxy for disengagement
+- **Language**: R
+- **Format**: R Markdown
+- **Prerequisites**: vivainsights R package, tidyverse, randomForest
+- **Key Features**: Meeting-level modelling, random forest permutation importance, rate-vs-exposure duration analysis
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/meeting-engagement-drivers.Rmd)**
+- **[🌐 View HTML Output](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/meeting-engagement-drivers.html)**
 
 ---
 

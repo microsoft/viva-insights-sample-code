@@ -33,6 +33,8 @@ In R, once a package is loaded with `library(package)`, it's not necessary to pr
 
 The next step here is to load in the dataset, and then examine the data. In our local directory, we have a demo dataset that has a similar structure to a Person Query, with an additional 5-point scale 'performance' attribute that represents performance scores. 
 
+> **Note on the data.** This demo dataset is de-identified: each person is represented only by a hashed `PersonId` alongside a handful of aggregate collaboration metrics, and it contains no names, email addresses, or organisational attributes. It is included purely to illustrate the modelling workflow, so please substitute your own Person Query when applying this to real data.
+
 `import_query()` imports the demo person query data, and performs cleaning on the variable names. An alternative to this is to use `read_csv()` (from the package **readr**, which is part of **tidyverse**), which does the same thing of reading in the input csv file. 
 
 ```{r}

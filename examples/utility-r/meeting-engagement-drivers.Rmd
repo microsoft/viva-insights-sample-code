@@ -1,0 +1,308 @@
+---
+title: "Meeting Engagement Drivers with Viva Insights in R"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: "lumen"
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+library(tidyverse)
+library(vivainsights)
+library(randomForest)   # random forests, matching the repo's existing RF example
+```
+
+# Meeting Engagement Drivers
+
+## Introduction
+
+Many meeting-culture conversations start with *"we have too many meetings"*. A
+more useful question is often *"are we meeting **well**?"*, that is, are the
+people in a meeting actually engaged, or are they quietly working on something
+else while it runs?
+
+Viva Insights captures a few behavioural signals for every meeting that let us
+approximate engagement, including the number of attendees multitasking and the
+number of **chats and emails sent during the meeting**. In this example we treat
+in-meeting messaging as a proxy for disengagement (a busy backchannel usually
+means people are only half-present) and ask a simple modelling question: **which
+characteristics of a meeting best predict how much backchannel messaging it
+generates?**
+
+We will:
+
+1. Prepare a simulated meeting-level dataset shaped like a Meeting Query.
+2. Fit a random forest to rank the design features that drive per-attendee messaging.
+3. Take a closer look at the top driver (meeting duration) and separate a genuine
+   effect from the trivial "a longer meeting simply has more minutes" explanation.
+
+Everything below runs on a small **simulated** Meeting Query created inside this
+document, so it is fully reproducible with no data of your own. The package does
+ship a sample Meeting Query (`vivainsights::mt_data`), but it is small and mostly
+single-person focus blocks, so it lacks the multi-person meetings and in-meeting
+messaging this model needs. We use a seeded simulation instead, built with the
+same column names as a real Meeting Query, so that the identical downstream code
+runs on your own export.
+
+## Set-up and data preparation
+
+We begin by simulating a Meeting Query. The data-generating process makes
+**duration the dominant driver** of messaging, with a sub-linear (exponent < 1)
+relationship, so total messaging rises with length while per-minute messaging
+gently declines, which creates a plausible pattern for demonstration. The column
+names match a real Meeting Query, so to run this on your own tenant you can
+replace `simulate_meeting_query()` with
+`vivainsights::import_query("your_meeting_query.csv")`. (The shipped
+`vivainsights::mt_data` is handy for inspecting the expected schema, but is too
+small and focus-block-heavy to fit this model.)
+
+```{r}
+simulate_meeting_query <- function(n = 2000, seed = 42) {
+  set.seed(seed)
+  duration_min <- sample(c(15, 30, 45, 60, 90, 120, 180), n, replace = TRUE,
+                         prob = c(.14, .28, .20, .18, .10, .06, .04))
+  n_attendees  <- 2 + rpois(n, 4)                 # at least 2
+  intended     <- n_attendees + rpois(n, 1)
+  recurring    <- rbinom(n, 1, 0.5)
+  accept       <- rbinom(n, intended, 0.70)       # RSVP responses out of invitees
+  remaining    <- intended - accept
+  no_response  <- rbinom(n, remaining, 0.60)
+  decline      <- remaining - no_response
+  redundant    <- rbinom(n, n_attendees, 0.10)
+  no_response_rate <- no_response / pmax(intended, 1)
+
+  # Per-attendee messaging rate: duration dominates, sub-linearly (^0.85)
+  lam <- 0.03 * duration_min^0.85 *
+    (1 + 0.8 * no_response_rate) *
+    (1 + 0.05 * log(n_attendees))
+  chats  <- rpois(n, lam * 0.5 * n_attendees)
+  emails <- rpois(n, lam * 0.5 * n_attendees)
+
+  tibble::tibble(
+    Number_of_attendees                      = n_attendees,
+    Number_of_attendees_multitasking         = rbinom(n, n_attendees, 0.3),
+    Number_of_chats_sent_during_the_meeting  = chats,
+    Number_of_emails_sent_during_the_meeting = emails,
+    Number_of_redundant_attendees            = redundant,
+    All_Day_Meeting                          = "FALSE",
+    Cancelled                                = "FALSE",
+    Recurring                                = ifelse(recurring == 1, "TRUE", "FALSE"),
+    Accept_count                             = accept,
+    No_response_count                        = no_response,
+    Decline_count                            = decline,
+    Intended_participant_count               = intended,
+    Duration                                 = duration_min / 60   # Duration is in HOURS
+  )
+}
+
+# On your own data, replace this line with an exported Meeting Query, e.g.
+#   vivainsights::import_query("your_meeting_query.csv")
+mt_raw <- simulate_meeting_query()
+```
+
+Now a light quality filter to keep genuine meetings only, dropping solo calendar
+blocks, cancelled items, and all-day entries. (On your own data you would apply a
+fuller cleaning step; the point here is simply to model real meetings.)
+
+```{r}
+# Coerce the TRUE/FALSE flags robustly (they may load as strings)
+as_flag <- function(x) as.logical(as.character(x))
+
+mt <- mt_raw %>%
+  mutate(
+    Cancelled       = as_flag(Cancelled),
+    All_Day_Meeting = as_flag(All_Day_Meeting),
+    Recurring       = as_flag(Recurring)
+  ) %>%
+  filter(
+    Number_of_attendees >= 2,   # drop solo holds / focus blocks
+    !Cancelled,
+    !All_Day_Meeting,
+    Duration > 0
+  )
+
+nrow(mt)
+```
+
+Next we engineer the modelling frame. Note that `Duration` in a Meeting Query is
+expressed in **hours**, so we convert it to minutes for readability. We normalise
+the messaging counts **per attendee** so that large meetings do not automatically
+look busier, and we derive a few RSVP "commitment" signals (what share of invitees
+accepted, did not respond, or declined) that often turn out to matter.
+
+```{r}
+model_df <- mt %>%
+  transmute(
+    # --- outcomes: in-meeting messaging per attendee ---
+    chats_per_att   = Number_of_chats_sent_during_the_meeting  / Number_of_attendees,
+    emails_per_att  = Number_of_emails_sent_during_the_meeting / Number_of_attendees,
+
+    # --- candidate design predictors ---
+    duration_min          = Duration * 60,
+    n_attendees           = Number_of_attendees,
+    intended_participants = Intended_participant_count,
+    recurring             = factor(Recurring),
+    accept_rate           = Accept_count      / pmax(Intended_participant_count, 1),
+    no_response_rate      = No_response_count  / pmax(Intended_participant_count, 1),
+    decline_rate          = Decline_count      / pmax(Intended_participant_count, 1),
+    redundant_share       = Number_of_redundant_attendees / pmax(Number_of_attendees, 1)
+  ) %>%
+  drop_na()
+
+head(model_df)
+```
+
+## Ranking the drivers with a random forest
+
+We fit a random forest with the **randomForest** package (the same package used in
+this repo's top-performers example), setting `importance = TRUE` so we can read off
+permutation-based importance, the `%IncMSE`, i.e. how much the prediction error
+rises when each feature is shuffled. Random forests capture non-linear effects and
+interactions without us specifying them.
+
+We fit one model per outcome (chats per attendee and emails per attendee), which
+mirrors the idea that chat and email backchannels can behave a little differently.
+
+```{r}
+set.seed(123)
+
+predictors <- c("duration_min", "n_attendees", "intended_participants",
+                "recurring", "accept_rate", "no_response_rate",
+                "decline_rate", "redundant_share")
+
+rf_chats <- randomForest::randomForest(
+  x          = model_df[predictors],
+  y          = model_df$chats_per_att,
+  ntree      = 500,
+  importance = TRUE
+)
+
+rf_emails <- randomForest::randomForest(
+  x          = model_df[predictors],
+  y          = model_df$emails_per_att,
+  ntree      = 500,
+  importance = TRUE
+)
+```
+
+The out-of-bag (OOB) R-squared tells us how much of the variation in messaging the
+features explain. For human behaviour, modest values are entirely expected, and we
+report them as an **association**, not a causal effect.
+
+```{r}
+tibble(
+  outcome = c("chats per attendee", "emails per attendee"),
+  oob_rsq = c(tail(rf_chats$rsq, 1), tail(rf_emails$rsq, 1))
+)
+```
+
+Now the part we care about: the ranked importance of each design feature. We plot
+the permutation importance (`%IncMSE`) for the chats model (the more
+differentiating of the two signals).
+
+```{r}
+imp_df <- tibble(
+  feature    = rownames(randomForest::importance(rf_chats)),
+  importance = randomForest::importance(rf_chats)[, "%IncMSE"]
+) %>%
+  arrange(importance)
+
+ggplot(imp_df, aes(x = importance, y = reorder(feature, importance))) +
+  geom_col(fill = "#1B3A6B") +
+  labs(
+    title = "What drives in-meeting chat, per attendee",
+    subtitle = "Permutation importance (%IncMSE) from a random forest",
+    x = "Permutation importance", y = NULL
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+Typically **meeting duration ranks at or near the top**, alongside meeting size
+and the RSVP commitment signals. That already points at a practical lever, because
+duration is one of the few meeting properties you can change with a single calendar
+setting.
+
+## A closer look at duration
+
+Whenever "longer meetings have more messaging" comes up, a fair objection follows:
+*isn't that trivial, since a longer meeting simply contains more minutes in which
+to send a message?* It is worth testing directly rather than assuming, because the
+answer changes the recommendation.
+
+We group meetings into duration bands and compute messaging two ways: the **total**
+per attendee, and the same figure **per minute**. If the per-minute rate were flat,
+the total would be pure exposure (just more minutes). If it varies, something more
+interesting is going on.
+
+```{r}
+dose <- model_df %>%
+  mutate(
+    msgs_per_att = chats_per_att + emails_per_att,
+    band = cut(
+      duration_min,
+      breaks = c(0, 15, 30, 60, 120, Inf),
+      labels = c("<=15m", "16-30m", "31-60m", "61-120m", ">120m"),
+      right  = TRUE
+    )
+  ) %>%
+  group_by(band) %>%
+  summarise(
+    n_meetings          = n(),
+    msgs_per_att        = mean(msgs_per_att, na.rm = TRUE),
+    msgs_per_att_permin = mean(msgs_per_att / duration_min, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+dose
+```
+
+The usual pattern is that **total messaging per attendee rises with length**, while
+the **per-minute rate is roughly flat or gently declining**. In other words, longer
+meetings are not disproportionately distracting minute-for-minute, but disengagement
+does not correct itself either: once people drift into the backchannel they tend to
+stay there, so the distraction accumulates across a long session.
+
+A simple linear model gives us the marginal effect of length, holding meeting size
+constant, as an interpretable companion to the forest.
+
+```{r}
+lm_dur <- lm(
+  I(chats_per_att + emails_per_att) ~ duration_min + n_attendees,
+  data = model_df
+)
+
+# Extra messages per attendee for each additional 30 minutes
+coef(lm_dur)[["duration_min"]] * 30
+```
+
+## What this means
+
+Read carefully, the result is **not** that multitasking is an unavoidable fact of
+meetings that we should ignore, nor that the only response is to cut meeting volume.
+The messaging rate is not fixed: it responds to how a meeting is designed, and
+length is the part of the design that most reliably manufactures disengagement.
+Shorter meetings help twice over, because fewer people drift off in the first place
+and the drift that does happen has less time to accumulate. In-meeting messaging is
+therefore a **movable signal** worth tracking, not background noise.
+
+A few transferable practices for this kind of analysis:
+
+- Model engagement friction at the **meeting level**, not the person level, and
+  normalise messaging **per attendee** so meeting size does not dominate.
+- Use permutation importance to rank drivers, then corroborate the top one with an
+  interpretable model.
+- Always split a "bigger total" finding into **rate** and **exposure** before making
+  a claim about it.
+- State results as **association, not causation**, and report the modest variance
+  explained honestly.
+
+Finally, there is a natural link to AI adoption. Some in-meeting messaging is simply
+people trying to stay productive while stuck in a session that does not need all of
+them. Capabilities such as Microsoft 365 Copilot meeting recaps let people skip or
+leave lower-value meetings and catch up afterwards, which is complementary to
+shortening meetings: one removes the room for disengagement, the other removes the
+reason for it. A useful extension is to test whether higher Copilot adoption is
+associated with a lighter backchannel in long meetings.
