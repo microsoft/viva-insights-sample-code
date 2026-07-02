@@ -55,9 +55,6 @@ Explore the repo to discover sample code:
 - [Copilot Advanced Analysis sample scripts - Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/copilot-analytics-examples.py)
 - [Tracking Copilot Usage Segments over Time in Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/copilot-usage-segments-trend.py)
 - [Tracking Copilot Usage Segments over Time in R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-usage-segments-trend.Rmd)
-
-### Causal inference and difference-in-differences
-
 - [Scanning Many Metrics with a Difference-in-Differences Model in Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/did-metric-scan.py)
 - [Scanning Many Metrics with a Difference-in-Differences Model in R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/did-metric-scan.Rmd)
 - [Within-Person Event-Study & Difference-in-Differences in Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/event-study-did.py)
