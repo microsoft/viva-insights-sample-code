@@ -1,0 +1,238 @@
+---
+title: "Scanning many metrics with a difference-in-differences model: Power vs Low Copilot users in R"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: "lumen"
+---
+
+# A difference-in-differences "metric scan"
+
+## Introduction
+
+A frequent request in Copilot Analytics is a single table that answers: *across
+all our collaboration metrics, on which ones do heavier Copilot users change
+their behaviour, by how much, and which of those changes are statistically
+significant?*
+
+A naive version simply compares group means (Power users send more emails than
+Low users) but that is **cross-sectional** and confounded, because Power users may
+differ for many reasons. This notebook instead runs a **within-person
+difference-in-differences (DiD)** model *per metric* and assembles the results
+into one tidy, sortable table plus a **forest plot**. The design compares two
+**both-licensed** groups (**Power** vs **Low** Copilot users), so the contrast
+is usage *intensity*, not licence access.
+
+For a full walk-through of a single-metric event-study and the parallel-trends
+assumption, see the companion `event-study-did` example. Here the focus is the
+**scan across metrics** and honest reporting of significance, including metrics
+that do **not** move.
+
+As with the companion example, a Person Query does not ship with a clean
+adoption event, so we build a **small seeded simulation** whose column names
+match a real Person Query. Swap the simulation chunk for
+`vivainsights::import_query()` and the scan runs unchanged. The per-metric
+effects are **injected for demonstration only** and are not real results.
+
+## Set-up
+
+Install **fixest** with `install.packages("fixest")` if needed.
+
+```{r setup, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(scales)
+library(purrr)
+library(fixest)
+```
+
+## Simulate a Person-Query-shaped panel with two intensity groups
+
+Everyone here is a licensed adopter with an adoption week; they differ in
+**intensity**, where **Power** users ramp to heavy Copilot use while **Low** users stay
+light. We simulate several standard Person Query collaboration columns and inject
+a *different* post-adoption change for Power vs Low on each metric. Some
+differentials are large, some small, and one is zero, so the scan will show a
+realistic mix of significant and non-significant results.
+
+> **Replace this chunk for real data.** Load with `vivainsights::import_query()`,
+> classify Power/Low with `vivainsights::identify_usage_segments(version = "12w")`,
+> and derive each person's anchor week from their first Copilot action.
+
+```{r simulate}
+set.seed(202)
+
+n_persons <- 500L
+n_weeks   <- 40L
+weeks     <- seq(as.Date("2024-01-01"), by = "week", length.out = n_weeks)
+
+# ---- clearly-labelled illustrative effects --------------------------------
+# DEMO ONLY: the extra post-adoption change for POWER users relative to LOW
+# users, per metric. Delete / set to 0 for real data, because the model should
+# estimate these, not have them baked in. Note one metric is 0 on purpose.
+EFFECTS <- c(
+  Emails_sent                     =  1.5,
+  Chats_sent                      =  3.0,
+  Meeting_hours                   =  0.4,
+  Collaboration_hours             =  0.8,
+  After_hours_collaboration_hours =  0.15,
+  Channel_message_posts           =  0.0   # deliberately null
+)
+# ---------------------------------------------------------------------------
+
+persons <- tibble(
+  PersonId  = sprintf("P%04d", seq_len(n_persons)),
+  group     = sample(c("Power User", "Low User"), n_persons,
+                      replace = TRUE, prob = c(0.55, 0.45)),
+  adopt_wk  = sample(10:26, n_persons, replace = TRUE),
+  base_lvl  = rnorm(n_persons, 0, 1)          # person collaboration baseline
+)
+
+grid <- tidyr::crossing(PersonId = persons$PersonId, week_idx = seq_len(n_weeks)) |>
+  left_join(persons, by = "PersonId") |>
+  mutate(
+    MetricDate = weeks[week_idx],
+    post       = week_idx >= adopt_wk,
+    is_power   = group == "Power User",
+    season     = 1.2 * sin(2 * pi * week_idx / 26)
+  )
+
+# Baseline mean level per metric (rough Person Query scales)
+base_mean <- c(Emails_sent = 22, Chats_sent = 30, Meeting_hours = 10,
+               Collaboration_hours = 14, After_hours_collaboration_hours = 2,
+               Channel_message_posts = 6)
+noise_sd  <- c(Emails_sent = 5, Chats_sent = 7, Meeting_hours = 2.5,
+               Collaboration_hours = 3, After_hours_collaboration_hours = 0.8,
+               Channel_message_posts = 2)
+
+simulate_metric <- function(m) {
+  base_mean[[m]] + 3 * grid$base_lvl + grid$season +
+    ifelse(grid$post & grid$is_power, EFFECTS[[m]], 0) +
+    rnorm(nrow(grid), 0, noise_sd[[m]])
+}
+
+for (m in names(EFFECTS)) grid[[m]] <- simulate_metric(m)
+
+panel <- grid |>
+  select(PersonId, MetricDate, week_idx, group, adopt_wk, all_of(names(EFFECTS)))
+
+head(panel)
+```
+
+## Build event time and the DiD indicators
+
+Each person's anchor is their adoption week; we keep a balanced ±8-week window.
+`treated` flags Power users, `post` flags weeks on/after adoption, and their
+product `treat_post` is the DiD term.
+
+```{r event-time}
+WINDOW <- 8L
+
+panel_es <- panel |>
+  mutate(event_week = week_idx - adopt_wk) |>
+  filter(event_week >= -WINDOW, event_week <= WINDOW) |>
+  group_by(PersonId) |>
+  filter(sum(event_week < 0) >= 4, sum(event_week > 0) >= 4) |>
+  ungroup() |>
+  mutate(
+    treated    = as.integer(group == "Power User"),
+    post       = as.integer(event_week >= 0),
+    treat_post = post * treated
+  )
+
+panel_es |> distinct(PersonId, group) |> count(group)
+```
+
+## Run the DiD once per metric and collect the results
+
+We fit `y ~ treat_post | PersonId + MetricDate` (person + week fixed effects,
+person-clustered SE) for every metric, then record the effect, its 95% CI, the
+p-value, significance stars, and the effect as a share of the Power group's
+pre-adoption baseline.
+
+```{r scan}
+stars <- function(p) dplyr::case_when(
+  p < 0.001 ~ "***", p < 0.01 ~ "**", p < 0.05 ~ "*", TRUE ~ "n.s."
+)
+
+run_did <- function(metric) {
+  fit <- fixest::feols(
+    as.formula(paste0(metric, " ~ treat_post | PersonId + MetricDate")),
+    data = panel_es, cluster = ~PersonId
+  )
+  ct  <- fit$coeftable["treat_post", ]
+  ci  <- confint(fit)["treat_post", ]
+  base_pre <- mean(panel_es[[metric]][panel_es$treated == 1 & panel_es$post == 0],
+                   na.rm = TRUE)
+  tibble(
+    metric          = metric,
+    estimate        = ct[["Estimate"]],
+    conf_low        = ci[[1]],
+    conf_high       = ci[[2]],
+    p_value         = ct[["Pr(>|t|)"]],
+    sig             = stars(ct[["Pr(>|t|)"]]),
+    baseline_pre    = base_pre,
+    pct_of_baseline = ct[["Estimate"]] / base_pre
+  )
+}
+
+results <- purrr::map_dfr(names(EFFECTS), run_did) |>
+  arrange(desc(estimate))
+
+results |>
+  mutate(
+    estimate        = round(estimate, 3),
+    `95% CI`        = sprintf("[%+.2f, %+.2f]", conf_low, conf_high),
+    `% of baseline` = scales::percent(pct_of_baseline, accuracy = 0.1),
+    p_value         = signif(p_value, 2)
+  ) |>
+  select(Metric = metric, `Δ (units)` = estimate, `95% CI`,
+         `% of baseline`, p = p_value, Sig = sig) |>
+  knitr::kable(caption = "Power vs Low DiD: one row per metric, sorted by effect")
+```
+
+Read the table as: *within-person, Power users changed this metric by `Δ` more
+than Low users did after adoption.* The `Sig` column separates real signals from
+noise, and note the deliberately null metric lands **n.s.**, which is exactly the
+kind of honest result this scan is meant to surface.
+
+## Forest plot
+
+The forest plot shows each effect as a share of the Power baseline, with 95%
+confidence intervals. Intervals crossing the zero line are not statistically
+distinguishable from "no differential change".
+
+```{r forest, fig.width=9, fig.height=4.5}
+ggplot(results,
+       aes(x = pct_of_baseline,
+           y = reorder(metric, pct_of_baseline),
+           colour = sig != "n.s.")) +
+  geom_vline(xintercept = 0, colour = "grey50") +
+  geom_pointrange(aes(xmin = conf_low / baseline_pre,
+                      xmax = conf_high / baseline_pre),
+                  linewidth = 0.7, size = 0.5) +
+  scale_x_continuous(labels = scales::percent) +
+  scale_colour_manual(values = c(`TRUE` = "#1b4965", `FALSE` = "#bc4b51"),
+                      labels = c(`TRUE` = "Significant (p<0.05)", `FALSE` = "n.s."),
+                      name = NULL) +
+  labs(
+    title    = "Power vs Low Copilot users: DiD effect by metric",
+    subtitle = "Within-person change for Power relative to Low, as % of Power pre-adoption baseline (95% CI)",
+    x = "Effect as % of pre-adoption baseline", y = NULL
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+## Wrapping up
+
+Looping a DiD across metrics turns a vague "Power users collaborate more" claim
+into a defensible, per-metric statement with effect sizes and significance,
+including the honest cases where a metric does not move. To run this on your own
+data, replace the simulation with `vivainsights::import_query()`, define the
+Power and Low groups with `identify_usage_segments()`, and derive each anchor
+week from the first Copilot action; the scan and forest plot then work unchanged.

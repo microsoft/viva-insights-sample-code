@@ -1,0 +1,176 @@
+---
+title: "Tracking Copilot usage segments over time with **vivainsights** in R"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: "lumen"
+---
+
+# Copilot usage segments over time
+
+## Introduction
+
+When measuring Copilot adoption, a single snapshot ("what share of people used
+Copilot last week?") can be misleading, because usage is a *habit* that builds
+up (or decays) over many weeks. The **vivainsights** package ships a function,
+`identify_usage_segments()`, that classifies every person-week into an adoption
+segment (**Power User**, **Habitual User**, **Novice User**, **Low User** or
+**Non-user**) using a rolling window of Copilot actions.
+
+This notebook shows how to:
+
+1. build a total Copilot-actions metric from the individual Copilot action
+   columns in a Person Query,
+2. classify each person-week with `identify_usage_segments(version = "12w")`,
+   and
+3. visualise how the **mix of segments evolves over time** with a stacked-area
+   chart, alongside the trend in average Copilot actions.
+
+We use the built-in `pq_data` sample so the notebook runs end-to-end with no
+external files. To run this on your own data, replace the `pq_data` load with
+`vivainsights::import_query("your-person-query.csv")`.
+
+## Set-up
+
+```{r setup, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(scales)
+library(vivainsights)
+```
+
+For clarity in this demonstration we use the explicit `package::function()`
+notation in a few places to show which package each function comes from.
+
+## Load data and build a total Copilot-actions metric
+
+`identify_usage_segments()` expects a single metric column that captures Copilot
+intensity. A Person Query splits Copilot activity across several
+`Copilot_actions_taken_in_*` columns (Teams, Outlook, Word, Excel, and so on),
+so we sum them into a single `Total_Copilot_actions_taken` column. We also
+replace missing values with `0`, because a missing action count means the person simply
+did not take that action that week.
+
+```{r load}
+data("pq_data", package = "vivainsights")
+
+app_cols <- grep("^Copilot_actions_taken_in", names(pq_data), value = TRUE)
+app_cols
+
+pq <- pq_data %>%
+  mutate(across(all_of(app_cols), ~ tidyr::replace_na(.x, 0))) %>%
+  mutate(Total_Copilot_actions_taken = rowSums(across(all_of(app_cols))))
+
+# A quick look at the panel structure
+pq %>%
+  summarise(
+    persons = dplyr::n_distinct(PersonId),
+    weeks   = dplyr::n_distinct(MetricDate),
+    from    = min(MetricDate),
+    to      = max(MetricDate)
+  )
+```
+
+## Classify each person-week into a usage segment
+
+`identify_usage_segments()` with `version = "12w"` applies the standard
+12-week rolling definition: a person's segment in a given week depends on their
+Copilot actions over that week and the preceding weeks. Returning
+`return = "data"` appends the classification columns to the input frame.
+
+```{r segments}
+seg <- vivainsights::identify_usage_segments(
+  data    = pq,
+  metric  = "Total_Copilot_actions_taken",
+  version = "12w",
+  return  = "data"
+)
+
+seg <- seg %>%
+  mutate(UsageSegments_12w = factor(
+    UsageSegments_12w,
+    levels = c("Power User", "Habitual User", "Novice User",
+               "Low User", "Non-user")
+  ))
+
+# Overall distribution of person-weeks across segments
+seg %>%
+  count(UsageSegments_12w) %>%
+  mutate(share = scales::percent(n / sum(n), accuracy = 0.1))
+```
+
+> **Note on the rolling window.** Because the 12-week version looks back up to
+> 12 weeks, the earliest weeks in any export are based on a shorter window and
+> are therefore less stable. When you have a long enough history, it is common
+> to drop the first ~12 weeks before interpreting the trend. With the short
+> sample here we keep all weeks but flag the caveat.
+
+## Segment mix over time (stacked area)
+
+The clearest way to show adoption momentum is the **share of the population in
+each segment, week by week**. A stacked-area chart makes the shift from lighter
+to heavier usage (or vice versa) easy to read.
+
+```{r stacked-area, fig.width=9, fig.height=5}
+seg_share <- seg %>%
+  count(MetricDate, UsageSegments_12w, name = "n") %>%
+  group_by(MetricDate) %>%
+  mutate(share = n / sum(n)) %>%
+  ungroup()
+
+seg_palette <- c(
+  "Power User"    = "#1b4965",
+  "Habitual User" = "#5fa8d3",
+  "Novice User"   = "#cae9ff",
+  "Low User"      = "#f4a259",
+  "Non-user"      = "#bc4b51"
+)
+
+ggplot(seg_share, aes(x = MetricDate, y = share, fill = UsageSegments_12w)) +
+  geom_area(alpha = 0.9) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_manual(values = seg_palette, name = "Usage segment") +
+  labs(
+    title    = "Copilot usage-segment mix over time",
+    subtitle = "Share of person-weeks in each 12-week rolling segment",
+    x = NULL, y = "Share of population"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+## Average Copilot actions over time
+
+Alongside the segment mix, it is useful to plot the trend in mean Copilot
+actions per person-week. Rising average actions with a growing Power/Habitual
+share is the signature of healthy adoption.
+
+```{r avg-trend, fig.width=9, fig.height=4}
+actions_trend <- seg %>%
+  group_by(MetricDate) %>%
+  summarise(mean_actions = mean(Total_Copilot_actions_taken, na.rm = TRUE),
+            .groups = "drop")
+
+ggplot(actions_trend, aes(x = MetricDate, y = mean_actions)) +
+  geom_line(linewidth = 1.1, colour = "#1b4965") +
+  geom_point(size = 2, colour = "#1b4965") +
+  labs(
+    title    = "Average Copilot actions per person-week",
+    subtitle = "Mean of Total_Copilot_actions_taken across the population",
+    x = NULL, y = "Mean Copilot actions"
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+## Wrapping up
+
+With three short steps, namely summing the Copilot action columns, calling
+`identify_usage_segments(version = "12w")`, and aggregating by `MetricDate`, we
+turned a raw Person Query into a longitudinal view of Copilot adoption. The same
+code runs unchanged on a real export loaded with
+`vivainsights::import_query()`; just point it at your own file. Remember to treat
+the earliest weeks with caution because of the 12-week warm-up window.

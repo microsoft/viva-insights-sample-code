@@ -2,7 +2,7 @@
 layout: page
 title: "Advanced Analytics"
 eyebrow: "Advanced analytics"
-description: "Machine learning, regression, and statistical analysis for Viva Insights data, including random forest top-performer models, information value, pairwise chi-square tests, difference-in-differences intervention evaluation, meeting engagement drivers, and collaboration by time of day in R and Python."
+description: "Machine learning, regression, and statistical analysis for Viva Insights data, including random forest top-performer models, information value, pairwise chi-square tests, difference-in-differences intervention evaluation, meeting engagement drivers, collaboration by time of day, Copilot usage-segment trends, and event-study/DiD adoption analysis in R and Python."
 permalink: /advanced/
 ---
 # Advanced Analytics Scripts
@@ -18,6 +18,8 @@ When choosing which technique to use, consider if you need to build a predictive
 The **pairwise chi-square tests** use case is used for statistical hypothesis testing to determine if there are significant associations between categorical variables - typically organizational attributes or survey attributes - in your Viva Insights data. This technique is particularly valuable when you want to understand relationships between different organizational attributes (such as department, level, or location) and collaboration patterns or behaviors. The scripts include multiple testing corrections to control for false discovery rates when performing many simultaneous comparisons, ensuring reliable statistical conclusions. 
 
 The **behavioral and program analysis** examples move from modelling attributes to answering practical workplace questions. The *collaboration by time of day* scripts estimate a typical start and end of day from the hourly collaboration metrics, and they show how those hours shift by weekday and by role. The *evaluating a workplace intervention* scripts set up a treated-versus-control, difference-in-differences design so that a genuine programme effect can be separated from a company-wide or seasonal trend, which makes them directly applicable to measuring the impact of a Microsoft 365 Copilot enablement wave. The *meeting engagement drivers* scripts model in-meeting messaging as a proxy for disengagement and rank the meeting characteristics that drive it, and they then take a closer look at meeting duration to separate a real effect from simple exposure. Because the sample datasets do not contain the hourly buckets, a real intervention, or enough multi-person meetings, these examples generate small, clearly labelled simulated datasets that share the column names of a real query, so that the same downstream code runs unchanged on your own export.
+
+The **Copilot adoption and causal analysis** examples focus on measuring change credibly. The *Copilot usage segments over time* scripts sum the individual Copilot-action columns, classify each person-week with `identify_usage_segments(version = "12w")`, and visualise how the mix of Power, Habitual, Novice, Low and Non-users evolves week by week. The *difference-in-differences metric scan* runs a within-person DiD per metric across two both-licensed groups (Power vs Low Copilot users) and assembles the effects, confidence intervals, and significance into one sortable table plus a forest plot, honestly surfacing the metrics that do not move. The *event-study and difference-in-differences* example aligns each adopter on their own event time, checks the parallel-trends assumption before trusting a single headline number, and reads the within-person change net of a non-adopting control. The two causal examples build small, clearly labelled seeded simulations, with the injected effects present only so the models have something to recover, so please swap the simulation block for your own export before drawing conclusions.
 
 ## Machine Learning & Predictive Modeling
 
@@ -144,6 +146,68 @@ The **behavioral and program analysis** examples move from modelling attributes 
 
 ---
 
+## Copilot Adoption & Causal Analysis
+
+### Copilot Usage Segments Over Time (Python)
+**📄 [copilot-usage-segments-trend.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/copilot-usage-segments-trend.py)**
+- **Purpose**: Track how the mix of Copilot usage segments evolves week by week
+- **Language**: Python
+- **Prerequisites**: vivainsights Python package, pandas, numpy, matplotlib
+- **Key Features**: identify_usage_segments (12-week rolling), stacked-area segment mix, action trend
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/copilot-usage-segments-trend.py)**
+
+### Copilot Usage Segments Over Time (R)
+**📄 [copilot-usage-segments-trend.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-usage-segments-trend.Rmd)**
+- **Purpose**: Track how the mix of Copilot usage segments evolves week by week
+- **Language**: R
+- **Format**: R Markdown
+- **Prerequisites**: vivainsights R package, dplyr, tidyr, ggplot2, scales
+- **Key Features**: identify_usage_segments (12-week rolling), stacked-area segment mix, action trend
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/copilot-usage-segments-trend.Rmd)**
+- **[🌐 View HTML Output](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-usage-segments-trend.html)**
+
+---
+
+### Difference-in-Differences Metric Scan (Python)
+**📄 [did-metric-scan.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/did-metric-scan.py)**
+- **Purpose**: Run a within-person DiD per metric (Power vs Low Copilot users) into one sortable table
+- **Language**: Python
+- **Prerequisites**: vivainsights Python package, linearmodels, pandas, numpy, matplotlib
+- **Key Features**: Per-metric TWFE DiD, significance stars, forest plot, honest reporting of null effects
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/did-metric-scan.py)**
+
+### Difference-in-Differences Metric Scan (R)
+**📄 [did-metric-scan.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/did-metric-scan.Rmd)**
+- **Purpose**: Run a within-person DiD per metric (Power vs Low Copilot users) into one sortable table
+- **Language**: R
+- **Format**: R Markdown
+- **Prerequisites**: vivainsights R package, fixest, dplyr, tidyr, ggplot2, purrr, scales
+- **Key Features**: Per-metric TWFE DiD, significance stars, forest plot, honest reporting of null effects
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/did-metric-scan.Rmd)**
+- **[🌐 View HTML Output](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/did-metric-scan.html)**
+
+---
+
+### Event-Study & Difference-in-Differences (Python)
+**📄 [event-study-did.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/event-study-did.py)**
+- **Purpose**: Measure within-person behaviour change around Copilot adoption with a TWFE event-study/DiD
+- **Language**: Python
+- **Prerequisites**: vivainsights Python package, linearmodels, pandas, numpy, matplotlib
+- **Key Features**: Event-time alignment, pre-trend check, person + week fixed effects, z-scored composite index
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/event-study-did.py)**
+
+### Event-Study & Difference-in-Differences (R)
+**📄 [event-study-did.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/event-study-did.Rmd)**
+- **Purpose**: Measure within-person behaviour change around Copilot adoption with a TWFE event-study/DiD
+- **Language**: R
+- **Format**: R Markdown
+- **Prerequisites**: vivainsights R package, fixest, dplyr, tidyr, ggplot2, scales
+- **Key Features**: Event-time alignment, pre-trend check, person + week fixed effects, z-scored composite index
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/event-study-did.Rmd)**
+- **[🌐 View HTML Output](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/event-study-did.html)**
+
+---
+
 ## Sample Datasets
 
 ### Simulated Person Query
@@ -181,12 +245,12 @@ The **behavioral and program analysis** examples move from modelling attributes 
 
 ### Python Environment
 ```bash
-pip install vivainsights pandas numpy scikit-learn matplotlib seaborn jupyter
+pip install vivainsights pandas numpy scikit-learn linearmodels matplotlib seaborn jupyter
 ```
 
 ### R Environment
 ```r
-install.packages(c("vivainsights", "dplyr", "ggplot2", "randomForest", "Information", "rmarkdown"))
+install.packages(c("vivainsights", "dplyr", "tidyr", "ggplot2", "scales", "purrr", "randomForest", "fixest", "Information", "rmarkdown"))
 ```
 
 ---

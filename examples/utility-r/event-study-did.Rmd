@@ -1,0 +1,326 @@
+---
+title: "Within-person event-study & difference-in-differences with **vivainsights** in R"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: "lumen"
+---
+
+# Measuring behaviour change with an event-study / difference-in-differences
+
+## Introduction
+
+A common question in Copilot Analytics is *causal*: **did a person's
+collaboration behaviour actually change after they started using Copilot**, or
+are heavy users simply different people to begin with? A plain comparison of
+users vs non-users cannot separate the two, because adoption is not random.
+
+A **within-person event-study** paired with a **two-way fixed-effects (TWFE)
+difference-in-differences (DiD)** model is a standard way to address this. The
+design:
+
+* aligns every adopter on their own **event time** (weeks relative to the week
+  they adopted Copilot),
+* compares adopters against a control group of non-adopters over the same
+  calendar weeks,
+* absorbs each person's baseline (**person fixed effects**) and every calendar
+  week's common shocks (**week fixed effects**), and
+* reads the treatment effect as the *within-person* change in the treated group
+  relative to the control group.
+
+Person Query exports do not ship with a clean adoption event, so this notebook
+builds a **small seeded simulation** whose column names match a real Person
+Query. The downstream modelling code therefore runs on a real export loaded
+with `vivainsights::import_query()`, so you swap out the data-generation chunk and
+map your outcome columns (shown below). The simulation injects a **clearly-labelled
+illustrative effect** so the model has something to recover; this is for
+demonstration only and is not a real result.
+
+## Set-up
+
+This example uses **fixest** for fast fixed-effects estimation; install it with
+`install.packages("fixest")` if you do not already have it.
+
+```{r setup, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(scales)
+library(fixest)   # fast fixed-effects estimation (feols, i(), iplot)
+```
+
+To run this notebook on your **own** export instead of the simulation, replace
+the simulation chunk below with the following, then continue unchanged from the
+*"Derive the adoption week"* section:
+
+```{r real-data, eval=FALSE, purl=FALSE}
+panel <- vivainsights::import_query("your-person-query.csv")
+app_cols <- grep("^Copilot_actions_taken_in", names(panel), value = TRUE)
+panel <- panel %>%
+  mutate(across(all_of(app_cols), ~ tidyr::replace_na(.x, 0))) %>%
+  mutate(Total_Copilot_actions_taken = rowSums(across(all_of(app_cols))))
+# choose the outcome column(s) to model, e.g. Collaboration_hours, Chat_hours,
+# Emails_sent -- these are standard Person Query columns.
+```
+
+## Simulate a Person-Query-shaped panel
+
+The block below creates a weekly panel with the same shape as a Person Query:
+one row per `PersonId` x `MetricDate`, a `Total_Copilot_actions_taken` column,
+and a few collaboration outcomes (`Collaboration_hours`, `Chat_hours`,
+`Emails_sent`). Treated people adopt Copilot at a **staggered** week; control
+people never adopt. We add person baselines, calendar-week seasonality, and
+noise so the panel looks realistic.
+
+> **Replace this chunk for real data.** Load your export with
+> `vivainsights::import_query()` and derive the adoption week from the first week
+> of non-zero Copilot actions (see the next section). Everything downstream stays
+> the same.
+
+```{r simulate}
+set.seed(100)
+
+n_persons <- 400L
+n_weeks   <- 40L
+weeks     <- seq(as.Date("2024-01-01"), by = "week", length.out = n_weeks)
+
+# ---- clearly-labelled illustrative effect ---------------------------------
+# DEMO ONLY: this is the size of the behaviour change we inject into treated
+# people after adoption. Set to 0 (or delete) when running on real data, so the
+# model should estimate the effect, not have it baked in.
+TREATMENT_EFFECT <- 0.8   # extra collaboration hours/week once adopted
+# ---------------------------------------------------------------------------
+
+persons <- tibble(
+  PersonId    = sprintf("P%04d", seq_len(n_persons)),
+  treated     = rbinom(n_persons, 1, 0.6),
+  # person baseline (some people simply collaborate more than others)
+  base_collab = rnorm(n_persons, mean = 12, sd = 3)
+)
+
+# Treated people adopt at a staggered week (10..28); controls never adopt.
+persons <- persons %>%
+  mutate(adopt_week = ifelse(
+    treated == 1,
+    sample(10:28, n_persons, replace = TRUE),
+    NA_integer_
+  ))
+
+# calendar-week seasonality shared by everyone
+week_shock <- tibble(
+  week_idx  = seq_len(n_weeks),
+  MetricDate = weeks,
+  season    = 1.5 * sin(2 * pi * seq_len(n_weeks) / 26)
+)
+
+panel <- tidyr::crossing(PersonId = persons$PersonId, week_idx = seq_len(n_weeks)) %>%
+  left_join(persons, by = "PersonId") %>%
+  left_join(week_shock, by = "week_idx") %>%
+  mutate(
+    adopted_now = treated == 1 & week_idx >= adopt_week,
+    # Copilot actions: 0 before adoption, positive afterwards (treated only)
+    Total_Copilot_actions_taken = ifelse(
+      adopted_now, rpois(n(), lambda = 25), 0L
+    ),
+    # primary outcome: baseline + season + injected effect (post-adoption) + noise
+    Collaboration_hours = base_collab + season +
+      ifelse(adopted_now, TREATMENT_EFFECT, 0) +
+      rnorm(n(), 0, 2),
+    # two correlated collaboration outcomes for the composite index later
+    Chat_hours  = 0.35 * Collaboration_hours + rnorm(n(), 0, 0.8),
+    Emails_sent = 20 + 1.2 * Collaboration_hours + rnorm(n(), 0, 4)
+  ) %>%
+  select(PersonId, MetricDate, week_idx, treated,
+         Total_Copilot_actions_taken,
+         Collaboration_hours, Chat_hours, Emails_sent)
+
+head(panel)
+```
+
+## Derive the adoption week and event time
+
+On a real export you would not know who is "treated"; you would infer it from
+the data. Here we reproduce that realistic step: a person is an **adopter** if
+they ever record a non-zero Copilot action, and their **adoption week** is the
+first such week. Control people (never any actions) are assigned a **placebo**
+adoption week (the median adopter week), so they contribute a comparable
+event-time window.
+
+```{r event-time}
+adopt <- panel %>%
+  filter(Total_Copilot_actions_taken > 0) %>%
+  group_by(PersonId) %>%
+  summarise(adopt_date = min(MetricDate), .groups = "drop")
+
+placebo_date <- as.Date(median(adopt$adopt_date))
+
+panel <- panel %>%
+  left_join(adopt, by = "PersonId") %>%
+  mutate(
+    is_adopter = !is.na(adopt_date),
+    anchor     = dplyr::coalesce(adopt_date, placebo_date),
+    event_week = as.integer((MetricDate - anchor) / 7)
+  )
+
+# Keep a balanced +/- 8-week window around each person's anchor
+WINDOW <- 8L
+panel_es <- panel %>%
+  filter(event_week >= -WINDOW, event_week <= WINDOW) %>%
+  group_by(PersonId) %>%
+  filter(sum(event_week < 0) >= 4, sum(event_week > 0) >= 4) %>%
+  ungroup() %>%
+  mutate(
+    treated_grp = as.integer(is_adopter),
+    post        = as.integer(event_week >= 0),
+    treat_post  = post * treated_grp
+  )
+
+panel_es %>%
+  distinct(PersonId, treated_grp) %>%
+  count(group = ifelse(treated_grp == 1, "Adopter (treated)", "Non-adopter (control)"))
+```
+
+## The headline TWFE difference-in-differences
+
+The core model is:
+
+$$y_{it} = \beta\,(\text{post}_{it}\times\text{treated}_i) + \alpha_i + \gamma_t + \varepsilon_{it}$$
+
+where $\alpha_i$ are person fixed effects, $\gamma_t$ are calendar-week fixed
+effects, and standard errors are clustered by person. The coefficient $\beta$ on
+`treat_post` is the difference-in-differences estimate, the within-person change
+for adopters, net of the control group and of anything common to a given week.
+
+```{r twfe}
+did <- fixest::feols(
+  Collaboration_hours ~ treat_post | PersonId + MetricDate,
+  data    = panel_es,
+  cluster = ~PersonId
+)
+
+summary(did)
+
+did_beta <- coef(did)[["treat_post"]]
+cat(sprintf(
+  "\nDiD estimate: %+.2f collaboration hours/week (injected demo effect was %+.2f)\n",
+  did_beta, TREATMENT_EFFECT
+))
+```
+
+The recovered coefficient should land close to the injected `TREATMENT_EFFECT`,
+confirming the model is working. On real data you would *not* know the true
+value, and that is the whole point of estimating it.
+
+## The event-study: check for pre-trends and see the effect emerge
+
+A single DiD number hides a crucial assumption: **parallel trends**. The
+event-study version estimates a separate coefficient for each event week
+(relative to week -1, the week before adoption). If the design is valid, the
+**pre-adoption** coefficients should sit near zero (no divergence before
+treatment), and the **post-adoption** coefficients should step up to the effect.
+
+`fixest::i()` builds these event-time interactions directly, with `ref = -1` as
+the omitted reference week.
+
+```{r event-study, fig.width=9, fig.height=5}
+es <- fixest::feols(
+  Collaboration_hours ~ i(event_week, treated_grp, ref = -1) |
+    PersonId + MetricDate,
+  data    = panel_es,
+  cluster = ~PersonId
+)
+
+# Tidy the event-time coefficients for a ggplot
+es_tab <- as.data.frame(coeftable(es))
+es_tab$term <- rownames(es_tab)
+es_coefs <- es_tab %>%
+  filter(grepl("event_week::", term)) %>%
+  mutate(
+    event_week = as.integer(sub(".*event_week::(-?\\d+).*", "\\1", term)),
+    lwr = Estimate - 1.96 * `Std. Error`,
+    upr = Estimate + 1.96 * `Std. Error`
+  )
+
+# Add the reference week (-1) at exactly 0
+es_coefs <- bind_rows(
+  es_coefs,
+  tibble(event_week = -1, Estimate = 0, lwr = 0, upr = 0)
+) %>% arrange(event_week)
+
+ggplot(es_coefs, aes(event_week, Estimate)) +
+  geom_hline(yintercept = 0, colour = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", colour = "grey40") +
+  geom_ribbon(aes(ymin = lwr, ymax = upr), fill = "#5fa8d3", alpha = 0.25) +
+  geom_line(linewidth = 1, colour = "#1b4965") +
+  geom_point(size = 2, colour = "#1b4965") +
+  scale_x_continuous(breaks = seq(-WINDOW, WINDOW, 2)) +
+  labs(
+    title    = "Event-study: collaboration hours around Copilot adoption",
+    subtitle = "Coefficients vs event week (ref = week -1), 95% CI. Flat before, steps up after.",
+    x = "Weeks relative to adoption", y = "Effect vs week -1 (hours/week)"
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+A flat pre-period and a clean post-period step is the visual signature of a
+credible DiD. If the pre-period coefficients trended, you would be worried that
+adopters were already diverging before Copilot and would treat the DiD estimate
+with caution.
+
+## Bonus: run the same design on a composite index
+
+Individual metrics can be noisy. A robust alternative is to combine several
+related collaboration metrics into a single **z-scored composite index**, then
+run the identical DiD on the index. Each component is standardised across the
+panel (mean 0, sd 1) and averaged, so no single metric's scale dominates.
+
+```{r composite, fig.width=9, fig.height=4}
+components <- c("Collaboration_hours", "Chat_hours", "Emails_sent")
+
+zscore <- function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+
+panel_es <- panel_es %>%
+  mutate(across(all_of(components), zscore, .names = "z_{.col}")) %>%
+  mutate(collab_index = rowMeans(across(starts_with("z_")), na.rm = TRUE))
+
+did_index <- fixest::feols(
+  collab_index ~ treat_post | PersonId + MetricDate,
+  data    = panel_es,
+  cluster = ~PersonId
+)
+
+summary(did_index)
+
+# Event-time trajectory of the composite, treated vs control
+idx_traj <- panel_es %>%
+  mutate(grp = ifelse(treated_grp == 1, "Adopter", "Control")) %>%
+  group_by(grp, event_week) %>%
+  summarise(idx = mean(collab_index), .groups = "drop")
+
+ggplot(idx_traj, aes(event_week, idx, colour = grp)) +
+  geom_vline(xintercept = -0.5, linetype = "dashed", colour = "grey40") +
+  geom_line(linewidth = 1) +
+  geom_point(size = 1.8) +
+  scale_colour_manual(values = c("Adopter" = "#1b4965", "Control" = "#bc4b51"),
+                      name = NULL) +
+  labs(
+    title    = "Composite collaboration index around adoption",
+    subtitle = "Mean z-scored index (Collaboration hours + Chat hours + Emails sent)",
+    x = "Weeks relative to adoption", y = "Composite index (z-units)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+## Wrapping up
+
+The event-study + TWFE DiD pattern is a portable way to ask *"did behaviour
+change after adoption, within the same person?"* without being fooled by the
+fact that adopters differ from non-adopters. To apply it to your own data,
+replace the simulation chunk with `vivainsights::import_query()`, derive the
+adoption week from the first non-zero Copilot action, set `TREATMENT_EFFECT`
+aside entirely, and let the model estimate the effect. Always inspect the
+event-study pre-trends before trusting the single DiD number.
