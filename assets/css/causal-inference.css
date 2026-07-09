@@ -1,0 +1,129 @@
+/* ------------------------------------------------------------------
+   Causal Inference (conceptual guide series) — page components
+   Loaded per-page via `css: "/assets/css/causal-inference.css"` front matter.
+   Distinct visual identity from the Copilot Causal Toolkit (ct-*),
+   but built on the same shared design tokens defined in site.css
+   (--primary, --ink, --text, --radius-card, --shadow-card).
+   ------------------------------------------------------------------ */
+
+:root {
+  --ci-border: #e6e6ef;
+  --ci-muted: #5b5b6b;
+  --ci-accent: #5c2d91;      /* purple — differentiates from the toolkit's blue */
+  --ci-note: #335ccc;
+  --ci-tip: #2e7d32;
+  --ci-warning: #b3531d;
+}
+
+/* ---- Series breadcrumb chips ---- */
+.ci-series-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 1.75rem;
+  font-size: 0.82rem;
+}
+.page-content a.ci-chip,
+.ci-chip {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--ci-border);
+  background: #fff;
+  color: var(--ci-muted) !important;
+  text-decoration: none !important;
+}
+.page-content a.ci-chip:hover { border-color: var(--ci-accent); color: var(--ink, #1b1b24) !important; }
+.ci-chip.is-current {
+  background: var(--ci-accent);
+  border-color: var(--ci-accent);
+  color: #fff !important;
+  font-weight: 600;
+}
+.ci-chip-step { opacity: 0.7; margin-right: 4px; }
+
+/* ---- Callouts (assumptions / tips / pitfalls) ---- */
+.ci-callout {
+  border: 1px solid var(--ci-border);
+  border-left: 4px solid var(--ci-note);
+  background: #fff;
+  border-radius: var(--radius-card, 12px);
+  padding: 16px 20px;
+  margin: 1.5rem 0;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.06));
+}
+.ci-callout > :first-child { margin-top: 0; }
+.ci-callout > :last-child { margin-bottom: 0; }
+.ci-callout .ci-callout-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ci-note);
+  margin-bottom: 0.4rem;
+}
+.ci-callout.is-tip { border-left-color: var(--ci-tip); }
+.ci-callout.is-tip .ci-callout-label { color: var(--ci-tip); }
+.ci-callout.is-warning { border-left-color: var(--ci-warning); }
+.ci-callout.is-warning .ci-callout-label { color: var(--ci-warning); }
+.ci-callout.is-accent { border-left-color: var(--ci-accent); }
+.ci-callout.is-accent .ci-callout-label { color: var(--ci-accent); }
+
+/* ---- Collapsible "show full implementation" blocks ---- */
+details.ci-details {
+  border: 1px solid var(--ci-border);
+  border-radius: var(--radius-card, 12px);
+  background: #fff;
+  padding: 0 18px;
+  margin: 1rem 0;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.06));
+}
+details.ci-details > summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 14px 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+details.ci-details > summary::-webkit-details-marker { display: none; }
+details.ci-details > summary::before {
+  content: "\25B8";
+  color: var(--ci-accent);
+  transition: transform 0.15s ease;
+}
+details.ci-details[open] > summary::before { transform: rotate(90deg); }
+details.ci-details[open] > summary { border-bottom: 1px solid var(--ci-border); }
+details.ci-details > summary + * { margin-top: 14px; }
+details.ci-details > :last-child { margin-bottom: 16px; }
+
+/* ---- Prev / next pager ---- */
+.ci-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 2.5rem 0 0;
+  border-top: 1px solid var(--ci-border);
+  padding-top: 1.25rem;
+}
+.page-content a.ci-pager-link {
+  display: flex;
+  flex-direction: column;
+  max-width: 48%;
+  padding: 12px 16px;
+  border: 1px solid var(--ci-border);
+  border-radius: var(--radius-card, 12px);
+  text-decoration: none !important;
+  color: var(--text, #1b1b24) !important;
+  background: #fff;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
+}
+.page-content a.ci-pager-link:hover {
+  border-color: var(--ci-accent);
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.06));
+}
+.ci-pager-link.is-next { margin-left: auto; text-align: right; align-items: flex-end; }
+.ci-pager-dir { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ci-muted); }
+.ci-pager-title { font-weight: 600; }

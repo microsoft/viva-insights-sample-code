@@ -3,9 +3,23 @@ layout: default
 title: "Causal Inference: Doubly Robust Methods"
 eyebrow: "Causal inference"
 permalink: /causal-inference-doubly-robust/
+css: "/assets/css/causal-inference.css"
 ---
 
 # Method 5: Doubly Robust Methods & Double Machine Learning
+
+<nav class="ci-series-nav" aria-label="Causal inference guide">
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference/"><span class="ci-chip-step">1</span>Overview</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-experimentation-guide/"><span class="ci-chip-step">2</span>Worked example</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-data-prep/"><span class="ci-chip-step">3</span>Data prep</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-regression/"><span class="ci-chip-step">4</span>Regression</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-propensity/"><span class="ci-chip-step">5</span>Propensity</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-did/"><span class="ci-chip-step">6</span>DiD</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-iv/"><span class="ci-chip-step">7</span>IV</a>
+  <a class="ci-chip is-current" href="{{ site.baseurl }}/causal-inference-doubly-robust/"><span class="ci-chip-step">8</span>Doubly robust</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-validation/"><span class="ci-chip-step">9</span>Validation</a>
+</nav>
+
 ## Overview
 
 Doubly Robust methods combine regression adjustment and propensity score methods to provide protection against model misspecification. These methods remain consistent if either the outcome model OR the propensity score model is correctly specified, but not necessarily both.
@@ -16,10 +30,6 @@ Doubly Robust methods combine regression adjustment and propensity score methods
 > - **Double / debiased machine learning (DML)** is a *framework* (Chernozhukov et al., 2018) for using flexible ML models to estimate those nuisance functions while still obtaining valid confidence intervals. It relies on two ingredients: a **Neyman-orthogonal** score (the AIPW score is one such DR score) **and cross-fitting** (out-of-fold nuisance predictions) to remove overfitting/regularization bias.
 >
 > In short: DR is the *robustness property of the score*; DML is the *recipe (orthogonal score + cross-fitting)* that makes ML-based nuisance estimation safe. Many DML estimators are built on a DR score, but you can be doubly robust without cross-fitting, and the two terms should not be used interchangeably.
-
-**Navigation:**
-- [← Back to Instrumental Variables]({{ site.baseurl }}/causal-inference-iv/)
-- [Next: Validation & Testing →]({{ site.baseurl }}/causal-inference-validation/)
 
 ---
 
@@ -1008,10 +1018,17 @@ def dr_implementation_checklist():
 dr_implementation_checklist()
 ```
 
-**Navigation:**
-- [← Back to Instrumental Variables]({{ site.baseurl }}/causal-inference-iv/)
-- [Next: Validation & Testing →]({{ site.baseurl }}/causal-inference-validation/)
-
 ---
 
 *Doubly Robust methods provide powerful protection against model misspecification by combining multiple approaches. Always test robustness across different model specifications and validate assumptions before making business decisions.*
+
+<nav class="ci-pager" aria-label="Causal inference pagination">
+  <a class="ci-pager-link" href="{{ site.baseurl }}/causal-inference-iv/">
+    <span class="ci-pager-dir">← Back</span>
+    <span class="ci-pager-title">IV</span>
+  </a>
+  <a class="ci-pager-link is-next" href="{{ site.baseurl }}/causal-inference-validation/">
+    <span class="ci-pager-dir">Next →</span>
+    <span class="ci-pager-title">Validation</span>
+  </a>
+</nav>

@@ -3,16 +3,26 @@ layout: default
 title: "Causal Inference: Instrumental Variables"
 eyebrow: "Causal inference"
 permalink: /causal-inference-iv/
+css: "/assets/css/causal-inference.css"
 ---
 
 # Method 4: Instrumental Variables (IV)
+
+<nav class="ci-series-nav" aria-label="Causal inference guide">
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference/"><span class="ci-chip-step">1</span>Overview</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-experimentation-guide/"><span class="ci-chip-step">2</span>Worked example</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-data-prep/"><span class="ci-chip-step">3</span>Data prep</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-regression/"><span class="ci-chip-step">4</span>Regression</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-propensity/"><span class="ci-chip-step">5</span>Propensity</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-did/"><span class="ci-chip-step">6</span>DiD</a>
+  <a class="ci-chip is-current" href="{{ site.baseurl }}/causal-inference-iv/"><span class="ci-chip-step">7</span>IV</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-doubly-robust/"><span class="ci-chip-step">8</span>Doubly robust</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-validation/"><span class="ci-chip-step">9</span>Validation</a>
+</nav>
+
 ## Overview
 
 Instrumental Variables (IV) address endogeneity by using variation that affects treatment assignment but only influences outcomes through the treatment itself. This powerful technique can recover causal effects even with unmeasured confounders.
-
-**Navigation:**
-- [← Back to Difference-in-Differences]({{ site.baseurl }}/causal-inference-did/)
-- [Next: Doubly Robust Methods →]({{ site.baseurl }}/causal-inference-doubly-robust/)
 
 ---
 
@@ -1113,10 +1123,17 @@ if all(var in locals() for var in ['validity_results', 'weak_iv_diagnostics', 'i
     )
 ```
 
-**Navigation:**
-- [← Back to Difference-in-Differences]({{ site.baseurl }}/causal-inference-did/)
-- [Next: Doubly Robust Methods →]({{ site.baseurl }}/causal-inference-doubly-robust/)
-
 ---
 
 *Instrumental Variables provide powerful tools for causal inference when unmeasured confounding is suspected. Always validate instrument strength and exclusion restrictions before interpreting results.*
+
+<nav class="ci-pager" aria-label="Causal inference pagination">
+  <a class="ci-pager-link" href="{{ site.baseurl }}/causal-inference-did/">
+    <span class="ci-pager-dir">← Back</span>
+    <span class="ci-pager-title">DiD</span>
+  </a>
+  <a class="ci-pager-link is-next" href="{{ site.baseurl }}/causal-inference-doubly-robust/">
+    <span class="ci-pager-dir">Next →</span>
+    <span class="ci-pager-title">Doubly robust</span>
+  </a>
+</nav>

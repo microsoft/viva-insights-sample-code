@@ -3,9 +3,23 @@ layout: default
 title: "Causal Inference: Experimentation Guide"
 eyebrow: "Causal inference"
 permalink: /causal-inference-experimentation-guide/
+css: "/assets/css/causal-inference.css"
 ---
 
 # Causal Inference: Experimentation Guide for Copilot Analytics
+
+<nav class="ci-series-nav" aria-label="Causal inference guide">
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference/"><span class="ci-chip-step">1</span>Overview</a>
+  <a class="ci-chip is-current" href="{{ site.baseurl }}/causal-inference-experimentation-guide/"><span class="ci-chip-step">2</span>Worked example</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-data-prep/"><span class="ci-chip-step">3</span>Data prep</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-regression/"><span class="ci-chip-step">4</span>Regression</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-propensity/"><span class="ci-chip-step">5</span>Propensity</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-did/"><span class="ci-chip-step">6</span>DiD</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-iv/"><span class="ci-chip-step">7</span>IV</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-doubly-robust/"><span class="ci-chip-step">8</span>Doubly robust</a>
+  <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-validation/"><span class="ci-chip-step">9</span>Validation</a>
+</nav>
+
 This is a comprehensive guide on how to run a causal inference (or treatment effect estimation) analysis with Copilot Analytics. 
 
 ## What is causal inference?
@@ -433,3 +447,14 @@ CATE analysis identifies heterogeneous treatment effects across subgroups:
 - [Causal Inference in Copilot Analytics]({{ site.baseurl }}/causal-inference/) — conceptual introduction and business context
 - [Technical Implementation Overview]({{ site.baseurl }}/causal-inference-technical/) - method selection and the full set of method-specific guides
 - [Copilot Causal Toolkit]({{ site.baseurl }}/copilot-causal-toolkit/) — a ready-to-run toolkit that automates much of this workflow
+
+<nav class="ci-pager" aria-label="Causal inference pagination">
+  <a class="ci-pager-link" href="{{ site.baseurl }}/causal-inference/">
+    <span class="ci-pager-dir">← Back</span>
+    <span class="ci-pager-title">Overview</span>
+  </a>
+  <a class="ci-pager-link is-next" href="{{ site.baseurl }}/causal-inference-data-prep/">
+    <span class="ci-pager-dir">Next →</span>
+    <span class="ci-pager-title">Data prep</span>
+  </a>
+</nav>
