@@ -29,6 +29,11 @@ Before running, you customize a few parameters **directly inside the notebook ce
 4. **Don't run the cell yet** — review all parameters first, then run from the top.
 </div>
 
+<div class="ct-callout" markdown="1">
+<span class="ct-callout-label">A note on cell numbers</span>
+Cell numbers below refer to the After-Hours and External Collaboration notebooks. The **Engagement notebook has an extra survey-merge step near the top**, so every cell after the setup cell is shifted by **+1** (e.g. what is Cell 7 in the other notebooks is Cell 8 in the Engagement notebook). The Engagement-only section below quotes its own cell numbers directly.
+</div>
+
 ## 1 · File paths — Cell 3 (Setup and Imports)
 
 Update the data file path to match your CSV filename:
@@ -60,11 +65,9 @@ FIND_NEGATIVE_EFFECTS = True   # True = reductions, False = increases
 
 This toggle does **not** exist in the External Collaboration notebooks.
 
-<details class="ct-details">
-<summary>Engagement notebook only — outcome variable &amp; scale (Cell 4)</summary>
-<div markdown="1">
+## 3 · Outcome variable &amp; scale — Cell 5 (Engagement notebook only)
 
-The Engagement notebook needs the ordinal survey outcome and its scale:
+The Engagement notebook is the **only** scenario whose outcome is an ordinal survey metric rather than a Viva Insights metric. Because Glint survey scales vary between organizations (1–5, 1–7, 1–9, 1–10, …), you must tell the notebook both which column to use and what its scale is:
 
 ```python
 # Match OUTCOME_VAR to your Glint survey metric column name
@@ -75,12 +78,15 @@ OUTCOME_SCALE_MIN = 1   # Minimum value on the scale
 OUTCOME_SCALE_MAX = 7   # Maximum value (e.g. 5, 7, 9, or 10)
 ```
 
-`OUTCOME_VAR` must match the exact column name in your Person Query export. The scale parameters drive ceiling/floor diagnostics and the interpretation of effect magnitudes on the ordinal scale.
+`OUTCOME_VAR` must match the exact column name in your Person Query export.
 
+<div class="ct-callout is-tip" markdown="1">
+<span class="ct-callout-label">These parameters describe your scale — they do not transform it</span>
+
+`OUTCOME_SCALE_MIN` / `OUTCOME_SCALE_MAX` are used **only** for the ceiling/floor diagnostics and the interpretation of effect magnitudes. They do **not** rescale, normalise, or otherwise transform the outcome — the model is fit on the raw values in `OUTCOME_VAR`. Set them to match the **actual response range** of your survey metric. The diagnostic cell (Cell 6) prints the observed min/max and warns you if they fall outside the declared scale, so run that cell and confirm there is no mismatch before continuing.
 </div>
-</details>
 
-## 3 · Organizational attributes — Cell 7 (Variable Definitions)
+## 4 · Organizational attributes — Cell 7 (Variable Definitions)
 
 Update these lists to match the column names in **your** data.
 
@@ -120,7 +126,7 @@ COLLABORATION_VARS = [
 </div>
 </details>
 
-## 4 · Date range filter — Cell 7
+## 5 · Date range filter — Cell 7
 
 Match the period covered by your data:
 
@@ -129,14 +135,14 @@ start_date_str = '2025-03-01'  # your data's start date
 end_date_str   = '2025-06-30'  # your data's end date
 ```
 
-## 5 · Treatment &amp; outcome — Cell 5 (usually no change)
+## 6 · Treatment &amp; outcome — Cell 5 (usually no change)
 
 These are typically standard, but verify they exist in your data:
 
 - **Treatment:** `Total_Copilot_actions_taken`
 - **Outcome:** `External_collaboration_hours`, `After_hours_collaboration_hours`, or your chosen survey metric (e.g. `eSat`).
 
-For the Engagement notebook, the outcome is specified in the configuration cell (see section 2) rather than pre-defined.
+For the Engagement notebook, the outcome is specified in the configuration cell (see section 3) rather than pre-defined.
 
 ## Pre-flight checklist
 

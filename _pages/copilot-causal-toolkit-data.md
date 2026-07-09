@@ -129,7 +129,7 @@ Glint metrics vary across organizations and may be custom-defined. Review and up
 
 * **Outcome:** a Glint metric such as `eSat` (Employee Satisfaction) — set this to whichever ordinal survey outcome you intend to evaluate.
 * **Treatment:** `Total_Copilot_actions_taken`.
-* **Outcome scale configuration:** because the outcome is ordinal, set `OUTCOME_SCALE_MIN` / `OUTCOME_SCALE_MAX` to match the survey scale (e.g. 1–5, 1–7, 1–10). These drive ceiling/floor diagnostics and interpretation.
+* **Outcome scale configuration:** because the outcome is ordinal, set `OUTCOME_SCALE_MIN` / `OUTCOME_SCALE_MAX` to match the survey scale (e.g. 1–5, 1–7, 1–10). These drive ceiling/floor diagnostics and interpretation **only** — they do not rescale or transform the outcome, which is modelled on its raw values. Set them to the metric's actual response range; the notebook's diagnostic cell warns you if the observed data falls outside the declared scale.
 * **Confounders (starting point — revise per outcome):**
   - `Collaboration_hours`, `Available_to_focus_hours`, `Active_connected_hours`, `Uninterrupted_hours`
   - `After_hours_collaboration_hours`, `Collaboration_span`
