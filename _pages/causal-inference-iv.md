@@ -6,7 +6,7 @@ permalink: /causal-inference-iv/
 css: "/assets/css/causal-inference.css"
 ---
 
-# Method 4: Instrumental Variables (IV)
+# Method 4: Instrumental variables (IV)
 
 <nav class="ci-series-nav" aria-label="Causal inference guide">
   <a class="ci-chip" href="{{ site.baseurl }}/causal-inference/"><span class="ci-chip-step">1</span>Overview</a>
@@ -20,37 +20,21 @@ css: "/assets/css/causal-inference.css"
   <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-validation/"><span class="ci-chip-step">9</span>Validation</a>
 </nav>
 
-## Overview
+Instrumental variables (IV) estimate a causal effect when treatment assignment may be affected by unmeasured confounding. The method uses an instrument that shifts treatment uptake, then isolates the part of treatment variation that can plausibly be treated as external to the outcome.
 
-Instrumental Variables (IV) address endogeneity by using variation that affects treatment assignment but only influences outcomes through the treatment itself. This powerful technique can recover causal effects even with unmeasured confounders.
+<div class="ci-callout is-accent" markdown="1">
+<span class="ci-callout-label">When to use it</span>
 
----
+**Best for** settings where you suspect unmeasured confounding or reverse causality, but you have a credible natural experiment such as random manager assignment, staged rollout timing, geography, or administrative rules that shift treatment exposure.
 
-## When to Use Instrumental Variables
+**Key assumptions — relevance and exclusion:** the instrument must strongly predict treatment, and it must affect the outcome only through that treatment. It should also be as-good-as randomly assigned after any controls you include.
 
-**Key Advantages:**
-- **Handles unmeasured confounders**: Controls for unobserved factors that affect both treatment and outcome
-- **Natural experiments**: Exploits random or quasi-random variation
-- **Policy evaluation**: Useful when treatment assignment has random component
+**Trade-off:** IV can handle confounders you did not measure, but only for the treatment variation created by the instrument, and estimates are often less precise than regression or propensity-score approaches.
+</div>
 
-**Best for:**
-- Unmeasured confounding suspected
-- Natural experiments available (lottery systems, policy changes, geographic variation)
-- Treatment assignment partly random but not fully controlled
-- Need to address reverse causality
+## Understanding instrumental variables logic
 
-**Key Requirements:**
-1. **Relevance**: Instrument strongly predicts treatment assignment
-2. **Exclusion restriction**: Instrument only affects outcome through treatment
-3. **Independence**: Instrument is as-good-as randomly assigned
-
----
-
-## Understanding Instrumental Variables Logic
-
-The IV approach uses two-stage least squares (2SLS):
-1. **First stage**: Predict treatment using instrument
-2. **Second stage**: Use predicted treatment to estimate causal effect
+The IV approach usually uses two-stage least squares (2SLS): first predict treatment using the instrument, then estimate the outcome using the predicted treatment. The first code example lays out the intuition before moving into diagnostics and estimation.
 
 ```python
 import pandas as pd
@@ -93,9 +77,13 @@ iv_conceptual_explanation()
 
 ---
 
-## First Stage Analysis
+## First-stage analysis
 
-The first stage examines how well the instrument predicts treatment assignment. A strong first stage is crucial for valid IV estimation.
+The first stage checks whether the instrument meaningfully predicts treatment assignment. A strong first stage is essential: weak instruments can bias IV estimates and make inference unreliable.
+
+<details class="ci-details">
+<summary>Show the first-stage analysis function</summary>
+<div markdown="1">
 
 ```python
 def first_stage_analysis(df, instrument_col, treatment_col, confounders=None):
@@ -231,11 +219,18 @@ first_stage_results = first_stage_analysis(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Two-Stage Least Squares (2SLS) Estimation
+## Two-stage least squares (2SLS) estimation
 
-The core IV estimation uses two-stage least squares to isolate the causal effect.
+The core IV estimate uses the instrument-driven part of treatment variation to estimate the causal effect. Compare the IV result with the ordinary least squares result to understand how much endogeneity correction changes the conclusion.
+
+<details class="ci-details">
+<summary>Show the 2SLS estimation function</summary>
+<div markdown="1">
 
 ```python
 def two_stage_least_squares(df, instrument_col, treatment_col, outcome_col, confounders=None):
@@ -377,11 +372,18 @@ iv_results = two_stage_least_squares(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Instrument Validity Tests
+## Instrument validity tests
 
-Critical tests to validate that the instrument satisfies IV assumptions.
+Validity checks focus on relevance, balance, reduced-form relationships, and the exclusion restriction. The exclusion restriction cannot be proven from the data alone, so document the business mechanism and plausible alternative pathways.
+
+<details class="ci-details">
+<summary>Show the instrument-validity test function</summary>
+<div markdown="1">
 
 ```python
 def test_instrument_validity(df, instrument_col, treatment_col, outcome_col, confounders=None):
@@ -526,11 +528,20 @@ validity_results = test_instrument_validity(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Instrument Strength and Weak IV Diagnostics
+## Instrument strength and weak-IV diagnostics
 
-### Comprehensive Weak Instrument Diagnostics
+Weak instruments can produce biased estimates, invalid confidence intervals, and large precision loss. Use first-stage strength and weak-IV diagnostics before relying on the estimate.
+
+### Comprehensive weak-instrument diagnostics
+
+<details class="ci-details">
+<summary>Show the weak-instrument diagnostic function</summary>
+<div markdown="1">
 
 ```python
 def weak_instrument_diagnostics(first_stage_results, iv_results, confidence_level=0.95):
@@ -649,11 +660,18 @@ if 'first_stage_results' in locals() and 'iv_results' in locals():
     weak_iv_diagnostics = weak_instrument_diagnostics(first_stage_results, iv_results)
 ```
 
+</div>
+</details>
+
 ---
 
-## Multiple Instruments and Overidentification Tests
+## Multiple instruments and overidentification tests
 
-When multiple instruments are available, we can test the overidentifying restrictions.
+Multiple instruments can strengthen the first stage and allow overidentification checks. They also raise the bar for explanation: every instrument needs a credible exclusion story.
+
+<details class="ci-details">
+<summary>Show the multiple-instruments analysis function</summary>
+<div markdown="1">
 
 ```python
 def multiple_instruments_analysis(df, instruments, treatment_col, outcome_col, confounders=None):
@@ -838,11 +856,20 @@ def multiple_instruments_analysis(df, instruments, treatment_col, outcome_col, c
 # )
 ```
 
+</div>
+</details>
+
 ---
 
-## Business Application Examples
+## Business application examples
 
-### Common IV Applications in Business Analytics
+### Common IV applications in business analytics
+
+Instrumental variables are most persuasive when the assignment mechanism is easy to explain to stakeholders and was not chosen by the employees or teams being evaluated.
+
+<details class="ci-details">
+<summary>Show the business-example helper</summary>
+<div markdown="1">
 
 ```python
 def iv_business_examples():
@@ -899,7 +926,16 @@ def iv_business_examples():
 iv_business_examples()
 ```
 
-### Interpreting IV Results for Business Decisions
+</div>
+</details>
+
+### Interpreting IV results for business decisions
+
+Translate the estimate into a business recommendation only after explaining the instrument, the population affected by the instrument, and the remaining assumptions.
+
+<details class="ci-details">
+<summary>Show the business-interpretation function</summary>
+<div markdown="1">
 
 ```python
 def interpret_iv_for_business(iv_results, treatment_description, outcome_description):
@@ -1002,11 +1038,20 @@ if 'iv_results' in locals():
     )
 ```
 
+</div>
+</details>
+
 ---
 
-## Troubleshooting Common IV Problems
+## Troubleshooting common IV problems
 
-### Diagnostic Framework
+### Diagnostic framework
+
+Troubleshooting should start with the identification story, then move to first-stage strength, balance, precision, and plausibility of the effect size.
+
+<details class="ci-details">
+<summary>Show the IV troubleshooting guide</summary>
+<div markdown="1">
 
 ```python
 def iv_troubleshooting_guide(validity_results, weak_iv_diagnostics, iv_results):
@@ -1123,9 +1168,18 @@ if all(var in locals() for var in ['validity_results', 'weak_iv_diagnostics', 'i
     )
 ```
 
+</div>
+</details>
+
 ---
 
-*Instrumental Variables provide powerful tools for causal inference when unmeasured confounding is suspected. Always validate instrument strength and exclusion restrictions before interpreting results.*
+<div class="ci-callout is-tip" markdown="1">
+<span class="ci-callout-label">Run this on your own data</span>
+
+This page explains the method. To run an instrumental-variables analysis end to end on a Viva Insights Person Query, use the [Copilot Causal Toolkit]({{ site.baseurl }}/copilot-causal-toolkit/).
+</div>
+
+*Instrumental variables provide powerful tools for causal inference when unmeasured confounding is suspected. Always validate instrument strength and exclusion restrictions before interpreting results.*
 
 <nav class="ci-pager" aria-label="Causal inference pagination">
   <a class="ci-pager-link" href="{{ site.baseurl }}/causal-inference-did/">

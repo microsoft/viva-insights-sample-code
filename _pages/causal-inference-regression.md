@@ -20,40 +20,21 @@ css: "/assets/css/causal-inference.css"
   <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-validation/"><span class="ci-chip-step">9</span>Validation</a>
 </nav>
 
-## Overview
+Regression adjustment is the most straightforward causal method. It estimates the effect of a treatment by controlling for confounders in a linear model: if you can measure every variable that influences both the treatment and the outcome, the treatment's coefficient is your causal estimate.
 
-Regression adjustment is the most straightforward causal inference method. It estimates the treatment effect by controlling for confounding variables through linear regression. The key insight is that if you can measure and control for all variables that influence both treatment and outcome, the remaining correlation between treatment and outcome represents the causal effect.
+<div class="ci-callout is-accent" markdown="1">
+<span class="ci-callout-label">When to use it</span>
 
----
+**Best for** a handful of well-understood confounders, roughly linear relationships, and early exploratory analysis where you can reason about the confounding structure.
 
-## When to Use Regression Adjustment
+**Key assumption — no unmeasured confounders (conditional ignorability):** every variable that influences both the treatment and the outcome is measured and included. Regression is sensitive to this assumption, and to model misspecification.
 
-**Best for:**
-- Few, well-understood confounders
-- Linear relationships between variables
-- When you have domain knowledge about confounding structure
-- Initial exploratory causal analysis
+**Trade-off:** simple, fast, and easy to explain, but it will not rescue you from confounders you did not measure or interactions you did not model.
+</div>
 
-**Key Assumption:** 
-- **No unmeasured confounders** (Conditional Ignorability)
-- All variables that influence both treatment and outcome are measured and included
+## A minimal example
 
-**Strengths:**
-- Simple and interpretable
-- Fast to implement and compute
-- Transparent modeling assumptions
-- Easy to communicate to stakeholders
-
-**Limitations:**
-- Strong assumption about unmeasured confounders
-- Sensitive to model misspecification
-- May not handle complex interactions well
-
----
-
-## Basic Implementation
-
-### Simple Regression Adjustment
+The core is a few lines of `statsmodels`. The column names here (`copilot_usage`, `tickets_per_week`) are illustrative; on real data, substitute your Viva Insights outcome and confounders.
 
 ```python
 import statsmodels.formula.api as smf
@@ -106,7 +87,7 @@ print(f"Model R²: {result['r_squared']:.3f}")
 
 # Interpret the results
 if result['p_value'] < 0.05:
-    print(f"\n✅ SIGNIFICANT EFFECT DETECTED")
+    print(f"\nSIGNIFICANT EFFECT DETECTED")
     if result['ate'] > 0:
         print(f"Copilot usage INCREASES productivity by {result['ate']:.2f} tickets/week")
         print(f"Monthly impact: ~{result['ate'] * 4:.1f} additional tickets per user")
@@ -114,7 +95,7 @@ if result['p_value'] < 0.05:
         print(f"Copilot usage DECREASES productivity by {abs(result['ate']):.2f} tickets/week")
         print("Consider investigating implementation or training issues")
 else:
-    print(f"\n❌ NO SIGNIFICANT EFFECT DETECTED")
+    print(f"\nNO SIGNIFICANT EFFECT DETECTED")
     print(f"Cannot conclude that Copilot has a causal effect on productivity")
     print(f"Consider: larger sample size, different model specification, or other methods")
 ```
@@ -127,9 +108,13 @@ else:
 
 ---
 
-## Model Diagnostics and Validation
+## Checking the assumptions
 
-### Comprehensive Model Diagnostics
+### Full diagnostic suite
+
+<details class="ci-details">
+<summary>Show the full diagnostic function</summary>
+<div markdown="1">
 
 ```python
 def regression_diagnostics(model, df, outcome_col, treatment_col):
@@ -233,7 +218,14 @@ diagnostic_results = regression_diagnostics(
 )
 ```
 
-### Robust Standard Errors
+</div>
+</details>
+
+### Robust standard errors
+
+<details class="ci-details">
+<summary>Show the robust-SE variant</summary>
+<div markdown="1">
 
 ```python
 def regression_with_robust_se(df, outcome_col, treatment_col, confounder_cols):
@@ -274,13 +266,20 @@ robust_result = regression_with_robust_se(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Advanced Regression with Interaction Effects
+## Heterogeneous effects: who benefits most
 
-### Heterogeneous Treatment Effects
+### Interaction terms
 
 Sometimes the treatment effect differs across subgroups. Interaction terms help us identify these heterogeneous effects - crucial for targeted deployment strategies.
+
+<details class="ci-details">
+<summary>Show the interaction-model function</summary>
+<div markdown="1">
 
 ```python
 def regression_with_interactions(df, outcome_col, treatment_col, confounder_cols, interaction_vars=None):
@@ -348,7 +347,14 @@ print("These results show how Copilot's effect varies by job level.")
 print("Use this to target deployment to groups with highest returns.")
 ```
 
-### Marginal Effects Analysis
+</div>
+</details>
+
+### Marginal effects
+
+<details class="ci-details">
+<summary>Show the marginal-effects function</summary>
+<div markdown="1">
 
 ```python
 def calculate_marginal_effects(model, df, treatment_col, continuous_vars):
@@ -391,11 +397,18 @@ if 'tenure_months' in confounders:
             print(f"  {percentile}: {effect:.3f}")
 ```
 
+</div>
+</details>
+
 ---
 
-## Polynomial and Non-linear Specifications
+## Alternative specifications
 
-### Testing Non-linear Relationships
+### Testing non-linear relationships
+
+<details class="ci-details">
+<summary>Show the specification-comparison function</summary>
+<div markdown="1">
 
 ```python
 def test_nonlinear_specifications(df, outcome_col, treatment_col, confounder_cols):
@@ -466,11 +479,18 @@ specifications = test_nonlinear_specifications(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Sensitivity Analysis
+## Sensitivity analysis
 
-### Testing Robustness to Model Specification
+### Robustness to the confounder set
+
+<details class="ci-details">
+<summary>Show the sensitivity-analysis function</summary>
+<div markdown="1">
 
 ```python
 def sensitivity_analysis_specification(df, outcome_col, treatment_col, all_confounders):
@@ -547,11 +567,18 @@ sensitivity_results = sensitivity_analysis_specification(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Business Value Interpretation
+## From estimate to business impact
 
-### Converting Statistical Results to Business Impact
+### Converting the estimate to business terms
+
+<details class="ci-details">
+<summary>Show the business-impact function</summary>
+<div markdown="1">
 
 ```python
 def interpret_business_impact(ate, baseline_mean, confidence_interval, cost_per_license=50):
@@ -623,22 +650,25 @@ business_impact = interpret_business_impact(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Best Practices and Recommendations
+## Before you rely on the results
 
-### Implementation Checklist
+### Checklist
 
 Before using regression adjustment results:
 
-- ✅ **Check assumptions**: No unmeasured confounders assumption is critical
-- ✅ **Run diagnostics**: Test for normality, homoscedasticity, specification
-- ✅ **Use robust SEs**: Protect against heteroscedasticity
-- ✅ **Test interactions**: Check for heterogeneous treatment effects
-- ✅ **Sensitivity analysis**: Test robustness to model specification
-- ✅ **Business translation**: Convert statistical results to actionable insights
+- **Check the assumption** — the no-unmeasured-confounders assumption is the one that matters most.
+- **Run diagnostics** — test for normality, homoscedasticity, and specification.
+- **Use robust standard errors** to protect against heteroscedasticity.
+- **Test interactions** to check for heterogeneous effects.
+- **Run a sensitivity analysis** across confounder sets.
+- **Translate to business terms** so stakeholders can act on the estimate.
 
-### When to Move to Other Methods
+### When to move to another method
 
 Consider alternative methods if:
 
@@ -648,9 +678,13 @@ Consider alternative methods if:
 - Treatment assignment appears non-random
 - Need to handle complex treatment timing
 
-**Next Method:** [Propensity Score Methods →]({{ site.baseurl }}/causal-inference-propensity/)
-
 ---
+
+<div class="ci-callout is-tip" markdown="1">
+<span class="ci-callout-label">Run this on your own data</span>
+
+This page explains the method. To run regression adjustment end to end on a Viva Insights Person Query — with the data prep, diagnostics, and reporting already wired up — use the [Copilot Causal Toolkit]({{ site.baseurl }}/copilot-causal-toolkit/).
+</div>
 
 *Regression adjustment provides a solid foundation for causal analysis when assumptions are met. Always validate results through diagnostics and sensitivity analysis before making business decisions.*
 

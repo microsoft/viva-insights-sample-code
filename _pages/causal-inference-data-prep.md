@@ -6,7 +6,7 @@ permalink: /causal-inference-data-prep/
 css: "/assets/css/causal-inference.css"
 ---
 
-# Data Preparation & Setup for Causal Inference
+# Data preparation and setup for causal inference
 
 <nav class="ci-series-nav" aria-label="Causal inference guide">
   <a class="ci-chip" href="{{ site.baseurl }}/causal-inference/"><span class="ci-chip-step">1</span>Overview</a>
@@ -20,18 +20,25 @@ css: "/assets/css/causal-inference.css"
   <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-validation/"><span class="ci-chip-step">9</span>Validation</a>
 </nav>
 
-## Overview
+Reliable causal analysis starts with a dataset that makes the treatment, outcome, timing, and confounders explicit. This page shows how to shape a Viva Insights Person Query into analysis-ready columns before you choose a method such as regression adjustment, propensity scores, or difference-in-differences.
 
-Successful causal inference starts with properly structured data. Unlike simple correlation analysis, causal methods require specific data characteristics and measurement approaches. This guide covers essential data preparation steps before implementing any causal inference method.
+<div class="ci-callout is-accent" markdown="1">
+<span class="ci-callout-label">When to use it</span>
+
+**Best for** preparing Viva Insights Person Query exports for causal analysis, especially when you need a clear treatment definition, outcome metric, and confounder set.
+
+**Key assumption:** treatment timing and outcome measurement are ordered correctly, and the important confounders are measured before or alongside treatment assignment.
+
+**Trade-off:** careful preparation reduces avoidable bias, but it cannot recover variables that were never collected or fix an ambiguous rollout design.
+</div>
 
 ---
 
-## Understanding Your Data Requirements
+## Understanding the data requirements
 
-**The Gold Standard: Panel Data Structure**
-The ideal dataset for causal analysis is panel data - observations of the same individuals over multiple time periods. This structure allows us to observe changes within individuals and control for time-invariant characteristics.
+The ideal input is panel data: repeated observations for the same people across multiple time periods. That structure lets you compare changes within people or groups while preserving the timing needed for causal claims.
 
-Before implementing any causal inference method, ensure your data meets these requirements:
+Before implementing any causal method, validate that your data has identifiers, time periods, treatment variation, outcomes, and candidate confounders:
 
 ```python
 import pandas as pd
@@ -113,21 +120,25 @@ if validation_results['recommendations']:
     print("Recommendations:", validation_results['recommendations'])
 ```
 
-**Understanding the Output:**
-- `temporal_ordering`: Ensures each unit's periods are strictly increasing (critical for causal ordering)
-- `treatment_variation`: Confirms we have both treated and untreated observations
-- `outcome_completeness`: High missing data can bias results
-- `sufficient_sample`: Small samples lead to unreliable estimates
-- `no_duplicate_user_periods`: Flags duplicate (user, period) rows — the real panel data-quality issue
-- `panel_info`: Reports whether the panel is balanced (informational — unbalanced panels are still valid)
+**Understanding the output:**
+- `temporal_ordering`: Ensures each unit's periods are strictly increasing, which is critical for causal ordering
+- `treatment_variation`: Confirms there are both treated and untreated observations
+- `outcome_completeness`: Flags missing outcome data that can bias results
+- `sufficient_sample`: Warns when the sample may be too small for reliable estimates
+- `no_duplicate_user_periods`: Flags duplicate `(user, period)` rows, the main panel data-quality issue
+- `panel_info`: Reports whether the panel is balanced; unbalanced panels can still be valid
 
 ---
 
-## Defining Treatment and Outcome Variables
+## Defining treatment and outcome variables
 
-### Treatment Variable Design
+### Treatment variable design
 
-How you define your treatment variable fundamentally affects your causal interpretation. Consider these different approaches:
+How you define treatment determines the causal question you can answer. In Viva Insights data, this might be Copilot adoption, usage intensity, or membership in a rollout group.
+
+<details class="ci-details">
+<summary>Show treatment variable builders</summary>
+<div markdown="1">
 
 ```python
 # Treatment variable definitions
@@ -174,9 +185,16 @@ print("Continuous:", df['treatment_continuous'].describe())
 print("Categorical:", df['treatment_categorical'].value_counts())
 ```
 
-### Outcome Variable Selection
+</div>
+</details>
 
-Your outcome choice determines what causal effect you're measuring:
+### Outcome variable selection
+
+Your outcome choice determines what effect you are estimating. Pick a metric that maps directly to the business question and can be measured after treatment exposure.
+
+<details class="ci-details">
+<summary>Show productivity outcome builders</summary>
+<div markdown="1">
 
 ```python
 def productivity_metrics(df):
@@ -213,13 +231,20 @@ chosen_outcome = 'tickets_resolved'
 print(f"Analyzing: {interpretations[chosen_outcome]}")
 ```
 
+</div>
+</details>
+
 ---
 
-## Identifying and Measuring Confounders
+## Identifying and measuring confounders
 
-Confounders are variables that influence both treatment assignment and the outcome. Proper identification and measurement of confounders is crucial for causal inference.
+Confounders are variables that influence both treatment assignment and the outcome. In a Viva Insights workflow, these often include role, tenure, team context, baseline work patterns, and prior performance.
 
-### Common Confounders in Copilot Analytics
+### Common confounders in Copilot analytics
+
+<details class="ci-details">
+<summary>Show confounder inventory and preparation</summary>
+<div markdown="1">
 
 ```python
 def identify_potential_confounders():
@@ -294,7 +319,16 @@ def prepare_confounders(df):
 available_confounders = prepare_confounders(df)
 ```
 
-### Confounder Quality Assessment
+</div>
+</details>
+
+### Confounder quality assessment
+
+After listing candidate confounders, check whether each one is present, variable enough to be useful, and measured with acceptable completeness.
+
+<details class="ci-details">
+<summary>Show confounder quality checks</summary>
+<div markdown="1">
 
 ```python
 def assess_confounder_quality(df, confounders, treatment_col, outcome_col):
@@ -350,11 +384,20 @@ for var, assessment in confounder_assessments.items():
         print(f"✅ {var}: Good quality confounder")
 ```
 
+</div>
+</details>
+
 ---
 
-## Data Quality Checks and Validation
+## Checking data quality and validity
 
-### Comprehensive Data Quality Assessment
+### Comprehensive data quality assessment
+
+Run a broader quality check before estimating effects. This helps catch treatment imbalance, missing confounders, outcome outliers, and sample-size issues before they become modeling problems.
+
+<details class="ci-details">
+<summary>Show comprehensive data quality checks</summary>
+<div markdown="1">
 
 ```python
 def comprehensive_data_quality_check(df, outcome_col, treatment_col, confounder_cols):
@@ -415,7 +458,16 @@ if quality_report['warnings']:
         print(f"   - {warning}")
 ```
 
-### Data Preprocessing for Causal Analysis
+</div>
+</details>
+
+### Preprocessing for causal analysis
+
+Preprocessing should be explicit and reproducible. Handle missing values, outliers, and derived categories consistently so the analysis dataset can be audited later.
+
+<details class="ci-details">
+<summary>Show the preprocessing pipeline</summary>
+<div markdown="1">
 
 ```python
 def preprocess_for_causal_analysis(df, outcome_col, treatment_col, confounder_cols):
@@ -463,11 +515,20 @@ processed_df, validation_results = preprocess_for_causal_analysis(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Creating Analysis-Ready Datasets
+## Creating analysis-ready datasets
 
-### Standard Dataset Formats
+### Standard dataset formats
+
+Different causal methods need different dataset shapes. Build cross-sectional, panel, and before/after versions deliberately instead of letting each method reshape the data differently.
+
+<details class="ci-details">
+<summary>Show analysis dataset creation</summary>
+<div markdown="1">
 
 ```python
 def create_analysis_datasets(df, outcome_col, treatment_col, confounder_cols,
@@ -530,42 +591,49 @@ analysis_datasets = create_analysis_datasets(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Best Practices Summary
+## Best practices summary
 
-### Data Quality Checklist
+### Data quality checklist
 
 Before proceeding with causal analysis, ensure:
 
-- ✅ **Temporal ordering**: Treatment occurs before outcome measurement
-- ✅ **Sufficient variation**: Both treated and untreated observations exist
-- ✅ **Complete outcomes**: Low missing data in key variables (<10%)
-- ✅ **Adequate sample size**: At least 100 observations, preferably 500+
-- ✅ **Balanced treatment**: Treatment prevalence between 10-90%
-- ✅ **Measured confounders**: Key confounding variables are captured
-- ✅ **Data consistency**: Variables measured consistently across time/groups
+- **Temporal ordering**: Treatment occurs before outcome measurement
+- **Sufficient variation**: Both treated and untreated observations exist
+- **Complete outcomes**: Key variables have low missingness, ideally below 10%
+- **Adequate sample size**: At least 100 observations, preferably 500 or more
+- **Balanced treatment**: Treatment prevalence is not near zero or one
+- **Measured confounders**: Key confounding variables are captured
+- **Data consistency**: Variables are measured consistently across time and groups
 
-### Common Pitfalls to Avoid
+### Common pitfalls to avoid
 
 1. **Selection bias in data collection**: Ensure representative sampling
-2. **Measurement error**: Validate that variables capture intended constructs
+2. **Measurement error**: Validate that variables capture the intended constructs
 3. **Time-varying confounders**: Account for confounders that change over time
-4. **Spillover effects**: Consider whether treatment affects control group
-5. **Survivorship bias**: Account for users who drop out of analysis
+4. **Spillover effects**: Consider whether treatment affects the control group
+5. **Survivorship bias**: Account for users who drop out of the analysis
 
 ---
 
-## Next Steps
+## Next steps
 
 Once your data is prepared and validated:
 
-1. **Choose your causal method** based on data structure and research question
-2. **Start with simple methods** (regression adjustment) before moving to complex ones
-3. **Always check assumptions** specific to your chosen method
+1. **Choose your causal method** based on the data structure and research question
+2. **Start with simple methods** such as regression adjustment before moving to complex ones
+3. **Check assumptions** specific to your chosen method
 4. **Validate results** through robustness testing and sensitivity analysis
 
-**Continue to:** [Regression Adjustment Method →]({{ site.baseurl }}/causal-inference-regression/)
+<div class="ci-callout is-tip" markdown="1">
+<span class="ci-callout-label">Run this on your own data</span>
+
+This page explains the data-preparation concepts. To prepare a Viva Insights Person Query and run the full causal workflow end to end, use the [Copilot Causal Toolkit]({{ site.baseurl }}/copilot-causal-toolkit/).
+</div>
 
 ---
 

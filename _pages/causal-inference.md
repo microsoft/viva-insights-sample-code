@@ -31,17 +31,23 @@ This guide introduces the fundamental concepts, practical applications, and stra
 
 ---
 
-## What is Causal Inference?
+## What is causal inference?
 
 Causal inference is the scientific process of determining whether and how much a specific intervention actually causes changes in an outcome of interest. Unlike correlation analysis, which simply identifies patterns between variables, causal inference aims to answer the counterfactual question: **"What would have happened if we had not implemented this intervention?"**
 
-### The Fundamental Challenge
+### The fundamental challenge
 
 The core challenge in causal inference is that we can never directly observe what researchers call the "counterfactual" – the alternative reality where the same person or team did not use Copilot. For any individual user, we can only observe one scenario: either they used Copilot or they didn't. We cannot see both outcomes simultaneously.
 
 This creates what statisticians call the "fundamental problem of causal inference." To overcome this limitation, causal inference methods use sophisticated statistical techniques to construct plausible counterfactuals from observational data, effectively simulating the conditions of a randomized controlled trial.
 
-### Key Concepts in Causal Analysis
+<div class="ci-callout is-accent" markdown="1">
+<span class="ci-callout-label">The key idea</span>
+
+Every causal method on this site is a different strategy for building a credible **counterfactual** — a stand-in for what the same people would have done without Copilot. Choosing a method is really about which counterfactual is most believable for your data.
+</div>
+
+### Key concepts
 
 * **Treatment**: The intervention being studied – in our case, Copilot usage. This might be defined as binary (used vs. not used) or continuous (frequency of use).
 * **Outcome**: The metric we believe might be influenced by Copilot usage, such as tickets resolved per week, deal closure rates, or time saved on routine tasks.
@@ -50,13 +56,13 @@ This creates what statisticians call the "fundamental problem of causal inferenc
 
 ---
 
-## Why Apply Causal Inference to Copilot Analytics?
+## Why apply it to Copilot analytics?
 
-### Moving Beyond Correlation
+### Moving beyond correlation
 
 Traditional analytics might reveal that teams using Copilot complete 20% more tickets than those who don't. However, this correlation could be explained by numerous factors: perhaps high-performing teams are more likely to adopt new tools, or maybe managers assign Copilot licenses to their most productive employees first. Without causal analysis, we cannot determine how much of the productivity gain is genuinely attributable to Copilot.
 
-### Strategic Decision Making
+### Strategic decision making
 
 Causal inference enables evidence-based decisions about Copilot deployment:
 
@@ -65,7 +71,7 @@ Causal inference enables evidence-based decisions about Copilot deployment:
 * Training Optimization: Understand whether additional training programs actually improve outcomes, and by how much.
 * Adoption Strategy: Determine the most effective approaches for driving sustained usage and maximizing business impact.
 
-### Financial and Resource Planning
+### Financial and resource planning
 
 By quantifying true causal effects, organizations can:
 - Convert productivity gains into concrete financial terms
@@ -75,43 +81,43 @@ By quantifying true causal effects, organizations can:
 
 ---
 
-## Common Applications in Copilot Analytics
+## Common applications
 
 ### Productivity Impact Assessment
 
-#### **Question**: "How much does Copilot usage actually increase productivity metrics?"
+#### "How much does Copilot usage actually increase productivity metrics?"
 
 Causal inference can isolate the true productivity gains attributable to Copilot from other factors like seasonal variations, team changes, or concurrent process improvements. This analysis might reveal, for example, that Copilot causes a genuine 15% increase in tickets resolved, with 95% confidence that the true effect is between 12% and 18%.
 
 ### Adoption Driver Analysis
 
-#### **Question**: "Which interventions most effectively drive sustained Copilot usage?"
+#### "Which interventions most effectively drive sustained Copilot usage?"
 
 Organizations often implement multiple strategies to encourage adoption – training sessions, email reminders, manager coaching. Causal analysis can determine which of these interventions actually cause increased usage and sustained engagement, allowing teams to focus resources on the most effective approaches.
 
 ### Heterogeneous Treatment Effects
 
-#### **Question**: "Who benefits most from Copilot?"
+#### "Who benefits most from Copilot?"
 
 Different users may experience vastly different benefits from Copilot. Causal inference can identify which characteristics predict the largest productivity gains, enabling targeted deployment strategies. For instance, analysis might reveal that customer service representatives with 2-5 years of experience see the greatest improvements, while very senior staff show minimal gains.
 
 ### Long-term Impact Measurement
 
-#### **Question**: "Do Copilot benefits persist over time?"
+#### "Do Copilot benefits persist over time?"
 
 Initial productivity boosts might fade as novelty wears off, or they might compound as users develop more sophisticated usage patterns. Causal inference can track these dynamics and identify factors that sustain long-term benefits.
 
 ---
 
-## Key Methodological Approaches
+## Key methodological approaches
 
 While detailed implementation is covered in our [technical guide]({{ site.baseurl }}/causal-inference-technical/), here are the primary methodological frameworks used in Copilot causal analysis:
 
-### Randomized Controlled Trials (The Gold Standard)
+### Randomized controlled trials (the gold standard)
 
 When feasible, randomly assigning Copilot access provides the clearest causal evidence. However, practical and ethical constraints often make this approach challenging in enterprise settings.
 
-### Quasi-Experimental Methods
+### Quasi-experimental methods
 
 These approaches approximate experimental conditions using observational data:
 
@@ -119,34 +125,34 @@ These approaches approximate experimental conditions using observational data:
 * **Difference-in-Differences**: Compare productivity trends before and after Copilot rollout between departments that received access at different times.
 * **Instrumental Variables**: Use external factors that influence Copilot adoption but don't directly affect productivity outcomes.
 
-### Machine Learning Enhanced Approaches
+### Machine-learning-enhanced approaches
 
 Modern techniques combine traditional causal inference with machine learning to handle complex data patterns and numerous potential confounders while maintaining statistical rigor.
 
 ---
 
-## Interpreting and Communicating Results
+## Interpreting and communicating results
 
-### Statistical Significance vs. Practical Significance
+### Statistical vs. practical significance
 
 A statistically significant result indicates high confidence that an effect exists, but doesn't necessarily mean the effect is large enough to matter practically. Always consider both the magnitude of effects and their uncertainty ranges.
 
-### Business Translation
+### Business translation
 
 Convert statistical findings into business-relevant terms:
 - "5 additional tickets resolved per user per month"
 - "15% reduction in average case resolution time"  
 - "£50,000 annual productivity gain per 100 users"
 
-### Uncertainty Communication
+### Communicating uncertainty
 
 Always report confidence intervals alongside point estimates. "Copilot increases productivity by 15% (95% CI: 12% - 18%)" provides much more useful information than simply "Copilot increases productivity by 15%."
 
 ---
 
-## Implementation Considerations
+## Implementation considerations
 
-### Data Requirements
+### Data requirements
 
 Successful causal inference requires:
 - **Temporal data**: Measurements before and after Copilot adoption
@@ -154,13 +160,17 @@ Successful causal inference requires:
 - **Usage metrics**: Detailed Copilot engagement data
 - **Outcome measures**: Clear, quantifiable productivity or business metrics
 
-### Common Pitfalls
+### Common pitfalls
 
-* **Selection Bias**: If Copilot users systematically differ from non-users in unmeasured ways, causal estimates may be biased.
-* **Spillover Effects**: Benefits to one user might affect their teammates' performance, violating standard causal inference assumptions.
-* **Measurement Issues**: Poorly defined or inconsistently measured outcomes can lead to misleading conclusions.
+<div class="ci-callout is-warning" markdown="1">
+<span class="ci-callout-label">Watch out for</span>
 
-### Organizational Prerequisites
+- **Selection bias** — if Copilot users differ systematically from non-users in ways you did not measure, the estimate is biased.
+- **Spillover** — benefits to one user can affect teammates, which breaks the standard assumption that one person's treatment does not affect another's outcome.
+- **Measurement** — poorly defined or inconsistently measured outcomes lead to misleading conclusions.
+</div>
+
+### Organizational prerequisites
 
 Effective causal analysis requires:
 - Clear business questions and success metrics
@@ -170,7 +180,7 @@ Effective causal analysis requires:
 
 ---
 
-## Getting Started
+## Getting started
 
 ### Step 1: Define Your Research Question
 Clearly articulate what causal relationship you want to investigate. "Does Copilot improve productivity?" is too vague. "Does weekly Copilot usage increase the number of customer issues resolved per week for technical support staff?" provides a specific, testable hypothesis.
@@ -189,7 +199,7 @@ Translate findings into actionable business insights and communicate uncertainty
 
 ---
 
-## Resources and Next Steps
+## Resources and next steps
 
 - **[Technical Implementation Guide]({{ site.baseurl }}/causal-inference-technical/)**: Detailed methodological explanations and code examples
 - **[Copilot Analytics Overview]({{ site.baseurl }}/copilot/)**: Broader context for Copilot usage analysis
@@ -199,28 +209,13 @@ For organizations just beginning their causal inference journey, we recommend st
 
 ---
 
-## Quick Navigation
+<div class="ci-callout is-tip" markdown="1">
+<span class="ci-callout-label">Where to go next</span>
 
-### This Guide
-- [What is Causal Inference?](#what-is-causal-inference)
-- [Why Apply Causal Inference to Copilot Analytics?](#why-apply-causal-inference-to-copilot-analytics)
-- [Common Applications in Copilot Analytics](#common-applications-in-copilot-analytics)
-- [Key Methodological Approaches](#key-methodological-approaches)
-- [Implementation Considerations](#implementation-considerations)
-- [Getting Started](#getting-started)
-
-### Detailed Technical Guides
-- [Technical Implementation Overview]({{ site.baseurl }}/causal-inference-technical/) - Method selection and workflow guide
-- [Experimentation Guide]({{ site.baseurl }}/causal-inference-experimentation-guide/) - End-to-end worked example of running a causal analysis
-- [Data Preparation]({{ site.baseurl }}/causal-inference-data-prep/) - Data validation and preprocessing
-- [Regression Adjustment]({{ site.baseurl }}/causal-inference-regression/) - Linear models and diagnostics
-- [Propensity Score Methods]({{ site.baseurl }}/causal-inference-propensity/) - Matching, weighting, and stratification
-- [Difference-in-Differences]({{ site.baseurl }}/causal-inference-did/) - Panel data and parallel trends
-- [Instrumental Variables]({{ site.baseurl }}/causal-inference-iv/) - Two-stage estimation and validity testing
-- [Doubly Robust Methods]({{ site.baseurl }}/causal-inference-doubly-robust/) - Double ML and TMLE
-- [Validation & Testing]({{ site.baseurl }}/causal-inference-validation/) - Assumption checking and robustness
-
----
+- New to this? Read the [worked example]({{ site.baseurl }}/causal-inference-experimentation-guide/) to see a full analysis end to end.
+- Ready to choose a method? The [technical overview]({{ site.baseurl }}/causal-inference-technical/) helps you pick one, and the numbered guides above cover each in depth.
+- Want to run it on your own data? The [Copilot Causal Toolkit]({{ site.baseurl }}/copilot-causal-toolkit/) automates the whole workflow on a Viva Insights Person Query.
+</div>
 
 *Remember: Causal inference is as much about asking the right questions as it is about applying the right methods. Start with clear business objectives and let those guide your analytical approach.*
 

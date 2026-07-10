@@ -6,7 +6,7 @@ permalink: /causal-inference-doubly-robust/
 css: "/assets/css/causal-inference.css"
 ---
 
-# Method 5: Doubly Robust Methods & Double Machine Learning
+# Method 5: Doubly robust methods and double machine learning
 
 <nav class="ci-series-nav" aria-label="Causal inference guide">
   <a class="ci-chip" href="{{ site.baseurl }}/causal-inference/"><span class="ci-chip-step">1</span>Overview</a>
@@ -20,41 +20,21 @@ css: "/assets/css/causal-inference.css"
   <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-validation/"><span class="ci-chip-step">9</span>Validation</a>
 </nav>
 
-## Overview
+Doubly robust (AIPW) estimation combines a propensity model for treatment assignment with an outcome model for the metric you care about. It is consistent if either nuisance model is correct, and double machine learning extends the same idea with orthogonal scores and cross-fitting so packages such as DoubleML or econml can use flexible ML safely.
 
-Doubly Robust methods combine regression adjustment and propensity score methods to provide protection against model misspecification. These methods remain consistent if either the outcome model OR the propensity score model is correctly specified, but not necessarily both.
+<div class="ci-callout is-accent" markdown="1">
+<span class="ci-callout-label">When to use it</span>
 
-> **Doubly robust (DR) vs. double machine learning (DML) — they are related but not the same.**
->
-> - **Doubly robust (DR)** refers to the *estimator's consistency property*: an augmented-IPW / AIPW-style estimator stays consistent if **either** the outcome model **or** the propensity model is correct. DR says nothing about *how* those two nuisance models are fit — they could be simple parametric models.
-> - **Double / debiased machine learning (DML)** is a *framework* (Chernozhukov et al., 2018) for using flexible ML models to estimate those nuisance functions while still obtaining valid confidence intervals. It relies on two ingredients: a **Neyman-orthogonal** score (the AIPW score is one such DR score) **and cross-fitting** (out-of-fold nuisance predictions) to remove overfitting/regularization bias.
->
-> In short: DR is the *robustness property of the score*; DML is the *recipe (orthogonal score + cross-fitting)* that makes ML-based nuisance estimation safe. Many DML estimators are built on a DR score, but you can be doubly robust without cross-fitting, and the two terms should not be used interchangeably.
+**Best for** complex, high-dimensional confounding where both regression adjustment and propensity-score approaches are plausible, especially when flexible ML models may capture non-linear relationships.
 
----
+**Key assumption — double robustness:** the estimate remains consistent if either the outcome model or the propensity model is correctly specified, while still requiring overlap and no unmeasured confounding.
 
-## When to Use Doubly Robust Methods
+**Trade-off:** stronger protection than a single model, but more moving parts to validate, and poor overlap or unstable nuisance predictions can still dominate the result.
+</div>
 
-**Key Advantages:**
-- **Double protection**: Consistent if either outcome or propensity model is correct
-- **Machine learning friendly**: Can incorporate flexible ML models
-- **Bias reduction**: Often performs better than single-model approaches
-- **Transparent uncertainty**: Clear assessment of model dependence
+## Basic doubly robust estimation
 
-**Best for:**
-- Complex, high-dimensional confounding
-- Uncertainty about functional form
-- When both regression and propensity score approaches seem reasonable
-- Machine learning applications in causal inference
-
-**Key Insight:**
-You only need to get ONE of the two models (outcome or propensity) approximately right, rather than both exactly right.
-
----
-
-## Basic Doubly Robust Estimation
-
-The core doubly robust estimator combines regression predictions with propensity score weighting.
+The core doubly robust estimator combines regression predictions with propensity-score weighting. This first example stays visible because it is the main implementation pattern.
 
 ```python
 import pandas as pd
@@ -223,9 +203,13 @@ dr_results = doubly_robust_estimation(
 
 ---
 
-## Double Machine Learning (DML)
+## Double machine learning (DML)
 
-Double Machine Learning extends doubly robust methods with cross-fitting to avoid overfitting bias when using flexible ML models.
+Double machine learning adds cross-fitting to reduce overfitting bias when flexible ML models estimate the nuisance functions.
+
+<details class="ci-details">
+<summary>Show the double machine learning function</summary>
+<div markdown="1">
 
 ```python
 def double_machine_learning(df, treatment_col, outcome_col, confounders, 
@@ -377,11 +361,20 @@ dml_results = double_machine_learning(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Model Selection and Robustness
+## Model selection and robustness
 
-### Testing Different Model Combinations
+### Testing different model combinations
+
+Compare estimates across propensity and outcome model specifications. Large swings are a warning sign that the nuisance models or overlap need closer inspection.
+
+<details class="ci-details">
+<summary>Show the model-robustness function</summary>
+<div markdown="1">
 
 ```python
 def test_model_robustness(df, treatment_col, outcome_col, confounders):
@@ -454,7 +447,14 @@ robustness_results = test_model_robustness(
 )
 ```
 
-### Cross-Validation for Model Assessment
+</div>
+</details>
+
+### Cross-validation for model assessment
+
+<details class="ci-details">
+<summary>Show the cross-validation assessment function</summary>
+<div markdown="1">
 
 ```python
 def cross_validate_dr_methods(df, treatment_col, outcome_col, confounders, cv_folds=5):
@@ -541,11 +541,20 @@ cv_assessment = cross_validate_dr_methods(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Advanced Doubly Robust Methods
+## Advanced doubly robust methods
 
-### Targeted Maximum Likelihood Estimation (TMLE)
+### Targeted maximum likelihood estimation (TMLE)
+
+TMLE is another doubly robust estimator. The simplified example below shows the workflow, but production use should rely on a dedicated implementation.
+
+<details class="ci-details">
+<summary>Show the simplified TMLE function</summary>
+<div markdown="1">
 
 ```python
 def targeted_maximum_likelihood(df, treatment_col, outcome_col, confounders):
@@ -649,11 +658,20 @@ def targeted_maximum_likelihood(df, treatment_col, outcome_col, confounders):
 # )
 ```
 
+</div>
+</details>
+
 ---
 
-## Diagnostics and Model Assessment
+## Diagnostics and model assessment
 
-### Comprehensive DR Diagnostics
+### Comprehensive DR diagnostics
+
+Diagnostics should check overlap, outcome-model fit, agreement between component estimators, influence-function behavior, and agreement with DML.
+
+<details class="ci-details">
+<summary>Show the comprehensive diagnostics function</summary>
+<div markdown="1">
 
 ```python
 def dr_diagnostics_comprehensive(dr_results, dml_results, df, treatment_col, outcome_col):
@@ -790,11 +808,18 @@ if 'dr_results' in locals():
     )
 ```
 
+</div>
+</details>
+
 ---
 
-## Business Translation and Interpretation
+## Business translation and interpretation
 
-### Converting DR Results to Business Insights
+### Converting DR results to business insights
+
+<details class="ci-details">
+<summary>Show the business-interpretation function</summary>
+<div markdown="1">
 
 ```python
 def interpret_dr_results_for_business(dr_results, dml_results, treatment_name, outcome_name):
@@ -926,11 +951,18 @@ if 'dr_results' in locals():
     )
 ```
 
+</div>
+</details>
+
 ---
 
-## Best Practices and Guidelines
+## Best practices and guidelines
 
-### Implementation Checklist
+### Implementation checklist
+
+<details class="ci-details">
+<summary>Show the implementation checklist function</summary>
+<div markdown="1">
 
 ```python
 def dr_implementation_checklist():
@@ -1018,9 +1050,18 @@ def dr_implementation_checklist():
 dr_implementation_checklist()
 ```
 
+</div>
+</details>
+
 ---
 
-*Doubly Robust methods provide powerful protection against model misspecification by combining multiple approaches. Always test robustness across different model specifications and validate assumptions before making business decisions.*
+<div class="ci-callout is-tip" markdown="1">
+<span class="ci-callout-label">Run this on your own data</span>
+
+This page explains the method. To run doubly robust estimation end to end on a Viva Insights Person Query, use the [Copilot Causal Toolkit]({{ site.baseurl }}/copilot-causal-toolkit/).
+</div>
+
+*Doubly robust methods provide powerful protection against model misspecification by combining multiple approaches. Always test robustness across different model specifications and validate assumptions before making business decisions.*
 
 <nav class="ci-pager" aria-label="Causal inference pagination">
   <a class="ci-pager-link" href="{{ site.baseurl }}/causal-inference-iv/">

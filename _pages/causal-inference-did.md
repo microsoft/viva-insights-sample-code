@@ -6,7 +6,7 @@ permalink: /causal-inference-did/
 css: "/assets/css/causal-inference.css"
 ---
 
-# Method 3: Difference-in-Differences (DiD)
+# Method 3: Difference-in-differences (DiD)
 
 <nav class="ci-series-nav" aria-label="Causal inference guide">
   <a class="ci-chip" href="{{ site.baseurl }}/causal-inference/"><span class="ci-chip-step">1</span>Overview</a>
@@ -20,34 +20,19 @@ css: "/assets/css/causal-inference.css"
   <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-validation/"><span class="ci-chip-step">9</span>Validation</a>
 </nav>
 
-## Overview
+Difference-in-differences (DiD) estimates a causal effect by comparing before/after changes in a treated group with before/after changes in a control group. It is useful when an intervention rolls out at a clear point in time and you can observe comparable groups on both sides of the change.
 
-Difference-in-Differences (DiD) exploits variation in the timing of treatment implementation across groups or regions. By comparing changes over time between treated and control groups, DiD controls for time-invariant confounders that affect both groups equally.
+<div class="ci-callout is-accent" markdown="1">
+<span class="ci-callout-label">When to use it</span>
 
----
+**Best for** interventions rolled out across teams or regions at different times, policy changes with clear implementation dates, and pre/post analysis where you have a credible control group.
 
-## When to Use Difference-in-Differences
+**Key assumption — parallel trends:** without the intervention, treated and control groups would have followed the same outcome trend. Diagnose this with pre-period plots and event-study leads; it cannot be proven from data alone.
 
-**Key Advantages:**
-- **Controls for unobserved confounders** that are constant over time
-- **Natural experiment** design when treatment timing varies
-- **Policy evaluation** strength for interventions with staggered rollout
-- **Intuitive interpretation** as "difference of differences"
+**Trade-off:** DiD handles stable unobserved differences between groups, but it is fragile when groups were already trending differently, anticipating treatment, or changing composition.
+</div>
 
-**Best for:**
-- Interventions rolled out across teams/regions at different times
-- Pre/post comparisons with control groups
-- Policy changes with clear implementation dates
-- When treatment assignment is correlated with time-invariant factors
-
-**Key Assumptions:**
-- **Parallel trends**: Control and treatment groups would follow similar trends without treatment
-- **No anticipation effects**: Behavior doesn't change before actual treatment
-- **Stable composition**: Group composition remains stable over time
-
----
-
-## Data Structure and Preparation
+## Data structure and preparation
 
 DiD requires panel data with observations before and after treatment for both treated and control groups.
 
@@ -145,11 +130,15 @@ df_did = prepare_did_data(
 
 ---
 
-## Pre-Treatment Trends Analysis
+## Pre-treatment trends analysis
 
 The key assumption in DiD is **parallel trends** - that treated and control groups would have followed similar trends in the absence of treatment.
 
 > **How to assess parallel trends (and what it can't prove).** Parallel trends is fundamentally *untestable* — it concerns the counterfactual post-period trend of the treated group, which we never observe. We can only **diagnose** it using pre-treatment data. Do not reduce this to a single pass/fail p-value: a high p-value does **not** prove parallel trends (it may just reflect low power), and a low p-value is a genuine red flag. Best practice is to (1) plot an **event-study** of period-by-period lead/lag coefficients relative to an omitted reference period, (2) eyeball whether the **pre-period leads** hug zero, and (3) back this with a **joint Wald/F-test** that all leads are zero — then combine that statistical read with substantive, economic discussion of the pre-period (e.g. were the groups comparable, were there anticipation effects or other shocks?). The linear-trend check below is a quick first screen; the [event-study](#event-study-analysis) further down is the primary diagnostic.
+
+<details class="ci-details">
+<summary>Show the parallel-trends diagnostic</summary>
+<div markdown="1">
 
 ```python
 def test_parallel_trends(df_did, unit_col, time_col, treatment_col, outcome_col, 
@@ -244,11 +233,18 @@ trends_test = test_parallel_trends(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Basic Difference-in-Differences Estimation
+## Basic difference-in-differences estimation
 
 The core DiD specification compares the change in outcomes between treatment and control groups.
+
+<details class="ci-details">
+<summary>Show the basic DiD estimator</summary>
+<div markdown="1">
 
 ```python
 def estimate_basic_did(df_did, treatment_col, outcome_col, unit_col='team_id'):
@@ -340,11 +336,18 @@ def estimate_basic_did(df_did, treatment_col, outcome_col, unit_col='team_id'):
 basic_did_results = estimate_basic_did(df_did, 'copilot_usage', 'tickets_per_week')
 ```
 
+</div>
+</details>
+
 ---
 
-## Event Study Analysis
+## Event study analysis
 
 Event studies examine treatment effects period-by-period around the intervention, providing detailed insights into effect dynamics.
+
+<details class="ci-details">
+<summary>Show the event-study function</summary>
+<div markdown="1">
 
 ```python
 def event_study_analysis(df_did, time_col, treatment_col, outcome_col, unit_col, 
@@ -493,11 +496,18 @@ event_study_results = event_study_analysis(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Robustness Checks and Diagnostics
+## Robustness checks and diagnostics
 
-### Multiple Robustness Tests
+### Multiple robustness tests
+
+<details class="ci-details">
+<summary>Show the robustness-checks function</summary>
+<div markdown="1">
 
 ```python
 def did_robustness_checks(df_did, treatment_col, outcome_col, unit_col, time_col):
@@ -604,7 +614,14 @@ robustness_results = did_robustness_checks(
 )
 ```
 
-### Sensitivity Analysis
+</div>
+</details>
+
+### Sensitivity analysis
+
+<details class="ci-details">
+<summary>Show the sensitivity-analysis function</summary>
+<div markdown="1">
 
 ```python
 def did_sensitivity_analysis(df_did, treatment_col, outcome_col, unit_col):
@@ -660,11 +677,18 @@ sensitivity_results = did_sensitivity_analysis(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Advanced DiD Specifications
+## Advanced DiD specifications
 
-### Two-Way Fixed Effects
+### Two-way fixed effects
+
+<details class="ci-details">
+<summary>Show the two-way fixed-effects function</summary>
+<div markdown="1">
 
 ```python
 def two_way_fixed_effects_did(df_did, treatment_col, outcome_col, unit_col, time_col):
@@ -723,11 +747,18 @@ twfe_results = two_way_fixed_effects_did(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Business Translation Framework
+## Business translation framework
 
-### Converting DiD Results to Business Insights
+### Converting DiD results to business insights
+
+<details class="ci-details">
+<summary>Show the business-translation function</summary>
+<div markdown="1">
 
 ```python
 def translate_did_results_to_business(did_results, outcome_col, treatment_description, 
@@ -838,11 +869,18 @@ business_translation = translate_did_results_to_business(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## When DiD May Not Work
+## When DiD may not work
 
-### Diagnostic Checks
+### Diagnostic checks
+
+<details class="ci-details">
+<summary>Show the diagnostic-summary function</summary>
+<div markdown="1">
 
 ```python
 def did_diagnostic_summary(trends_test, event_study_results, robustness_results):
@@ -920,7 +958,16 @@ if 'trends_test' in locals() and 'event_study_results' in locals():
     diagnostic_summary = did_diagnostic_summary(trends_test, event_study_results, robustness_results)
 ```
 
+</div>
+</details>
+
 ---
+
+<div class="ci-callout is-tip" markdown="1">
+<span class="ci-callout-label">Run this on your own data</span>
+
+This page explains the method. To run difference-in-differences end to end on a Viva Insights Person Query, use the [Copilot Causal Toolkit]({{ site.baseurl }}/copilot-causal-toolkit/).
+</div>
 
 *Difference-in-Differences leverages natural experiments and timing variation to identify causal effects. Always validate the parallel trends assumption and conduct comprehensive robustness checks before making business recommendations.*
 

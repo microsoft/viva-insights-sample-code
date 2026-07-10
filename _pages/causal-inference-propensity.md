@@ -6,7 +6,7 @@ permalink: /causal-inference-propensity/
 css: "/assets/css/causal-inference.css"
 ---
 
-# Method 2: Propensity Score Methods
+# Method 2: Propensity score methods
 
 <nav class="ci-series-nav" aria-label="Causal inference guide">
   <a class="ci-chip" href="{{ site.baseurl }}/causal-inference/"><span class="ci-chip-step">1</span>Overview</a>
@@ -20,34 +20,21 @@ css: "/assets/css/causal-inference.css"
   <a class="ci-chip" href="{{ site.baseurl }}/causal-inference-validation/"><span class="ci-chip-step">9</span>Validation</a>
 </nav>
 
-## Overview
+Propensity score methods address selection bias by balancing treated and control groups on observed characteristics. Instead of controlling for confounders directly in the outcome model, they estimate each person's probability of receiving treatment and then compare people with similar probabilities.
 
-Propensity score methods address selection bias by balancing groups on observed characteristics. Instead of controlling for confounders directly in the outcome model, we match treated and control units with similar probabilities of receiving treatment.
+<div class="ci-callout is-accent" markdown="1">
+<span class="ci-callout-label">When to use it</span>
 
----
+**Best for** binary treatments, many observed confounders, and situations where you need to show stakeholders that the compared groups are genuinely comparable.
 
-## When to Use Propensity Score Methods
+**Key assumption — no unmeasured confounders and common support:** all variables that influence both treatment and outcome are measured, and treated and control people exist across the propensity-score range.
 
-**Key Advantages:**
-- **Dimension Reduction**: Summarizes many confounders into a single score
-- **Transparency**: Shows which units are truly comparable
-- **Assumption Testing**: Forces explicit consideration of overlap
+**Trade-off:** more transparent about overlap and balance than a single outcome regression, but it can discard observations, create unstable weights, and still cannot fix unmeasured confounding.
+</div>
 
-**Best for:**
-- High-dimensional confounding (many covariates)
-- Binary treatment variables
-- Need to demonstrate comparable groups to stakeholders
-- Concerns about model specification in outcome analysis
+## Propensity score estimation
 
-**Key Assumption:**
-- **No unmeasured confounders** (same as regression adjustment)
-- **Overlap/Common support**: Treated and control units exist across propensity score range
-
----
-
-## Propensity Score Estimation
-
-The propensity score e(x) = P(Treatment = 1 | X = x) is the probability of treatment given observed characteristics. A well-estimated propensity score should achieve balance and have sufficient overlap between groups.
+The propensity score `e(x) = P(Treatment = 1 | X = x)` is the probability of treatment given observed characteristics. A well-estimated propensity score should achieve balance and have sufficient overlap between groups.
 
 ```python
 from sklearn.linear_model import LogisticRegression
@@ -166,25 +153,25 @@ df_with_ps, ps_model, overlap_stats = estimate_propensity_scores(
 )
 ```
 
-**Interpreting Propensity Score Quality:**
+**Interpreting propensity score quality:**
 
-A high AUC is *not* the goal. The propensity model exists to balance covariates and
-create overlap between groups — not to predict treatment as accurately as possible.
-A very high AUC usually means the groups are easy to tell apart, i.e. **poor overlap**,
-which is bad for causal inference. Prioritise balance and common-support diagnostics
-over discrimination metrics.
+A high AUC is *not* the goal. The propensity model exists to balance covariates and create overlap between groups — not to predict treatment as accurately as possible. A very high AUC usually means the groups are easy to tell apart, which is bad for causal inference. Prioritise balance and common-support diagnostics over discrimination metrics.
 
-- **AUC ≈ 0.5-0.7**: Often *desirable* — treatment is hard to predict from covariates, implying good overlap.
-- **AUC 0.7-0.8**: Acceptable, but inspect overlap carefully.
-- **AUC > 0.8-0.9**: **Warning sign** — strong separation typically means limited common support; many units may have no comparable counterpart.
-- **Common Support**: Should include most observations (>80%). This matters far more than AUC.
-- **Extreme Scores**: Values near 0 or 1 suggest near-deterministic assignment and should be trimmed.
+- **AUC ≈ 0.5-0.7:** often desirable because treatment is hard to predict from covariates, implying good overlap.
+- **AUC 0.7-0.8:** acceptable, but inspect overlap carefully.
+- **AUC > 0.8-0.9:** warning sign; strong separation typically means limited common support, and many units may have no comparable counterpart.
+- **Common support:** should include most observations (>80%). This matters far more than AUC.
+- **Extreme scores:** values near 0 or 1 suggest near-deterministic assignment and should be trimmed.
 
 ---
 
-## Propensity Score Matching
+## Propensity score matching
 
-Once we have good propensity scores, we match treated units to similar control units. This creates a dataset that is **more comparable on observed covariates** within matched pairs. Note that matching only balances the covariates you include — it cannot remove bias from unobserved confounders, so residual confounding may remain.
+Once we have good propensity scores, we match treated units to similar control units. This creates a dataset that is **more comparable on observed covariates** within matched pairs. Matching only balances the covariates you include; it cannot remove bias from unobserved confounders, so residual confounding may remain.
+
+<details class="ci-details">
+<summary>Show the matching function</summary>
+<div markdown="1">
 
 ```python
 from scipy.spatial.distance import cdist
@@ -323,17 +310,24 @@ if matching_results:
         print("Consider investigating implementation or training issues")
 ```
 
-**Key Matching Diagnostics:**
-- **Match Rate**: Percentage of treated units successfully matched (aim for >80%)
-- **Caliper Choice**: Balance between match quality and sample size
-- **PS Distance**: Average distance should be small (< 0.05)
-- **Effect Size**: Cohen's d helps interpret practical significance
+</div>
+</details>
+
+**Key matching diagnostics:**
+- **Match rate:** percentage of treated units successfully matched; aim for >80%.
+- **Caliper choice:** balance between match quality and sample size.
+- **PS distance:** average distance should be small, often <0.05.
+- **Effect size:** Cohen's d helps interpret practical significance.
 
 ---
 
-## Balance Assessment
+## Balance assessment
 
-### Checking Covariate Balance After Matching
+After matching, check whether covariates are balanced between treated and control groups. The standardized-difference threshold is a diagnostic, not proof that the causal assumptions are true.
+
+<details class="ci-details">
+<summary>Show the balance-assessment function</summary>
+<div markdown="1">
 
 ```python
 def assess_covariate_balance(df_original, df_matched, confounders, treatment_col):
@@ -436,11 +430,18 @@ if matching_results:
     )
 ```
 
+</div>
+</details>
+
 ---
 
-## Inverse Propensity Weighting (IPW)
+## Inverse propensity weighting
 
-Instead of matching, we can weight observations by their inverse propensity scores. This uses all data while balancing the groups.
+Inverse propensity weighting (IPW) uses all observations by weighting each person by the inverse probability of receiving the treatment they actually received. This can improve efficiency, but extreme weights are a sign that overlap is weak.
+
+<details class="ci-details">
+<summary>Show the IPW function</summary>
+<div markdown="1">
 
 ```python
 def inverse_propensity_weighting(df, ps_col, treatment_col, outcome_col, trim_weights=True):
@@ -545,21 +546,30 @@ ipw_results = inverse_propensity_weighting(
 )
 ```
 
-**IPW Advantages vs. Matching:**
-- **Efficiency**: Uses entire sample, more statistical power
-- **Transparency**: Clear weighting interpretation  
-- **Flexibility**: Easier to incorporate into complex models
+</div>
+</details>
 
-**IPW Diagnostics to Monitor:**
-- **Weight Distribution**: Extreme weights indicate poor overlap
-- **Effective Sample Size**: Heavy weighting reduces effective N
-- **Balance Check**: Weighted covariates should be balanced
+**IPW advantages vs. matching:**
+- **Efficiency:** uses the full sample, which can increase statistical power.
+- **Transparency:** provides a clear weighting interpretation.
+- **Flexibility:** easier to incorporate into complex models.
+
+**IPW diagnostics to monitor:**
+- **Weight distribution:** extreme weights indicate poor overlap.
+- **Effective sample size:** heavy weighting reduces effective N.
+- **Balance check:** weighted covariates should be balanced.
 
 ---
 
-## Advanced Propensity Score Methods
+## Advanced propensity score methods
 
-### Stratification by Propensity Score
+### Stratification by propensity score
+
+Stratification divides the sample into propensity-score bands and estimates effects within each band. It is useful as a transparent robustness check alongside matching or weighting.
+
+<details class="ci-details">
+<summary>Show the stratification function</summary>
+<div markdown="1">
 
 ```python
 def propensity_score_stratification(df, ps_col, treatment_col, outcome_col, n_strata=5):
@@ -615,7 +625,16 @@ stratification_results = propensity_score_stratification(
 )
 ```
 
-### Propensity Score Regression
+</div>
+</details>
+
+### Propensity score regression
+
+Propensity score regression includes the score as an additional control in the outcome model. Treat it as a robustness check rather than a replacement for balance and overlap diagnostics.
+
+<details class="ci-details">
+<summary>Show the propensity-score regression function</summary>
+<div markdown="1">
 
 ```python
 def propensity_score_regression(df, ps_col, treatment_col, outcome_col, confounders):
@@ -651,11 +670,18 @@ ps_regression_results = propensity_score_regression(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Comparing Propensity Score Methods
+## Comparing propensity score methods
 
-### Method Comparison Framework
+Compare matching, IPW, stratification, and propensity-score regression to see whether the estimate is stable across defensible designs. Large swings are usually a cue to revisit overlap, balance, and sensitivity analysis before making a business claim.
+
+<details class="ci-details">
+<summary>Show the method-comparison function</summary>
+<div markdown="1">
 
 ```python
 def compare_ps_methods(df_with_ps, ps_col, treatment_col, outcome_col, confounders):
@@ -726,11 +752,18 @@ if 'matching_results' in locals() and 'ipw_results' in locals():
     )
 ```
 
+</div>
+</details>
+
 ---
 
-## Best Practices and Troubleshooting
+## Best practices and troubleshooting
 
-### Common Issues and Solutions
+### Common issues and solutions
+
+<details class="ci-details">
+<summary>Show the propensity-score diagnostics function</summary>
+<div markdown="1">
 
 ```python
 def diagnose_ps_issues(df, ps_col, treatment_col, overlap_stats):
@@ -777,29 +810,37 @@ def diagnose_ps_issues(df, ps_col, treatment_col, overlap_stats):
 ps_diagnostics = diagnose_ps_issues(df_with_ps, 'propensity_score', 'copilot_usage', overlap_stats)
 ```
 
-### Implementation Checklist
+</div>
+</details>
+
+### Implementation checklist
 
 Before using propensity score results:
 
-- ✅ **Check overlap**: Ensure adequate common support (>80% of observations)
-- ✅ **Assess balance**: Verify covariate balance after matching/weighting
-- ✅ **Compare methods**: Test multiple PS approaches for consistency
-- ✅ **Validate assumptions**: No unmeasured confounders assumption still applies
-- ✅ **Sensitivity analysis**: Test robustness to PS model specification
-- ✅ **Business translation**: Convert results to actionable insights
+- **Check overlap:** ensure adequate common support (>80% of observations).
+- **Assess balance:** verify covariate balance after matching or weighting.
+- **Compare methods:** test multiple propensity score approaches for consistency.
+- **Validate assumptions:** the no-unmeasured-confounders assumption still applies.
+- **Run sensitivity analysis:** test robustness to propensity-score model specification.
+- **Translate to business terms:** convert results to actionable insights.
 
-### When to Move to Other Methods
+### When to move to another method
 
 Consider alternative methods if:
-- Poor overlap persists despite PS model improvements
-- Results are highly sensitive to PS model specification
-- Strong suspicion of unmeasured confounders
-- Need to handle time-varying treatments
-- Complex treatment timing or dose-response relationships
 
-**Next Method:** [Difference-in-Differences →]({{ site.baseurl }}/causal-inference-did/)
+- Poor overlap persists despite propensity-score model improvements
+- Results are highly sensitive to propensity-score model specification
+- You strongly suspect unmeasured confounders
+- You need to handle time-varying treatments
+- Treatment timing or dose-response relationships are complex
 
 ---
+
+<div class="ci-callout is-tip" markdown="1">
+<span class="ci-callout-label">Run this on your own data</span>
+
+This page explains the method. To run propensity score analysis end to end on a Viva Insights Person Query, use the [Copilot Causal Toolkit]({{ site.baseurl }}/copilot-causal-toolkit/).
+</div>
 
 *Propensity score methods provide powerful tools for creating balanced comparisons when randomization isn't possible. Always validate overlap and balance assumptions before interpreting results.*
 

@@ -6,7 +6,7 @@ permalink: /causal-inference-validation/
 css: "/assets/css/causal-inference.css"
 ---
 
-# Validation & Testing Framework
+# Validation and testing framework
 
 <nav class="ci-series-nav" aria-label="Causal inference guide">
   <a class="ci-chip" href="{{ site.baseurl }}/causal-inference/"><span class="ci-chip-step">1</span>Overview</a>
@@ -20,15 +20,22 @@ css: "/assets/css/causal-inference.css"
   <a class="ci-chip is-current" href="{{ site.baseurl }}/causal-inference-validation/"><span class="ci-chip-step">9</span>Validation</a>
 </nav>
 
-## Overview
 
-This comprehensive validation framework helps ensure your causal inference results are robust, reliable, and ready for business decision-making. We cover assumption testing, robustness checks, sensitivity analysis, and comprehensive reporting standards.
+Validation is the step that turns a causal estimate into evidence you can trust. Use this framework to pressure-test assumptions, compare robustness checks, run sensitivity analysis, and prepare reporting that is clear about uncertainty.
 
----
+<div class="ci-callout is-accent" markdown="1">
+<span class="ci-callout-label">Why this matters</span>
 
-## Assumption Testing Framework
+A causal estimate should not drive action until you know whether it survives plausible alternative specifications, placebo tests, and sensitivity to unmeasured confounding.
+</div>
+
+## Assumption testing framework
 
 Every causal inference method relies on key assumptions. Systematic testing helps validate these assumptions and assess result reliability.
+
+<details class="ci-details">
+<summary>Show the assumption-testing framework</summary>
+<div markdown="1">
 
 ```python
 import pandas as pd
@@ -340,11 +347,18 @@ assumption_tests = comprehensive_assumption_testing(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Robustness Testing Framework
+## Robustness testing framework
 
 Robustness tests examine how sensitive results are to different specifications and assumptions.
+
+<details class="ci-details">
+<summary>Show the robustness-testing framework</summary>
+<div markdown="1">
 
 ```python
 def comprehensive_robustness_testing(df, treatment_col, outcome_col, confounders):
@@ -672,11 +686,18 @@ robustness_tests = comprehensive_robustness_testing(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Sensitivity Analysis Framework
+## Sensitivity analysis framework
 
 Sensitivity analysis examines how results change under different assumptions about unmeasured confounding and model parameters.
+
+<details class="ci-details">
+<summary>Show the sensitivity-analysis framework</summary>
+<div markdown="1">
 
 ```python
 def sensitivity_analysis_framework(df, treatment_col, outcome_col, confounders, baseline_estimate):
@@ -922,11 +943,18 @@ sensitivity_results = sensitivity_analysis_framework(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Comprehensive Reporting Framework
+## Comprehensive reporting framework
 
-### Executive Summary Generator
+### Executive summary generator
+
+<details class="ci-details">
+<summary>Show the executive-summary generator</summary>
+<div markdown="1">
 
 ```python
 def generate_executive_summary(method_results, assumption_tests, robustness_tests, 
@@ -1156,11 +1184,18 @@ executive_summary = generate_executive_summary(
 )
 ```
 
+</div>
+</details>
+
 ---
 
-## Quality Assurance Checklist
+## Quality assurance checklist
 
-### Pre-Publication Checklist
+### Pre-publication checklist
+
+<details class="ci-details">
+<summary>Show the quality-assurance checklist</summary>
+<div markdown="1">
 
 ```python
 def causal_inference_qa_checklist():
@@ -1283,11 +1318,18 @@ def causal_inference_qa_checklist():
 causal_inference_qa_checklist()
 ```
 
+</div>
+</details>
+
 ---
 
-## Final Integration and Next Steps
+## Final integration and next steps
 
-### Choosing the Right Method
+### Choosing the right method
+
+<details class="ci-details">
+<summary>Show the method-selection guide</summary>
+<div markdown="1">
 
 ```python
 def method_selection_guide():
@@ -1375,7 +1417,14 @@ def method_selection_guide():
 method_selection_guide()
 ```
 
-### Implementation Roadmap
+</div>
+</details>
+
+### Implementation roadmap
+
+<details class="ci-details">
+<summary>Show the implementation roadmap</summary>
+<div markdown="1">
 
 ```python
 def implementation_roadmap():
@@ -1474,7 +1523,16 @@ def implementation_roadmap():
 implementation_roadmap()
 ```
 
+</div>
+</details>
+
 ---
+
+<div class="ci-callout is-tip" markdown="1">
+<span class="ci-callout-label">Run this on your own data</span>
+
+This page explains how to validate a causal estimate. To run these robustness checks automatically on a Viva Insights Person Query, use the [Copilot Causal Toolkit]({{ site.baseurl }}/copilot-causal-toolkit/).
+</div>
 
 *This validation framework ensures your causal inference results are robust, reliable, and ready for business decision-making. Always conduct comprehensive testing before making recommendations that could impact business operations or strategy.*
 
