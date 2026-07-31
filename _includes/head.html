@@ -19,4 +19,7 @@
   {%- if jekyll.environment == 'production' and site.google_analytics -%}
     {%- include google-analytics.html -%}
   {%- endif -%}
+  {%- if jekyll.environment == 'production' and site.umami.host and site.umami.website_id -%}
+    {%- include umami-analytics.html -%}
+  {%- endif -%}
 </head>
