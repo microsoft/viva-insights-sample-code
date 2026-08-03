@@ -135,7 +135,7 @@ description: "Sample code, tutorials, and AI prompt libraries for Microsoft Viva
       <a class="vi-card" href="{{ site.baseurl }}/frontier-analytics/">
         <span class="vi-card-icon">🚀</span>
         <span class="vi-card-title">Frontier</span>
-        <span class="vi-card-desc">Turn a Viva Insights export into a dashboard, exec deck, or ROI analysis with a coding agent — plus prompt libraries and schema docs.</span>
+        <span class="vi-card-desc">Turn a Viva Insights export into a dashboard, exec deck, or ROI analysis with a coding agent, plus prompt libraries and schema docs.</span>
         <span class="vi-card-more">Explore →</span>
       </a>
       <a class="vi-card" href="{{ site.baseurl }}/articles/">
@@ -165,8 +165,8 @@ description: "Sample code, tutorials, and AI prompt libraries for Microsoft Viva
           <span class="vi-badge vi-badge-blue">Prompt library</span>
           <span class="vi-badge vi-badge-purple">Agent-ready</span>
         </div>
-        <h3 class="vi-featured-card-title">Frontier — turn a Viva Insights export into a finished output</h3>
-        <p>Paste a ready-made analyst prompt into a coding agent and produce a dashboard, executive summary, ROI estimate, or PowerPoint-ready deck from your own Viva Insights data — with schema docs and worked examples to validate against.</p>
+        <h3 class="vi-featured-card-title">Frontier: turn a Viva Insights export into a finished output</h3>
+        <p>Paste a ready-made analyst prompt into a coding agent and produce a dashboard, executive summary, ROI estimate, or PowerPoint-ready deck from your own Viva Insights data, with schema docs and worked examples to validate against.</p>
         <span class="vi-featured-card-cta">Open the prompt library →</span>
       </div>
       <div class="vi-featured-art" aria-hidden="true">
@@ -203,7 +203,7 @@ description: "Sample code, tutorials, and AI prompt libraries for Microsoft Viva
       <li>Creating executive dashboards for tracking deployment success</li>
     </ul>
 
-    <h3>Frontier — AI-agent analytics</h3>
+    <h3>Frontier: AI-agent analytics</h3>
     <p>As organizations move from measuring Copilot adoption to measuring the impact of AI <strong>agents</strong>, a new class of analysis is required. Our <a href="{{ site.baseurl }}/frontier-analytics/">Frontier</a> section turns a Viva Insights export into a finished dashboard, executive deck, or ROI analysis by pasting a ready-made prompt into a coding agent. It provides analyst prompts, schema guides, and worked examples for:</p>
     <ul>
       <li>Profiling agent and Copilot usage across the organization</li>

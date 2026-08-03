@@ -2,16 +2,16 @@
 layout: page
 title: "Frontier"
 eyebrow: "Frontier"
-description: "Turn a Viva Insights export into a finished dashboard, executive deck, or ROI analysis by pasting a prompt into a coding agent — with reusable prompts, schema guides, and example outputs."
+description: "Turn a Viva Insights export into a finished dashboard, executive deck, or ROI analysis by pasting a prompt into a coding agent. Includes reusable prompts, schema guides, and example outputs."
 permalink: /frontier-analytics/
 ---
 # Frontier
 
-**Turn a Viva Insights export into a finished dashboard, executive deck, or ROI analysis — by pasting a prompt into a coding agent.**
+**Turn a Viva Insights export into a finished dashboard, executive deck, or ROI analysis by pasting a prompt into a coding agent.**
 
-Frontier is a collection of ready-to-use prompts, schema guides, and example outputs for [Viva Insights](https://learn.microsoft.com/en-us/viva/insights/). Instead of writing analysis code from scratch, you export your data, pick a prompt, and let a coding agent — such as [GitHub Copilot](https://github.com/features/copilot) or [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview) — generate the deliverable for you to review and adapt.
+Frontier is a collection of ready-to-use prompts, schema guides, and example outputs for [Viva Insights](https://learn.microsoft.com/en-us/viva/insights/). Instead of writing analysis code from scratch, you export your data, pick a prompt, and let a coding agent such as [GitHub Copilot](https://github.com/features/copilot) or [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview) generate the deliverable for you to review and adapt.
 
-> **Note:** Everything in this section is sample code and starter assets — not production software. Outputs require review, validation, and adaptation to your environment before use.
+> **Note:** Everything in this section is sample code and starter assets, not production software. Outputs require review, validation, and adaptation to your environment before use.
 
 {% include responsible-use.html %}
 
@@ -66,7 +66,7 @@ Before you start, make sure you have:
 
 1. **Export your data.** Run a person query (or other query type) from the Viva Insights Analyst portal and download the CSV.
 2. **Pick a prompt card.** Browse the [Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/) for the analysis task that matches your use case.
-3. **Review the schema docs.** Check [Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/) to understand the structure of your exported data — column definitions, expected granularity, and common pitfalls.
+3. **Review the schema docs.** Check [Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/) to understand the structure of your exported data: column definitions, expected granularity, and common pitfalls.
 4. **Open your coding agent.** Launch GitHub Copilot, Claude Code, or a similar tool in a workspace with R or Python available.
 5. **Paste the prompt.** Copy the prompt text from the card, point it at your data file, and let the agent generate the output.
 6. **Review and iterate.** Check the output against the documented failure modes and adaptation notes. Refine as needed.
