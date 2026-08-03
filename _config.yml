@@ -4,6 +4,13 @@ description: "Sample code, tutorials, and AI prompt libraries for Microsoft Viva
 baseurl: "/viva-insights-sample-code"
 url: "https://microsoft.github.io"
 
+# Privacy-focused analytics. Add host and website_id after the shared Umami
+# service is deployed; the tracker remains disabled while either value is empty.
+umami:
+  host: "https://ca-umami-prod.lemonglacier-6a5930b7.uksouth.azurecontainerapps.io"
+  website_id: "707fe1cb-2998-4b46-beba-097dcd182238"
+  domains: "microsoft.github.io"
+
 # Branding & social sharing (consumed by jekyll-seo-tag)
 logo: /assets/images/apple-touch-icon.png
 twitter:
