@@ -55,6 +55,23 @@ When a static HTML report or memo is not suitable and stakeholders need a polish
 
 A .pptx file with 10–15 slides, using editable native PowerPoint charts (not pasted images) so that recipients can modify the deck as needed.
 
+## Quick prompt (short version)
+
+Use this shorter prompt for a fast first pass that adapts to your data.
+
+```
+Help me generate an exec-ready PowerPoint deck that summarizes Copilot adoption for senior leaders from a Viva Insights person query export.
+Start by loading the actual CSV and printing row count, column names, data types, date range, and unique people so you can map the real Copilot and HR fields before building slides.
+Adapt field names dynamically, use the installed toolchain that best supports native PowerPoint charts, and ask me for the file path, template path, or any ambiguous metric mapping before you proceed.
+Classify licensed versus active users correctly, using the real primary activity metric from the data rather than assuming the default names blindly.
+Create the deck directly as a .pptx file with native editable chart objects wherever the library supports them, and avoid HTML to PowerPoint conversion pipelines.
+If a needed chart type cannot be created natively, simplify it to a supported native chart where possible and clearly note any remaining slide that must fall back to an image.
+Keep the deck concise, data-driven, and presentation-ready, suppress segments below about 5 people, and skip slides that depend on unavailable metrics rather than leaving blanks.
+Finish by listing any assumptions you made about chart support, metric mappings, or optional slide substitutions.
+```
+
+Use the detailed prompt below for a reproducible, exact-structure output. Use the quick prompt above for a faster first pass that you refine through follow-up turns.
+
 ## Prompt
 
 ```

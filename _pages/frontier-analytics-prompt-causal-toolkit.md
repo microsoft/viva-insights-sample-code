@@ -54,6 +54,23 @@ HR analytics leads, people analytics practitioners who want to evaluate the caus
 - The user may not be a data scientist — the agent should explain decisions clearly
 - The toolkit notebooks and helper modules are already available in the repository
 
+## Quick prompt (short version)
+
+Use this shorter prompt for a fast first pass that adapts to your data.
+
+```
+Help me use the Copilot Causal Toolkit end to end by first configuring and running the right notebook for my data, then interpreting the outputs for a business audience.
+Start by loading the actual CSV and printing row count, column names, data types, date range, and unique people so you can determine whether it is a Person Query or Super Users Report and map the real fields.
+Do not assume exact paths or variables, and ask me for the CSV location, toolkit location, and business question if any of those are missing or ambiguous.
+Keep the required two-part flow from this card, which means run and validate the analysis first, then interpret the generated outputs in a separate pass.
+Do not change the treatment variable from Total_Copilot_actions_taken, do not edit shared helper modules, and warn me if the dataset is shorter than about 12 weeks.
+When choosing or configuring the notebook, adapt subgroup, collaboration, and outcome variables to the columns that actually exist in my data.
+When interpreting results, explain the ATE direction in business terms, include the sensitivity analysis, and avoid overstating causation or borderline significance.
+Finish each phase by listing any assumptions you made about notebook choice, variable mappings, or output interpretation.
+```
+
+Use the detailed prompts below for a reproducible, exact-structure output. Use the quick prompt above for a faster first pass that you refine through follow-up turns.
+
 ---
 
 ## Prompt 1 — Run the Analysis

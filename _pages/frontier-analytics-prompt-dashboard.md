@@ -54,6 +54,23 @@ After exporting a person query with Copilot activity metrics spanning at least 8
 
 A self-contained static HTML file with embedded charts, suitable for sharing via email or SharePoint.
 
+## Quick prompt (short version)
+
+Use this shorter prompt for a fast first pass that adapts to your data.
+
+```
+Help me create a self-contained static HTML dashboard for people analytics and IT leaders that summarizes Copilot adoption trends and group differences from a Viva Insights person query export.
+Start by loading the actual CSV and printing the row count, column names, data types, date range, and number of unique people, then map the real metric and HR columns from what is present.
+Do not assume exact field names, and ask me to confirm the primary activity metric or any missing HR columns if the mapping is ambiguous.
+Separate licensed users from active users before calculating anything, treating missing Copilot metrics as unlicensed unless the data clearly indicates otherwise.
+Build weekly adoption metrics using distinct people per week, then add the most useful group views from the available HR attributes.
+The output must be a single self-contained static HTML file with inline assets and no server or external dependencies.
+Suppress any group with fewer than about 5 people, and note any skipped charts or missing segments.
+At the end, list any assumptions you made about metric selection, licensing logic, or field mappings.
+```
+
+Use the detailed prompt below for a reproducible, exact-structure output. Use the quick prompt above for a faster first pass that you refine through follow-up turns.
+
 ## Prompt
 
 ```
