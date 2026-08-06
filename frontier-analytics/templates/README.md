@@ -13,6 +13,7 @@ Frontier Analytics relies on a consistent structure so that analysts, consultant
 | [Prompt Card Template](prompt-card-template.md) | Create a new prompt card for the prompt library | You have a repeatable analytics workflow that can be driven by a coding agent |
 | [Starter Kit Template](starter-kit-template.md) | Create a new starter kit (a multi-prompt workflow) | You want to package several prompt cards into an end-to-end analysis workflow |
 | [Schema Doc Template](schema-doc-template.md) | Document a new data schema or data source | You need to describe a Viva Insights export format, Purview log format, or other data source |
+| [Skill Template](skill-template.md) | Create a new agent Skill | You have domain conventions or workflows that should apply across many tasks, not a single analysis prompt |
 
 ## How to use a template
 
@@ -20,6 +21,7 @@ Frontier Analytics relies on a consistent structure so that analysts, consultant
    - Prompt cards → `frontier-analytics/prompts/<category>/`
    - Starter kits → `frontier-analytics/starter-kits/<kit-name>/`
    - Schema docs → `frontier-analytics/schemas/`
+   - Skills → `frontier-analytics/skills/<skill-name>/`
 
 2. **Fill in every section.** Replace all placeholder text (marked with `[brackets]`) with your actual content. Remove any guidance comments once you have addressed them.
 

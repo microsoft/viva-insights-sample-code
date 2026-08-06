@@ -56,6 +56,23 @@ When stakeholders need a quantified business justification for Copilot investmen
 
 An ROI summary report in HTML or Markdown, containing a value framework, sensitivity analysis, and methodology notes suitable for inclusion in a business case document.
 
+## Quick prompt (short version)
+
+Use this shorter prompt for a fast first pass that adapts to your data.
+
+```
+Help me build an ROI summary report for finance and IT leaders that estimates the value of Copilot usage from a Viva Insights person query export.
+Start by loading the actual CSV and printing row count, column names, data types, date range, and unique people so you can identify the real Copilot and collaboration fields.
+Adapt to the column names that are present, and ask me for the file path, hourly rate, license cost, or any ambiguous metric mapping instead of guessing.
+Separate licensed, active, and unlicensed rows correctly, use a recent multi-week average rather than a single week for annualization, and make the break-even threshold explicit.
+If Copilot_Assisted_Hours is missing, use the best available proxy only after telling me what you chose and why.
+Include a sensitivity analysis under multiple hourly-rate and adoption scenarios, and be explicit that any licensed versus unlicensed comparison is observational and does not prove causation.
+Report negative or uncertain ROI honestly, suppress any segment below about 5 people, and keep assumptions and caveats prominent throughout the output.
+Finish by listing every assumption you had to make about value realization, proxies, and segment definitions.
+```
+
+Use the detailed prompt below for a reproducible, exact-structure output. Use the quick prompt above for a faster first pass that you refine through follow-up turns.
+
 ## Prompt
 
 ```
@@ -75,9 +92,9 @@ DATA LOADING AND PREPARATION
 2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity metric. Print detected columns.
 3. Run `extract_hr(df)` from the `vivainsights` library to identify available HR / organizational attribute columns. Use the returned list for all organizational breakdowns instead of hard-coding column names.
 4. Classify each person-week:
-   - "Licensed": at least one non-null, non-zero Copilot metric value.
+   - "Licensed": if an enabled-days column is present (for example `Total_Copilot_enabled_days`), that column is greater than zero for the week. Otherwise, at least one non-null, non-zero Copilot metric value.
    - "Active": licensed AND Total_Copilot_actions_taken > 0.
-   - "Unlicensed": all Copilot metric values are null or zero.
+   - "Unlicensed": the enabled-days column equals zero when available. Otherwise, all Copilot metric values are null or zero.
 5. Print: total persons, licensed persons, active persons (ever active), date range.
 
 TIME SAVINGS ESTIMATION

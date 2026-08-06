@@ -54,6 +54,23 @@ When you need to communicate Copilot adoption progress to senior leadership — 
 
 A 1–2 page executive summary in HTML or Markdown, formatted as a professional memo suitable for distribution to VP/C-suite audiences.
 
+## Quick prompt (short version)
+
+Use this shorter prompt for a fast first pass that adapts to your data.
+
+```
+Help me produce a concise executive summary memo for senior leaders that explains Copilot adoption progress, risks, and recommended next actions from a Viva Insights person query export.
+Start by loading the real CSV and printing row count, column names, data types, date range, and unique people so you can map the actual Copilot and HR fields.
+Adapt the column names dynamically rather than assuming the defaults, and ask me for the file path, preferred output format, or any ambiguous field mapping before you proceed.
+Separate licensed, active, and unlicensed person-weeks correctly before computing headline metrics, and calculate every reported number directly from the data.
+Compare recent adoption and usage trends using the amount of history actually available, and call out when the dataset is too short for the preferred comparison window.
+Keep the tone balanced and executive-friendly, include specific numbers in findings and recommendations, and avoid unsupported claims.
+Suppress organizational breakouts below about 5 people for privacy, and note data quality or missing-field limitations clearly.
+End by listing any assumptions you made about activity metrics, comparison windows, or segment mappings.
+```
+
+Use the detailed prompt below for a reproducible, exact-structure output. Use the quick prompt above for a faster first pass that you refine through follow-up turns.
+
 ## Prompt
 
 ```
@@ -67,9 +84,9 @@ DATA LOADING AND PREPARATION
 2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity metric. Print the detected columns and the date range for verification.
 3. Run `extract_hr(df)` from the `vivainsights` library to identify available HR / organizational attribute columns. Use the returned list for all organizational breakdowns instead of hard-coding column names.
 4. Classify each person-week row:
-   - "Licensed": has at least one non-null, non-zero Copilot metric value.
+   - "Licensed": if an enabled-days column is present (for example `Total_Copilot_enabled_days`), that column is greater than zero for the week. Otherwise, at least one non-null, non-zero Copilot metric value.
    - "Active": is licensed AND has Total_Copilot_actions_taken > 0 (the primary activity metric).
-   - "Unlicensed": all Copilot metric values are null or zero.
+   - "Unlicensed": the enabled-days column equals zero when available. Otherwise, all Copilot metric values are null or zero.
 5. If any expected HR attribute columns are not found by `extract_hr()`, note which ones are unavailable and proceed with what is present.
 
 HEADLINE METRICS (compute these for the memo)
