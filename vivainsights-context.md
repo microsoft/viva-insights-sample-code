@@ -1,6 +1,8 @@
-# Viva Insights — Agent Context
+# Viva Insights: Agent Context
 
 > **What is this file?** This is a reusable context file for AI coding agents (GitHub Copilot, Claude Code, or similar). Drop it into your project or paste it as context before a prompt. It provides domain knowledge about Viva Insights data and the `vivainsights` package so you don't have to repeat it in every prompt.
+>
+> **If your coding agent supports the Skill format** (for example GitHub Copilot CLI or Claude Code), use the [viva-insights-analysis skill](frontier-analytics/skills/viva-insights-analysis/) instead. It covers the same ground as this file in more depth, is organized into reference files an agent reads on demand, and is kept current with the packages' own `llms.txt` function index. This file remains here as a fallback for agents that do not support Skills.
 
 ## Data structure
 

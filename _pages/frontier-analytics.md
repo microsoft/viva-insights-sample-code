@@ -28,6 +28,19 @@ You do not need to be a software engineer. If you can export a CSV from Viva Ins
 
 ---
 
+## Which asset should I use?
+
+Frontier offers four ways to bring this work into a coding agent. They solve overlapping problems, so use this table to pick the right one before browsing further.
+
+| Mechanism | What it is | Status | Use it when |
+|-----------|------------|--------|-------------|
+| [Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/) | Structured text you copy and paste into any coding agent for a single analysis task. | Available | Your agent does not support Skills or MCP, or you want a one-off analysis without any setup. |
+| Skills | A packaged capability that a compatible coding agent loads automatically, so it applies the right conventions without you pasting anything. See the [skills folder on GitHub](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/skills). | Available | Your coding agent supports the Skill format (for example GitHub Copilot CLI or Claude Code) and you want ongoing, repeated Viva Insights work to follow consistent conventions. |
+| [vivainsights-context.md](https://github.com/microsoft/viva-insights-sample-code/blob/main/vivainsights-context.md) | A single context file you paste once at the start of a session. | Available | Your agent does not support Skills, but you still want to avoid repeating setup instructions in every prompt. |
+| [mcp/](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/mcp) | A protocol-level integration that would let an agent query prompts, schemas, and tools directly from a server. | Concept only, no server implemented | Not yet. Read the folder for the design intent and to track progress. |
+
+---
+
 ## What's inside
 
 | Section | Description |
@@ -39,9 +52,10 @@ Additional resources available on GitHub:
 
 | Folder | Description |
 |--------|-------------|
+| [skills/](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/skills) | Agent Skills. Packaged capabilities that a compatible coding agent loads automatically for ongoing Viva Insights work. |
 | [examples/](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/examples) | Sample output specifications describing what a finished deliverable looks like. |
-| [templates/](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/templates) | Templates for contributing new prompt cards and schema docs. |
-| [mcp/](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/mcp) | Concepts and sample configuration for Model Context Protocol (MCP) integration. |
+| [templates/](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/templates) | Templates for contributing new prompt cards, skills, and schema docs. |
+| [mcp/](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/mcp) | Concept and sample configuration for Model Context Protocol (MCP) integration. Not yet implemented: there is no MCP server today, see the folder's README for the design intent. |
 
 ---
 
@@ -85,6 +99,7 @@ Before you start, make sure you have:
 
 - [Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/)
 - [Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)
+- [Skills library](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/skills)
 - [Browse on GitHub](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics)
 - [Contributing](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/CONTRIBUTING.md)
 - [Changelog](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/CHANGELOG.md)

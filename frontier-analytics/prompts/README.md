@@ -36,6 +36,8 @@ A prompt card is a structured document that contains:
 | [Executive Summary](copilot-adoption/executive-summary.md) | Produce a concise executive memo summarizing Copilot adoption metrics, key findings, and recommendations for VP/C-suite audiences. |
 | [Segmentation & Churn](copilot-adoption/segmentation-and-churn.md) | Classify users into usage segments, track segment transitions over time, and calculate churn rates. |
 | [ROI Estimation](copilot-adoption/roi-estimation.md) | Estimate return on investment for Copilot by quantifying time savings, productivity value, and license cost breakdowns. |
+| [Executive PowerPoint Deck](copilot-adoption/executive-powerpoint-deck.md) | Generate an exec-ready 10-15 page PowerPoint deck with editable native charts. |
+| [Copilot Causal Toolkit](copilot-adoption/copilot-causal-toolkit.md) | Run a causal inference analysis using the Copilot Causal Toolkit, then interpret results for senior leadership. Two prompts: one to run the analysis, one to interpret outputs. |
 
 ### Purview Augmentation
 
