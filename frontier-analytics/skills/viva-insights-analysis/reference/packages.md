@@ -38,11 +38,11 @@ non-English exports see `data-pitfalls.md`.
 |---|---|---|
 | Copilot / metric usage segments | `identify_usage_segments(data, metric, metric_str, version = "12w", power_thres = 15, return = "data")` | `identify_usage_segments(data, metric, metric_str, version='12w', return_type='data', power_thres=None)` |
 | Habitual-use flag | `identify_habit(data, metric, threshold = 1, width, max_window, hrvar, return = "plot")` | `identify_habit(data, metric, threshold=1, width=1, max_window=4, return_type='plot')` |
-| Holiday weeks (low-activity weeks) | `identify_holidayweeks(data, ...)` | `identify_holidayweeks()` |
-| Inactive weeks | `identify_inactiveweeks()` | `identify_inactiveweeks()` |
-| Non-knowledge-worker / low-signal | `identify_nkw()` | `identify_nkw()` |
-| Statistical outliers | `identify_outlier()` | `identify_outlier()` |
-| Tenure from a hire-date column | `identify_tenure()` | `identify_tenure()` |
+| Holiday weeks (low-activity weeks) | `identify_holidayweeks(data, ...)` | `identify_holidayweeks(data, ...)` |
+| Inactive weeks | `identify_inactiveweeks()` | `identify_inactiveweeks(data, ...)` |
+| Non-knowledge-worker / low-signal | `identify_nkw()` | `identify_nkw(data, ...)` |
+| Statistical outliers | `identify_outlier()` | `identify_outlier(data, ...)` |
+| Tenure from a hire-date column | `identify_tenure()` | `identify_tenure(data, ...)` |
 | Churn between two periods | N/A | `identify_churn()` |
 | Privacy-threshold groups | `identify_privacythreshold(data, hrvar = extract_hr(data), mingroup = 5, return = "table")` | N/A |
 | Structural shifts in a series | `identify_shifts()` | N/A |
