@@ -11,7 +11,7 @@ permalink: /frontier-analytics/
 
 Frontier is a collection of ready-to-use prompts, schema guides, and example outputs for [Viva Insights](https://learn.microsoft.com/en-us/viva/insights/). Instead of writing analysis code from scratch, you export your data, pick a prompt, and let a coding agent such as [GitHub Copilot](https://github.com/features/copilot) or [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview) generate the deliverable for you to review and adapt.
 
-> **Note:** Everything in this section is sample code and starter assets, not production software. Outputs require review, validation, and adaptation to your environment before use.
+> **Note:** Everything in this section is sample code and starter assets. It is not production software. Outputs require review, validation, and adaptation to your environment before use.
 
 {% include responsible-use.html %}
 
@@ -75,6 +75,14 @@ Before you start, make sure you have:
    - [GitHub Copilot](https://github.com/features/copilot) (in VS Code, JetBrains, or CLI)
    - [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview)
    - Other coding agents with code execution capabilities
+
+### Don't have a coding agent yet?
+
+- **GitHub Copilot** is free to start with a personal GitHub account. Install the Copilot extension in [VS Code](https://code.visualstudio.com/), or install the [GitHub Copilot CLI](https://github.com/features/copilot) and sign in from a terminal.
+- **Claude Code** is a terminal-based coding agent from Anthropic. Its [getting started guide](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview) covers installation.
+- If your organization already provides an enterprise-hosted coding agent, use that instead, especially when working with real HR data, since it keeps your data inside your organization's boundary.
+
+Once installed, open the agent in a folder that has R or Python available, then continue with the workflow below.
 
 ### Workflow
 

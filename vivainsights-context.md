@@ -9,8 +9,8 @@
 Viva Insights exports **person query** data as CSV files at **person-week** granularity:
 
 - Each row represents one person in one week.
-- `PersonId` — anonymized identifier (treat as string, not numeric).
-- `MetricDate` — date marking the start of each week.
+- `PersonId`: anonymized identifier. Treat as a string, never convert it to a number.
+- `MetricDate`: date marking the start of each week.
 - A balanced panel means every person appears in every week. Verify by checking that `PersonId × MetricDate` combinations are unique.
 - Super Users Report exports use `Date` instead of `MetricDate`.
 
@@ -34,7 +34,7 @@ library(vivainsights)
 df <- import_query("path/to/person_query.csv")
 ```
 
-Do **not** use `pd.read_csv()` or `read.csv()` directly — `import_query()` handles edge cases that raw CSV readers miss.
+Do **not** use `pd.read_csv()` or `read.csv()` directly. `import_query()` handles edge cases that raw CSV readers miss.
 
 ## Identifying organizational attributes
 
@@ -48,7 +48,7 @@ hr_attrs = vi.extract_hr(df)
 hr_attrs <- extract_hr(df)
 ```
 
-Use the returned list for all segmentation and grouping operations instead of hard-coding column names like `Organization`, `FunctionType`, or `LevelDesignation` — exact names vary between tenants and localization settings.
+Use the returned list for all segmentation and grouping operations instead of hard-coding column names like `Organization`, `FunctionType`, or `LevelDesignation`. Exact names vary between tenants and localization settings.
 
 ## Copilot metrics
 
@@ -56,7 +56,7 @@ Not all analyses involve Copilot data. If the dataset does not contain Copilot m
 
 - Copilot metric columns usually contain the word **"Copilot"** in their name, but do not always start with `Copilot_`.
 - Identify them dynamically: filter columns where the name contains "Copilot".
-- The **primary activity metric** is `Total_Copilot_actions_taken` — it captures all Copilot usage across apps and is generally recommended.
+- The **primary activity metric** is `Total_Copilot_actions_taken`. It captures all Copilot usage across apps and is generally recommended.
 - Reference the metrics taxonomy for classification and validation:
   [copilot-metrics-taxonomy.csv](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv)
 
@@ -94,7 +94,7 @@ holiday_weeks = vi.identify_holidayweeks(df)
 holiday_weeks <- identify_holidayweeks(df)
 ```
 
-Offer the user the choice to exclude identified holiday weeks from the analysis — this can materially change results. If excluding, document which weeks were removed in the methodology or footnotes.
+Offer the user the choice to exclude identified holiday weeks from the analysis. This can materially change results. If excluding, document which weeks were removed in the methodology or footnotes.
 
 ## Language choice
 
@@ -110,17 +110,17 @@ Both packages provide the same core functions (`import_query`, `extract_hr`, `id
 - For **HTML outputs**: create an RMarkdown (`.Rmd`) or Jupyter notebook (`.ipynb`) first, then knit/export to HTML. Keep the intermediary file for troubleshooting.
 - For **PowerPoint outputs**: generate `.pptx` directly using specialized packages (`officer` + `mschart` in R, or `python-pptx` in Python). Do not use an intermediary notebook.
 - For **self-contained HTML**: all CSS, JS, fonts, and chart images must be inline or base64-encoded. No external dependencies.
-- **Always include base sizes (n) and date ranges** in captions, footnotes, or subtitles of all charts and tables. These are critical for interpretation — a trend based on 20 people reads very differently from one based on 2,000.
+- **Always include base sizes (n) and date ranges** in captions, footnotes, or subtitles of all charts and tables. These are critical for interpretation. A trend based on 20 people reads very differently from one based on 2,000.
 
 ## Exploratory data analysis
 
 For exploratory analysis, prefer built-in functions from the **vivainsights** package over writing custom code from scratch. Key functions include:
 
-- `create_bar()` — bar charts of metric averages by organizational attribute
-- `create_rank()` — ranked comparisons across groups
-- `create_trend()` — trend lines over time
-- `create_boxplot()` — distributions by group
-- `create_dist()` — distribution analysis
+- `create_bar()`: bar charts of metric averages by organizational attribute
+- `create_rank()`: ranked comparisons across groups
+- `create_trend()`: trend lines over time
+- `create_boxplot()`: distributions by group
+- `create_dist()`: distribution analysis
 
 These functions accept a `return` parameter (R: `return`, Python: `return_type`) that can be set to `"table"` or `"data"` to return a data frame instead of a plot, making it easy to reuse the output in further analysis.
 
@@ -132,11 +132,11 @@ These functions accept a `return` parameter (R: `return`, Python: `return_type`)
 ## Official documentation
 
 Column definitions and metric descriptions are maintained at:
-[Microsoft Learn — Viva Insights metrics reference](https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics)
+[Microsoft Learn: Viva Insights metrics reference](https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics)
 
-Do not hard-code specific column names from documentation — actual names can vary by tenant and localization. Use `import_query()` and `extract_hr()` to handle this dynamically.
+Do not hard-code specific column names from documentation. Actual names can vary by tenant and localization. Use `import_query()` and `extract_hr()` to handle this dynamically.
 
 ## Prompt library
 
 Ready-to-use prompt cards for common analytics tasks are available at:
-[Frontier Analytics — Prompt Library](https://microsoft.github.io/viva-insights-sample-code/frontier-analytics-prompts/)
+[Frontier Analytics: Prompt Library](https://microsoft.github.io/viva-insights-sample-code/frontier-analytics-prompts/)

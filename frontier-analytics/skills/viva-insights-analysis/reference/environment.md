@@ -1,8 +1,8 @@
 # Environment and run tips
 
 Practical notes for running vivainsights analyses reliably, especially in a
-headless / agent context. These are general good practices, not tied to any
-machine or customer.
+headless / agent context. These are general good practices. They are not tied
+to any machine or customer.
 
 ## Prefer script files over long inline one-liners
 
@@ -17,7 +17,7 @@ python analysis.py
 
 If a specific environment proves unstable running `Rscript -e "library(...)"`
 inline, switch to a `.R` file. Write a temporary `_probe.R` / `_probe.py` for
-interactive checks and delete it when done; do not leave debug scripts behind.
+interactive checks and delete it when done. Do not leave debug scripts behind.
 
 ## Headless plotting
 
@@ -54,13 +54,13 @@ than to debug a misleading chart later.
 ## Reproducibility
 
 - Pin package versions in the environment and record them in outputs.
-- Set a seed for anything stochastic (network layouts take a `seed=`; simulators
-  and samples should be seeded).
+- Set a seed for anything stochastic. Network layouts take a `seed=`, and
+  simulators and samples should be seeded too.
 - State the exact date windows and `mingroup` used, so a cut can be reproduced.
 
 ## Verifying the API at runtime
 
-Do not rely on memory for signatures; the R and Python packages version
+Do not rely on memory for signatures. The R and Python packages version
 independently. Introspect the installed version:
 
 ```r

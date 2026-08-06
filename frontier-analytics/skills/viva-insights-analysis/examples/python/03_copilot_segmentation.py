@@ -8,8 +8,8 @@ Low / Non-user) with identify_usage_segments.
 Convention reminders (see reference/analysis-conventions.md):
 - Fill the metric NaNs with 0 before segmenting, or the rolling window leaves
   people unclassified.
-- Define the licensed population by enabled days for a snapshot, not by action
-  presence.
+- Define the licensed population by enabled days for a snapshot rather than by
+  action presence.
 """
 import vivainsights as vi
 

@@ -4,10 +4,10 @@ The recurring traps when loading and aggregating Viva Insights exports. Each has
 a symptom, a cause, and a fix. Most produce silent wrong answers rather than
 errors, so check for them proactively.
 
-## 1. `IsManager` is "Yes"/"No" text, not boolean
+## 1. `IsManager` arrives as "Yes"/"No" text rather than a boolean
 
 **Symptom:** manager filters match nothing, or every row goes NA.
-**Cause:** the export delivers `"Yes"`/`"No"` strings, not `TRUE`/`FALSE` or 1/0.
+**Cause:** the export delivers `"Yes"`/`"No"` strings instead of `TRUE`/`FALSE` or 1/0.
 **Fix:** normalise robustly.
 
 ```r
@@ -26,8 +26,8 @@ The same pattern applies to any other Yes/No flag column.
 
 ## 2. `"#N/A"` arrives as a literal string
 
-**Symptom:** a numeric column is typed as text; `is.na()` / `.isna()` misses
-blanks; group counts include a bogus "#N/A" category.
+**Symptom:** a numeric column is typed as text. `is.na()` / `.isna()` misses
+blanks. Group counts include a bogus "#N/A" category.
 **Cause:** some exports write `"#N/A"` (and variants) as text rather than a true
 null. Common in HR attribute columns.
 **Fix:** filter the string forms explicitly before typing/aggregating.
@@ -43,7 +43,7 @@ df = df[~df["Organization"].isin(bad)]
 
 ## 3. Non-English / accented-locale exports
 
-**Symptom:** column matching breaks after import; dictionary lookups miss;
+**Symptom:** column matching breaks after import. Dictionary lookups miss.
 `import_query()` quietly turns accented headers into underscores.
 **Cause:** exports from non-English tenants use localised, accented column names
 and often **smart-quote apostrophes** (U+2019) mixed with ASCII ones.
@@ -65,12 +65,12 @@ for enc in ("utf-8-sig", "utf-8", "latin-1"):
 ```
 
 Diagnose apostrophe type with `repr(col_name)` on a sample of headers before
-building the map. Keep the local->English mapping in one place. This generalises
-to any locale, not just one language.
+building the map. Keep the local->English mapping in one place. This approach
+works across locales rather than for a single language.
 
 ## 4. Privacy threshold (minimum group size)
 
-**Symptom:** small groups look precise but are not privacy-safe; results are not
+**Symptom:** small groups look precise but are not privacy-safe. Results are not
 reproducible against the portal, which suppresses small groups.
 **Cause:** Viva Insights enforces a minimum aggregation group size (commonly 5).
 Below it, a group should not be reported.
@@ -91,7 +91,7 @@ number" for a small team. Aggregate up to a coarser `hrvar` instead.
 which looks like a data glitch or a "methodology change".
 **Cause:** several metrics (network sizes, tie counts, and similar) are computed
 over a **trailing multi-week window**. The same windowed value repeats until the
-window slides. This is the metric definition, not an error.
+window slides. This is how the metric is defined. It is not an error.
 **Fix:** do not interpret the plateaus-and-steps as behavioural change. For
 cross-period comparison, pool over multi-month windows or normalise per person,
 and avoid week-on-week deltas on these metrics.
@@ -117,10 +117,10 @@ pq = vi.identify_inactiveweeks(pq)
 Prefer comparing matched calendar periods, and state when holidays fall inside a
 compared window.
 
-## 7. Load the columns you need, not all of them
+## 7. Load only the columns you need
 
 **Symptom:** slow loads and high memory on wide exports (hundreds of columns).
-**Cause:** Person Query exports can be very wide; reading every column is
+**Cause:** Person Query exports can be very wide. Reading every column is
 wasteful when an analysis needs a handful.
 **Fix:** select columns at read time.
 

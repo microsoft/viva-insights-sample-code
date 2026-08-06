@@ -7,9 +7,9 @@ the generalised quality filter and a per-rule attrition table.
 
 Note: the built-in mt_data sample is small and synthetic, so very few rows
 survive the strict filter. The point here is the filter mechanics and the
-attrition breakdown, not the surviving counts. Adapt thresholds to your data.
+attrition breakdown rather than the surviving counts. Adapt thresholds to your data.
 
-Reminder: Duration and *_hours columns are in HOURS, not minutes.
+Reminder: Duration and *_hours columns are measured in hours rather than minutes.
 """
 import pandas as pd
 import vivainsights as vi

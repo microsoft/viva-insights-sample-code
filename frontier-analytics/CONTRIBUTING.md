@@ -21,11 +21,11 @@ Thank you for your interest in improving Frontier Analytics. This guide covers h
 1. Copy the starter kit template from [templates/](templates/).
 2. Create a new folder under [starter-kits/](starter-kits/) with a descriptive kebab-case name (e.g., `starter-kits/meeting-culture-report/`).
 3. Include at minimum:
-   - `README.md` — use case overview, audience, and output description
-   - `quickstart.md` — step-by-step instructions
-   - `required-inputs.md` — data files and parameters needed
+   - `README.md`: use case overview, audience, and output description
+   - `quickstart.md`: step-by-step instructions
+   - `required-inputs.md`: data files and parameters needed
 4. Reference existing prompt cards from [prompts/](prompts/) or create new ones.
-5. Update [STARTER_KITS.md](STARTER_KITS.md) to list the new kit.
+5. Update [starter-kits/README.md](starter-kits/README.md) to list the new kit.
 
 ## Adding a new skill
 

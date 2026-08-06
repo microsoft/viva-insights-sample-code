@@ -2,7 +2,7 @@
 
 Frontier Analytics is an **export-first, self-service analytics toolkit** for [Viva Insights](https://learn.microsoft.com/en-us/viva/insights/). It provides reusable prompts, starter kits, schema documentation, and example specifications that you can combine with a coding agent to produce analytics outputs from exported Viva Insights data.
 
-> **Note:** Everything in this folder is sample code and starter assets, not production software. Outputs require review, validation, and adaptation to your environment before use.
+> **Note:** Everything in this folder is sample code and starter assets. It is not production software. Outputs require review, validation, and adaptation to your environment before use.
 
 ## Who is this for?
 
@@ -26,6 +26,16 @@ Frontier Analytics offers four ways to bring this work into a coding agent. They
 
 If you are not sure where to start, use a [starter kit](starter-kits/) for an end-to-end walkthrough, or a [prompt card](prompts/) for a single task.
 
+## Don't have a coding agent yet?
+
+Frontier Analytics assumes you have a coding agent available. If you don't yet, here is the fastest path to get one:
+
+- **GitHub Copilot** is free to start with a personal GitHub account. Install the Copilot extension in [VS Code](https://code.visualstudio.com/) (or open the [GitHub Copilot CLI](https://github.com/features/copilot) in a terminal) and sign in with your GitHub account.
+- **Claude Code** is a terminal-based coding agent from Anthropic. See its [getting started guide](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview) for installation.
+- If your organization provides an enterprise-hosted coding agent, use that instead, especially when working with real HR data, since it keeps your data inside your organization's boundary.
+
+Once installed, open the agent in a folder that has R or Python available, then continue with the workflow below.
+
 ## What's inside
 
 | Folder | Description |
@@ -40,14 +50,38 @@ If you are not sure where to start, use a [starter kit](starter-kits/) for an en
 
 ## How to use this with a coding agent
 
-The intended workflow:
+### Prerequisites
+
+- **Exported Viva Insights data.** Typically a person query CSV from the Viva Insights Analyst portal. Person query data has a panel structure with rows keyed by `PersonId` and `MetricDate` (person-week or person-day granularity), with HR attributes such as organization, function, geography, and level as columns.
+- **An R or Python environment**, with the [vivainsights R package](https://microsoft.github.io/vivainsights/) or the [vivainsights Python package](https://microsoft.github.io/vivainsights-py/) installed. See "Recommended packages" below.
+- **A coding agent.** See "Don't have a coding agent yet?" above if you need one.
+
+### Workflow
 
 1. **Export your data.** Run a person query (or other query type) from the Viva Insights Analyst portal and download the CSV.
 2. **Pick a starter kit or prompt card.** Browse [starter-kits/](starter-kits/) for end-to-end workflows or [prompts/](prompts/) for individual analysis tasks.
 3. **Review the schema docs.** Check [schemas/](schemas/) to understand the structure of your exported data, including column definitions, expected granularity, and common pitfalls.
 4. **Open your coding agent.** Launch [GitHub Copilot](https://github.com/features/copilot), [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview), or a similar tool in a workspace with R or Python available.
-5. **Paste the prompt.** Copy the prompt text from the card, point it at your data file, and let the agent generate the output.
+5. **Paste the prompt.** Copy the prompt text from the card, point it at your data file, and let the agent generate the output. If a card offers a quick prompt and a detailed prompt, start with whichever matches how exact you need the output to be.
 6. **Review and iterate.** Check the output against the documented failure modes and adaptation notes. Refine as needed.
+
+### What to expect as output
+
+Depending on the starter kit or prompt card you use, you may get:
+
+- **HTML dashboards**: self-contained interactive dashboards you can open in a browser or share
+- **Markdown or HTML reports**: formatted summary documents suitable for leadership review
+- **Jupyter notebooks or R Markdown**: reproducible analysis documents with code and commentary
+- **PowerPoint decks**: exec-ready slides with native, editable charts
+- **Data tables and charts**: intermediate outputs for further analysis
+
+### Tips for working with coding agents
+
+1. **Be specific about your data.** Tell the agent the file name, column names, and date range. The more context you give, the better the output.
+2. **Iterate in small steps.** If the output is not right, ask the agent to fix one thing at a time rather than regenerating everything.
+3. **Validate the output.** Spot-check row counts, date ranges, and aggregation logic. Coding agents can make plausible-looking mistakes.
+4. **Use the vivainsights packages.** They handle common data validation and visualization tasks. Prompts that reference these functions tend to produce cleaner code.
+5. **Keep your data private.** Do not paste raw data into cloud-based agents unless your organization's data policies allow it. Use local or enterprise-hosted agents when working with sensitive HR data.
 
 ### Recommended packages
 
@@ -60,8 +94,7 @@ The packages provide helper functions for reading, validating, and visualizing V
 
 ## Quick links
 
-- [Quickstart guide](QUICKSTART.md)
-- [Starter kits overview](STARTER_KITS.md)
+- [Starter kits overview](starter-kits/README.md)
 - [Skills library](skills/)
 - [Contributing to Frontier Analytics](CONTRIBUTING.md)
 - [Changelog](CHANGELOG.md)

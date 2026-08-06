@@ -2,7 +2,7 @@
 #
 # A P2P export is an edge list: one row per collaboration tie between two people,
 # with tie-strength scores. network_p2p builds the graph and can detect
-# communities; network_summary computes node centrality.
+# communities. network_summary computes node centrality.
 #
 # The built-in R p2p_data ships with HR attributes already, so network_p2p runs
 # directly. network_p2p requires a single-date snapshot.

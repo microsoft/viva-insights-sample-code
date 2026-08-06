@@ -3,13 +3,13 @@
 > **Live, machine-readable equivalent:** both packages now publish an
 > auto-generated `llms.txt` (R: https://microsoft.github.io/vivainsights/llms.txt,
 > Python: https://microsoft.github.io/vivainsights-py/llms.txt) that reflects the
-> exact installed API and is more current than this file. Check it first; use
+> exact installed API and is more current than this file. Check it first. Use
 > this file for the grouped context (wrapper families, sample-dataset shapes,
 > export/theming) it doesn't cover. See `ecosystem.md`.
 
 Grouped by purpose. Function names verified against **R `vivainsights` 0.7.0.9000**
 (~156 exported objects) and **Python `vivainsights` 0.4.2** (~74 exported objects).
-R is the fuller package; where a Python equivalent exists it is noted, otherwise
+R is the fuller package. Where a Python equivalent exists it is noted, otherwise
 assume R-only.
 
 > **Return argument:** R functions take `return = "plot" | "table" | "data"`.
@@ -68,7 +68,7 @@ consistent set of suffixes. `X` is one of: `collaboration` (alias `collab`),
 
 Example: `collaboration_summary()`, `afterhours_dist()`, `email_line()`,
 `meeting_rank()`, `one2one_trend()`, `external_fizz()`. **Python does not ship
-these wrappers**; build the equivalent with the generic `create_*` viz functions
+these wrappers.** Build the equivalent with the generic `create_*` viz functions
 below plus a group aggregation.
 
 ## 4. Generic visualisations (`create_*`)
@@ -117,8 +117,8 @@ and Python, so pass an explicit `metrics=` vector when you need reproducibility.
 ## 6. Text mining on Meeting Query subjects (R only)
 
 `tm_clean()`, `tm_freq()`, `tm_cooc()` (co-occurrence), `tm_wordcloud()`, and the
-one-shot `meeting_tm_report()`. Use these to categorise meeting subject lines;
-there is no Python equivalent, so replicate with a standard NLP stack if needed.
+one-shot `meeting_tm_report()`. Use these to categorise meeting subject lines.
+There is no Python equivalent, so replicate with a standard NLP stack if needed.
 
 ## 7. Built-in sample datasets (use these, never customer data)
 
@@ -132,16 +132,16 @@ there is no Python equivalent, so replicate with a standard NLP stack if needed.
 
 Verified shapes (current versions): the Python `load_pq_data()` returns ~10,500
 person-weeks x 73 cols and the R `pq_data` ~6,900 x 73 (the two packages ship
-slightly different samples); `mt_data` is ~612 rows x 41 cols in both. Use them
+slightly different samples). `mt_data` is ~612 rows x 41 cols in both. Use them
 for every worked example, doc snippet, and test.
 
 ## 8. Export and theming
 
 - Export any object (data frame, ggplot/matplotlib figure) with `export()`.
-  R: `export(x, method = ...)`; Python: `export(x, file_format='auto', path='insights export', timestamp=True)`.
-- R plots use `theme_wpa()` / `theme_wpa_basic()`; both packages expose a Viva
-  Insights colour palette (`Colors` / `color_codes` / `COLOR_PALLET_ALT_1` in
-  Python; `rgb2hex`, palette helpers in R).
+  R: `export(x, method = ...)`. Python: `export(x, file_format='auto', path='insights export', timestamp=True)`.
+- R plots use `theme_wpa()` / `theme_wpa_basic()`. Both packages expose a Viva
+  Insights colour palette: `Colors` / `color_codes` / `COLOR_PALLET_ALT_1` in
+  Python, and `rgb2hex` plus palette helpers in R.
 
 ## Finding the exact signature at runtime
 

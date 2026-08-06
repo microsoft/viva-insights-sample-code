@@ -2,13 +2,13 @@
 Example 5 - Person-to-person network analysis.
 
 A P2P export is an edge list: one row per collaboration tie between two people,
-with tie-strength scores. network_p2p builds the graph and detects communities;
+with tie-strength scores. network_p2p builds the graph and detects communities.
 network_summary computes node centrality.
 
 Data-shape note: a real P2P export carries HR attributes for each collaborator
 (columns like PrimaryCollaborator_Organization). The built-in Python sample is a
 bare edge list, so below we attach an ILLUSTRATIVE group derived deterministically
-from the PersonId. This is only to make the example run; replace it with the real
+from the PersonId. This is only to make the example run. Replace it with the real
 HR attributes from your query.
 """
 import hashlib

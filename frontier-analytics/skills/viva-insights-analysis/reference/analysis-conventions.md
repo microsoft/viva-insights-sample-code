@@ -4,7 +4,7 @@ How to turn Viva Insights outputs into honest, defensible findings. These
 conventions matter more than any single chart: workplace-analytics results are
 easy to over-claim.
 
-## 1. Association, not causation
+## 1. Prefer association over causation
 
 Viva Insights data is observational. Unless a designed experiment or a valid
 quasi-experimental design supports a causal claim, describe relationships as
@@ -13,8 +13,8 @@ associations.
 | Avoid | Prefer |
 |---|---|
 | "X causes Y" | "X is associated with Y" / "X is the strongest observable predictor of Y" |
-| "X drove the change" | "X coincides with the change; worth investigating" |
-| "Caused by a methodology update" | "Cause not confirmed; possible explanations include ..." |
+| "X drove the change" | "X coincides with the change. Worth investigating." |
+| "Caused by a methodology update" | "Cause not confirmed. Possible explanations include ..." |
 
 For predictive-model outputs (Information Value, odds ratios, feature
 importance), report predictive strength and direction, and state explicitly that
@@ -34,7 +34,7 @@ Two rules prevent the most common misclassification:
 
 1. **Fill missing metric values with 0 before calling it.** A rolling window
    propagates NaN and leaves people unclassified otherwise.
-2. **Define the licensed population by enabled days, not by action presence.**
+2. **Define the licensed population by enabled days rather than by action presence.**
    Use an enabled-days-positive filter (for example `Copilot_enabled_days > 0`)
    as the denominator for a target-week snapshot. Counting only rows where an
    action metric is non-null understates the Non-user group.
@@ -59,11 +59,11 @@ seg = vi.identify_usage_segments(df_lic, metric="Total_Copilot_actions_taken",
 If segments come back all Non-user or all None, check: metric renamed correctly?
 NaNs filled? correct population filter applied?
 
-## 4. Period framing (pattern, not fixed dates)
+## 4. Period framing as a pattern rather than fixed dates
 
 Before/After comparisons are common (a programme launch, a policy change). Treat
 the windows as a **parameter of the analysis**, chosen from the data and the
-intervention date, not as fixed constants.
+intervention date rather than as fixed constants.
 
 - Use windows of equal length on each side of the intervention.
 - Prefer **matched calendar periods** (same quarter year over year) so
@@ -79,7 +79,7 @@ eyeballing a line chart.
 ## 5. Respect privacy in every reported cut
 
 - Keep `mingroup` at or above the organisation's agreed threshold (default 5).
-- Do not publish a group smaller than the threshold; aggregate up instead.
+- Do not publish a group smaller than the threshold. Aggregate up instead.
 - Anonymise identifiers in any shared artefact (`anonymise()` in R).
 
 ## 6. Units and wording precision
@@ -93,6 +93,7 @@ eyeballing a line chart.
 
 ## 7. House writing style
 
-- Minimise em-dashes; prefer commas, parentheses, or conjunctions.
+- Avoid em-dashes and semicolons. Prefer short sentences, commas, parentheses, or conjunctions.
+- Avoid contrastive marketing phrasing (for example "simple, not simplistic"). State what something is directly.
 - Lead with the finding, then the caveat, then the method.
 - Every number in prose should be traceable to a cut in the code.

@@ -6,11 +6,13 @@ description: >
   exports (Person Query, Meeting Query, person-to-person or group-to-group
   network queries) or the vivainsights packages: importing and validating a
   query, computing metrics, segmenting Copilot usage, building the standard
-  visualisations, running network or information-value analysis, and avoiding
-  the well-known export data pitfalls (IsManager strings, "#N/A" text, non-English
-  locales, privacy thresholds, trailing-window metric plateaus, holiday weeks).
-  It also points to the viva-insights-sample-code repo and its Frontier
-  Analytics toolkit for ready-made prompts, starter kits, and schema docs.
+  visualisations, running network or information-value analysis, building a
+  common deliverable (adoption dashboard, executive summary memo, ROI estimate),
+  and avoiding the well-known export data pitfalls (IsManager strings, "#N/A"
+  text, non-English locales, privacy thresholds, trailing-window metric
+  plateaus, holiday weeks). It also points to the viva-insights-sample-code
+  repo and its Frontier Analytics toolkit for ready-made prompts, starter kits,
+  and schema docs.
 ---
 
 ## What this skill is for
@@ -28,6 +30,9 @@ Use this skill when a task involves any of:
 - Person-to-person or group-to-group network analysis.
 - Information Value / driver analysis, key-metrics scans, interrupted time-series.
 - Debugging why a Viva Insights export loaded or aggregated strangely.
+- Building a common deliverable such as an adoption dashboard, an executive
+  summary memo, or an ROI estimate, when no Frontier Analytics prompt card is
+  being used for the task. See "How to use the reference files" below.
 
 This skill is **customer-agnostic**. It contains no organisation-specific paths,
 scopes, or dates. Adapt column lists, populations, and time windows to the data
@@ -44,7 +49,7 @@ in front of you.
 | Coverage | Fuller API (metric-family wrappers, text mining, ITSA, survival) | Core subset (import, identify, viz, IV, network) |
 | Return arg | `return = "plot"` / `"table"` / `"data"` | `return_type = "plot"` / `"table"` / `"data"` |
 
-Both packages are MIT-licensed. R is the more complete of the two; the Python
+Both packages are MIT-licensed. R is the more complete of the two. The Python
 package mirrors its design for the most common workflows. **The single most
 common cross-language bug is the return argument name: R uses `return`, Python
 uses `return_type`.**
@@ -80,6 +85,7 @@ everything:
 | `reference/query-schemas.md` | The shape of each query type (grain, key columns, raw vs imported column names) and the meeting quality filter. |
 | `reference/data-pitfalls.md` | To diagnose or pre-empt a loading / aggregation problem (IsManager, "#N/A", locales, privacy threshold, trailing windows, holidays). |
 | `reference/analysis-conventions.md` | To write honest, defensible claims (association vs causation), segment definitions, and period framing. |
+| `reference/deliverables.md` | To build a standard deliverable (adoption dashboard, executive summary, ROI estimate, usage segmentation) when there is no Frontier Analytics prompt card for the task, or the user wants a faster first pass. |
 | `reference/ecosystem.md` | The canonical upstream: package docs, the sample-code repo, and the Frontier Analytics toolkit to defer to. |
 | `reference/environment.md` | Practical run tips: performant loads, headless plotting, script-file vs inline execution. |
 

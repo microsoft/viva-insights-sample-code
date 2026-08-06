@@ -84,7 +84,7 @@ association over causation in written claims.]
 - The `name` in the frontmatter matches the folder name exactly.
 - All package function names and signatures are verified against the currently
   installed version of the package.
-- Any example data uses the packages' built-in sample datasets, not real or
+- Any example data uses the packages' built-in sample datasets rather than real or
   simulated customer data.
 - The skill has been tried with at least one Skill-compatible coding agent.
 - The file is saved at `frontier-analytics/skills/[skill-name]/SKILL.md`, and

@@ -30,7 +30,7 @@ recommended lookup order.
 | License | MIT | MIT |
 
 The docs sites carry the function reference and article-style walkthroughs. The R
-package is the reference implementation; the Python package mirrors the common
+package is the reference implementation. The Python package mirrors the common
 workflows. Confirm signatures against the installed version (see
 `packages.md` for the runtime introspection snippets) because the API evolves.
 
@@ -65,7 +65,7 @@ schema docs, open a coding agent in an R/Python workspace, paste the prompt at
 your file, then review the output against the documented failure modes.
 
 **This skill complements Frontier Analytics.** Frontier Analytics owns the
-prompt/starter-kit/schema library; this skill owns the package fluency, the
+prompt/starter-kit/schema library. This skill owns the package fluency, the
 query-schema and data-pitfall knowledge, and the analysis conventions that make
 those prompts produce trustworthy output. When a task maps to an existing prompt
 card or starter kit, use it and reference upstream rather than duplicating it.
@@ -74,7 +74,7 @@ card or starter kit, use it and reference upstream rather than duplicating it.
 
 `wpa` is the predecessor R package for the older Workplace Analytics data model.
 `vivainsights` is the current, supported package for Viva Insights query exports.
-Prefer `vivainsights`; only reach for `wpa` when working with legacy Workplace
+Prefer `vivainsights`. Only reach for `wpa` when working with legacy Workplace
 Analytics outputs, and expect different column schemas.
 
 ## Keeping this skill current

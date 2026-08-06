@@ -41,12 +41,12 @@ Prerequisites: `pip install vivainsights` (Python) or
    temp directory, so the skill folder stays clean.
 3. **Copilot segmentation.** Builds a total-actions metric from the per-app
    action columns, fills NaNs with 0, then `identify_usage_segments`. Shows the
-   full-panel segment mix; filter to one week for a point-in-time report.
+   full-panel segment mix. Filter to one week for a point-in-time report.
 4. **Meeting quality.** The generalised meeting quality filter plus a per-rule
-   attrition table. The sample Meeting Query is synthetic, so few rows survive;
-   the lesson is the filter mechanics, not the surviving counts.
+   attrition table. The sample Meeting Query is synthetic, so few rows survive.
+   The lesson is the filter mechanics rather than the surviving counts.
 5. **Network.** `network_p2p` builds the graph and `network_summary` computes
-   node centrality. The R sample ships HR attributes so it runs directly; the
+   node centrality. The R sample ships HR attributes so it runs directly. The
    Python sample is a bare edge list, so the script attaches a clearly labelled
    illustrative group that you replace with real HR attributes.
 
@@ -54,7 +54,7 @@ Prerequisites: `pip install vivainsights` (Python) or
 
 - Built-in sample data only, never customer data.
 - Headless, file-based plotting so scripts never block.
-- Association-not-causation framing and explicit units (hours, not minutes).
+- Framing that favors association over causation, with explicit units (for example hours rather than minutes).
 - Any fabricated field (the illustrative network group) is labelled as such.
 
 Sample dataset sizes differ slightly between packages (for instance the R

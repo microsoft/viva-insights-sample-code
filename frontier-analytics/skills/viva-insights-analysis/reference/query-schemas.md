@@ -15,7 +15,7 @@ and column set. Knowing the grain first prevents most analysis mistakes.
 | **Person-to-Group (P2G)** | a person's collaboration with a group | person + group columns | `network_summary()`, P2G views |
 
 Always confirm the grain before aggregating. A Person Query is already
-person-level; a Meeting Query is meeting-level and must be filtered and
+person-level. A Meeting Query is meeting-level and must be filtered and
 aggregated before it means anything at the person or group level.
 
 ## Column naming: raw export vs imported
@@ -52,10 +52,10 @@ Three column families:
    `External_network_size`, `Copilot_actions_taken_in_Teams`.
 
 Notes:
-- Metrics are **per period** (per week), not cumulative.
+- Metrics are **per period** (per week). They are not cumulative.
 - Many network / tie metrics are computed over a **trailing multi-week window**,
   which produces step plateaus. See `data-pitfalls.md`.
-- `IsManager` comes through as `"Yes"`/`"No"` strings, not booleans. See
+- `IsManager` comes through as `"Yes"`/`"No"` strings instead of booleans. See
   `data-pitfalls.md`.
 
 ## Meeting Query anatomy and the quality filter
@@ -94,7 +94,7 @@ mq = mt[(mt["Number_of_attendees"] >= 2)
 ```
 
 **Critical unit gotcha:** where a `Duration` column is present it is measured in
-**HOURS, not minutes**. Multiply by 60 for a minutes display. `Meeting_hours`
+**hours rather than minutes**. Multiply by 60 for a minutes display. `Meeting_hours`
 and `Attendee_meeting_hours` are likewise in hours.
 
 **Subject-line noise:** after the structural filter, non-meeting items still slip
@@ -107,10 +107,10 @@ dropping.
 
 ## Network query anatomy
 
-- **P2P** edges carry a primary and secondary collaborator plus tie strength;
+- **P2P** edges carry a primary and secondary collaborator plus tie strength.
   `network_p2p()` expects that edge shape and can compute centrality and detect
   communities.
-- **G2G** rows carry a group pair and a collaboration weight; `network_g2g()`
+- **G2G** rows carry a group pair and a collaboration weight. `network_g2g()`
   renders the group-level graph.
 - Use the built-in `p2p_data` / `g2g_data` (and `p2p_data_sim()`) to prototype a
   network view before pointing at a real export.

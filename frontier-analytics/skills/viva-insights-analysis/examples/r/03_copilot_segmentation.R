@@ -7,8 +7,8 @@
 # Convention reminders (see reference/analysis-conventions.md):
 # - Fill the metric NAs with 0 before segmenting, or the rolling window leaves
 #   people unclassified.
-# - Define the licensed population by enabled days for a snapshot, not by action
-#   presence.
+# - Define the licensed population by enabled days for a snapshot rather than by
+#   action presence.
 
 suppressMessages(library(vivainsights))
 
