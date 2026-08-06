@@ -51,6 +51,10 @@ and often **smart-quote apostrophes** (U+2019) mixed with ASCII ones.
 map to canonical English names.
 
 ```python
+import pandas as pd
+
+path = "path/to/export.csv"  # TODO: replace with your file path
+
 def _norm_col(s: str) -> str:
     for ch in ("\u2019","\u2018","\u02bc","\u02be","\u02b9","\u2032"):
         s = s.replace(ch, "'")
