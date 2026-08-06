@@ -26,7 +26,7 @@ badges:
 
 ## Purpose
 
-Generate an exec-ready 10–15 page PowerPoint deck (.pptx) with editable native PowerPoint charts, summarizing Copilot adoption trends, organizational breakdowns, and key recommendations.
+Generate an exec-ready 10-15 page PowerPoint deck (.pptx) with editable native PowerPoint charts, summarizing Copilot adoption trends, organizational breakdowns, and key recommendations.
 
 ## Audience
 
@@ -34,7 +34,7 @@ VP/C-suite executives, board presentations, steering committee reviews
 
 ## When to use
 
-When a static HTML report or memo is not suitable and stakeholders need a polished, editable PowerPoint deck — for example, for a live presentation, a board pack, or a document that will be further edited by others.
+When a static HTML report or memo is not suitable and stakeholders need a polished, editable PowerPoint deck. For example, for a live presentation, a board pack, or a document that will be further edited by others.
 
 ## Required inputs
 
@@ -53,7 +53,7 @@ When a static HTML report or memo is not suitable and stakeholders need a polish
 
 ## Recommended output
 
-A .pptx file with 10–15 slides, using editable native PowerPoint charts (not pasted images) so that recipients can modify the deck as needed.
+A .pptx file with 10-15 slides, using editable native PowerPoint charts (not pasted images) so that recipients can modify the deck as needed.
 
 ## Quick prompt (short version)
 
@@ -182,7 +182,7 @@ SLIDE DECK GENERATION
    - Any suppressed data notes
    - Data source details
 
-   Adjust the slide count as needed — aim for 10-15 slides total. Skip slides where data is unavailable rather than leaving them blank.
+   Adjust the slide count as needed. Aim for 10-15 slides total. Skip slides where data is unavailable rather than leaving them blank.
 
 8. Design guidelines:
    - Use a clean, professional layout with consistent fonts (e.g., Calibri or Segoe UI)

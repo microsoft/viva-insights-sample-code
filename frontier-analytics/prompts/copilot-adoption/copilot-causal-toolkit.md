@@ -47,7 +47,7 @@ When interpreting results, explain the ATE direction in business terms, include 
 Finish each phase by listing any assumptions you made about notebook choice, variable mappings, or output interpretation.
 ```
 
-Use the detailed prompt below for a reproducible, exact-structure output. Use the quick prompt above for a faster first pass that you refine through follow-up turns.
+Use the detailed prompts below for a reproducible, exact-structure output. Use the quick prompt above for a faster first pass that you refine through follow-up turns.
 
 ## Prompt 1: Run the Analysis
 

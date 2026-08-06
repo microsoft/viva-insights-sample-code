@@ -1,0 +1,38 @@
+name: Frontier Prompt Drift Check
+
+# Checks that each Frontier Analytics prompt card (frontier-analytics/prompts/**/*.md)
+# stays in sync with its site-facing mirror page (_pages/frontier-analytics-prompt-*.md).
+# frontier-analytics/ is excluded from the Jekyll build, so these are two manually
+# maintained copies of the same content rather than one generated from the other.
+# See .github/scripts/check_prompt_drift.py for what this does and does not catch.
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'frontier-analytics/prompts/**'
+      - '_pages/frontier-analytics-prompt-*.md'
+      - '.github/scripts/check_prompt_drift.py'
+      - '.github/workflows/prompt-drift-check.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'frontier-analytics/prompts/**'
+      - '_pages/frontier-analytics-prompt-*.md'
+      - '.github/scripts/check_prompt_drift.py'
+      - '.github/workflows/prompt-drift-check.yml'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Check prompt card / site page drift
+        run: python .github/scripts/check_prompt_drift.py
