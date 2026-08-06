@@ -38,7 +38,7 @@ Use this shorter prompt for a fast first pass that adapts to your data.
 Help me create a segmentation and churn analysis for Copilot usage that classifies licensed users, tracks movement between segments over time, and highlights at-risk groups.
 Start by loading the actual CSV and printing row count, column names, data types, date range, and unique people so you can map the real activity and HR fields.
 Do not assume exact column names, and ask me for the file path, the main activity metric, or any unclear field mapping before you continue.
-Exclude unlicensed users from denominators, then define weekly usage segments from percentiles in the actual data rather than fixed cutoffs, and print the thresholds you used.
+Exclude unlicensed users from denominators, then use `identify_usage_segments()` (vivainsights) to compute weekly usage segments when available. If you cannot use it, fall back to percentile-based thresholds and print the thresholds you used.
 Include both week-level segment trends and a stable user segment for group breakdowns, then build a week-to-week transition matrix only for users present in consecutive weeks.
 Use the stated churn logic unless I tell you otherwise, flag if the time span is too short for reliable churn analysis, and identify currently at-risk users separately from fully churned users.
 Suppress group views below about 5 people for privacy, and note any missing HR attributes or holiday-related caveats that affect interpretation.
