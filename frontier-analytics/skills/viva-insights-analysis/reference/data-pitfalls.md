@@ -134,6 +134,10 @@ cols <- c("PersonId","MetricDate","Collaboration_hours","Internal_network_size")
 pq <- as.data.frame(arrow::read_parquet(path, col_select = dplyr::all_of(cols)))
 ```
 ```python
+import pandas as pd
+
+path = "path/to/export.parquet"  # TODO: replace with your file path
+
 pq = pd.read_parquet(path, columns=["PersonId","MetricDate",
                                     "Collaboration_hours","Internal_network_size"])
 ```

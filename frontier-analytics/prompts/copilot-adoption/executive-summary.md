@@ -59,9 +59,12 @@ DATA LOADING AND PREPARATION
 2. Auto-detect Copilot metric columns (columns starting with "Copilot_"). Print the detected columns
    and the date range for verification.
 3. Classify each person-week row:
-   - "Licensed": has at least one non-null, non-zero Copilot metric value.
+   - "Licensed": if an enabled-days column is present (for example `Total_Copilot_enabled_days`),
+     that column is greater than zero for the week. Otherwise, at least one non-null, non-zero
+     Copilot metric value.
    - "Active": is licensed AND has Copilot_Actions > 0 (or the primary activity metric).
-   - "Unlicensed": all Copilot metric values are null or zero.
+   - "Unlicensed": the enabled-days column equals zero when available. Otherwise, all Copilot
+     metric values are null or zero.
 4. If any HR attribute columns (Organization, FunctionType, LevelDesignation) are missing, note which
    ones are unavailable and proceed with what is present.
 

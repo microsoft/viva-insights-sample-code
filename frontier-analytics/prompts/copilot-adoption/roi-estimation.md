@@ -66,9 +66,12 @@ DATA LOADING AND PREPARATION
 1. Load the person query CSV. Parse MetricDate as a date. Treat PersonId as a string.
 2. Auto-detect Copilot metric columns (columns starting with "Copilot_"). Print detected columns.
 3. Classify each person-week:
-   - "Licensed": at least one non-null, non-zero Copilot metric value.
+   - "Licensed": if an enabled-days column is present (for example `Total_Copilot_enabled_days`),
+     that column is greater than zero for the week. Otherwise, at least one non-null, non-zero
+     Copilot metric value.
    - "Active": licensed AND Copilot_Actions > 0.
-   - "Unlicensed": all Copilot metric values are null or zero.
+   - "Unlicensed": the enabled-days column equals zero when available. Otherwise, all Copilot
+     metric values are null or zero.
 4. Print: total persons, licensed persons, active persons (ever active), date range.
 
 TIME SAVINGS ESTIMATION

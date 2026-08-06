@@ -35,7 +35,7 @@ Two rules prevent the most common misclassification:
 1. **Fill missing metric values with 0 before calling it.** A rolling window
    propagates NaN and leaves people unclassified otherwise.
 2. **Define the licensed population by enabled days rather than by action presence.**
-   Use an enabled-days-positive filter (for example `Copilot_enabled_days > 0`)
+   Use an enabled-days-positive filter (for example `Total_Copilot_enabled_days > 0`)
    as the denominator for a target-week snapshot. Counting only rows where an
    action metric is non-null understates the Non-user group.
 
@@ -50,7 +50,7 @@ Segment definitions (12-week version, `power_thres` default 15):
 | Non-user | 12w rolling mean == 0 |
 
 ```python
-df_lic = df[df["Copilot_enabled_days"].fillna(0) > 0].copy()
+df_lic = df[df["Total_Copilot_enabled_days"].fillna(0) > 0].copy()
 df_lic["Total_Copilot_actions_taken"] = df_lic["Total_Copilot_actions_taken"].fillna(0)
 seg = vi.identify_usage_segments(df_lic, metric="Total_Copilot_actions_taken",
                                  version="12w", return_type="data")

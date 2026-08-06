@@ -12,9 +12,9 @@ user wants a faster first pass.
 
 ## Licensed, active, and unlicensed (used by every Copilot deliverable below)
 
-- **Licensed:** use `Copilot_enabled_days > 0` when that column exists. Otherwise, treat a person-week as licensed if at least one Copilot metric is non-null and greater than zero.
+- **Licensed:** use `Total_Copilot_enabled_days > 0` when that column exists. Otherwise, treat a person-week as licensed if at least one Copilot metric is non-null and greater than zero.
 - **Active:** licensed and the primary activity metric (commonly `Total_Copilot_actions_taken`) is greater than zero.
-- **Unlicensed:** `Copilot_enabled_days == 0` when available. Otherwise, all Copilot metric values are null or zero.
+- **Unlicensed:** `Total_Copilot_enabled_days == 0` when available. Otherwise, all Copilot metric values are null or zero.
 
 Treat missing Copilot values as unlicensed rather than as zero usage, unless the
 data clearly indicates otherwise.

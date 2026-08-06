@@ -67,9 +67,9 @@ DATA LOADING AND PREPARATION
 2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity metric. Print the detected columns and the date range for verification.
 3. Run `extract_hr(df)` from the `vivainsights` library to identify available HR / organizational attribute columns. Use the returned list for all organizational breakdowns instead of hard-coding column names.
 4. Classify each person-week row:
-   - "Licensed": has at least one non-null, non-zero Copilot metric value.
+   - "Licensed": if an enabled-days column is present (for example `Total_Copilot_enabled_days`), that column is greater than zero for the week. Otherwise, at least one non-null, non-zero Copilot metric value.
    - "Active": is licensed AND has Total_Copilot_actions_taken > 0 (the primary activity metric).
-   - "Unlicensed": all Copilot metric values are null or zero.
+   - "Unlicensed": the enabled-days column equals zero when available. Otherwise, all Copilot metric values are null or zero.
 5. If any expected HR attribute columns are not found by `extract_hr()`, note which ones are unavailable and proceed with what is present.
 
 HEADLINE METRICS (compute these for the memo)

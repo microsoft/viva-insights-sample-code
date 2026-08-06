@@ -62,7 +62,7 @@ Not all analyses involve Copilot data. If the dataset does not contain Copilot m
 
 ## Licensed and active user classification
 
-- **Licensed:** A person-week where at least one Copilot metric column has a non-null value. Null Copilot metrics indicate the user is not licensed, not that they are inactive.
+- **Licensed:** If an enabled-days column is present (for example `Total_Copilot_enabled_days`), use that column greater than zero. Otherwise, a person-week where at least one Copilot metric column has a non-null, non-zero value. Null Copilot metrics indicate the user is unlicensed rather than inactive.
 - **Active:** A licensed person-week where `Total_Copilot_actions_taken > 0`.
 - **Adoption rate** = active users / licensed users (as a percentage), computed per week.
 

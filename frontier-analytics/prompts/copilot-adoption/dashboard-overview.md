@@ -63,9 +63,12 @@ DATA LOADING AND VALIDATION
    match what is expected. Auto-detect columns that start with "Copilot_" as Copilot metric columns.
 
 IDENTIFYING LICENSED USERS
-6. A user is considered "Copilot-licensed" in a given week if they have a non-null, non-zero value
-   in at least one Copilot metric column for that week. Create a boolean column `is_licensed` to
-   flag these rows.
+6. A user is considered "Copilot-licensed" in a given week using this rule, in order:
+   a. If an enabled-days column is present (for example `Total_Copilot_enabled_days`), the user
+      is licensed when that column is greater than zero for the week.
+   b. Otherwise, the user is licensed if they have a non-null, non-zero value in at least one
+      Copilot metric column for that week.
+   Create a boolean column `is_licensed` to flag these rows.
 7. Also flag "active" users: licensed users who have Copilot_Actions > 0 (or the equivalent primary
    activity metric) in that week. Create a boolean column `is_active`.
 8. Print a summary: total person-weeks, licensed person-weeks, active person-weeks.

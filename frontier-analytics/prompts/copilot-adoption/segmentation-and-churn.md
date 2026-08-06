@@ -59,8 +59,11 @@ DATA LOADING AND PREPARATION
 2. Auto-detect Copilot metric columns (columns starting with "Copilot_"). Print detected columns
    and the date range.
 3. Classify each person-week:
-   - "Licensed": at least one non-null, non-zero Copilot metric value.
-   - "Unlicensed": all Copilot metrics are null or zero.
+   - "Licensed": if an enabled-days column is present (for example `Total_Copilot_enabled_days`),
+     that column is greater than zero for the week. Otherwise, at least one non-null, non-zero
+     Copilot metric value.
+   - "Unlicensed": the enabled-days column equals zero when available. Otherwise, all Copilot
+     metrics are null or zero.
 4. Filter to only licensed person-weeks for the segmentation analysis.
 5. Fill any remaining NaN values in Copilot metric columns with 0 for licensed users (a licensed
    user with a null action count in one metric likely had zero usage of that specific feature).
