@@ -1,0 +1,83 @@
+/* ------------------------------------------------------------------
+   Global R / Python language switcher.
+   Loaded per-page via `css: "/assets/css/lang-switch.css"` front matter.
+   Relies on the shared design tokens defined in site.css
+   (--primary, --ink, --text, --muted, --rule, --radius-card, --shadow-card,
+   --sticky-offset).
+
+   Unlike the per-instance Causal Toolkit tabs (assets/css/causal-toolkit.css),
+   this is a single, page-wide switch. One choice (R or Python) controls every
+   [data-lang-block] element on the page at once, and is remembered across
+   visits via localStorage, so a reader does not have to re-choose their
+   language at every section.
+   ------------------------------------------------------------------ */
+
+.lang-switch {
+  position: sticky;
+  top: var(--sticky-offset, 56px);
+  z-index: 400;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid var(--rule, #e0e0e0);
+  border-radius: var(--radius-card, 16px);
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.06));
+  padding: 10px 14px;
+  margin: 0 0 1.75rem;
+  font-size: 0.9rem;
+}
+
+.lang-switch-label {
+  font-weight: 600;
+  color: var(--ink, #0E1726);
+}
+
+.lang-switch-group {
+  display: inline-flex;
+  border: 1px solid var(--rule, #e0e0e0);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+  background: #f6f7fb;
+}
+
+.lang-switch-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text, #242424);
+  padding: 6px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.lang-switch-btn.is-active {
+  background: var(--primary, #335CCC);
+  color: #fff;
+}
+
+.lang-switch-btn:focus-visible {
+  outline: 2px solid var(--primary, #335CCC);
+  outline-offset: 2px;
+}
+
+.lang-switch-note {
+  color: var(--muted, #616161);
+  font-size: 0.8rem;
+}
+
+/* Content visibility. Default (before JS runs, or with JS disabled) shows R
+   and hides Python, so the page never flashes both languages at once. */
+html:not([data-lang="python"]) [data-lang-block="python"] { display: none; }
+html[data-lang="python"] [data-lang-block="r"] { display: none; }
+
+@media (max-width: 600px) {
+  .lang-switch {
+    position: static;
+  }
+}
