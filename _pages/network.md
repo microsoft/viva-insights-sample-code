@@ -2,8 +2,9 @@
 layout: page
 title: "Network Analysis"
 eyebrow: "Advanced analytics · Network"
-description: "Organizational network analysis (ONA) with Viva Insights — visualize and analyze collaboration networks at the group-to-group and person-to-person level in R and Python."
+description: "Organizational network analysis (ONA) with Viva Insights. Visualize and analyze collaboration networks at the group-to-group and person-to-person level in R and Python."
 permalink: /network/
+css: "/assets/css/lang-switch.css"
 ---
 # Network Analysis Scripts
 
@@ -37,47 +38,67 @@ In Viva Insights, network metrics are available in four main queries.
 3. The **person-to-person query** is an edgelist with each row representign the collaboration with one person with another. 
 4. The **person-to-group query** which is an edgelist with each row representing the collaboration of each person with respect to a grouping (organizational) attribute.
 
+<div class="lang-switch" role="group" aria-label="Choose code language for this page">
+  <span class="lang-switch-label">Show code in:</span>
+  <div class="lang-switch-group">
+    <button type="button" class="lang-switch-btn" data-lang-btn="r">R</button>
+    <button type="button" class="lang-switch-btn" data-lang-btn="python">Python</button>
+  </div>
+  <span class="lang-switch-note">Remembers your choice on this device.</span>
+</div>
+<script>
+(function () {
+  var stored = null;
+  try { stored = window.localStorage.getItem('vi-lang-pref'); } catch (e) {}
+  document.documentElement.setAttribute('data-lang', stored === 'python' ? 'python' : 'r');
+})();
+</script>
+
 ---
 
 ## Group-to-Group Network Analysis
 
-### Customizing Group-to-Group Networks (Python)
-**📄 [custom-network-g2g.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/custom-network-g2g.py)**
-- **Purpose**: Create customized group-to-group collaboration network visualizations
-- **Language**: Python
-- **Prerequisites**: vivainsights Python package, networkx, matplotlib
-- **Key Features**: Custom styling, filtering, layout algorithms, export options
-- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/custom-network-g2g.py)**
+### Customizing Group-to-Group Networks
 
-### Customizing Group-to-Group Networks (R)
+<div data-lang-block="r" markdown="1">
 **📄 [custom-network-g2g.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/custom-network-g2g.Rmd)**
 - **Purpose**: Create customized group-to-group collaboration network visualizations
-- **Language**: R
 - **Format**: R Markdown
 - **Prerequisites**: vivainsights R package, igraph, ggplot2
 - **Key Features**: Custom styling, filtering, layout algorithms, export options
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/custom-network-g2g.Rmd)**
+</div>
+
+<div data-lang-block="python" markdown="1">
+**📄 [custom-network-g2g.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/custom-network-g2g.py)**
+- **Purpose**: Create customized group-to-group collaboration network visualizations
+- **Prerequisites**: vivainsights Python package, networkx, matplotlib
+- **Key Features**: Custom styling, filtering, layout algorithms, export options
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/custom-network-g2g.py)**
+</div>
 
 ---
 
 ## Person-to-Person Network Analysis
 
-### Customizing Person-to-Person Networks (Python)
-**📄 [custom-network-p2p.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/custom-network-p2p.py)**
-- **Purpose**: Create customized person-to-person collaboration network visualizations
-- **Language**: Python
-- **Prerequisites**: vivainsights Python package, networkx, matplotlib
-- **Key Features**: Individual-level analysis, community detection, centrality measures
-- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/custom-network-p2p.py)**
+### Customizing Person-to-Person Networks
 
-### Customizing Person-to-Person Networks (R)
+<div data-lang-block="r" markdown="1">
 **📄 [custom-network-p2p.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/custom-network-p2p.Rmd)**
 - **Purpose**: Create customized person-to-person collaboration network visualizations
-- **Language**: R
 - **Format**: R Markdown
 - **Prerequisites**: vivainsights R package, igraph, ggplot2
 - **Key Features**: Individual-level analysis, community detection, centrality measures
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/custom-network-p2p.Rmd)**
+</div>
+
+<div data-lang-block="python" markdown="1">
+**📄 [custom-network-p2p.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/custom-network-p2p.py)**
+- **Purpose**: Create customized person-to-person collaboration network visualizations
+- **Prerequisites**: vivainsights Python package, networkx, matplotlib
+- **Key Features**: Individual-level analysis, community detection, centrality measures
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/custom-network-p2p.py)**
+</div>
 
 ---
 
@@ -175,15 +196,19 @@ In Viva Insights, network metrics are available in four main queries.
 
 ## Prerequisites
 
-### Python Environment
-```bash
-pip install vivainsights networkx matplotlib seaborn plotly pandas numpy
-```
-
+<div data-lang-block="r" markdown="1">
 ### R Environment
 ```r
 install.packages(c("vivainsights", "igraph", "ggplot2", "dplyr", "visNetwork"))
 ```
+</div>
+
+<div data-lang-block="python" markdown="1">
+### Python Environment
+```bash
+pip install vivainsights networkx matplotlib seaborn plotly pandas numpy
+```
+</div>
 
 ---
 
@@ -191,7 +216,7 @@ install.packages(c("vivainsights", "igraph", "ggplot2", "dplyr", "visNetwork"))
 
 1. **Data Quality**: Ensure clean, complete collaboration data
 2. **Privacy**: Anonymize person-level data when appropriate
-3. **Interpretation**: Focus on actionable insights, not just metrics
+3. **Interpretation**: Focus on actionable insights rather than metrics alone
 4. **Validation**: Cross-check network insights with qualitative feedback
 5. **Temporal Analysis**: Track network changes over time for trends
 
@@ -199,10 +224,10 @@ install.packages(c("vivainsights", "igraph", "ggplot2", "dplyr", "visNetwork"))
 
 ## Related pages
 
-- [Essentials]({{ site.baseurl }}/essentials/) — core utilities and visualizations to prepare your data
-- [Advanced Analytics]({{ site.baseurl }}/advanced/) — predictive modeling and statistical testing
-- [Joining People Skills Data]({{ site.baseurl }}/skills-data-join/) — enrich network analysis with People Skills data
-- [Getting Started]({{ site.baseurl }}/getting-started/) — environment setup and first steps
+- [Essentials]({{ site.baseurl }}/essentials/): core utilities and visualizations to prepare your data
+- [Advanced Analytics]({{ site.baseurl }}/advanced/): predictive modeling and statistical testing
+- [Joining People Skills Data]({{ site.baseurl }}/skills-data-join/): enrich network analysis with People Skills data
+- [Getting Started]({{ site.baseurl }}/getting-started/): environment setup and first steps
 
 ---
 
@@ -212,3 +237,5 @@ install.packages(c("vivainsights", "igraph", "ggplot2", "dplyr", "visNetwork"))
 - **Visualization**: [Matplotlib](https://matplotlib.org/) | [ggplot2](https://ggplot2.tidyverse.org/)
 - **Viva Insights**: [Package Documentation](https://microsoft.github.io/vivainsights/)
 - **Sample Data**: [Example datasets](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/example-data)
+
+<script src="{{ '/assets/js/lang-switch.js' | relative_url }}"></script>
