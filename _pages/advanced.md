@@ -4,6 +4,7 @@ title: "Advanced Analytics"
 eyebrow: "Advanced analytics"
 description: "Machine learning, regression, and statistical analysis for Viva Insights data, including random forest top-performer models, information value, pairwise chi-square tests, difference-in-differences intervention evaluation, meeting engagement drivers, and collaboration by time of day in R and Python."
 permalink: /advanced/
+css: "/assets/css/lang-switch.css"
 ---
 # Advanced Analytics Scripts
 
@@ -19,129 +20,156 @@ The **pairwise chi-square tests** use case is used for statistical hypothesis te
 
 The **behavioral and program analysis** examples move from modelling attributes to answering practical workplace questions. The *collaboration by time of day* scripts estimate a typical start and end of day from the hourly collaboration metrics, and they show how those hours shift by weekday and by role. The *evaluating a workplace intervention* scripts set up a treated-versus-control, difference-in-differences design so that a genuine programme effect can be separated from a company-wide or seasonal trend, which makes them directly applicable to measuring the impact of a Microsoft 365 Copilot enablement wave. The *meeting engagement drivers* scripts model in-meeting messaging as a proxy for disengagement and rank the meeting characteristics that drive it, and they then take a closer look at meeting duration to separate a real effect from simple exposure. Because the sample datasets do not contain the hourly buckets, a real intervention, or enough multi-person meetings, these examples generate small, clearly labelled simulated datasets that share the column names of a real query, so that the same downstream code runs unchanged on your own export.
 
+<div class="lang-switch" role="group" aria-label="Choose code language for this page">
+  <span class="lang-switch-label">Show code in:</span>
+  <div class="lang-switch-group">
+    <button type="button" class="lang-switch-btn" data-lang-btn="r">R</button>
+    <button type="button" class="lang-switch-btn" data-lang-btn="python">Python</button>
+  </div>
+  <span class="lang-switch-note">Remembers your choice on this device.</span>
+</div>
+<script>
+(function () {
+  var stored = null;
+  try { stored = window.localStorage.getItem('vi-lang-pref'); } catch (e) {}
+  document.documentElement.setAttribute('data-lang', stored === 'python' ? 'python' : 'r');
+})();
+</script>
 
 ## Machine Learning & Predictive Modeling
 
-### Top Performers Modeling (Python)
-**📓 [top-performers-rf.ipynb](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/top-performers-rf.ipynb)**
-- **Purpose**: Identify characteristics of top performers using Random Forest
-- **Language**: Python
-- **Format**: Jupyter Notebook
-- **Prerequisites**: vivainsights Python package, scikit-learn, pandas
-- **Key Features**: Feature importance analysis, model validation, performance metrics
-- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/top-performers-rf.ipynb)**
+### Top Performers Modeling
 
-### Top Performers Modeling (R)
+<div data-lang-block="r" markdown="1">
 **📄 [top-performers-rf.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/top-performers-rf.Rmd)**
 - **Purpose**: Identify characteristics of top performers using Random Forest
-- **Language**: R
 - **Format**: R Markdown
 - **Prerequisites**: vivainsights R package, randomForest, dplyr
 - **Key Features**: Feature importance analysis, model validation, performance metrics
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/top-performers-rf.Rmd)**
 - **[🌐 View HTML Output](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/top-performers-rf.html)**
+</div>
+
+<div data-lang-block="python" markdown="1">
+**📓 [top-performers-rf.ipynb](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/top-performers-rf.ipynb)**
+- **Purpose**: Identify characteristics of top performers using Random Forest
+- **Format**: Jupyter Notebook
+- **Prerequisites**: vivainsights Python package, scikit-learn, pandas
+- **Key Features**: Feature importance analysis, model validation, performance metrics
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/top-performers-rf.ipynb)**
+</div>
 
 ---
 
 ## Statistical Analysis
 
-### Information Value Analysis (Python)
-**📓 [information-value.ipynb](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/information-value.ipynb)**
-- **Purpose**: Calculate Information Value (IV) for feature selection and variable importance
-- **Language**: Python
-- **Format**: Jupyter Notebook
-- **Prerequisites**: vivainsights Python package, pandas, numpy
-- **Key Features**: IV calculation, binning strategies, feature ranking
-- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/information-value.ipynb)**
+### Information Value Analysis
 
-### Information Value Analysis (R)
+<div data-lang-block="r" markdown="1">
 **📄 [information-value.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/information-value.Rmd)**
 - **Purpose**: Calculate Information Value (IV) for feature selection and variable importance
-- **Language**: R
 - **Format**: R Markdown
 - **Prerequisites**: vivainsights R package, Information, dplyr
 - **Key Features**: IV calculation, binning strategies, feature ranking
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/information-value.Rmd)**
+</div>
 
-### Pairwise Chi-Square Tests (Python)
-**📄 [pairwise-chisq.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/pairwise-chisq.py)**
-- **Purpose**: Perform pairwise chi-square tests for categorical variables
-- **Language**: Python
-- **Prerequisites**: vivainsights Python package, scipy, pandas
-- **Key Features**: Multiple testing correction, p-value adjustment, significance testing
-- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/pairwise-chisq.py)**
+<div data-lang-block="python" markdown="1">
+**📓 [information-value.ipynb](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/information-value.ipynb)**
+- **Purpose**: Calculate Information Value (IV) for feature selection and variable importance
+- **Format**: Jupyter Notebook
+- **Prerequisites**: vivainsights Python package, pandas, numpy
+- **Key Features**: IV calculation, binning strategies, feature ranking
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/information-value.ipynb)**
+</div>
 
-### Pairwise Chi-Square Tests (R)
+### Pairwise Chi-Square Tests
+
+<div data-lang-block="r" markdown="1">
 **📄 [pairwise_chisq.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/pairwise_chisq.Rmd)**
 - **Purpose**: Perform pairwise chi-square tests for categorical variables
-- **Language**: R
 - **Format**: R Markdown
 - **Prerequisites**: vivainsights R package, stats
 - **Key Features**: Multiple testing correction, p-value adjustment, significance testing
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/pairwise_chisq.Rmd)**
 - **[🌐 View HTML Output](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/pairwise_chisq.html)**
+</div>
+
+<div data-lang-block="python" markdown="1">
+**📄 [pairwise-chisq.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/pairwise-chisq.py)**
+- **Purpose**: Perform pairwise chi-square tests for categorical variables
+- **Prerequisites**: vivainsights Python package, scipy, pandas
+- **Key Features**: Multiple testing correction, p-value adjustment, significance testing
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/pairwise-chisq.py)**
+</div>
 
 ---
 
 ## Behavioral & Program Analysis
 
-### Collaboration by Time of Day (Python)
-**📄 [collaboration-by-time-of-day.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/collaboration-by-time-of-day.py)**
-- **Purpose**: Estimate a typical start and end of day from hourly collaboration metrics
-- **Language**: Python
-- **Prerequisites**: vivainsights Python package, pandas, numpy
-- **Key Features**: Hourly activity matrix, two-stage aggregation, cuts by weekday and role
-- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/collaboration-by-time-of-day.py)**
+### Collaboration by Time of Day
 
-### Collaboration by Time of Day (R)
+<div data-lang-block="r" markdown="1">
 **📄 [collaboration-by-time-of-day.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/collaboration-by-time-of-day.Rmd)**
 - **Purpose**: Estimate a typical start and end of day from hourly collaboration metrics
-- **Language**: R
 - **Format**: R Markdown
 - **Prerequisites**: vivainsights R package, tidyverse, lubridate
 - **Key Features**: Hourly activity matrix, two-stage aggregation, cuts by weekday and role
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/collaboration-by-time-of-day.Rmd)**
 - **[🌐 View HTML Output](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/collaboration-by-time-of-day.html)**
+</div>
+
+<div data-lang-block="python" markdown="1">
+**📄 [collaboration-by-time-of-day.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/collaboration-by-time-of-day.py)**
+- **Purpose**: Estimate a typical start and end of day from hourly collaboration metrics
+- **Prerequisites**: vivainsights Python package, pandas, numpy
+- **Key Features**: Hourly activity matrix, two-stage aggregation, cuts by weekday and role
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/collaboration-by-time-of-day.py)**
+</div>
 
 ---
 
-### Evaluating a Workplace Intervention (Python)
-**📄 [evaluate-intervention.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/evaluate-intervention.py)**
-- **Purpose**: Measure a workplace intervention with a treated-vs-control difference-in-differences design
-- **Language**: Python
-- **Prerequisites**: vivainsights Python package, pandas, numpy
-- **Key Features**: Before/During/After windows, difference-in-differences, two-stage aggregation, displacement checks
-- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/evaluate-intervention.py)**
+### Evaluating a Workplace Intervention
 
-### Evaluating a Workplace Intervention (R)
+<div data-lang-block="r" markdown="1">
 **📄 [evaluate-intervention.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/evaluate-intervention.Rmd)**
 - **Purpose**: Measure a workplace intervention with a treated-vs-control difference-in-differences design
-- **Language**: R
 - **Format**: R Markdown
 - **Prerequisites**: vivainsights R package, tidyverse
 - **Key Features**: Before/During/After windows, difference-in-differences, two-stage aggregation, displacement checks
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/evaluate-intervention.Rmd)**
 - **[🌐 View HTML Output](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/evaluate-intervention.html)**
+</div>
+
+<div data-lang-block="python" markdown="1">
+**📄 [evaluate-intervention.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/evaluate-intervention.py)**
+- **Purpose**: Measure a workplace intervention with a treated-vs-control difference-in-differences design
+- **Prerequisites**: vivainsights Python package, pandas, numpy
+- **Key Features**: Before/During/After windows, difference-in-differences, two-stage aggregation, displacement checks
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/evaluate-intervention.py)**
+</div>
 
 ---
 
-### Meeting Engagement Drivers (Python)
-**📄 [meeting-engagement-drivers.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/meeting-engagement-drivers.py)**
-- **Purpose**: Rank the meeting characteristics that drive in-meeting messaging as a proxy for disengagement
-- **Language**: Python
-- **Prerequisites**: vivainsights Python package, scikit-learn, pandas, numpy
-- **Key Features**: Meeting-level modelling, random forest permutation importance, rate-vs-exposure duration analysis
-- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/meeting-engagement-drivers.py)**
+### Meeting Engagement Drivers
 
-### Meeting Engagement Drivers (R)
+<div data-lang-block="r" markdown="1">
 **📄 [meeting-engagement-drivers.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/meeting-engagement-drivers.Rmd)**
 - **Purpose**: Rank the meeting characteristics that drive in-meeting messaging as a proxy for disengagement
-- **Language**: R
 - **Format**: R Markdown
 - **Prerequisites**: vivainsights R package, tidyverse, randomForest
 - **Key Features**: Meeting-level modelling, random forest permutation importance, rate-vs-exposure duration analysis
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/meeting-engagement-drivers.Rmd)**
 - **[🌐 View HTML Output](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/meeting-engagement-drivers.html)**
+</div>
+
+<div data-lang-block="python" markdown="1">
+**📄 [meeting-engagement-drivers.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/meeting-engagement-drivers.py)**
+- **Purpose**: Rank the meeting characteristics that drive in-meeting messaging as a proxy for disengagement
+- **Prerequisites**: vivainsights Python package, scikit-learn, pandas, numpy
+- **Key Features**: Meeting-level modelling, random forest permutation importance, rate-vs-exposure duration analysis
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/meeting-engagement-drivers.py)**
+</div>
 
 ---
 
@@ -180,15 +208,19 @@ The **behavioral and program analysis** examples move from modelling attributes 
 
 ## Prerequisites
 
-### Python Environment
-```bash
-pip install vivainsights pandas numpy scikit-learn linearmodels matplotlib seaborn jupyter
-```
-
+<div data-lang-block="r" markdown="1">
 ### R Environment
 ```r
 install.packages(c("vivainsights", "dplyr", "tidyr", "ggplot2", "scales", "purrr", "randomForest", "fixest", "Information", "rmarkdown"))
 ```
+</div>
+
+<div data-lang-block="python" markdown="1">
+### Python Environment
+```bash
+pip install vivainsights pandas numpy scikit-learn linearmodels matplotlib seaborn jupyter
+```
+</div>
 
 ---
 
@@ -204,11 +236,11 @@ install.packages(c("vivainsights", "dplyr", "tidyr", "ggplot2", "scales", "purrr
 
 ## Related pages
 
-- [Causal Inference in Copilot Analytics]({{ site.baseurl }}/causal-inference/) — move beyond correlation to measure the true impact of an intervention
-- [Network Analysis]({{ site.baseurl }}/network/) — organizational network analysis (ONA) as a complementary advanced technique
-- [Copilot Analytics]({{ site.baseurl }}/copilot/) — adoption metrics and Power/Habitual user segmentation
-- [Essentials]({{ site.baseurl }}/essentials/) — utilities and visualizations to prepare your data
-- [Getting Started]({{ site.baseurl }}/getting-started/) — environment setup and first steps
+- [Causal Inference in Copilot Analytics]({{ site.baseurl }}/causal-inference/): move beyond correlation to measure the true impact of an intervention
+- [Network Analysis]({{ site.baseurl }}/network/): organizational network analysis (ONA) as a complementary advanced technique
+- [Copilot Analytics]({{ site.baseurl }}/copilot/): adoption metrics and Power/Habitual user segmentation
+- [Essentials]({{ site.baseurl }}/essentials/): utilities and visualizations to prepare your data
+- [Getting Started]({{ site.baseurl }}/getting-started/): environment setup and first steps
 
 ---
 
@@ -218,3 +250,5 @@ install.packages(c("vivainsights", "dplyr", "tidyr", "ggplot2", "scales", "purrr
 - **Statistical Analysis**: [R Stats Documentation](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/00Index.html)
 - **Viva Insights**: [Package Documentation](https://microsoft.github.io/vivainsights/)
 - **Sample Data**: [Example datasets](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/example-data)
+
+<script src="{{ '/assets/js/lang-switch.js' | relative_url }}"></script>
