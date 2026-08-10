@@ -10,7 +10,7 @@ last_validated: 2026-08-10
 
 # Getting Started with Viva Insights Analytics
 
-This page gets you from a blank machine to your first successful Viva Insights analysis in R or Python. For custom KPIs, multi-query joins, and automated reporting patterns, see [Essentials]({{ site.baseurl }}/essentials/) and [Advanced Analytics]({{ site.baseurl }}/advanced/) once you are set up.
+Welcome to Viva Insights sample code! This guide will help you set up your development environment and get started with analyzing Viva Insights data using R or Python. For custom KPIs, multi-query joins, and automated reporting patterns once you're up and running, see [Essentials]({{ site.baseurl }}/essentials/) and [Advanced Analytics]({{ site.baseurl }}/advanced/).
 
 {% include last-validated.html %}
 
@@ -106,13 +106,15 @@ To export a query, use the query designer in the Viva Insights Analyst portal. S
 ```r
 library(vivainsights)
 
-# import_query() standardizes column names and cleans special characters,
-# which read.csv() does not do for you.
+# Load person query data and standardize variable names
 person_data <- import_query("path/to/your/person_query.csv")
 
+# Quick exploration
 check_query(person_data)
 create_bar(person_data, metric = "Collaboration_hours")
 ```
+
+Whilst you can use `read.csv()` for reading the .csv query into your R environment, we recommend using the `import_query()` function instead from the **vivainsights** package. `import_query()` standardizes variable names and 'cleans' special characters, ensuring that you minimize the number of errors arising from variable name mismatches.
 
 No query export handy yet? Use the package's built-in sample dataset instead:
 
@@ -125,13 +127,15 @@ person_data <- pq_data
 ```python
 import vivainsights as vi
 
-# import_query() standardizes column names and cleans special characters,
-# which pd.read_csv() does not do for you.
+# Load person query data and standardize variable names
 person_data = vi.import_query("path/to/your/person_query.csv")
 
+# Quick exploration
 print(person_data.info())
 vi.create_bar(person_data, metric="Collaboration_hours")
 ```
+
+Whilst you can use `pd.read_csv()` for reading the .csv query into your Python environment, we recommend using the `import_query()` function instead from the **vivainsights** package. `import_query()` standardizes variable names and 'cleans' special characters, ensuring that you minimize the number of errors arising from variable name mismatches.
 
 No query export handy yet? Use the package's built-in sample dataset instead:
 
