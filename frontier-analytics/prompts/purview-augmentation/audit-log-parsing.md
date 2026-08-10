@@ -30,6 +30,23 @@ Immediately after exporting raw audit logs from Purview, before running any anal
 
 A cleaned, flat CSV file (or DataFrame) with one row per event and consistently named columns, ready for analysis with any downstream prompt or tool.
 
+## Quick prompt (short version)
+
+Use this shorter prompt for a fast first pass that adapts to your data.
+
+```
+Help me parse a raw Microsoft Purview audit log export into a clean flat dataset and data dictionary that are ready for downstream analysis.
+Start by loading the actual file and printing row count, column names, data types, date range if available, and sample records so you can inspect the real schema before assuming any mappings.
+Do not assume exact Purview or AuditData field names, and ask me for the file path or any known Copilot operation names if the mapping or filter logic is unclear.
+Parse AuditData defensively with error handling, count malformed rows, and adapt extracted columns to the structures actually present in the data.
+Flatten nested JSON only one level deep, keep deeper structures as JSON strings, standardize final names to snake_case, and avoid exposing raw UserIds in printed output.
+If the file is large, process it in chunks, then produce both a full cleaned output and a Copilot-focused output when the filter finds relevant events.
+Also generate a data dictionary that records source, type, null rate, and examples for each final column so downstream users can understand the schema.
+End by listing any assumptions you made about field mappings, event classification, or anonymization.
+```
+
+Use the detailed prompt below for a reproducible, exact-structure output. Use the quick prompt above for a faster first pass that you refine through follow-up turns.
+
 ## Prompt
 
 ```

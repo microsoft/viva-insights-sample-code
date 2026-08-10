@@ -30,6 +30,23 @@ After exporting a person query with Copilot activity metrics spanning at least 8
 
 A self-contained static HTML file with embedded charts, suitable for sharing via email or SharePoint.
 
+## Quick prompt (short version)
+
+Use this shorter prompt for a fast first pass that adapts to your data.
+
+```
+Help me create a self-contained static HTML dashboard for people analytics and IT leaders that summarizes Copilot adoption trends and group differences from a Viva Insights person query export.
+Start by loading the actual CSV and printing the row count, column names, data types, date range, and number of unique people, then map the real metric and HR columns from what is present.
+Do not assume exact field names, and ask me to confirm the primary activity metric or any missing HR columns if the mapping is ambiguous.
+Separate licensed users from active users before calculating anything, treating missing Copilot metrics as unlicensed unless the data clearly indicates otherwise.
+Build weekly adoption metrics using distinct people per week, then add the most useful group views from the available HR attributes.
+The output must be a single self-contained static HTML file with inline assets and no server or external dependencies.
+Suppress any group with fewer than about 5 people, and note any skipped charts or missing segments.
+At the end, list any assumptions you made about metric selection, licensing logic, or field mappings.
+```
+
+Use the detailed prompt below for a reproducible, exact-structure output. Use the quick prompt above for a faster first pass that you refine through follow-up turns.
+
 ## Prompt
 
 ```
@@ -46,9 +63,12 @@ DATA LOADING AND VALIDATION
    match what is expected. Auto-detect columns that start with "Copilot_" as Copilot metric columns.
 
 IDENTIFYING LICENSED USERS
-6. A user is considered "Copilot-licensed" in a given week if they have a non-null, non-zero value
-   in at least one Copilot metric column for that week. Create a boolean column `is_licensed` to
-   flag these rows.
+6. A user is considered "Copilot-licensed" in a given week using this rule, in order:
+   a. If an enabled-days column is present (for example `Total_Copilot_enabled_days`), the user
+      is licensed when that column is greater than zero for the week.
+   b. Otherwise, the user is licensed if they have a non-null, non-zero value in at least one
+      Copilot metric column for that week.
+   Create a boolean column `is_licensed` to flag these rows.
 7. Also flag "active" users: licensed users who have Copilot_Actions > 0 (or the equivalent primary
    activity metric) in that week. Create a boolean column `is_active`.
 8. Print a summary: total person-weeks, licensed person-weeks, active person-weeks.

@@ -1,6 +1,6 @@
 # Prompt Card Library
 
-This directory contains **prompt cards** — ready-to-use prompts that you can paste directly into a coding agent (such as [GitHub Copilot](https://github.com/features/copilot), [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview), or similar tools) to generate analytics outputs from Viva Insights data.
+This directory contains **prompt cards**, ready-to-use prompts that you can paste directly into a coding agent (such as [GitHub Copilot](https://github.com/features/copilot), [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview), or similar tools) to generate analytics outputs from Viva Insights data.
 
 ## What is a prompt card?
 
@@ -36,6 +36,8 @@ A prompt card is a structured document that contains:
 | [Executive Summary](copilot-adoption/executive-summary.md) | Produce a concise executive memo summarizing Copilot adoption metrics, key findings, and recommendations for VP/C-suite audiences. |
 | [Segmentation & Churn](copilot-adoption/segmentation-and-churn.md) | Classify users into usage segments, track segment transitions over time, and calculate churn rates. |
 | [ROI Estimation](copilot-adoption/roi-estimation.md) | Estimate return on investment for Copilot by quantifying time savings, productivity value, and license cost breakdowns. |
+| [Executive PowerPoint Deck](copilot-adoption/executive-powerpoint-deck.md) | Generate an exec-ready 10-15 page PowerPoint deck with editable native charts. |
+| [Copilot Causal Toolkit](copilot-adoption/copilot-causal-toolkit.md) | Run a causal inference analysis using the Copilot Causal Toolkit, then interpret results for senior leadership. Two prompts: one to run the analysis, one to interpret outputs. |
 
 ### Purview Augmentation
 

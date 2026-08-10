@@ -55,6 +55,23 @@ When you have access to Purview audit log exports containing Copilot-related eve
 
 An exploratory HTML report or Jupyter/R notebook with usage trends, operation breakdowns, and user activity distributions.
 
+## Quick prompt (short version)
+
+Use this shorter prompt for a fast first pass that adapts to your data.
+
+```
+Help me produce an exploratory report on Copilot agent and extension usage from Microsoft Purview audit logs for program, security, and analytics stakeholders.
+Start by loading the actual file and printing row count, column names, data types, date range, and sample records so you can inspect the real schema before analyzing anything.
+Do not assume exact Purview field names, and ask me for the file path or confirmation of the user, timestamp, operation, workload, or AuditData fields if the mapping is ambiguous.
+Use a broad first-pass filter for Copilot-related operations and workloads, show what matched, and refine the logic based on the values actually present in the data.
+If AuditData exists, inspect it carefully before extracting agent or extension details, and skip that section with a clear note if those fields are unavailable.
+Use static charts in a standalone HTML or notebook output, protect privacy by avoiding raw email addresses or other direct identifiers in printed output, and sample only for exploration if the dataset is very large.
+Call out system-generated events, duplicates, or other schema quirks that could distort the analysis.
+End by listing any assumptions you made about field mappings, Copilot filters, or agent identification.
+```
+
+Use the detailed prompt below for a reproducible, exact-structure output. Use the quick prompt above for a faster first pass that you refine through follow-up turns.
+
 ## Prompt
 
 ```

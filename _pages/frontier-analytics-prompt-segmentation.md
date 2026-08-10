@@ -54,6 +54,23 @@ After at least 8–12 weeks of person query data have been collected, when you n
 
 An HTML report or Jupyter/R notebook containing segment distribution charts, transition matrices, churn curves, and at-risk group analysis.
 
+## Quick prompt (short version)
+
+Use this shorter prompt for a fast first pass that adapts to your data.
+
+```
+Help me create a segmentation and churn analysis for Copilot usage that classifies licensed users, tracks movement between segments over time, and highlights at-risk groups.
+Start by loading the actual CSV and printing row count, column names, data types, date range, and unique people so you can map the real activity and HR fields.
+Do not assume exact column names, and ask me for the file path, the main activity metric, or any unclear field mapping before you continue.
+Exclude unlicensed users from denominators, then use `identify_usage_segments()` (vivainsights) to compute weekly usage segments when available. If you cannot use it, fall back to percentile-based thresholds and print the thresholds you used.
+Include both week-level segment trends and a stable user segment for group breakdowns, then build a week-to-week transition matrix only for users present in consecutive weeks.
+Use the stated churn logic unless I tell you otherwise, flag if the time span is too short for reliable churn analysis, and identify currently at-risk users separately from fully churned users.
+Suppress group views below about 5 people for privacy, and note any missing HR attributes or holiday-related caveats that affect interpretation.
+End by listing any assumptions you made about thresholds, churn rules, or field mappings.
+```
+
+Use the detailed prompt below for a reproducible, exact-structure output. Use the quick prompt above for a faster first pass that you refine through follow-up turns.
+
 ## Prompt
 
 ```
@@ -67,8 +84,8 @@ DATA LOADING AND PREPARATION
 2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity metric. Print detected columns and the date range.
 3. Run `extract_hr(df)` from the `vivainsights` library to identify available HR / organizational attribute columns. Use the returned list for all segmentation breakdowns instead of hard-coding column names.
 4. Classify each person-week:
-   - "Licensed": at least one non-null, non-zero Copilot metric value.
-   - "Unlicensed": all Copilot metrics are null or zero.
+   - "Licensed": if an enabled-days column is present (for example `Total_Copilot_enabled_days`), that column is greater than zero for the week. Otherwise, at least one non-null, non-zero Copilot metric value.
+   - "Unlicensed": the enabled-days column equals zero when available. Otherwise, all Copilot metrics are null or zero.
 5. Filter to only licensed person-weeks for the segmentation analysis.
 6. Fill any remaining NaN values in Copilot metric columns with 0 for licensed users (a licensed user with a null action count in one metric likely had zero usage of that specific feature).
 

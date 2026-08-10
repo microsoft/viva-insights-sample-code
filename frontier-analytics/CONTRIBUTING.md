@@ -21,11 +21,20 @@ Thank you for your interest in improving Frontier Analytics. This guide covers h
 1. Copy the starter kit template from [templates/](templates/).
 2. Create a new folder under [starter-kits/](starter-kits/) with a descriptive kebab-case name (e.g., `starter-kits/meeting-culture-report/`).
 3. Include at minimum:
-   - `README.md` — use case overview, audience, and output description
-   - `quickstart.md` — step-by-step instructions
-   - `required-inputs.md` — data files and parameters needed
+   - `README.md`: use case overview, audience, and output description
+   - `quickstart.md`: step-by-step instructions
+   - `required-inputs.md`: data files and parameters needed
 4. Reference existing prompt cards from [prompts/](prompts/) or create new ones.
-5. Update [STARTER_KITS.md](STARTER_KITS.md) to list the new kit.
+5. Update [starter-kits/README.md](starter-kits/README.md) to list the new kit.
+
+## Adding a new skill
+
+1. Copy the skill template from [templates/](templates/).
+2. Create a new folder under [skills/](skills/) with a descriptive kebab-case name matching the skill's `name` field (e.g., `skills/my-new-skill/`).
+3. Fill in `SKILL.md` following the template. Add `reference/` and `examples/` subfolders if the content is long enough to benefit from being split, following the pattern in `skills/viva-insights-analysis/`.
+4. Confirm the skill is customer-agnostic. It must not reference a specific organization, engagement, or private data source.
+5. Test the skill with at least one Skill-compatible coding agent before submitting.
+6. Update [skills/README.md](skills/README.md) to list the new skill.
 
 ## Improving schema documentation
 
@@ -48,10 +57,10 @@ Thank you for your interest in improving Frontier Analytics. This guide covers h
 Pull requests to Frontier Analytics are reviewed against the following:
 
 1. **Grounded in real use cases.** Content must address actual Viva Insights analytics scenarios, not hypothetical ones.
-2. **Prompts are tested.** Every prompt card must have been tested with at least one coding agent against realistic data.
+2. **Prompts and skills are tested.** Every prompt card and skill must have been tested with at least one coding agent against realistic data.
 3. **Complete documentation.** All required sections are filled in. No placeholder text.
 4. **Consistent structure.** Follows the relevant template from [templates/](templates/).
-5. **No sensitive data.** No real employee data, organization names, or identifiable information in examples.
+5. **No sensitive data.** No real employee data, organization names, or identifiable information in examples. Skills additionally must be customer-agnostic, with no references to a specific engagement or client repository.
 
 ## Submitting your contribution
 
