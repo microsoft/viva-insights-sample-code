@@ -22,6 +22,11 @@ on:
       - '.github/scripts/check_prompt_drift.py'
       - '.github/workflows/prompt-drift-check.yml'
 
+# This check only reads files in the checkout, so the GITHUB_TOKEN needs no
+# write access anywhere. Restrict it to the minimum.
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest

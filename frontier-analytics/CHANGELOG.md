@@ -37,4 +37,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Example output specifications** (3 specs) describing expected deliverable formats
 - **Templates** for creating new prompt cards, starter kits, and schema documentation
 - **MCP concepts documentation** with sample configuration for Model Context Protocol integration
-- [README](README.md), [Quickstart guide](QUICKSTART.md), [Starter Kits overview](STARTER_KITS.md), and [Contributing guide](CONTRIBUTING.md)
+- [README](README.md), Quickstart guide, Starter Kits overview, and [Contributing guide](CONTRIBUTING.md). The Quickstart guide and Starter Kits overview were later consolidated into [README.md](README.md) and [starter-kits/README.md](starter-kits/README.md), so those two links are intentionally not included here since the original files no longer exist.
