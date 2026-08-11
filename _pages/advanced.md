@@ -8,17 +8,48 @@ css: "/assets/css/lang-switch.css"
 ---
 # Advanced Analytics Scripts
 
-This page covers machine learning, regression models, and statistical analysis techniques for Viva Insights data.
+This page covers machine learning, regression models, and statistical analysis techniques for Viva Insights data — from predicting top performance and selecting predictive features, to testing for significant associations, to measuring the real-world impact of a program or intervention.
 
-The **top performers** use case is used for understanding the drivers behind top performance, in which top performance is usually provided by a business outcome metric uploaded into Viva Insights. The example scripts below make use of a random forest model, which has the benefits of handling non-linear relationships, providing feature importance rankings, and being robust to outliers and missing values. The same technique can be used for predicting other outcomes, such as high engagement or likelihood to stay (using sentiment surveys). 
+Pick a card to jump straight to a technique, or read the short intro above each section for guidance on which one fits your question.
 
-The **information value** use case is used for feature selection and understanding which Viva Insights metrics are most predictive of a categorical outcome variable. Similar to the top performers use case, this allows you to identify the most important Viva Insights metrics that differentiate between different groups or categories for a categorical outcome variable. Information Value (IV) is particularly useful for identifying variables with strong predictive power while avoiding overfitting in your models.
-
-When choosing which technique to use, consider if you need to build a predictive model that can handle complex, non-linear relationships and you want to make actual predictions on new data (e.g., predicting which employees are likely to be top performers). Random Forest is ideal when you have sufficient sample size (typically 100+ observations) and want robust predictions with feature importance rankings. Use information value when you need to perform initial feature selection, have limited sample sizes, or want to understand the univariate predictive power of individual variables before building more complex models. IV is particularly valuable for preprocessing large numbers of potential predictors and identifying which variables are worth including in downstream modeling efforts.
-
-The **pairwise chi-square tests** use case is used for statistical hypothesis testing to determine if there are significant associations between categorical variables - typically organizational attributes or survey attributes - in your Viva Insights data. This technique is particularly valuable when you want to understand relationships between different organizational attributes (such as department, level, or location) and collaboration patterns or behaviors. The scripts include multiple testing corrections to control for false discovery rates when performing many simultaneous comparisons, ensuring reliable statistical conclusions. 
-
-The **behavioral and program analysis** examples move from modelling attributes to answering practical workplace questions. The *collaboration by time of day* scripts estimate a typical start and end of day from the hourly collaboration metrics, and they show how those hours shift by weekday and by role. The *evaluating a workplace intervention* scripts set up a treated-versus-control, difference-in-differences design so that a genuine programme effect can be separated from a company-wide or seasonal trend, which makes them directly applicable to measuring the impact of a Microsoft 365 Copilot enablement wave. The *meeting engagement drivers* scripts model in-meeting messaging as a proxy for disengagement and rank the meeting characteristics that drive it, and they then take a closer look at meeting duration to separate a real effect from simple exposure. Because the sample datasets do not contain the hourly buckets, a real intervention, or enough multi-person meetings, these examples generate small, clearly labelled simulated datasets that share the column names of a real query, so that the same downstream code runs unchanged on your own export.
+<div class="vi-card-grid" markdown="0">
+  <a class="vi-card" href="#top-performers-modeling">
+    <span class="vi-card-icon">🌳</span>
+    <span class="vi-card-title">Top Performers Modeling</span>
+    <span class="vi-card-desc">Random forest model identifying what characteristics drive top performance, or any other business outcome you upload.</span>
+    <span class="vi-card-more">Jump to section →</span>
+  </a>
+  <a class="vi-card" href="#information-value-analysis">
+    <span class="vi-card-icon">🔍</span>
+    <span class="vi-card-title">Information Value Analysis</span>
+    <span class="vi-card-desc">Rank which Viva Insights metrics are most predictive of a categorical outcome, for feature selection before a bigger model.</span>
+    <span class="vi-card-more">Jump to section →</span>
+  </a>
+  <a class="vi-card" href="#pairwise-chi-square-tests">
+    <span class="vi-card-icon">📐</span>
+    <span class="vi-card-title">Pairwise Chi-Square Tests</span>
+    <span class="vi-card-desc">Test whether organizational attributes are significantly associated with collaboration behaviors, with multiple-testing correction built in.</span>
+    <span class="vi-card-more">Jump to section →</span>
+  </a>
+  <a class="vi-card" href="#collaboration-by-time-of-day">
+    <span class="vi-card-icon">🕒</span>
+    <span class="vi-card-title">Collaboration by Time of Day</span>
+    <span class="vi-card-desc">Estimate a typical start and end of day from hourly collaboration metrics, and see how it shifts by weekday and role.</span>
+    <span class="vi-card-more">Jump to section →</span>
+  </a>
+  <a class="vi-card" href="#evaluating-a-workplace-intervention">
+    <span class="vi-card-icon">🧪</span>
+    <span class="vi-card-title">Evaluating a Workplace Intervention</span>
+    <span class="vi-card-desc">A treated-vs-control, difference-in-differences design that separates a genuine program effect from a company-wide trend.</span>
+    <span class="vi-card-more">Jump to section →</span>
+  </a>
+  <a class="vi-card" href="#meeting-engagement-drivers">
+    <span class="vi-card-icon">📅</span>
+    <span class="vi-card-title">Meeting Engagement Drivers</span>
+    <span class="vi-card-desc">Rank the meeting characteristics that drive in-meeting messaging, used here as a proxy for disengagement.</span>
+    <span class="vi-card-more">Jump to section →</span>
+  </a>
+</div>
 
 <div class="lang-switch" role="group" aria-label="Choose code language for this page">
   <span class="lang-switch-label">Show code in:</span>
@@ -39,6 +70,8 @@ The **behavioral and program analysis** examples move from modelling attributes 
 ## Machine Learning & Predictive Modeling
 
 ### Top Performers Modeling
+
+Understand the drivers behind top performance, where top performance is usually a business outcome metric uploaded into Viva Insights. The scripts below use a random forest model, which handles non-linear relationships, provides feature importance rankings, and is robust to outliers and missing values. The same technique can predict other outcomes too, such as high engagement or likelihood to stay (using sentiment surveys). Random Forest is best when you have sufficient sample size (typically 100+ observations) and want robust predictions with feature importance rankings — for smaller samples or a first pass at feature selection, see Information Value below.
 
 <div data-lang-block="r" markdown="1">
 **📄 [top-performers-rf.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/top-performers-rf.Rmd)**
@@ -65,6 +98,8 @@ The **behavioral and program analysis** examples move from modelling attributes 
 
 ### Information Value Analysis
 
+Feature selection: understand which Viva Insights metrics are most predictive of a categorical outcome variable, identifying variables with strong predictive power while avoiding overfitting. Use Information Value (IV) for initial feature selection, with limited sample sizes, or to understand the univariate predictive power of individual variables before building a more complex model like the Random Forest above — it's particularly valuable for preprocessing large numbers of potential predictors.
+
 <div data-lang-block="r" markdown="1">
 **📄 [information-value.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/information-value.Rmd)**
 - **Purpose**: Calculate Information Value (IV) for feature selection and variable importance
@@ -84,6 +119,8 @@ The **behavioral and program analysis** examples move from modelling attributes 
 </div>
 
 ### Pairwise Chi-Square Tests
+
+Statistical hypothesis testing for significant associations between categorical variables — typically organizational attributes (department, level, location) or survey attributes — and collaboration patterns or behaviors. Multiple testing corrections control for false discovery rates when running many simultaneous comparisons, keeping the conclusions reliable.
 
 <div data-lang-block="r" markdown="1">
 **📄 [pairwise_chisq.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/pairwise_chisq.Rmd)**
@@ -107,7 +144,11 @@ The **behavioral and program analysis** examples move from modelling attributes 
 
 ## Behavioral & Program Analysis
 
+These examples move from modelling attributes to answering practical workplace questions. Because the sample datasets don't contain the hourly buckets, a real intervention, or enough multi-person meetings needed below, each script generates a small, clearly labelled simulated dataset that shares the column names of a real query — so the same downstream code runs unchanged on your own export.
+
 ### Collaboration by Time of Day
+
+Estimate a typical start and end of day from hourly collaboration metrics, and show how those hours shift by weekday and by role.
 
 <div data-lang-block="r" markdown="1">
 **📄 [collaboration-by-time-of-day.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/collaboration-by-time-of-day.Rmd)**
@@ -131,6 +172,8 @@ The **behavioral and program analysis** examples move from modelling attributes 
 
 ### Evaluating a Workplace Intervention
 
+Set up a treated-versus-control, difference-in-differences design so a genuine programme effect can be separated from a company-wide or seasonal trend — directly applicable to measuring the impact of a Microsoft 365 Copilot enablement wave.
+
 <div data-lang-block="r" markdown="1">
 **📄 [evaluate-intervention.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/evaluate-intervention.Rmd)**
 - **Purpose**: Measure a workplace intervention with a treated-vs-control difference-in-differences design
@@ -152,6 +195,8 @@ The **behavioral and program analysis** examples move from modelling attributes 
 ---
 
 ### Meeting Engagement Drivers
+
+Model in-meeting messaging as a proxy for disengagement and rank the meeting characteristics that drive it, then take a closer look at meeting duration to separate a real effect from simple exposure.
 
 <div data-lang-block="r" markdown="1">
 **📄 [meeting-engagement-drivers.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/meeting-engagement-drivers.Rmd)**
