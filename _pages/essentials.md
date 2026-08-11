@@ -32,25 +32,11 @@ This page provides some essential scripts to let you get started with analysis i
 
 ## Utility Scripts
 
-<div data-lang-block="r" markdown="1">
-### R Utilities
-Essential functions and utilities for R-based analysis.
+Most of the utility scripts formerly listed here now have their own catalogued entry, with a fuller description, prerequisites, and a direct download link, on the topic page where they're used:
 
-**📁 [Utility code for R](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-r)**
-- **Purpose**: Collection of utility functions for common Viva Insights analysis tasks
-- **Format**: Multiple R files
-- **Prerequisites**: vivainsights R package
-</div>
-
-<div data-lang-block="python" markdown="1">
-### Python Utilities
-Essential functions and utilities for Python-based analysis.
-
-**📁 [Utility code for Python](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python)**
-- **Purpose**: Collection of utility functions for common Viva Insights analysis tasks
-- **Format**: Multiple Python files
-- **Prerequisites**: vivainsights Python package
-</div>
+- **[Advanced Analytics]({{ site.baseurl }}/advanced/)**: top-performer modeling, information value, pairwise chi-square tests, collaboration by time of day, workplace intervention evaluation, meeting engagement drivers
+- **[Network Analysis]({{ site.baseurl }}/network/)**: group-to-group and person-to-person network customization
+- **[Copilot Analytics]({{ site.baseurl }}/copilot/)**: Copilot usage analysis, usage segment trends, difference-in-differences and event-study impact analysis
 
 ---
 
@@ -89,7 +75,7 @@ Essential functions and utilities for Python-based analysis.
 
 ---
 
-## Getting Started Tutorials
+## Introductory Notebooks
 
 ### Introduction to Viva Insights with Python
 **📁 [Introduction to Viva Insights with Python](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/intro-to-vivainsights-py)**
@@ -103,6 +89,8 @@ Essential functions and utilities for Python-based analysis.
 - **[📓 demo-vivainsights-py.ipynb](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/intro-to-vivainsights-py/demo-vivainsights-py.ipynb)**: General introduction
 - **[📓 demo-ona-vivainsights-py.ipynb](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/intro-to-vivainsights-py/demo-ona-vivainsights-py.ipynb)**: Organizational Network Analysis
 
+There is no R equivalent notebook yet. R users can start instead from the [Getting Started]({{ site.baseurl }}/getting-started/) page, which covers the same import and first-analysis steps.
+
 ---
 
 ## Related pages
@@ -112,6 +100,8 @@ Essential functions and utilities for Python-based analysis.
 - [Joining People Skills Data]({{ site.baseurl }}/skills-data-join/): combine People Skills data with Viva Insights metrics
 - [Advanced Analytics]({{ site.baseurl }}/advanced/): machine learning, regression, and statistical testing
 - [Network Analysis]({{ site.baseurl }}/network/): organizational network analysis (ONA)
+- [Copilot Analytics]({{ site.baseurl }}/copilot/): measure Microsoft Copilot adoption and impact
+- [Frontier]({{ site.baseurl }}/frontier-analytics/): turn an export into a finished dashboard or report with a coding agent
 
 ---
 
@@ -119,6 +109,7 @@ Essential functions and utilities for Python-based analysis.
 
 - **R Package Documentation**: [vivainsights R](https://microsoft.github.io/vivainsights/)
 - **Python Package Documentation**: [vivainsights Python](https://microsoft.github.io/vivainsights-py/)
+- **Common data pitfalls**: [Data pitfalls reference](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/skills/viva-insights-analysis/reference/data-pitfalls.md), for issues like `IsManager` arriving as text or the privacy suppression threshold
 - **Sample Data**: [Example datasets](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/example-data)
 
 <script src="{{ '/assets/js/lang-switch.js' | relative_url }}"></script>
