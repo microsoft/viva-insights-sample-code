@@ -38,8 +38,6 @@ Most of the utility scripts formerly listed here now have their own catalogued e
 - **[Network Analysis]({{ site.baseurl }}/network/)**: group-to-group and person-to-person network customization
 - **[Copilot Analytics]({{ site.baseurl }}/copilot/)**: Copilot usage analysis, usage segment trends, difference-in-differences and event-study impact analysis
 
-If you'd rather browse everything in one place, the raw folders are on GitHub: [utility-r](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-r) and [utility-python](https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python).
-
 ---
 
 ## Visualization Scripts
@@ -102,6 +100,7 @@ There is no R equivalent notebook yet. R users can start instead from the [Getti
 - [Joining People Skills Data]({{ site.baseurl }}/skills-data-join/): combine People Skills data with Viva Insights metrics
 - [Advanced Analytics]({{ site.baseurl }}/advanced/): machine learning, regression, and statistical testing
 - [Network Analysis]({{ site.baseurl }}/network/): organizational network analysis (ONA)
+- [Copilot Analytics]({{ site.baseurl }}/copilot/): measure Microsoft Copilot adoption and impact
 - [Frontier]({{ site.baseurl }}/frontier-analytics/): turn an export into a finished dashboard or report with a coding agent
 
 ---
