@@ -1,0 +1,74 @@
+/* ------------------------------------------------------------------
+   Network page topic switcher: Group-to-Group / Person-to-Person / Both.
+   Companion to lang-switch.css/js — same visual language, but a second,
+   independent axis (network query type, not code language) so it can be
+   combined freely with the R/Python switch for four addressable
+   view-states. Relies on the shared design tokens defined in site.css
+   (--primary, --ink, --text, --muted, --rule, --radius-card, --shadow-card).
+
+   Unlike .lang-switch, this is intentionally NOT sticky: stacking two
+   sticky bars at the same offset would overlap on scroll, and staying
+   pinned matters less for a page-specific filter than for the site-wide
+   language switch.
+   ------------------------------------------------------------------ */
+
+.topic-switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid var(--rule, #e0e0e0);
+  border-radius: var(--radius-card, 16px);
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.06));
+  padding: 10px 14px;
+  margin: 0 0 1.75rem;
+  font-size: 0.9rem;
+}
+
+.topic-switch-label {
+  font-weight: 600;
+  color: var(--ink, #0E1726);
+}
+
+.topic-switch-group {
+  display: inline-flex;
+  border: 1px solid var(--rule, #e0e0e0);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+  background: #f6f7fb;
+}
+
+.topic-switch-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text, #242424);
+  padding: 6px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.topic-switch-btn.is-active {
+  background: var(--primary, #335CCC);
+  color: #fff;
+}
+
+.topic-switch-btn:focus-visible {
+  outline: 2px solid var(--primary, #335CCC);
+  outline-offset: 2px;
+}
+
+.topic-switch-note {
+  color: var(--muted, #616161);
+  font-size: 0.8rem;
+}
+
+/* Content visibility. Default ("all", or before JS runs) shows both
+   Group-to-Group and Person-to-Person blocks. */
+html[data-topic="g2g"] [data-topic-block="p2p"] { display: none; }
+html[data-topic="p2p"] [data-topic-block="g2g"] { display: none; }
