@@ -10,7 +10,7 @@ css_files:
 ---
 # Network Analysis Scripts
 
-Organizational Network Analysis (ONA) maps the relationships and interactions between people, teams, and departments based on actual collaboration patterns, rather than formal reporting structures — revealing the informal networks that drive real work and innovation, in ways a traditional org chart cannot. It's used for change management, organizational design, identifying informal leaders and connectors, and spotting collaboration silos or over-dependencies on key individuals.
+Organizational Network Analysis (ONA) maps the relationships and interactions between people, teams, and departments based on actual collaboration patterns, rather than formal reporting structures — revealing the informal networks that drive real work and innovation, in ways a traditional org chart cannot. See [Key Use Cases for Network Analysis](#key-use-cases-for-network-analysis) further down the page for the full range of ways this is applied.
 
 Viva Insights makes network metrics available through four query types. Sample scripts on this page currently cover two of them — pick a card to jump straight to one, or read on for the full picture.
 
@@ -183,6 +183,23 @@ A deeper walkthrough of `network_p2p()`: Louvain and Leiden community detection,
 2. **Temporal Analysis**: Track network changes over time
 3. **Comparative Analysis**: Compare networks across departments/teams
 4. **Recommendations**: Provide actionable insights for collaboration improvement
+
+---
+
+## Key Use Cases for Network Analysis
+
+Network analysis with Viva Insights data is particularly valuable for:
+
+- **Change Management**: Identify key influencers and communication pathways to ensure successful organizational transformations
+- **Organizational Design**: Understand how work actually flows across teams and departments to optimize organizational structure
+- **Talent Development**: Discover high-potential employees who serve as connectors and bridge-builders across the organization
+- **Innovation & Knowledge Sharing**: Map how expertise and information flow to identify bottlenecks and opportunities for better collaboration
+- **Merger & Acquisition Integration**: Visualize collaboration patterns between merged entities and track integration progress
+- **Remote Work Optimization**: Understand how distributed teams collaborate and identify potential isolation or over-collaboration issues
+- **Leadership Development**: Identify informal leaders and understand influence patterns beyond formal hierarchy
+- **Diversity & Inclusion**: Analyze collaboration patterns across different demographic groups to identify potential barriers or silos
+- **Team Formation**: Use network insights to create more effective cross-functional teams based on existing collaboration patterns
+- **Risk Management**: Identify over-dependencies on key individuals or potential knowledge silos that could impact business continuity
 
 ---
 
