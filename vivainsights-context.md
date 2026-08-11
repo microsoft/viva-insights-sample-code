@@ -3,6 +3,8 @@
 > **What is this file?** This is a reusable context file for AI coding agents (GitHub Copilot, Claude Code, or similar). Drop it into your project or paste it as context before a prompt. It provides domain knowledge about Viva Insights data and the `vivainsights` package so you don't have to repeat it in every prompt.
 >
 > **If your coding agent supports the Skill format** (for example GitHub Copilot CLI or Claude Code), use the [viva-insights-analysis skill](frontier-analytics/skills/viva-insights-analysis/) instead. It covers the same ground as this file in more depth, is organized into reference files an agent reads on demand, and is kept current with the packages' own `llms.txt` function index. This file remains here as a fallback for agents that do not support Skills.
+>
+> **Landed on this file directly (e.g. via search or a repo browse)?** This is part of the [microsoft/viva-insights-sample-code](https://github.com/microsoft/viva-insights-sample-code) repository. Beyond this context file, it hosts the full sample code library, ready-to-run tutorials, and utility scripts for analysing Viva Insights data — browse it all at **[microsoft.github.io/viva-insights-sample-code](https://microsoft.github.io/viva-insights-sample-code/)**.
 
 ## Data structure
 
@@ -140,3 +142,7 @@ Do not hard-code specific column names from documentation. Actual names can vary
 
 Ready-to-use prompt cards for common analytics tasks are available at:
 [Frontier Analytics: Prompt Library](https://microsoft.github.io/viva-insights-sample-code/frontier-analytics-prompts/)
+
+## Sample code library
+
+For runnable examples that go beyond this context file — utility scripts, playbooks, and topic-organized tutorials in R and Python — browse the full site at **[microsoft.github.io/viva-insights-sample-code](https://microsoft.github.io/viva-insights-sample-code/)**.
