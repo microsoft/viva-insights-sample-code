@@ -8,6 +8,11 @@
   {%- if page.css -%}
   <link rel="stylesheet" href="{{ page.css | relative_url }}">
   {%- endif -%}
+  {%- if page.css_files -%}
+    {%- for css_file in page.css_files -%}
+  <link rel="stylesheet" href="{{ css_file | relative_url }}">
+    {%- endfor -%}
+  {%- endif -%}
 
   {%- comment -%} Viva Insights branding: favicon + theme colour {%- endcomment -%}
   <link rel="icon" type="image/svg+xml" href="{{ "/assets/images/favicon.svg" | relative_url }}">
