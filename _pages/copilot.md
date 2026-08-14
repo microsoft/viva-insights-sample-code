@@ -61,6 +61,16 @@ For more inspiration on analyzing Copilot adoption and impact, have a look at ou
 - **Prerequisites**: vivainsights Python package, Copilot usage data
 - **Key Features**: Step-by-step analysis, interactive visualizations
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/copilot-analytics-examples.ipynb)**
+
+### Copilot Adoption Journey and Ways of Working
+
+**📓 [copilot-adoption-journey-analysis.ipynb](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/copilot-adoption-journey-analysis.ipynb)** (Jupyter Notebook)
+- **Purpose**: End-to-end assessment of Copilot reach, habit formation, conversion opportunity, and associated ways of working
+- **Format**: Jupyter Notebook
+- **Prerequisites**: vivainsights, pandas, NumPy, SciPy, statsmodels, matplotlib, and a Copilot-rich Person Query export with at least 12 weeks of data
+- **Key Features**: 12-week Power/Habitual/Novice/Low/Non-user segmentation, cohort and function analysis, native Viva Insights scans, adjusted associations, and same-person diagnostics
+- **Interpretation**: Observational associations only; replace the configured input path before running and review metric availability for the export
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/copilot-adoption-journey-analysis.ipynb)**
 </div>
 
 ---
