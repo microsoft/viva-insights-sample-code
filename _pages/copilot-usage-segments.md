@@ -179,6 +179,8 @@ To calculate the Copilot Usage Segments, you can use the `identify_usage_segment
 
 For an implementation in Power BI, have a look at [this guide]({{ site.baseurl }}/dax-calculated-columns/).
 
+To see the segments applied end-to-end in an adoption assessment, covering entry cohorts, conversion targeting, and associated ways of working, see the [Copilot Adoption Journey notebook](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/copilot-adoption-journey-analysis.ipynb).
+
 ---
 
 ## Frequently Asked Questions
@@ -207,6 +209,7 @@ To implement these segments in your analysis, you can use our pre-built DAX calc
 
 - **[DAX Calculated Columns]({{ site.baseurl }}/dax-calculated-columns/)** - Ready-to-use Power BI formulas
 - **[Copilot Analytics Scripts]({{ site.baseurl }}/copilot/)** - Python and R implementation examples
+- **[Copilot Adoption Journey notebook](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/copilot-adoption-journey-analysis.ipynb)** - The segments applied end-to-end, from reach and habit formation through to ways of working
 
 ---
 
