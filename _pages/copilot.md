@@ -73,7 +73,7 @@ need to answer a leadership question rather than explore the data.
 | Start with | When |
 | --- | --- |
 | **Copilot Advanced Analysis** (above) | You are getting oriented, and you want the core metrics, segmentation, and standard visuals. |
-| **Copilot Adoption Journey** (below) | You have 12+ weeks of data and need cohorts, habit formation, conversion sizing, and associated ways of working. |
+| **Copilot Adoption Journey** (below) | You have 12+ weeks of data and need cohorts, habit formation, conversion targeting, and associated ways of working. |
 
 <div data-lang-block="python" markdown="1">
 **📓 [copilot-adoption-journey-analysis.ipynb](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/copilot-adoption-journey-analysis.ipynb)** (Jupyter Notebook)
