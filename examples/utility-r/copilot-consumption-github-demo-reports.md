@@ -4,6 +4,12 @@ Two self-contained R Markdown flexdashboards demonstrate different analysis ques
 All data used by these two demos are generated synthetic data. Neither report establishes
 causal effects, wellbeing or overall productivity from tool activity.
 
+Both reports are built around the Consumption query and GitHub query, both accessible from the
+**Customised query** tab under **Create analysis** in the Viva Insights analyst experience. See the
+[AI cost query documentation](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query)
+for the official schema and access details — the `_data/` folders in this directory are
+illustrative synthetic exports, not a substitute for that reference.
+
 | Report | Source | Rendered report | Scope |
 |---|---|---|---|
 | Copilot Consumption and Ways of Working | [Rmd](copilot-consumption-ways-of-working-simulation.Rmd) | [HTML](copilot-consumption-ways-of-working-simulation.html) | Consumption credits/tokens alongside collaboration patterns. This report and its data are unchanged by the developer-experience rebuild. |

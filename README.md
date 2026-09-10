@@ -63,6 +63,11 @@ Explore the repo to discover sample code:
 - [Combining a Consumption query with a Person Query for Ways of Working analysis - R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-ways-of-working-simulation.Rmd)
 - [Developer Experience and Copilot: working conditions and joint GitHub/M365 use - R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/github-copilot-developer-productivity-simulation.Rmd)
 
+  Both reports read the Consumption query and GitHub query, both accessible from the **Customised
+  query** tab under **Create analysis** in the Viva Insights analyst experience. See the
+  [AI cost query documentation](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query)
+  for the official schema and access details.
+
 ### Other
 
 - [Performing Pairwise Chi-square Tests for categorical variables in R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/pairwise_chisq.Rmd)

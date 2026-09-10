@@ -177,7 +177,9 @@ with R Markdown and flexdashboard, and both ship with **synthetic data** so they
 end to end before you point them at your own export.
 
 They are built on two of the newer Viva Insights query types, both available from the
-**Customised query** tab under **Create analysis** in the Viva Insights analyst experience:
+**Customised query** tab under **Create analysis** in the Viva Insights analyst experience. See the
+[AI cost query documentation](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query)
+for the official schema and access details:
 
 | Query | What it adds | Used by |
 | --- | --- | --- |
