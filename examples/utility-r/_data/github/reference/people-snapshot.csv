@@ -1,0 +1,1081 @@
+"PersonId","Team","Tenure","JobFamily","IsDeveloper","IsCopilotLicensed"
+"P00001","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00002","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00003","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00004","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00005","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00006","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00007","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00008","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00009","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00010","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00011","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00012","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00013","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00014","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00015","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00016","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00017","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00018","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00019","Mobile","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00020","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00021","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00022","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00023","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00024","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00025","Data Engineering","Over 5 years","Software Engineering",TRUE,FALSE
+"P00026","Identity","Under 2 years","Software Engineering",TRUE,FALSE
+"P00027","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00028","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00029","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00030","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00031","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00032","Platform","Over 5 years","Software Engineering",TRUE,FALSE
+"P00033","Platform","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00034","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00035","Developer Experience","Under 2 years","Software Engineering",TRUE,FALSE
+"P00036","Data Engineering","Over 5 years","Software Engineering",TRUE,FALSE
+"P00037","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00038","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00039","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00040","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00041","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00042","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00043","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00044","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00045","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00046","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00047","Mobile","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00048","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00049","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00050","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00051","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00052","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00053","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00054","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00055","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00056","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00057","Developer Experience","Over 5 years","Software Engineering",TRUE,TRUE
+"P00058","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00059","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00060","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00061","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00062","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00063","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00064","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00065","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00066","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00067","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00068","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00069","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00070","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00071","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00072","Payments","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00073","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00074","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00075","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00076","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00077","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00078","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00079","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00080","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00081","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00082","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00083","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00084","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00085","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00086","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00087","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00088","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00089","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00090","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00091","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00092","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00093","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00094","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00095","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00096","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00097","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00098","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00099","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00100","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00101","Mobile","Over 5 years","Software Engineering",TRUE,FALSE
+"P00102","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00103","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00104","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00105","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00106","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00107","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00108","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00109","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00110","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00111","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00112","Developer Experience","Over 5 years","Software Engineering",TRUE,TRUE
+"P00113","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00114","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00115","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00116","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00117","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00118","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00119","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00120","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00121","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00122","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00123","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00124","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00125","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00126","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00127","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00128","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00129","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00130","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00131","Identity","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00132","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00133","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00134","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00135","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00136","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00137","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00138","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00139","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00140","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00141","Developer Experience","Over 5 years","Software Engineering",TRUE,TRUE
+"P00142","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00143","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00144","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00145","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00146","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00147","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00148","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00149","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00150","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00151","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00152","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00153","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00154","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00155","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00156","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00157","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00158","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00159","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00160","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00161","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00162","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00163","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00164","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00165","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00166","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00167","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00168","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00169","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00170","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00171","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00172","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00173","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00174","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00175","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00176","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00177","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00178","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00179","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00180","Identity","Over 5 years","Software Engineering",TRUE,FALSE
+"P00181","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00182","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00183","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00184","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00185","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00186","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00187","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00188","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00189","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00190","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00191","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00192","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00193","Developer Experience","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00194","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00195","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00196","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00197","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00198","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00199","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00200","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00201","Mobile","Under 2 years","Software Engineering",TRUE,FALSE
+"P00202","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00203","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00204","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00205","Developer Experience","Over 5 years","Software Engineering",TRUE,TRUE
+"P00206","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00207","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00208","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00209","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00210","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00211","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00212","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00213","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00214","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00215","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00216","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00217","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00218","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00219","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00220","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00221","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00222","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00223","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00224","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00225","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00226","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00227","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00228","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00229","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00230","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00231","Developer Experience","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00232","Data Engineering","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00233","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00234","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00235","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00236","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00237","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00238","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00239","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00240","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00241","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00242","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00243","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00244","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00245","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00246","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00247","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00248","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00249","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00250","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00251","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00252","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00253","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00254","Payments","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00255","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00256","Data Engineering","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00257","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00258","Payments","Under 2 years","Software Engineering",TRUE,FALSE
+"P00259","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00260","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00261","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00262","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00263","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00264","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00265","Payments","Under 2 years","Software Engineering",TRUE,FALSE
+"P00266","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00267","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00268","Data Engineering","Over 5 years","Software Engineering",TRUE,FALSE
+"P00269","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00270","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00271","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00272","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00273","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00274","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00275","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00276","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00277","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00278","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00279","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00280","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00281","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00282","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00283","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00284","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00285","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00286","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00287","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00288","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00289","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00290","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00291","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00292","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00293","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00294","Payments","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00295","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00296","Developer Experience","Over 5 years","Software Engineering",TRUE,TRUE
+"P00297","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00298","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00299","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00300","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00301","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00302","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00303","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00304","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00305","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00306","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00307","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00308","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00309","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00310","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00311","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00312","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00313","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00314","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00315","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00316","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00317","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00318","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00319","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00320","Developer Experience","Over 5 years","Software Engineering",TRUE,TRUE
+"P00321","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00322","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00323","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00324","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00325","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00326","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00327","Data Engineering","Over 5 years","Software Engineering",TRUE,FALSE
+"P00328","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00329","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00330","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00331","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00332","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00333","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00334","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00335","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00336","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00337","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00338","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00339","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00340","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00341","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00342","Developer Experience","Over 5 years","Software Engineering",TRUE,TRUE
+"P00343","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00344","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00345","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00346","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00347","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00348","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00349","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00350","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00351","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00352","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00353","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00354","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00355","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00356","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00357","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00358","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00359","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00360","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00361","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00362","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00363","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00364","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00365","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00366","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00367","Identity","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00368","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00369","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00370","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00371","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00372","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00373","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00374","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00375","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00376","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00377","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00378","Developer Experience","Over 5 years","Software Engineering",TRUE,TRUE
+"P00379","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00380","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00381","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00382","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00383","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00384","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00385","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00386","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00387","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00388","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00389","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00390","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00391","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00392","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00393","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00394","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00395","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00396","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00397","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00398","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00399","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00400","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00401","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00402","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00403","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00404","Platform","Under 2 years","Software Engineering",TRUE,FALSE
+"P00405","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00406","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00407","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00408","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00409","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00410","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00411","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00412","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00413","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00414","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00415","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00416","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00417","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00418","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00419","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00420","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00421","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00422","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00423","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00424","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00425","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00426","Platform","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00427","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00428","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00429","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00430","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00431","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00432","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00433","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00434","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00435","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00436","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00437","Mobile","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00438","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00439","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00440","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00441","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00442","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00443","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00444","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00445","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00446","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00447","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00448","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00449","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00450","Developer Experience","Over 5 years","Software Engineering",TRUE,TRUE
+"P00451","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00452","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00453","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00454","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00455","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00456","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00457","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00458","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00459","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00460","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00461","Developer Experience","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00462","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00463","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00464","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00465","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00466","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00467","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00468","Data Engineering","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00469","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00470","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00471","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00472","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00473","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00474","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00475","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00476","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00477","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00478","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00479","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00480","Developer Experience","Over 5 years","Software Engineering",TRUE,TRUE
+"P00481","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00482","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00483","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00484","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00485","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00486","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00487","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00488","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00489","Platform","Under 2 years","Software Engineering",TRUE,FALSE
+"P00490","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00491","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00492","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00493","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00494","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00495","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00496","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00497","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00498","Developer Experience","Over 5 years","Software Engineering",TRUE,TRUE
+"P00499","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00500","Developer Experience","Over 5 years","Software Engineering",TRUE,FALSE
+"P00501","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00502","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00503","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00504","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00505","Developer Experience","Under 2 years","Software Engineering",TRUE,FALSE
+"P00506","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00507","Payments","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00508","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00509","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00510","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00511","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00512","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00513","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00514","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00515","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00516","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00517","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00518","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00519","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00520","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00521","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00522","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00523","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00524","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00525","Developer Experience","Under 2 years","Software Engineering",TRUE,FALSE
+"P00526","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00527","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00528","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00529","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00530","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00531","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00532","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00533","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00534","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00535","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00536","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00537","Platform","Under 2 years","Software Engineering",TRUE,FALSE
+"P00538","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00539","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00540","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00541","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00542","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00543","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00544","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00545","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00546","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00547","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00548","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00549","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00550","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00551","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00552","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00553","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00554","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00555","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00556","Identity","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00557","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00558","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00559","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00560","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00561","Mobile","Over 5 years","Software Engineering",TRUE,FALSE
+"P00562","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00563","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00564","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00565","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00566","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00567","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00568","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00569","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00570","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00571","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00572","Platform","Over 5 years","Software Engineering",TRUE,FALSE
+"P00573","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00574","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00575","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00576","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00577","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00578","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00579","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00580","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00581","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00582","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00583","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00584","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00585","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00586","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00587","Mobile","Under 2 years","Software Engineering",TRUE,FALSE
+"P00588","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00589","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00590","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00591","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00592","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00593","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00594","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00595","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00596","Payments","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00597","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00598","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00599","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00600","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00601","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00602","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00603","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00604","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00605","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00606","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00607","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00608","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00609","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00610","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00611","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00612","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00613","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00614","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00615","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00616","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00617","Developer Experience","Under 2 years","Software Engineering",TRUE,FALSE
+"P00618","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00619","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00620","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00621","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00622","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00623","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00624","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00625","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00626","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00627","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00628","Developer Experience","Over 5 years","Software Engineering",TRUE,TRUE
+"P00629","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00630","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00631","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00632","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00633","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00634","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00635","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00636","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00637","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00638","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00639","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00640","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00641","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00642","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00643","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00644","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00645","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00646","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00647","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00648","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00649","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00650","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00651","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00652","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00653","Identity","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00654","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00655","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00656","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00657","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00658","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00659","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00660","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00661","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00662","Identity","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00663","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00664","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00665","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00666","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00667","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00668","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00669","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00670","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00671","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00672","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00673","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00674","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00675","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00676","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00677","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00678","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00679","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00680","Data Engineering","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00681","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00682","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00683","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00684","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00685","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00686","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00687","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00688","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00689","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00690","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00691","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00692","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00693","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00694","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00695","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00696","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00697","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00698","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00699","Developer Experience","Under 2 years","Software Engineering",TRUE,FALSE
+"P00700","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00701","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00702","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00703","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00704","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00705","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00706","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00707","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00708","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00709","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00710","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00711","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00712","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00713","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00714","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00715","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00716","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00717","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00718","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00719","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00720","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00721","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00722","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00723","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00724","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00725","Mobile","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00726","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00727","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00728","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00729","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00730","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00731","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00732","Platform","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00733","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00734","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00735","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00736","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00737","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00738","Platform","Under 2 years","Software Engineering",TRUE,FALSE
+"P00739","Developer Experience","Over 5 years","Software Engineering",TRUE,TRUE
+"P00740","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00741","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00742","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00743","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00744","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00745","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00746","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00747","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00748","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00749","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00750","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00751","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00752","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00753","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00754","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00755","Platform","Under 2 years","Software Engineering",TRUE,FALSE
+"P00756","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00757","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00758","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00759","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00760","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00761","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00762","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00763","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00764","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00765","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00766","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00767","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00768","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00769","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00770","Data Engineering","Over 5 years","Software Engineering",TRUE,FALSE
+"P00771","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00772","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00773","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00774","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00775","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00776","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00777","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00778","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00779","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00780","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00781","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00782","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00783","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00784","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00785","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00786","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00787","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00788","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00789","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00790","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00791","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00792","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00793","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00794","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00795","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00796","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00797","Platform","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00798","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00799","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00800","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00801","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00802","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00803","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00804","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00805","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00806","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00807","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00808","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00809","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00810","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00811","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00812","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00813","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00814","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00815","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00816","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00817","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00818","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00819","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00820","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00821","Identity","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00822","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00823","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00824","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00825","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00826","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00827","Developer Experience","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00828","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00829","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00830","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00831","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00832","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00833","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00834","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00835","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00836","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00837","Data Engineering","Under 2 years","Software Engineering",TRUE,FALSE
+"P00838","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00839","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00840","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00841","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00842","Platform","Under 2 years","Software Engineering",TRUE,FALSE
+"P00843","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00844","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00845","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00846","Mobile","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00847","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00848","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00849","Developer Experience","Over 5 years","Software Engineering",TRUE,TRUE
+"P00850","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00851","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00852","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00853","Platform","Under 2 years","Software Engineering",TRUE,FALSE
+"P00854","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00855","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00856","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00857","Payments","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00858","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00859","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00860","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00861","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00862","Platform","Over 5 years","Software Engineering",TRUE,TRUE
+"P00863","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00864","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00865","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00866","Mobile","Over 5 years","Software Engineering",TRUE,FALSE
+"P00867","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00868","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00869","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00870","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00871","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00872","Identity","Over 5 years","Software Engineering",TRUE,TRUE
+"P00873","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00874","Platform","Under 2 years","Software Engineering",TRUE,FALSE
+"P00875","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00876","Platform","Under 2 years","Software Engineering",TRUE,TRUE
+"P00877","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00878","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00879","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00880","Developer Experience","Under 2 years","Software Engineering",TRUE,TRUE
+"P00881","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00882","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00883","Platform","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00884","Data Engineering","Under 2 years","Software Engineering",TRUE,TRUE
+"P00885","Developer Experience","Over 5 years","Software Engineering",TRUE,TRUE
+"P00886","Payments","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00887","Data Engineering","Over 5 years","Software Engineering",TRUE,TRUE
+"P00888","Payments","Over 5 years","Software Engineering",TRUE,TRUE
+"P00889","Mobile","Under 2 years","Software Engineering",TRUE,TRUE
+"P00890","Platform","2 to 5 years","Software Engineering",TRUE,FALSE
+"P00891","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00892","Identity","Under 2 years","Software Engineering",TRUE,TRUE
+"P00893","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00894","Developer Experience","Over 5 years","Software Engineering",TRUE,TRUE
+"P00895","Developer Experience","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00896","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00897","Payments","Under 2 years","Software Engineering",TRUE,TRUE
+"P00898","Data Engineering","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00899","Mobile","Over 5 years","Software Engineering",TRUE,TRUE
+"P00900","Mobile","2 to 5 years","Software Engineering",TRUE,TRUE
+"P00901","Mobile","Under 2 years","Design",FALSE,FALSE
+"P00902","Developer Experience","Under 2 years","Design",FALSE,TRUE
+"P00903","Identity","2 to 5 years","Product Management",FALSE,TRUE
+"P00904","Payments","Under 2 years","Product Management",FALSE,TRUE
+"P00905","Identity","2 to 5 years","Design",FALSE,TRUE
+"P00906","Identity","Under 2 years","Product Management",FALSE,TRUE
+"P00907","Mobile","Over 5 years","Product Management",FALSE,TRUE
+"P00908","Mobile","Under 2 years","Technical Writing",FALSE,FALSE
+"P00909","Platform","2 to 5 years","Product Management",FALSE,TRUE
+"P00910","Identity","2 to 5 years","Design",FALSE,FALSE
+"P00911","Payments","Under 2 years","Product Management",FALSE,TRUE
+"P00912","Identity","Over 5 years","Design",FALSE,TRUE
+"P00913","Data Engineering","2 to 5 years","Product Management",FALSE,TRUE
+"P00914","Data Engineering","Under 2 years","Design",FALSE,TRUE
+"P00915","Payments","Over 5 years","Product Management",FALSE,TRUE
+"P00916","Platform","Over 5 years","Product Management",FALSE,FALSE
+"P00917","Mobile","Under 2 years","Product Management",FALSE,TRUE
+"P00918","Payments","2 to 5 years","Product Management",FALSE,TRUE
+"P00919","Platform","2 to 5 years","Product Management",FALSE,TRUE
+"P00920","Developer Experience","Over 5 years","Product Management",FALSE,TRUE
+"P00921","Identity","2 to 5 years","Product Management",FALSE,TRUE
+"P00922","Platform","2 to 5 years","Product Management",FALSE,TRUE
+"P00923","Mobile","Under 2 years","Product Management",FALSE,TRUE
+"P00924","Data Engineering","Over 5 years","Product Management",FALSE,TRUE
+"P00925","Mobile","2 to 5 years","Product Management",FALSE,FALSE
+"P00926","Payments","Under 2 years","Product Management",FALSE,FALSE
+"P00927","Data Engineering","2 to 5 years","Product Management",FALSE,TRUE
+"P00928","Mobile","2 to 5 years","Product Management",FALSE,FALSE
+"P00929","Payments","Over 5 years","Product Management",FALSE,TRUE
+"P00930","Data Engineering","Over 5 years","Design",FALSE,FALSE
+"P00931","Developer Experience","Over 5 years","Technical Writing",FALSE,TRUE
+"P00932","Mobile","Over 5 years","Product Management",FALSE,TRUE
+"P00933","Platform","Over 5 years","Design",FALSE,TRUE
+"P00934","Developer Experience","Over 5 years","Product Management",FALSE,TRUE
+"P00935","Platform","Under 2 years","Design",FALSE,FALSE
+"P00936","Mobile","Over 5 years","Product Management",FALSE,TRUE
+"P00937","Payments","2 to 5 years","Product Management",FALSE,FALSE
+"P00938","Data Engineering","2 to 5 years","Product Management",FALSE,TRUE
+"P00939","Developer Experience","Under 2 years","Design",FALSE,TRUE
+"P00940","Platform","Over 5 years","Product Management",FALSE,FALSE
+"P00941","Data Engineering","Over 5 years","Product Management",FALSE,TRUE
+"P00942","Platform","2 to 5 years","Technical Writing",FALSE,TRUE
+"P00943","Identity","Over 5 years","Product Management",FALSE,TRUE
+"P00944","Data Engineering","Under 2 years","Product Management",FALSE,FALSE
+"P00945","Platform","2 to 5 years","Product Management",FALSE,TRUE
+"P00946","Mobile","Over 5 years","Product Management",FALSE,TRUE
+"P00947","Payments","2 to 5 years","Technical Writing",FALSE,TRUE
+"P00948","Data Engineering","Under 2 years","Product Management",FALSE,FALSE
+"P00949","Data Engineering","2 to 5 years","Product Management",FALSE,FALSE
+"P00950","Mobile","2 to 5 years","Product Management",FALSE,FALSE
+"P00951","Identity","Under 2 years","Technical Writing",FALSE,FALSE
+"P00952","Mobile","Under 2 years","Design",FALSE,TRUE
+"P00953","Payments","2 to 5 years","Technical Writing",FALSE,TRUE
+"P00954","Platform","2 to 5 years","Technical Writing",FALSE,FALSE
+"P00955","Identity","Over 5 years","Product Management",FALSE,FALSE
+"P00956","Platform","Over 5 years","Design",FALSE,TRUE
+"P00957","Data Engineering","2 to 5 years","Design",FALSE,FALSE
+"P00958","Payments","Under 2 years","Product Management",FALSE,FALSE
+"P00959","Data Engineering","Under 2 years","Technical Writing",FALSE,FALSE
+"P00960","Data Engineering","Under 2 years","Product Management",FALSE,FALSE
+"P00961","Developer Experience","Under 2 years","Product Management",FALSE,FALSE
+"P00962","Mobile","Under 2 years","Technical Writing",FALSE,FALSE
+"P00963","Payments","Under 2 years","Design",FALSE,FALSE
+"P00964","Mobile","Over 5 years","Product Management",FALSE,TRUE
+"P00965","Identity","Over 5 years","Product Management",FALSE,TRUE
+"P00966","Identity","Over 5 years","Product Management",FALSE,FALSE
+"P00967","Identity","Under 2 years","Design",FALSE,FALSE
+"P00968","Identity","Under 2 years","Product Management",FALSE,TRUE
+"P00969","Developer Experience","Under 2 years","Design",FALSE,TRUE
+"P00970","Payments","Under 2 years","Design",FALSE,FALSE
+"P00971","Mobile","2 to 5 years","Technical Writing",FALSE,TRUE
+"P00972","Platform","2 to 5 years","Product Management",FALSE,TRUE
+"P00973","Mobile","Over 5 years","Design",FALSE,FALSE
+"P00974","Platform","Under 2 years","Technical Writing",FALSE,FALSE
+"P00975","Data Engineering","Over 5 years","Product Management",FALSE,FALSE
+"P00976","Mobile","Under 2 years","Design",FALSE,TRUE
+"P00977","Identity","2 to 5 years","Design",FALSE,FALSE
+"P00978","Payments","Under 2 years","Product Management",FALSE,FALSE
+"P00979","Mobile","Under 2 years","Product Management",FALSE,FALSE
+"P00980","Payments","2 to 5 years","Technical Writing",FALSE,TRUE
+"P00981","Payments","2 to 5 years","Product Management",FALSE,TRUE
+"P00982","Identity","2 to 5 years","Technical Writing",FALSE,FALSE
+"P00983","Identity","Over 5 years","Design",FALSE,FALSE
+"P00984","Developer Experience","2 to 5 years","Technical Writing",FALSE,TRUE
+"P00985","Mobile","Under 2 years","Product Management",FALSE,TRUE
+"P00986","Mobile","2 to 5 years","Technical Writing",FALSE,TRUE
+"P00987","Identity","Over 5 years","Design",FALSE,FALSE
+"P00988","Payments","Under 2 years","Technical Writing",FALSE,FALSE
+"P00989","Developer Experience","2 to 5 years","Product Management",FALSE,FALSE
+"P00990","Mobile","2 to 5 years","Product Management",FALSE,TRUE
+"P00991","Mobile","Under 2 years","Technical Writing",FALSE,FALSE
+"P00992","Data Engineering","2 to 5 years","Design",FALSE,FALSE
+"P00993","Payments","Over 5 years","Design",FALSE,TRUE
+"P00994","Mobile","Under 2 years","Product Management",FALSE,TRUE
+"P00995","Mobile","Under 2 years","Product Management",FALSE,FALSE
+"P00996","Platform","2 to 5 years","Product Management",FALSE,TRUE
+"P00997","Payments","Over 5 years","Design",FALSE,TRUE
+"P00998","Data Engineering","Over 5 years","Product Management",FALSE,TRUE
+"P00999","Payments","Over 5 years","Design",FALSE,TRUE
+"P01000","Data Engineering","2 to 5 years","Product Management",FALSE,FALSE
+"P01001","Payments","2 to 5 years","Product Management",FALSE,FALSE
+"P01002","Data Engineering","2 to 5 years","Design",FALSE,TRUE
+"P01003","Data Engineering","Under 2 years","Product Management",FALSE,TRUE
+"P01004","Platform","2 to 5 years","Product Management",FALSE,FALSE
+"P01005","Identity","Under 2 years","Product Management",FALSE,TRUE
+"P01006","Payments","2 to 5 years","Product Management",FALSE,FALSE
+"P01007","Mobile","2 to 5 years","Design",FALSE,FALSE
+"P01008","Data Engineering","Under 2 years","Design",FALSE,TRUE
+"P01009","Platform","2 to 5 years","Product Management",FALSE,FALSE
+"P01010","Data Engineering","2 to 5 years","Design",FALSE,TRUE
+"P01011","Data Engineering","2 to 5 years","Product Management",FALSE,FALSE
+"P01012","Mobile","2 to 5 years","Technical Writing",FALSE,FALSE
+"P01013","Platform","Over 5 years","Product Management",FALSE,FALSE
+"P01014","Platform","2 to 5 years","Product Management",FALSE,FALSE
+"P01015","Data Engineering","Over 5 years","Product Management",FALSE,TRUE
+"P01016","Data Engineering","2 to 5 years","Product Management",FALSE,TRUE
+"P01017","Platform","2 to 5 years","Design",FALSE,FALSE
+"P01018","Identity","2 to 5 years","Product Management",FALSE,TRUE
+"P01019","Platform","2 to 5 years","Product Management",FALSE,TRUE
+"P01020","Data Engineering","2 to 5 years","Design",FALSE,TRUE
+"P01021","Identity","2 to 5 years","Product Management",FALSE,TRUE
+"P01022","Payments","Under 2 years","Product Management",FALSE,TRUE
+"P01023","Data Engineering","Under 2 years","Design",FALSE,TRUE
+"P01024","Platform","Under 2 years","Design",FALSE,FALSE
+"P01025","Data Engineering","2 to 5 years","Product Management",FALSE,TRUE
+"P01026","Identity","Over 5 years","Product Management",FALSE,FALSE
+"P01027","Mobile","2 to 5 years","Product Management",FALSE,FALSE
+"P01028","Mobile","Under 2 years","Product Management",FALSE,TRUE
+"P01029","Payments","2 to 5 years","Product Management",FALSE,FALSE
+"P01030","Payments","Over 5 years","Product Management",FALSE,TRUE
+"P01031","Data Engineering","2 to 5 years","Product Management",FALSE,FALSE
+"P01032","Mobile","Under 2 years","Design",FALSE,TRUE
+"P01033","Payments","Over 5 years","Product Management",FALSE,FALSE
+"P01034","Payments","Over 5 years","Product Management",FALSE,TRUE
+"P01035","Payments","Under 2 years","Technical Writing",FALSE,TRUE
+"P01036","Platform","2 to 5 years","Product Management",FALSE,TRUE
+"P01037","Platform","Under 2 years","Product Management",FALSE,TRUE
+"P01038","Developer Experience","2 to 5 years","Product Management",FALSE,TRUE
+"P01039","Identity","Over 5 years","Design",FALSE,FALSE
+"P01040","Payments","Under 2 years","Product Management",FALSE,FALSE
+"P01041","Mobile","Under 2 years","Design",FALSE,FALSE
+"P01042","Payments","2 to 5 years","Product Management",FALSE,FALSE
+"P01043","Platform","2 to 5 years","Product Management",FALSE,TRUE
+"P01044","Platform","2 to 5 years","Design",FALSE,FALSE
+"P01045","Developer Experience","Under 2 years","Technical Writing",FALSE,TRUE
+"P01046","Payments","Over 5 years","Product Management",FALSE,FALSE
+"P01047","Data Engineering","Under 2 years","Product Management",FALSE,TRUE
+"P01048","Developer Experience","2 to 5 years","Design",FALSE,TRUE
+"P01049","Payments","Under 2 years","Design",FALSE,TRUE
+"P01050","Data Engineering","Over 5 years","Product Management",FALSE,TRUE
+"P01051","Platform","2 to 5 years","Product Management",FALSE,TRUE
+"P01052","Developer Experience","Under 2 years","Product Management",FALSE,FALSE
+"P01053","Data Engineering","Under 2 years","Technical Writing",FALSE,TRUE
+"P01054","Mobile","Under 2 years","Product Management",FALSE,TRUE
+"P01055","Platform","Under 2 years","Design",FALSE,FALSE
+"P01056","Payments","Over 5 years","Design",FALSE,TRUE
+"P01057","Mobile","2 to 5 years","Product Management",FALSE,TRUE
+"P01058","Identity","2 to 5 years","Design",FALSE,FALSE
+"P01059","Data Engineering","Over 5 years","Design",FALSE,TRUE
+"P01060","Platform","2 to 5 years","Product Management",FALSE,FALSE
+"P01061","Identity","2 to 5 years","Product Management",FALSE,TRUE
+"P01062","Developer Experience","Over 5 years","Product Management",FALSE,FALSE
+"P01063","Payments","2 to 5 years","Technical Writing",FALSE,TRUE
+"P01064","Platform","Under 2 years","Product Management",FALSE,FALSE
+"P01065","Platform","Over 5 years","Product Management",FALSE,TRUE
+"P01066","Platform","Over 5 years","Product Management",FALSE,TRUE
+"P01067","Mobile","2 to 5 years","Product Management",FALSE,TRUE
+"P01068","Data Engineering","Under 2 years","Product Management",FALSE,FALSE
+"P01069","Mobile","Under 2 years","Product Management",FALSE,TRUE
+"P01070","Payments","Under 2 years","Product Management",FALSE,FALSE
+"P01071","Developer Experience","2 to 5 years","Design",FALSE,FALSE
+"P01072","Data Engineering","Under 2 years","Design",FALSE,TRUE
+"P01073","Data Engineering","2 to 5 years","Product Management",FALSE,FALSE
+"P01074","Developer Experience","Under 2 years","Design",FALSE,TRUE
+"P01075","Mobile","2 to 5 years","Product Management",FALSE,TRUE
+"P01076","Platform","2 to 5 years","Design",FALSE,TRUE
+"P01077","Mobile","2 to 5 years","Technical Writing",FALSE,TRUE
+"P01078","Platform","Under 2 years","Technical Writing",FALSE,TRUE
+"P01079","Payments","Under 2 years","Technical Writing",FALSE,FALSE
+"P01080","Mobile","Under 2 years","Product Management",FALSE,FALSE

@@ -60,6 +60,8 @@ Explore the repo to discover sample code:
 - [Scanning Many Metrics with a Difference-in-Differences Model in R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/did-metric-scan.Rmd)
 - [Within-Person Event-Study & Difference-in-Differences in Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/event-study-did.py)
 - [Within-Person Event-Study & Difference-in-Differences in R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/event-study-did.Rmd)
+- [Combining a Consumption query with a Person Query for Ways of Working analysis - R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-ways-of-working-simulation.Rmd)
+- [Combining a GitHub Copilot query with a Person Query for Developer Productivity analysis - R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/github-copilot-developer-productivity-simulation.Rmd)
 
 ### Other
 
