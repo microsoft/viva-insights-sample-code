@@ -1,0 +1,1081 @@
+"PersonId","IsDeveloper","Team","Role","Seniority","Tenure","GH_eligible","M365_eligible"
+"SYN00001",TRUE,"Mobile","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00002",TRUE,"Payments","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00003",TRUE,"Mobile","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,FALSE
+"SYN00004",TRUE,"Platform","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00005",TRUE,"Developer Experience","Engineering management","Experienced","Under 2 years",TRUE,FALSE
+"SYN00006",TRUE,"Platform","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00007",TRUE,"Identity","Infrastructure engineering","Experienced","Under 2 years",TRUE,FALSE
+"SYN00008",TRUE,"Platform","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00009",TRUE,"Platform","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00010",TRUE,"Data Engineering","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00011",TRUE,"Payments","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00012",TRUE,"Mobile","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00013",TRUE,"Mobile","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00014",TRUE,"Data Engineering","Engineering management","Early career","2 to 5 years",TRUE,TRUE
+"SYN00015",TRUE,"Developer Experience","Infrastructure engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00016",TRUE,"Data Engineering","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00017",TRUE,"Mobile","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00018",TRUE,"Identity","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00019",TRUE,"Mobile","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00020",TRUE,"Payments","Engineering management","Experienced","Over 5 years",TRUE,TRUE
+"SYN00021",TRUE,"Identity","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00022",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00023",TRUE,"Identity","Application engineering","Early career","2 to 5 years",FALSE,TRUE
+"SYN00024",TRUE,"Platform","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00025",TRUE,"Payments","Engineering management","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00026",TRUE,"Payments","Application engineering","Experienced","Under 2 years",TRUE,FALSE
+"SYN00027",TRUE,"Identity","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00028",TRUE,"Identity","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00029",TRUE,"Mobile","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00030",TRUE,"Identity","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00031",TRUE,"Developer Experience","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00032",TRUE,"Payments","Engineering management","Early career","Under 2 years",TRUE,FALSE
+"SYN00033",TRUE,"Platform","Application engineering","Early career","Under 2 years",TRUE,FALSE
+"SYN00034",TRUE,"Mobile","Infrastructure engineering","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00035",TRUE,"Identity","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00036",TRUE,"Developer Experience","Infrastructure engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00037",TRUE,"Data Engineering","Engineering management","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00038",TRUE,"Data Engineering","Engineering management","Early career","Over 5 years",TRUE,TRUE
+"SYN00039",TRUE,"Platform","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00040",TRUE,"Developer Experience","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00041",TRUE,"Platform","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00042",TRUE,"Developer Experience","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00043",TRUE,"Payments","Engineering management","Early career","Over 5 years",TRUE,TRUE
+"SYN00044",TRUE,"Payments","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00045",TRUE,"Developer Experience","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00046",TRUE,"Identity","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00047",TRUE,"Mobile","Infrastructure engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00048",TRUE,"Mobile","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00049",TRUE,"Identity","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00050",TRUE,"Data Engineering","Application engineering","Experienced","2 to 5 years",FALSE,TRUE
+"SYN00051",TRUE,"Data Engineering","Application engineering","Senior / lead","2 to 5 years",TRUE,FALSE
+"SYN00052",TRUE,"Platform","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00053",TRUE,"Payments","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00054",TRUE,"Identity","Engineering management","Early career","Over 5 years",TRUE,TRUE
+"SYN00055",TRUE,"Developer Experience","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00056",TRUE,"Developer Experience","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00057",TRUE,"Developer Experience","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00058",TRUE,"Developer Experience","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00059",TRUE,"Developer Experience","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00060",TRUE,"Data Engineering","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00061",TRUE,"Developer Experience","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00062",TRUE,"Mobile","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00063",TRUE,"Platform","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00064",TRUE,"Platform","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00065",TRUE,"Payments","Engineering management","Early career","Over 5 years",TRUE,TRUE
+"SYN00066",TRUE,"Payments","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00067",TRUE,"Data Engineering","Engineering management","Early career","2 to 5 years",TRUE,FALSE
+"SYN00068",TRUE,"Platform","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00069",TRUE,"Data Engineering","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00070",TRUE,"Mobile","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00071",TRUE,"Payments","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00072",TRUE,"Data Engineering","Infrastructure engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00073",TRUE,"Platform","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00074",TRUE,"Data Engineering","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00075",TRUE,"Identity","Engineering management","Early career","2 to 5 years",TRUE,TRUE
+"SYN00076",TRUE,"Payments","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00077",TRUE,"Identity","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00078",TRUE,"Identity","Application engineering","Early career","Under 2 years",FALSE,TRUE
+"SYN00079",TRUE,"Developer Experience","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00080",TRUE,"Platform","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00081",TRUE,"Data Engineering","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00082",TRUE,"Payments","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00083",TRUE,"Payments","Engineering management","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00084",TRUE,"Mobile","Engineering management","Early career","Under 2 years",TRUE,FALSE
+"SYN00085",TRUE,"Payments","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00086",TRUE,"Platform","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00087",TRUE,"Developer Experience","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00088",TRUE,"Platform","Engineering management","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00089",TRUE,"Payments","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00090",TRUE,"Mobile","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00091",TRUE,"Platform","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00092",TRUE,"Identity","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00093",TRUE,"Platform","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00094",TRUE,"Data Engineering","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00095",TRUE,"Mobile","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00096",TRUE,"Identity","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00097",TRUE,"Data Engineering","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00098",TRUE,"Mobile","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00099",TRUE,"Identity","Engineering management","Experienced","Over 5 years",TRUE,TRUE
+"SYN00100",TRUE,"Data Engineering","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00101",TRUE,"Identity","Infrastructure engineering","Experienced","2 to 5 years",FALSE,TRUE
+"SYN00102",TRUE,"Platform","Infrastructure engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00103",TRUE,"Mobile","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00104",TRUE,"Data Engineering","Application engineering","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00105",TRUE,"Payments","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00106",TRUE,"Payments","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00107",TRUE,"Payments","Engineering management","Experienced","Over 5 years",TRUE,TRUE
+"SYN00108",TRUE,"Mobile","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00109",TRUE,"Mobile","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00110",TRUE,"Identity","Infrastructure engineering","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00111",TRUE,"Platform","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00112",TRUE,"Platform","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00113",TRUE,"Platform","Application engineering","Experienced","2 to 5 years",FALSE,TRUE
+"SYN00114",TRUE,"Mobile","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00115",TRUE,"Mobile","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00116",TRUE,"Payments","Engineering management","Early career","2 to 5 years",TRUE,TRUE
+"SYN00117",TRUE,"Mobile","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00118",TRUE,"Mobile","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00119",TRUE,"Data Engineering","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00120",TRUE,"Identity","Engineering management","Early career","2 to 5 years",TRUE,TRUE
+"SYN00121",TRUE,"Identity","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00122",TRUE,"Payments","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00123",TRUE,"Platform","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00124",TRUE,"Platform","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00125",TRUE,"Mobile","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00126",TRUE,"Mobile","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00127",TRUE,"Payments","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00128",TRUE,"Developer Experience","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00129",TRUE,"Data Engineering","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00130",TRUE,"Payments","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00131",TRUE,"Platform","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00132",TRUE,"Platform","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00133",TRUE,"Platform","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00134",TRUE,"Payments","Application engineering","Experienced","Over 5 years",TRUE,FALSE
+"SYN00135",TRUE,"Data Engineering","Infrastructure engineering","Experienced","Over 5 years",TRUE,FALSE
+"SYN00136",TRUE,"Data Engineering","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00137",TRUE,"Platform","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00138",TRUE,"Identity","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00139",TRUE,"Platform","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00140",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00141",TRUE,"Identity","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00142",TRUE,"Developer Experience","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00143",TRUE,"Data Engineering","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00144",TRUE,"Mobile","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00145",TRUE,"Data Engineering","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00146",TRUE,"Mobile","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00147",TRUE,"Payments","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00148",TRUE,"Mobile","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00149",TRUE,"Platform","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00150",TRUE,"Payments","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00151",TRUE,"Data Engineering","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00152",TRUE,"Platform","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00153",TRUE,"Developer Experience","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00154",TRUE,"Payments","Engineering management","Senior / lead","2 to 5 years",FALSE,FALSE
+"SYN00155",TRUE,"Mobile","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00156",TRUE,"Payments","Infrastructure engineering","Early career","2 to 5 years",FALSE,TRUE
+"SYN00157",TRUE,"Data Engineering","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00158",TRUE,"Platform","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00159",TRUE,"Developer Experience","Engineering management","Senior / lead","2 to 5 years",TRUE,FALSE
+"SYN00160",TRUE,"Platform","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00161",TRUE,"Data Engineering","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00162",TRUE,"Platform","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00163",TRUE,"Payments","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00164",TRUE,"Data Engineering","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00165",TRUE,"Data Engineering","Application engineering","Senior / lead","2 to 5 years",FALSE,TRUE
+"SYN00166",TRUE,"Mobile","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00167",TRUE,"Developer Experience","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00168",TRUE,"Payments","Infrastructure engineering","Early career","Under 2 years",TRUE,FALSE
+"SYN00169",TRUE,"Payments","Application engineering","Experienced","Under 2 years",TRUE,FALSE
+"SYN00170",TRUE,"Identity","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00171",TRUE,"Developer Experience","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00172",TRUE,"Payments","Engineering management","Early career","2 to 5 years",FALSE,FALSE
+"SYN00173",TRUE,"Payments","Infrastructure engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00174",TRUE,"Identity","Infrastructure engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00175",TRUE,"Data Engineering","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00176",TRUE,"Platform","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00177",TRUE,"Developer Experience","Engineering management","Experienced","Over 5 years",TRUE,TRUE
+"SYN00178",TRUE,"Payments","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00179",TRUE,"Payments","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00180",TRUE,"Developer Experience","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00181",TRUE,"Payments","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00182",TRUE,"Data Engineering","Application engineering","Experienced","Under 2 years",FALSE,TRUE
+"SYN00183",TRUE,"Identity","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00184",TRUE,"Payments","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00185",TRUE,"Data Engineering","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00186",TRUE,"Identity","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00187",TRUE,"Platform","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00188",TRUE,"Payments","Infrastructure engineering","Experienced","Under 2 years",FALSE,FALSE
+"SYN00189",TRUE,"Payments","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00190",TRUE,"Mobile","Engineering management","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00191",TRUE,"Mobile","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00192",TRUE,"Payments","Infrastructure engineering","Early career","2 to 5 years",TRUE,FALSE
+"SYN00193",TRUE,"Platform","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00194",TRUE,"Payments","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00195",TRUE,"Platform","Engineering management","Experienced","Over 5 years",TRUE,TRUE
+"SYN00196",TRUE,"Mobile","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00197",TRUE,"Identity","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00198",TRUE,"Mobile","Engineering management","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00199",TRUE,"Identity","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00200",TRUE,"Mobile","Infrastructure engineering","Experienced","Under 2 years",TRUE,FALSE
+"SYN00201",TRUE,"Mobile","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00202",TRUE,"Mobile","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00203",TRUE,"Payments","Engineering management","Experienced","Under 2 years",TRUE,FALSE
+"SYN00204",TRUE,"Mobile","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,FALSE
+"SYN00205",TRUE,"Data Engineering","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00206",TRUE,"Mobile","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00207",TRUE,"Identity","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00208",TRUE,"Data Engineering","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00209",TRUE,"Developer Experience","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00210",TRUE,"Platform","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00211",TRUE,"Payments","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00212",TRUE,"Platform","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00213",TRUE,"Payments","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00214",TRUE,"Data Engineering","Application engineering","Senior / lead","2 to 5 years",FALSE,TRUE
+"SYN00215",TRUE,"Data Engineering","Application engineering","Experienced","Under 2 years",TRUE,FALSE
+"SYN00216",TRUE,"Data Engineering","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00217",TRUE,"Data Engineering","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00218",TRUE,"Developer Experience","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00219",TRUE,"Mobile","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00220",TRUE,"Payments","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00221",TRUE,"Payments","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00222",TRUE,"Identity","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00223",TRUE,"Mobile","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00224",TRUE,"Data Engineering","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00225",TRUE,"Platform","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00226",TRUE,"Data Engineering","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00227",TRUE,"Data Engineering","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00228",TRUE,"Platform","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00229",TRUE,"Mobile","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00230",TRUE,"Payments","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00231",TRUE,"Payments","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00232",TRUE,"Data Engineering","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00233",TRUE,"Developer Experience","Engineering management","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00234",TRUE,"Developer Experience","Engineering management","Early career","Over 5 years",TRUE,TRUE
+"SYN00235",TRUE,"Data Engineering","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00236",TRUE,"Platform","Application engineering","Early career","2 to 5 years",FALSE,TRUE
+"SYN00237",TRUE,"Identity","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00238",TRUE,"Developer Experience","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00239",TRUE,"Platform","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00240",TRUE,"Platform","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00241",TRUE,"Data Engineering","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00242",TRUE,"Data Engineering","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00243",TRUE,"Data Engineering","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00244",TRUE,"Mobile","Engineering management","Experienced","Over 5 years",TRUE,FALSE
+"SYN00245",TRUE,"Payments","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00246",TRUE,"Identity","Infrastructure engineering","Senior / lead","2 to 5 years",FALSE,TRUE
+"SYN00247",TRUE,"Mobile","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00248",TRUE,"Platform","Infrastructure engineering","Early career","Under 2 years",FALSE,TRUE
+"SYN00249",TRUE,"Mobile","Infrastructure engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00250",TRUE,"Platform","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00251",TRUE,"Platform","Application engineering","Early career","2 to 5 years",TRUE,FALSE
+"SYN00252",TRUE,"Payments","Engineering management","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00253",TRUE,"Identity","Infrastructure engineering","Experienced","Under 2 years",TRUE,FALSE
+"SYN00254",TRUE,"Identity","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00255",TRUE,"Identity","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00256",TRUE,"Identity","Engineering management","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00257",TRUE,"Developer Experience","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00258",TRUE,"Identity","Engineering management","Early career","2 to 5 years",TRUE,TRUE
+"SYN00259",TRUE,"Identity","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00260",TRUE,"Developer Experience","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00261",TRUE,"Payments","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00262",TRUE,"Data Engineering","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00263",TRUE,"Mobile","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00264",TRUE,"Data Engineering","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00265",TRUE,"Mobile","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00266",TRUE,"Platform","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00267",TRUE,"Data Engineering","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00268",TRUE,"Identity","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,FALSE
+"SYN00269",TRUE,"Payments","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00270",TRUE,"Identity","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00271",TRUE,"Data Engineering","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00272",TRUE,"Identity","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00273",TRUE,"Identity","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00274",TRUE,"Identity","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00275",TRUE,"Identity","Infrastructure engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00276",TRUE,"Data Engineering","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00277",TRUE,"Platform","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00278",TRUE,"Data Engineering","Application engineering","Senior / lead","2 to 5 years",TRUE,FALSE
+"SYN00279",TRUE,"Developer Experience","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00280",TRUE,"Platform","Infrastructure engineering","Experienced","Under 2 years",TRUE,FALSE
+"SYN00281",TRUE,"Identity","Application engineering","Senior / lead","Under 2 years",TRUE,FALSE
+"SYN00282",TRUE,"Mobile","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00283",TRUE,"Platform","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00284",TRUE,"Identity","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00285",TRUE,"Platform","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00286",TRUE,"Payments","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00287",TRUE,"Mobile","Infrastructure engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00288",TRUE,"Payments","Infrastructure engineering","Senior / lead","2 to 5 years",FALSE,TRUE
+"SYN00289",TRUE,"Platform","Engineering management","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00290",TRUE,"Data Engineering","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00291",TRUE,"Payments","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00292",TRUE,"Data Engineering","Infrastructure engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00293",TRUE,"Data Engineering","Engineering management","Experienced","Over 5 years",TRUE,TRUE
+"SYN00294",TRUE,"Platform","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00295",TRUE,"Payments","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00296",TRUE,"Payments","Application engineering","Senior / lead","2 to 5 years",TRUE,FALSE
+"SYN00297",TRUE,"Identity","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00298",TRUE,"Mobile","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00299",TRUE,"Data Engineering","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00300",TRUE,"Platform","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00301",TRUE,"Payments","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00302",TRUE,"Platform","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00303",TRUE,"Payments","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00304",TRUE,"Mobile","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00305",TRUE,"Payments","Engineering management","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00306",TRUE,"Platform","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00307",TRUE,"Identity","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00308",TRUE,"Data Engineering","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00309",TRUE,"Identity","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00310",TRUE,"Identity","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00311",TRUE,"Developer Experience","Engineering management","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00312",TRUE,"Identity","Application engineering","Early career","2 to 5 years",FALSE,TRUE
+"SYN00313",TRUE,"Identity","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00314",TRUE,"Developer Experience","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00315",TRUE,"Identity","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00316",TRUE,"Developer Experience","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00317",TRUE,"Identity","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00318",TRUE,"Payments","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00319",TRUE,"Payments","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00320",TRUE,"Identity","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00321",TRUE,"Mobile","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00322",TRUE,"Payments","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00323",TRUE,"Developer Experience","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00324",TRUE,"Payments","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00325",TRUE,"Developer Experience","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00326",TRUE,"Mobile","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00327",TRUE,"Data Engineering","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00328",TRUE,"Mobile","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00329",TRUE,"Developer Experience","Engineering management","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00330",TRUE,"Identity","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00331",TRUE,"Payments","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00332",TRUE,"Payments","Engineering management","Senior / lead","Under 2 years",TRUE,FALSE
+"SYN00333",TRUE,"Developer Experience","Infrastructure engineering","Experienced","Under 2 years",FALSE,TRUE
+"SYN00334",TRUE,"Mobile","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00335",TRUE,"Mobile","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00336",TRUE,"Payments","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00337",TRUE,"Payments","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00338",TRUE,"Data Engineering","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00339",TRUE,"Platform","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00340",TRUE,"Identity","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00341",TRUE,"Payments","Infrastructure engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00342",TRUE,"Mobile","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00343",TRUE,"Identity","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00344",TRUE,"Identity","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00345",TRUE,"Payments","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00346",TRUE,"Platform","Application engineering","Senior / lead","Under 2 years",TRUE,FALSE
+"SYN00347",TRUE,"Platform","Engineering management","Early career","Over 5 years",TRUE,TRUE
+"SYN00348",TRUE,"Platform","Application engineering","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00349",TRUE,"Platform","Engineering management","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00350",TRUE,"Developer Experience","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00351",TRUE,"Platform","Engineering management","Early career","2 to 5 years",TRUE,FALSE
+"SYN00352",TRUE,"Mobile","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00353",TRUE,"Identity","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00354",TRUE,"Platform","Infrastructure engineering","Early career","2 to 5 years",FALSE,TRUE
+"SYN00355",TRUE,"Payments","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00356",TRUE,"Data Engineering","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00357",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00358",TRUE,"Data Engineering","Infrastructure engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00359",TRUE,"Platform","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00360",TRUE,"Platform","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00361",TRUE,"Developer Experience","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00362",TRUE,"Data Engineering","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00363",TRUE,"Developer Experience","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00364",TRUE,"Developer Experience","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00365",TRUE,"Data Engineering","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00366",TRUE,"Identity","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00367",TRUE,"Platform","Application engineering","Early career","Over 5 years",TRUE,FALSE
+"SYN00368",TRUE,"Mobile","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00369",TRUE,"Mobile","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00370",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00371",TRUE,"Mobile","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00372",TRUE,"Identity","Infrastructure engineering","Senior / lead","Over 5 years",FALSE,TRUE
+"SYN00373",TRUE,"Identity","Infrastructure engineering","Early career","2 to 5 years",TRUE,FALSE
+"SYN00374",TRUE,"Data Engineering","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00375",TRUE,"Developer Experience","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00376",TRUE,"Identity","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00377",TRUE,"Developer Experience","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00378",TRUE,"Payments","Application engineering","Senior / lead","2 to 5 years",TRUE,FALSE
+"SYN00379",TRUE,"Mobile","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00380",TRUE,"Developer Experience","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00381",TRUE,"Identity","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00382",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00383",TRUE,"Identity","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00384",TRUE,"Platform","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00385",TRUE,"Data Engineering","Infrastructure engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00386",TRUE,"Platform","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00387",TRUE,"Identity","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00388",TRUE,"Data Engineering","Application engineering","Senior / lead","Under 2 years",TRUE,FALSE
+"SYN00389",TRUE,"Identity","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00390",TRUE,"Mobile","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00391",TRUE,"Payments","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00392",TRUE,"Developer Experience","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00393",TRUE,"Data Engineering","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00394",TRUE,"Platform","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00395",TRUE,"Platform","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00396",TRUE,"Mobile","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00397",TRUE,"Identity","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00398",TRUE,"Platform","Infrastructure engineering","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00399",TRUE,"Platform","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00400",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00401",TRUE,"Developer Experience","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00402",TRUE,"Data Engineering","Engineering management","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00403",TRUE,"Data Engineering","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00404",TRUE,"Mobile","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00405",TRUE,"Data Engineering","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00406",TRUE,"Developer Experience","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00407",TRUE,"Identity","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00408",TRUE,"Identity","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00409",TRUE,"Developer Experience","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00410",TRUE,"Platform","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00411",TRUE,"Payments","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00412",TRUE,"Payments","Engineering management","Experienced","Over 5 years",TRUE,TRUE
+"SYN00413",TRUE,"Mobile","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00414",TRUE,"Data Engineering","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00415",TRUE,"Mobile","Engineering management","Early career","Over 5 years",TRUE,FALSE
+"SYN00416",TRUE,"Developer Experience","Engineering management","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00417",TRUE,"Platform","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00418",TRUE,"Developer Experience","Engineering management","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00419",TRUE,"Mobile","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00420",TRUE,"Mobile","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00421",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00422",TRUE,"Platform","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00423",TRUE,"Developer Experience","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00424",TRUE,"Mobile","Infrastructure engineering","Experienced","Under 2 years",FALSE,TRUE
+"SYN00425",TRUE,"Data Engineering","Infrastructure engineering","Experienced","Under 2 years",FALSE,TRUE
+"SYN00426",TRUE,"Platform","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00427",TRUE,"Developer Experience","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00428",TRUE,"Platform","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00429",TRUE,"Developer Experience","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00430",TRUE,"Developer Experience","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00431",TRUE,"Developer Experience","Engineering management","Early career","Over 5 years",TRUE,TRUE
+"SYN00432",TRUE,"Developer Experience","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00433",TRUE,"Platform","Infrastructure engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00434",TRUE,"Mobile","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00435",TRUE,"Mobile","Infrastructure engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00436",TRUE,"Mobile","Engineering management","Early career","2 to 5 years",TRUE,TRUE
+"SYN00437",TRUE,"Data Engineering","Application engineering","Experienced","Under 2 years",FALSE,TRUE
+"SYN00438",TRUE,"Data Engineering","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00439",TRUE,"Platform","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00440",TRUE,"Payments","Infrastructure engineering","Early career","2 to 5 years",FALSE,TRUE
+"SYN00441",TRUE,"Developer Experience","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00442",TRUE,"Payments","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00443",TRUE,"Developer Experience","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00444",TRUE,"Data Engineering","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00445",TRUE,"Identity","Infrastructure engineering","Senior / lead","Under 2 years",FALSE,TRUE
+"SYN00446",TRUE,"Payments","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00447",TRUE,"Developer Experience","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00448",TRUE,"Platform","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00449",TRUE,"Platform","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00450",TRUE,"Developer Experience","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00451",TRUE,"Data Engineering","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00452",TRUE,"Payments","Application engineering","Experienced","Over 5 years",TRUE,FALSE
+"SYN00453",TRUE,"Mobile","Application engineering","Early career","2 to 5 years",FALSE,TRUE
+"SYN00454",TRUE,"Mobile","Application engineering","Senior / lead","2 to 5 years",FALSE,TRUE
+"SYN00455",TRUE,"Identity","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00456",TRUE,"Mobile","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00457",TRUE,"Payments","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00458",TRUE,"Payments","Engineering management","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00459",TRUE,"Data Engineering","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00460",TRUE,"Identity","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00461",TRUE,"Identity","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00462",TRUE,"Identity","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00463",TRUE,"Developer Experience","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00464",TRUE,"Identity","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,FALSE
+"SYN00465",TRUE,"Platform","Engineering management","Early career","2 to 5 years",FALSE,TRUE
+"SYN00466",TRUE,"Payments","Engineering management","Experienced","Over 5 years",TRUE,TRUE
+"SYN00467",TRUE,"Identity","Engineering management","Early career","2 to 5 years",TRUE,TRUE
+"SYN00468",TRUE,"Identity","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00469",TRUE,"Platform","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00470",TRUE,"Payments","Engineering management","Senior / lead","2 to 5 years",TRUE,FALSE
+"SYN00471",TRUE,"Mobile","Infrastructure engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00472",TRUE,"Mobile","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00473",TRUE,"Developer Experience","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00474",TRUE,"Payments","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00475",TRUE,"Mobile","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00476",TRUE,"Identity","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00477",TRUE,"Identity","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00478",TRUE,"Identity","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00479",TRUE,"Identity","Infrastructure engineering","Experienced","2 to 5 years",FALSE,TRUE
+"SYN00480",TRUE,"Payments","Infrastructure engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00481",TRUE,"Data Engineering","Engineering management","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00482",TRUE,"Developer Experience","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00483",TRUE,"Mobile","Engineering management","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00484",TRUE,"Identity","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00485",TRUE,"Payments","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00486",TRUE,"Payments","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00487",TRUE,"Identity","Application engineering","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00488",TRUE,"Mobile","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00489",TRUE,"Payments","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00490",TRUE,"Platform","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00491",TRUE,"Developer Experience","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00492",TRUE,"Platform","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00493",TRUE,"Identity","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00494",TRUE,"Platform","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00495",TRUE,"Payments","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00496",TRUE,"Payments","Engineering management","Experienced","Over 5 years",TRUE,TRUE
+"SYN00497",TRUE,"Developer Experience","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00498",TRUE,"Identity","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00499",TRUE,"Identity","Engineering management","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00500",TRUE,"Data Engineering","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00501",TRUE,"Developer Experience","Infrastructure engineering","Early career","2 to 5 years",FALSE,TRUE
+"SYN00502",TRUE,"Mobile","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00503",TRUE,"Payments","Infrastructure engineering","Experienced","Over 5 years",TRUE,FALSE
+"SYN00504",TRUE,"Identity","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00505",TRUE,"Data Engineering","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00506",TRUE,"Mobile","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00507",TRUE,"Data Engineering","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00508",TRUE,"Payments","Infrastructure engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00509",TRUE,"Data Engineering","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00510",TRUE,"Data Engineering","Application engineering","Experienced","Under 2 years",FALSE,TRUE
+"SYN00511",TRUE,"Identity","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00512",TRUE,"Mobile","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00513",TRUE,"Mobile","Engineering management","Experienced","Under 2 years",FALSE,TRUE
+"SYN00514",TRUE,"Platform","Infrastructure engineering","Early career","Under 2 years",TRUE,FALSE
+"SYN00515",TRUE,"Data Engineering","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00516",TRUE,"Mobile","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00517",TRUE,"Mobile","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00518",TRUE,"Platform","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00519",TRUE,"Mobile","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00520",TRUE,"Developer Experience","Engineering management","Early career","Under 2 years",FALSE,TRUE
+"SYN00521",TRUE,"Mobile","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00522",TRUE,"Data Engineering","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00523",TRUE,"Payments","Application engineering","Senior / lead","2 to 5 years",FALSE,TRUE
+"SYN00524",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00525",TRUE,"Mobile","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00526",TRUE,"Data Engineering","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00527",TRUE,"Platform","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00528",TRUE,"Platform","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00529",TRUE,"Payments","Application engineering","Experienced","2 to 5 years",FALSE,TRUE
+"SYN00530",TRUE,"Developer Experience","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00531",TRUE,"Payments","Application engineering","Senior / lead","Under 2 years",TRUE,FALSE
+"SYN00532",TRUE,"Mobile","Application engineering","Experienced","Over 5 years",FALSE,TRUE
+"SYN00533",TRUE,"Platform","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00534",TRUE,"Data Engineering","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00535",TRUE,"Developer Experience","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00536",TRUE,"Payments","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00537",TRUE,"Payments","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00538",TRUE,"Developer Experience","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00539",TRUE,"Platform","Engineering management","Early career","Over 5 years",TRUE,FALSE
+"SYN00540",TRUE,"Data Engineering","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00541",TRUE,"Mobile","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00542",TRUE,"Developer Experience","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00543",TRUE,"Payments","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00544",TRUE,"Mobile","Engineering management","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00545",TRUE,"Developer Experience","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00546",TRUE,"Developer Experience","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00547",TRUE,"Payments","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00548",TRUE,"Mobile","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00549",TRUE,"Platform","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00550",TRUE,"Identity","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00551",TRUE,"Developer Experience","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00552",TRUE,"Payments","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00553",TRUE,"Identity","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00554",TRUE,"Developer Experience","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00555",TRUE,"Developer Experience","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00556",TRUE,"Mobile","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00557",TRUE,"Platform","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00558",TRUE,"Payments","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00559",TRUE,"Identity","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00560",TRUE,"Payments","Infrastructure engineering","Early career","Over 5 years",FALSE,TRUE
+"SYN00561",TRUE,"Mobile","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00562",TRUE,"Payments","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00563",TRUE,"Developer Experience","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00564",TRUE,"Data Engineering","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00565",TRUE,"Mobile","Engineering management","Senior / lead","2 to 5 years",TRUE,FALSE
+"SYN00566",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00567",TRUE,"Data Engineering","Engineering management","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00568",TRUE,"Mobile","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00569",TRUE,"Mobile","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00570",TRUE,"Identity","Engineering management","Early career","2 to 5 years",TRUE,FALSE
+"SYN00571",TRUE,"Developer Experience","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00572",TRUE,"Data Engineering","Application engineering","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00573",TRUE,"Data Engineering","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00574",TRUE,"Mobile","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00575",TRUE,"Mobile","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00576",TRUE,"Data Engineering","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,FALSE
+"SYN00577",TRUE,"Data Engineering","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00578",TRUE,"Payments","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00579",TRUE,"Platform","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00580",TRUE,"Developer Experience","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00581",TRUE,"Platform","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00582",TRUE,"Data Engineering","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00583",TRUE,"Developer Experience","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00584",TRUE,"Platform","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00585",TRUE,"Payments","Infrastructure engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00586",TRUE,"Platform","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00587",TRUE,"Developer Experience","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00588",TRUE,"Identity","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00589",TRUE,"Data Engineering","Infrastructure engineering","Early career","2 to 5 years",FALSE,TRUE
+"SYN00590",TRUE,"Platform","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00591",TRUE,"Identity","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00592",TRUE,"Data Engineering","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00593",TRUE,"Identity","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00594",TRUE,"Platform","Infrastructure engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00595",TRUE,"Data Engineering","Engineering management","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00596",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00597",TRUE,"Developer Experience","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00598",TRUE,"Developer Experience","Engineering management","Early career","Over 5 years",TRUE,TRUE
+"SYN00599",TRUE,"Mobile","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00600",TRUE,"Payments","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00601",TRUE,"Data Engineering","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00602",TRUE,"Payments","Infrastructure engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00603",TRUE,"Platform","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00604",TRUE,"Payments","Engineering management","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00605",TRUE,"Identity","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00606",TRUE,"Identity","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00607",TRUE,"Developer Experience","Application engineering","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00608",TRUE,"Data Engineering","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00609",TRUE,"Data Engineering","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00610",TRUE,"Mobile","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00611",TRUE,"Platform","Engineering management","Experienced","Over 5 years",TRUE,TRUE
+"SYN00612",TRUE,"Data Engineering","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00613",TRUE,"Payments","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00614",TRUE,"Developer Experience","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00615",TRUE,"Identity","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00616",TRUE,"Platform","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00617",TRUE,"Data Engineering","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00618",TRUE,"Data Engineering","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00619",TRUE,"Data Engineering","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00620",TRUE,"Developer Experience","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00621",TRUE,"Developer Experience","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00622",TRUE,"Payments","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00623",TRUE,"Developer Experience","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00624",TRUE,"Identity","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00625",TRUE,"Mobile","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00626",TRUE,"Developer Experience","Application engineering","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00627",TRUE,"Developer Experience","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00628",TRUE,"Data Engineering","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00629",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00630",TRUE,"Developer Experience","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00631",TRUE,"Identity","Engineering management","Early career","Under 2 years",FALSE,TRUE
+"SYN00632",TRUE,"Identity","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00633",TRUE,"Payments","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00634",TRUE,"Developer Experience","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00635",TRUE,"Identity","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00636",TRUE,"Platform","Engineering management","Experienced","Over 5 years",TRUE,TRUE
+"SYN00637",TRUE,"Data Engineering","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00638",TRUE,"Mobile","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00639",TRUE,"Mobile","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00640",TRUE,"Mobile","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00641",TRUE,"Identity","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00642",TRUE,"Payments","Engineering management","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00643",TRUE,"Mobile","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00644",TRUE,"Payments","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00645",TRUE,"Mobile","Infrastructure engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00646",TRUE,"Payments","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00647",TRUE,"Data Engineering","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,FALSE
+"SYN00648",TRUE,"Mobile","Infrastructure engineering","Senior / lead","Over 5 years",FALSE,TRUE
+"SYN00649",TRUE,"Data Engineering","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00650",TRUE,"Payments","Application engineering","Early career","2 to 5 years",TRUE,FALSE
+"SYN00651",TRUE,"Mobile","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00652",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","Over 5 years",FALSE,FALSE
+"SYN00653",TRUE,"Developer Experience","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00654",TRUE,"Mobile","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00655",TRUE,"Mobile","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00656",TRUE,"Platform","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00657",TRUE,"Mobile","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00658",TRUE,"Developer Experience","Engineering management","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00659",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00660",TRUE,"Identity","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00661",TRUE,"Developer Experience","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00662",TRUE,"Data Engineering","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00663",TRUE,"Identity","Application engineering","Early career","2 to 5 years",FALSE,TRUE
+"SYN00664",TRUE,"Payments","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00665",TRUE,"Platform","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00666",TRUE,"Identity","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00667",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00668",TRUE,"Identity","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00669",TRUE,"Payments","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00670",TRUE,"Payments","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00671",TRUE,"Developer Experience","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00672",TRUE,"Developer Experience","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00673",TRUE,"Developer Experience","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00674",TRUE,"Developer Experience","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00675",TRUE,"Identity","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00676",TRUE,"Mobile","Engineering management","Experienced","Over 5 years",TRUE,TRUE
+"SYN00677",TRUE,"Data Engineering","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00678",TRUE,"Platform","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00679",TRUE,"Payments","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00680",TRUE,"Identity","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00681",TRUE,"Data Engineering","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00682",TRUE,"Data Engineering","Infrastructure engineering","Experienced","Over 5 years",FALSE,TRUE
+"SYN00683",TRUE,"Identity","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00684",TRUE,"Developer Experience","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00685",TRUE,"Identity","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00686",TRUE,"Data Engineering","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00687",TRUE,"Payments","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00688",TRUE,"Developer Experience","Engineering management","Early career","2 to 5 years",TRUE,TRUE
+"SYN00689",TRUE,"Data Engineering","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00690",TRUE,"Platform","Application engineering","Senior / lead","Over 5 years",TRUE,FALSE
+"SYN00691",TRUE,"Platform","Engineering management","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00692",TRUE,"Identity","Engineering management","Senior / lead","Over 5 years",TRUE,FALSE
+"SYN00693",TRUE,"Developer Experience","Application engineering","Experienced","Over 5 years",FALSE,TRUE
+"SYN00694",TRUE,"Payments","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00695",TRUE,"Platform","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00696",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00697",TRUE,"Identity","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00698",TRUE,"Developer Experience","Engineering management","Senior / lead","2 to 5 years",TRUE,FALSE
+"SYN00699",TRUE,"Data Engineering","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00700",TRUE,"Platform","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00701",TRUE,"Payments","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00702",TRUE,"Developer Experience","Application engineering","Senior / lead","Over 5 years",FALSE,TRUE
+"SYN00703",TRUE,"Developer Experience","Application engineering","Senior / lead","2 to 5 years",TRUE,FALSE
+"SYN00704",TRUE,"Platform","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00705",TRUE,"Platform","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00706",TRUE,"Payments","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00707",TRUE,"Identity","Engineering management","Early career","Over 5 years",TRUE,TRUE
+"SYN00708",TRUE,"Platform","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00709",TRUE,"Payments","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00710",TRUE,"Mobile","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00711",TRUE,"Developer Experience","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00712",TRUE,"Platform","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00713",TRUE,"Data Engineering","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00714",TRUE,"Identity","Infrastructure engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00715",TRUE,"Data Engineering","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00716",TRUE,"Payments","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00717",TRUE,"Platform","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00718",TRUE,"Platform","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00719",TRUE,"Platform","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00720",TRUE,"Platform","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00721",TRUE,"Platform","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00722",TRUE,"Mobile","Engineering management","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00723",TRUE,"Data Engineering","Engineering management","Senior / lead","2 to 5 years",FALSE,FALSE
+"SYN00724",TRUE,"Data Engineering","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00725",TRUE,"Platform","Infrastructure engineering","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00726",TRUE,"Identity","Engineering management","Experienced","Over 5 years",TRUE,TRUE
+"SYN00727",TRUE,"Data Engineering","Infrastructure engineering","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00728",TRUE,"Platform","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00729",TRUE,"Data Engineering","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00730",TRUE,"Data Engineering","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00731",TRUE,"Platform","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00732",TRUE,"Platform","Engineering management","Early career","Over 5 years",TRUE,TRUE
+"SYN00733",TRUE,"Identity","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00734",TRUE,"Mobile","Application engineering","Senior / lead","Under 2 years",FALSE,TRUE
+"SYN00735",TRUE,"Identity","Infrastructure engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00736",TRUE,"Data Engineering","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00737",TRUE,"Mobile","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00738",TRUE,"Developer Experience","Application engineering","Senior / lead","Under 2 years",TRUE,FALSE
+"SYN00739",TRUE,"Developer Experience","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00740",TRUE,"Developer Experience","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00741",TRUE,"Platform","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00742",TRUE,"Payments","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00743",TRUE,"Payments","Application engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00744",TRUE,"Mobile","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00745",TRUE,"Payments","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00746",TRUE,"Mobile","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00747",TRUE,"Identity","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00748",TRUE,"Payments","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00749",TRUE,"Platform","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00750",TRUE,"Data Engineering","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00751",TRUE,"Data Engineering","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00752",TRUE,"Identity","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,FALSE
+"SYN00753",TRUE,"Mobile","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00754",TRUE,"Mobile","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00755",TRUE,"Platform","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00756",TRUE,"Mobile","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00757",TRUE,"Identity","Engineering management","Experienced","Under 2 years",TRUE,FALSE
+"SYN00758",TRUE,"Platform","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00759",TRUE,"Payments","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00760",TRUE,"Identity","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00761",TRUE,"Mobile","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00762",TRUE,"Platform","Application engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00763",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","2 to 5 years",FALSE,TRUE
+"SYN00764",TRUE,"Identity","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00765",TRUE,"Platform","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00766",TRUE,"Identity","Engineering management","Early career","2 to 5 years",TRUE,TRUE
+"SYN00767",TRUE,"Payments","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00768",TRUE,"Payments","Engineering management","Senior / lead","2 to 5 years",TRUE,FALSE
+"SYN00769",TRUE,"Payments","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00770",TRUE,"Platform","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00771",TRUE,"Platform","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00772",TRUE,"Developer Experience","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00773",TRUE,"Developer Experience","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00774",TRUE,"Identity","Application engineering","Senior / lead","Under 2 years",FALSE,TRUE
+"SYN00775",TRUE,"Identity","Engineering management","Experienced","Under 2 years",TRUE,TRUE
+"SYN00776",TRUE,"Mobile","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00777",TRUE,"Data Engineering","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00778",TRUE,"Payments","Infrastructure engineering","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00779",TRUE,"Identity","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00780",TRUE,"Identity","Infrastructure engineering","Early career","2 to 5 years",FALSE,TRUE
+"SYN00781",TRUE,"Platform","Infrastructure engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00782",TRUE,"Data Engineering","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00783",TRUE,"Payments","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00784",TRUE,"Data Engineering","Engineering management","Early career","2 to 5 years",TRUE,TRUE
+"SYN00785",TRUE,"Mobile","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00786",TRUE,"Platform","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00787",TRUE,"Platform","Application engineering","Early career","2 to 5 years",FALSE,TRUE
+"SYN00788",TRUE,"Developer Experience","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00789",TRUE,"Mobile","Engineering management","Early career","2 to 5 years",TRUE,TRUE
+"SYN00790",TRUE,"Developer Experience","Application engineering","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00791",TRUE,"Mobile","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00792",TRUE,"Data Engineering","Engineering management","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00793",TRUE,"Mobile","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00794",TRUE,"Mobile","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00795",TRUE,"Data Engineering","Infrastructure engineering","Senior / lead","Under 2 years",FALSE,TRUE
+"SYN00796",TRUE,"Developer Experience","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00797",TRUE,"Mobile","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00798",TRUE,"Identity","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00799",TRUE,"Mobile","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00800",TRUE,"Data Engineering","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00801",TRUE,"Identity","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00802",TRUE,"Identity","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00803",TRUE,"Mobile","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00804",TRUE,"Payments","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00805",TRUE,"Platform","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00806",TRUE,"Developer Experience","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00807",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00808",TRUE,"Payments","Engineering management","Experienced","Over 5 years",TRUE,TRUE
+"SYN00809",TRUE,"Mobile","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00810",TRUE,"Payments","Infrastructure engineering","Early career","Over 5 years",TRUE,TRUE
+"SYN00811",TRUE,"Identity","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00812",TRUE,"Developer Experience","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00813",TRUE,"Identity","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00814",TRUE,"Mobile","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00815",TRUE,"Developer Experience","Infrastructure engineering","Experienced","Under 2 years",TRUE,FALSE
+"SYN00816",TRUE,"Data Engineering","Engineering management","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00817",TRUE,"Payments","Application engineering","Experienced","Over 5 years",TRUE,FALSE
+"SYN00818",TRUE,"Payments","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00819",TRUE,"Developer Experience","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00820",TRUE,"Developer Experience","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00821",TRUE,"Data Engineering","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00822",TRUE,"Identity","Engineering management","Senior / lead","Under 2 years",TRUE,FALSE
+"SYN00823",TRUE,"Identity","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00824",TRUE,"Identity","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00825",TRUE,"Identity","Infrastructure engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00826",TRUE,"Mobile","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00827",TRUE,"Mobile","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00828",TRUE,"Mobile","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00829",TRUE,"Payments","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00830",TRUE,"Mobile","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00831",TRUE,"Platform","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00832",TRUE,"Identity","Engineering management","Senior / lead","2 to 5 years",TRUE,FALSE
+"SYN00833",TRUE,"Payments","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00834",TRUE,"Developer Experience","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00835",TRUE,"Data Engineering","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00836",TRUE,"Mobile","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00837",TRUE,"Data Engineering","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00838",TRUE,"Mobile","Infrastructure engineering","Senior / lead","Under 2 years",FALSE,TRUE
+"SYN00839",TRUE,"Data Engineering","Application engineering","Senior / lead","Over 5 years",TRUE,FALSE
+"SYN00840",TRUE,"Platform","Engineering management","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00841",TRUE,"Mobile","Infrastructure engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00842",TRUE,"Platform","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00843",TRUE,"Data Engineering","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00844",TRUE,"Data Engineering","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00845",TRUE,"Identity","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00846",TRUE,"Data Engineering","Infrastructure engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00847",TRUE,"Payments","Application engineering","Experienced","Over 5 years",FALSE,TRUE
+"SYN00848",TRUE,"Data Engineering","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00849",TRUE,"Developer Experience","Engineering management","Early career","Under 2 years",FALSE,TRUE
+"SYN00850",TRUE,"Mobile","Infrastructure engineering","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00851",TRUE,"Payments","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00852",TRUE,"Identity","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,FALSE
+"SYN00853",TRUE,"Data Engineering","Engineering management","Early career","Under 2 years",TRUE,TRUE
+"SYN00854",TRUE,"Data Engineering","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00855",TRUE,"Mobile","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00856",TRUE,"Data Engineering","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00857",TRUE,"Mobile","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00858",TRUE,"Developer Experience","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00859",TRUE,"Platform","Application engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00860",TRUE,"Platform","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00861",TRUE,"Identity","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00862",TRUE,"Identity","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00863",TRUE,"Mobile","Application engineering","Early career","Over 5 years",TRUE,FALSE
+"SYN00864",TRUE,"Developer Experience","Engineering management","Experienced","Over 5 years",TRUE,TRUE
+"SYN00865",TRUE,"Data Engineering","Engineering management","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00866",TRUE,"Developer Experience","Application engineering","Early career","Over 5 years",TRUE,FALSE
+"SYN00867",TRUE,"Payments","Infrastructure engineering","Senior / lead","2 to 5 years",FALSE,TRUE
+"SYN00868",TRUE,"Payments","Application engineering","Experienced","Over 5 years",TRUE,TRUE
+"SYN00869",TRUE,"Platform","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00870",TRUE,"Mobile","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00871",TRUE,"Mobile","Application engineering","Early career","Under 2 years",FALSE,TRUE
+"SYN00872",TRUE,"Platform","Engineering management","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00873",TRUE,"Data Engineering","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00874",TRUE,"Payments","Infrastructure engineering","Early career","Under 2 years",FALSE,TRUE
+"SYN00875",TRUE,"Developer Experience","Application engineering","Experienced","Over 5 years",FALSE,TRUE
+"SYN00876",TRUE,"Developer Experience","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00877",TRUE,"Identity","Infrastructure engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00878",TRUE,"Data Engineering","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00879",TRUE,"Developer Experience","Infrastructure engineering","Experienced","Under 2 years",FALSE,TRUE
+"SYN00880",TRUE,"Developer Experience","Application engineering","Early career","Under 2 years",TRUE,FALSE
+"SYN00881",TRUE,"Platform","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00882",TRUE,"Developer Experience","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00883",TRUE,"Data Engineering","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00884",TRUE,"Payments","Application engineering","Experienced","Under 2 years",TRUE,TRUE
+"SYN00885",TRUE,"Platform","Infrastructure engineering","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00886",TRUE,"Platform","Application engineering","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00887",TRUE,"Data Engineering","Infrastructure engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00888",TRUE,"Data Engineering","Application engineering","Senior / lead","2 to 5 years",TRUE,FALSE
+"SYN00889",TRUE,"Mobile","Engineering management","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00890",TRUE,"Identity","Application engineering","Early career","Under 2 years",TRUE,TRUE
+"SYN00891",TRUE,"Data Engineering","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00892",TRUE,"Platform","Application engineering","Early career","2 to 5 years",TRUE,TRUE
+"SYN00893",TRUE,"Identity","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00894",TRUE,"Identity","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00895",TRUE,"Platform","Infrastructure engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00896",TRUE,"Developer Experience","Application engineering","Senior / lead","Under 2 years",FALSE,TRUE
+"SYN00897",TRUE,"Payments","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00898",TRUE,"Developer Experience","Application engineering","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00899",TRUE,"Developer Experience","Application engineering","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00900",TRUE,"Identity","Application engineering","Early career","Under 2 years",FALSE,TRUE
+"SYN00901",FALSE,"Mobile","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00902",FALSE,"Identity","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00903",FALSE,"Identity","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00904",FALSE,"Developer Experience","Other job families","Experienced","Over 5 years",TRUE,TRUE
+"SYN00905",FALSE,"Platform","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00906",FALSE,"Developer Experience","Other job families","Early career","Over 5 years",TRUE,TRUE
+"SYN00907",FALSE,"Payments","Other job families","Early career","Under 2 years",TRUE,TRUE
+"SYN00908",FALSE,"Payments","Other job families","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00909",FALSE,"Platform","Other job families","Experienced","Over 5 years",TRUE,TRUE
+"SYN00910",FALSE,"Payments","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00911",FALSE,"Developer Experience","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00912",FALSE,"Developer Experience","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00913",FALSE,"Identity","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00914",FALSE,"Data Engineering","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00915",FALSE,"Payments","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00916",FALSE,"Platform","Other job families","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00917",FALSE,"Data Engineering","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00918",FALSE,"Developer Experience","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00919",FALSE,"Platform","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00920",FALSE,"Identity","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00921",FALSE,"Platform","Other job families","Experienced","Over 5 years",TRUE,TRUE
+"SYN00922",FALSE,"Platform","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00923",FALSE,"Platform","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00924",FALSE,"Platform","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00925",FALSE,"Developer Experience","Other job families","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00926",FALSE,"Payments","Other job families","Early career","Over 5 years",TRUE,TRUE
+"SYN00927",FALSE,"Developer Experience","Other job families","Early career","2 to 5 years",FALSE,TRUE
+"SYN00928",FALSE,"Payments","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00929",FALSE,"Data Engineering","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00930",FALSE,"Mobile","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00931",FALSE,"Developer Experience","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00932",FALSE,"Platform","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00933",FALSE,"Identity","Other job families","Experienced","Over 5 years",TRUE,TRUE
+"SYN00934",FALSE,"Platform","Other job families","Early career","Over 5 years",TRUE,TRUE
+"SYN00935",FALSE,"Platform","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00936",FALSE,"Payments","Other job families","Early career","2 to 5 years",FALSE,TRUE
+"SYN00937",FALSE,"Mobile","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00938",FALSE,"Data Engineering","Other job families","Early career","Under 2 years",TRUE,TRUE
+"SYN00939",FALSE,"Payments","Other job families","Early career","2 to 5 years",TRUE,TRUE
+"SYN00940",FALSE,"Mobile","Other job families","Experienced","Over 5 years",TRUE,TRUE
+"SYN00941",FALSE,"Mobile","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00942",FALSE,"Mobile","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00943",FALSE,"Developer Experience","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00944",FALSE,"Payments","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00945",FALSE,"Data Engineering","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00946",FALSE,"Identity","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00947",FALSE,"Platform","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00948",FALSE,"Data Engineering","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00949",FALSE,"Data Engineering","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00950",FALSE,"Data Engineering","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00951",FALSE,"Data Engineering","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00952",FALSE,"Payments","Other job families","Experienced","Over 5 years",TRUE,TRUE
+"SYN00953",FALSE,"Payments","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00954",FALSE,"Mobile","Other job families","Early career","Under 2 years",TRUE,TRUE
+"SYN00955",FALSE,"Platform","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00956",FALSE,"Platform","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00957",FALSE,"Mobile","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00958",FALSE,"Payments","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00959",FALSE,"Platform","Other job families","Senior / lead","2 to 5 years",FALSE,TRUE
+"SYN00960",FALSE,"Payments","Other job families","Experienced","2 to 5 years",FALSE,TRUE
+"SYN00961",FALSE,"Platform","Other job families","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN00962",FALSE,"Data Engineering","Other job families","Experienced","Over 5 years",TRUE,TRUE
+"SYN00963",FALSE,"Payments","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00964",FALSE,"Payments","Other job families","Early career","2 to 5 years",TRUE,TRUE
+"SYN00965",FALSE,"Platform","Other job families","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00966",FALSE,"Platform","Other job families","Early career","Under 2 years",TRUE,TRUE
+"SYN00967",FALSE,"Data Engineering","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00968",FALSE,"Platform","Other job families","Experienced","2 to 5 years",FALSE,TRUE
+"SYN00969",FALSE,"Developer Experience","Other job families","Early career","Under 2 years",TRUE,TRUE
+"SYN00970",FALSE,"Data Engineering","Other job families","Early career","Under 2 years",TRUE,TRUE
+"SYN00971",FALSE,"Payments","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00972",FALSE,"Platform","Other job families","Early career","Over 5 years",TRUE,TRUE
+"SYN00973",FALSE,"Identity","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00974",FALSE,"Data Engineering","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00975",FALSE,"Platform","Other job families","Early career","Over 5 years",TRUE,TRUE
+"SYN00976",FALSE,"Data Engineering","Other job families","Early career","2 to 5 years",TRUE,FALSE
+"SYN00977",FALSE,"Identity","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00978",FALSE,"Mobile","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00979",FALSE,"Developer Experience","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00980",FALSE,"Developer Experience","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00981",FALSE,"Developer Experience","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00982",FALSE,"Platform","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00983",FALSE,"Mobile","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00984",FALSE,"Data Engineering","Other job families","Early career","2 to 5 years",TRUE,TRUE
+"SYN00985",FALSE,"Developer Experience","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00986",FALSE,"Platform","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00987",FALSE,"Identity","Other job families","Experienced","2 to 5 years",TRUE,FALSE
+"SYN00988",FALSE,"Platform","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00989",FALSE,"Mobile","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00990",FALSE,"Mobile","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN00991",FALSE,"Data Engineering","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00992",FALSE,"Payments","Other job families","Early career","Under 2 years",TRUE,TRUE
+"SYN00993",FALSE,"Developer Experience","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00994",FALSE,"Payments","Other job families","Early career","Under 2 years",TRUE,TRUE
+"SYN00995",FALSE,"Data Engineering","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN00996",FALSE,"Developer Experience","Other job families","Experienced","Over 5 years",TRUE,TRUE
+"SYN00997",FALSE,"Payments","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN00998",FALSE,"Data Engineering","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN00999",FALSE,"Payments","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN01000",FALSE,"Data Engineering","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN01001",FALSE,"Payments","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN01002",FALSE,"Data Engineering","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN01003",FALSE,"Data Engineering","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN01004",FALSE,"Mobile","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN01005",FALSE,"Platform","Other job families","Early career","Over 5 years",TRUE,TRUE
+"SYN01006",FALSE,"Developer Experience","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN01007",FALSE,"Developer Experience","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN01008",FALSE,"Identity","Other job families","Early career","Over 5 years",TRUE,TRUE
+"SYN01009",FALSE,"Mobile","Other job families","Early career","Under 2 years",TRUE,TRUE
+"SYN01010",FALSE,"Platform","Other job families","Experienced","Under 2 years",FALSE,TRUE
+"SYN01011",FALSE,"Identity","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN01012",FALSE,"Developer Experience","Other job families","Early career","Over 5 years",FALSE,TRUE
+"SYN01013",FALSE,"Platform","Other job families","Early career","Under 2 years",FALSE,TRUE
+"SYN01014",FALSE,"Platform","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN01015",FALSE,"Data Engineering","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN01016",FALSE,"Identity","Other job families","Senior / lead","2 to 5 years",FALSE,TRUE
+"SYN01017",FALSE,"Data Engineering","Other job families","Early career","Under 2 years",FALSE,TRUE
+"SYN01018",FALSE,"Payments","Other job families","Early career","2 to 5 years",TRUE,TRUE
+"SYN01019",FALSE,"Developer Experience","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN01020",FALSE,"Mobile","Other job families","Early career","Under 2 years",TRUE,FALSE
+"SYN01021",FALSE,"Mobile","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN01022",FALSE,"Platform","Other job families","Early career","Over 5 years",TRUE,TRUE
+"SYN01023",FALSE,"Developer Experience","Other job families","Early career","2 to 5 years",TRUE,TRUE
+"SYN01024",FALSE,"Developer Experience","Other job families","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN01025",FALSE,"Platform","Other job families","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN01026",FALSE,"Mobile","Other job families","Early career","2 to 5 years",TRUE,TRUE
+"SYN01027",FALSE,"Mobile","Other job families","Senior / lead","Over 5 years",TRUE,FALSE
+"SYN01028",FALSE,"Data Engineering","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN01029",FALSE,"Platform","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN01030",FALSE,"Mobile","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN01031",FALSE,"Platform","Other job families","Early career","2 to 5 years",TRUE,TRUE
+"SYN01032",FALSE,"Mobile","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN01033",FALSE,"Data Engineering","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN01034",FALSE,"Identity","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN01035",FALSE,"Payments","Other job families","Early career","Under 2 years",TRUE,TRUE
+"SYN01036",FALSE,"Mobile","Other job families","Early career","2 to 5 years",TRUE,TRUE
+"SYN01037",FALSE,"Identity","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN01038",FALSE,"Data Engineering","Other job families","Early career","Over 5 years",TRUE,TRUE
+"SYN01039",FALSE,"Developer Experience","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN01040",FALSE,"Data Engineering","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN01041",FALSE,"Mobile","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN01042",FALSE,"Platform","Other job families","Early career","2 to 5 years",TRUE,TRUE
+"SYN01043",FALSE,"Platform","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN01044",FALSE,"Mobile","Other job families","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN01045",FALSE,"Platform","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN01046",FALSE,"Developer Experience","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN01047",FALSE,"Payments","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN01048",FALSE,"Data Engineering","Other job families","Early career","Over 5 years",TRUE,TRUE
+"SYN01049",FALSE,"Data Engineering","Other job families","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN01050",FALSE,"Data Engineering","Other job families","Early career","2 to 5 years",TRUE,TRUE
+"SYN01051",FALSE,"Mobile","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN01052",FALSE,"Mobile","Other job families","Early career","Under 2 years",TRUE,TRUE
+"SYN01053",FALSE,"Identity","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN01054",FALSE,"Identity","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN01055",FALSE,"Identity","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN01056",FALSE,"Mobile","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN01057",FALSE,"Platform","Other job families","Experienced","Over 5 years",TRUE,TRUE
+"SYN01058",FALSE,"Identity","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN01059",FALSE,"Platform","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN01060",FALSE,"Payments","Other job families","Senior / lead","Over 5 years",TRUE,FALSE
+"SYN01061",FALSE,"Payments","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN01062",FALSE,"Platform","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN01063",FALSE,"Payments","Other job families","Early career","Under 2 years",TRUE,TRUE
+"SYN01064",FALSE,"Data Engineering","Other job families","Experienced","Over 5 years",TRUE,TRUE
+"SYN01065",FALSE,"Payments","Other job families","Experienced","2 to 5 years",TRUE,FALSE
+"SYN01066",FALSE,"Identity","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN01067",FALSE,"Data Engineering","Other job families","Senior / lead","2 to 5 years",TRUE,TRUE
+"SYN01068",FALSE,"Mobile","Other job families","Early career","Under 2 years",TRUE,TRUE
+"SYN01069",FALSE,"Data Engineering","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN01070",FALSE,"Identity","Other job families","Early career","Over 5 years",TRUE,TRUE
+"SYN01071",FALSE,"Developer Experience","Other job families","Experienced","2 to 5 years",TRUE,TRUE
+"SYN01072",FALSE,"Payments","Other job families","Experienced","2 to 5 years",TRUE,FALSE
+"SYN01073",FALSE,"Platform","Other job families","Experienced","Under 2 years",TRUE,TRUE
+"SYN01074",FALSE,"Platform","Other job families","Senior / lead","Under 2 years",TRUE,TRUE
+"SYN01075",FALSE,"Mobile","Other job families","Experienced","2 to 5 years",TRUE,FALSE
+"SYN01076",FALSE,"Payments","Other job families","Experienced","Over 5 years",TRUE,TRUE
+"SYN01077",FALSE,"Mobile","Other job families","Experienced","Over 5 years",TRUE,FALSE
+"SYN01078",FALSE,"Platform","Other job families","Senior / lead","Over 5 years",TRUE,TRUE
+"SYN01079",FALSE,"Mobile","Other job families","Experienced","2 to 5 years",FALSE,TRUE
+"SYN01080",FALSE,"Data Engineering","Other job families","Early career","2 to 5 years",TRUE,TRUE

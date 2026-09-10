@@ -2,7 +2,7 @@
 layout: page
 title: "Copilot Analytics"
 eyebrow: "Copilot analytics"
-description: "Analyze Microsoft 365 Copilot usage from Viva Insights: adoption metrics, Power User and Habitual User segmentation, habit-based behavioral models, adoption journey and cohort analysis, usage-segment trends over time, and causal impact analysis with difference-in-differences and event-study methods in R, Python, and Power BI."
+description: "Analyze Microsoft 365 Copilot usage from Viva Insights: adoption metrics, Power User and Habitual User segmentation, habit-based behavioral models, adoption journey and cohort analysis, usage-segment trends over time, causal impact analysis with difference-in-differences and event-study methods, and ready-to-run report templates for the Consumption query and the GitHub query in R, Python, and Power BI."
 permalink: /copilot/
 css: "/assets/css/lang-switch.css"
 ---
@@ -166,6 +166,97 @@ Aligns each adopter on their own event time, checks the parallel-trends assumpti
 - **Key Features**: Event-time alignment, pre-trend check, person + week fixed effects, z-scored composite index
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/event-study-did.py)**
 </div>
+
+---
+
+## Interactive Report Templates
+
+Where the scripts above answer one question at a time, these two templates are complete
+multi-page HTML reports you can open in a browser and hand to a stakeholder. Both are built
+with R Markdown and flexdashboard, and both ship with **synthetic data** so they render
+end to end before you point them at your own export.
+
+They are built on two of the newer Viva Insights query types, both available from the
+**Customised query** tab under **Create analysis** in the Viva Insights analyst experience. See the
+[AI cost query documentation](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query)
+for the official schema and access details:
+
+| Query | What it adds | Used by |
+| --- | --- | --- |
+| **Consumption query** | Copilot credit and token consumption per person and per delegated task type | Copilot Consumption and Ways of Working |
+| **GitHub query** | GitHub Copilot activity, model mix, and language mix for linked developer accounts | Developer Experience and Copilot |
+
+Treat the numbers in the published outputs as illustrative. The simulations are seeded so the
+charts have something to show, and each report states its assumptions in an appendix.
+
+---
+
+### Copilot Consumption and Ways of Working
+
+Reads the Consumption query alongside a Person Query to separate **how much** Copilot is
+consumed from **how** it is consumed. It covers the concentration of token consumption across
+users, credit intensity as a cost-mix measure, delegated task types, and the association
+between consumption and collaboration patterns.
+
+[![Copilot Consumption and Ways of Working: overview page]({{ site.baseurl }}/assets/images/reports/copilot-consumption-overview.png)]({{ site.baseurl }}/examples/utility-r/copilot-consumption-ways-of-working-simulation.html)
+
+Token consumption is typically right-skewed, so the report leads with a concentration curve and
+banded percentiles rather than an average that a small number of heavy users can pull upward.
+
+[![Copilot Consumption and Ways of Working: token distribution page]({{ site.baseurl }}/assets/images/reports/copilot-consumption-token-distribution.png)]({{ site.baseurl }}/examples/utility-r/copilot-consumption-ways-of-working-simulation.html)
+
+<div data-lang-block="r" markdown="1">
+**📄 [copilot-consumption-ways-of-working-simulation.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-ways-of-working-simulation.Rmd)**
+- **Purpose**: Separate Copilot consumption volume from consumption mix, and relate both to ways of working
+- **Format**: R Markdown (flexdashboard), seven pages
+- **Prerequisites**: vivainsights R package, dplyr, tidyr, ggplot2, scales, flexdashboard, knitr
+- **Key Features**: Concentration curve and percentile bands, credit intensity per 1,000 tokens, delegated task-type mix, usage segments, function drill-down
+- **Interpretation**: Associations only. Credit intensity is a cost-mix measure rather than a measure of value or quality
+- **[🌐 View the live report]({{ site.baseurl }}/examples/utility-r/copilot-consumption-ways-of-working-simulation.html)**
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/copilot-consumption-ways-of-working-simulation.Rmd)**
+</div>
+
+<div data-lang-block="python" markdown="1">
+This template is currently available in R only. Switch the toggle above to R to see the
+details, or open the [live report]({{ site.baseurl }}/examples/utility-r/copilot-consumption-ways-of-working-simulation.html) directly.
+</div>
+
+---
+
+### Developer Experience and Copilot
+
+A manager view of developer working conditions and recorded AI use, combining the GitHub query
+with a Person Query so that **GitHub Copilot and Microsoft 365 Copilot are read together**
+rather than in isolation. It establishes a baseline before it looks at change, and it keeps
+eligibility and coverage visible rather than treating missing activity as zero.
+
+[![Developer Experience and Copilot: focus and coordination page]({{ site.baseurl }}/assets/images/reports/github-copilot-devex-focus.png)]({{ site.baseurl }}/examples/utility-r/github-copilot-developer-productivity-simulation.html)
+
+Joint product use is reported with coverage exceptions retained, so a team that simply lacks a
+licence is never mistaken for a team that has chosen not to adopt.
+
+[![Developer Experience and Copilot: AI use page]({{ site.baseurl }}/assets/images/reports/github-copilot-devex-ai-use.png)]({{ site.baseurl }}/examples/utility-r/github-copilot-developer-productivity-simulation.html)
+
+<div data-lang-block="r" markdown="1">
+**📄 [github-copilot-developer-productivity-simulation.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/github-copilot-developer-productivity-simulation.Rmd)**
+- **Purpose**: Give an engineering manager a baseline of developer working conditions and joint GitHub and M365 Copilot use
+- **Format**: R Markdown (flexdashboard), seven pages
+- **Prerequisites**: vivainsights R package, dplyr, tidyr, ggplot2, scales, flexdashboard, knitr
+- **Key Features**: Team league table, ranked distributions of meeting and uninterrupted hours, joint product-use footprint with coverage exceptions, model and language mix, trends
+- **Interpretation**: Associations only. Acceptance rate is not a measure of code quality, after-hours activity is not a measure of burnout, and calendar space does not establish coding time
+- **Also required**: [github-developer-experience-helpers.R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/github-developer-experience-helpers.R) and [render-github-developer-experience.R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/render-github-developer-experience.R)
+- **[🌐 View the live report]({{ site.baseurl }}/examples/utility-r/github-copilot-developer-productivity-simulation.html)**
+- **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/github-copilot-developer-productivity-simulation.Rmd)**
+</div>
+
+<div data-lang-block="python" markdown="1">
+This template is currently available in R only. Switch the toggle above to R to see the
+details, or open the [live report]({{ site.baseurl }}/examples/utility-r/github-copilot-developer-productivity-simulation.html) directly.
+</div>
+
+**📖 [Documentation for both templates](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-github-demo-reports.md)**, covering the
+expected schema of each query, the simulated data contracts, and how to swap the simulation
+block for your own export.
 
 ---
 

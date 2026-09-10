@@ -1,0 +1,1260 @@
+---
+title: "Copilot Consumption and Ways of Working"
+subtitle: "The art of the possible with consumption and Viva Insights data (fully synthetic)"
+date: "Synthetic window: 4 Jan–28 Jun 2026"
+output:
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+    theme: lumen
+    self_contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE,
+                      fig.width = 8.5, fig.height = 4.5)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(scales)
+library(knitr)
+library(vivainsights)
+library(ggrepel)
+
+MIN_GROUP_N <- 10L
+PAL <- c("#1F4E79", "#2E75B6", "#7FA8D0", "#BDD3E8",
+         "#C9C9C9", "#B03A2E", "#5B8C5A", "#7D5BA6")
+
+theme_t <- function() {
+  theme_minimal(base_size = 11) +
+    theme(
+      panel.grid.minor = element_blank(),
+      legend.position = "bottom",
+      plot.title.position = "plot",
+      plot.title = element_text(face = "bold", colour = PAL[1]),
+      plot.subtitle = element_text(colour = "grey30",
+                                   margin = margin(t = 2, b = 9)),
+      plot.caption = element_text(colour = "grey45", size = 8, hjust = 0,
+                                  margin = margin(t = 7)),
+      plot.margin = margin(t = 10, r = 16, b = 4, l = 4)
+    )
+}
+
+read_demo <- function(...) {
+  read.csv(file.path("_data", "consumption", ...),
+           check.names = FALSE, stringsAsFactors = FALSE)
+}
+
+people <- read_demo("reference", "people-snapshot.csv")
+consumption <- read_demo("consumption-query", "consumption-weekly.csv") |>
+  mutate(MetricDate = as.Date(MetricDate))
+credit_tasks <- read_demo("consumption-query", "consumption-task-types.csv")
+pq <- read_demo("person-query", "person-query-weekly.csv") |>
+  mutate(MetricDate = as.Date(MetricDate))
+net_monthly <- read_demo("person-query", "network-monthly.csv")
+
+SEGMENT_LEVELS <- c(
+  "Power User", "Habitual User", "Novice User", "Low User", "Non-user"
+)
+
+seg <- identify_usage_segments(
+  data = consumption,
+  metric = "Total_Copilot_actions_taken",
+  version = "12w",
+  return = "data"
+) |>
+  select(PersonId, MetricDate, UsageSegments_12w)
+
+LATEST_OBS_WEEK <- max(seg$MetricDate, na.rm = TRUE)
+
+OBS_WINDOW_START <- min(consumption$MetricDate, na.rm = TRUE)
+OBS_WINDOW_END <- max(consumption$MetricDate, na.rm = TRUE)
+CHART_CAPTION <- sprintf(
+  "Synthetic data | n = %s people | %s to %s",
+  comma(nrow(people)),
+  format(OBS_WINDOW_START, "%d %b %Y"),
+  format(OBS_WINDOW_END, "%d %b %Y")
+)
+
+person_segment <- seg |>
+  filter(MetricDate == LATEST_OBS_WEEK) |>
+  transmute(
+    PersonId,
+    Segment = factor(
+      as.character(UsageSegments_12w),
+      levels = SEGMENT_LEVELS,
+      ordered = TRUE
+    )
+  )
+
+segment_snapshot <- consumption |>
+  filter(MetricDate == LATEST_OBS_WEEK) |>
+  transmute(
+    PersonId,
+    weekly_actions = Total_Copilot_actions_taken,
+    weekly_credits = Copilot_credits_consumed,
+    weekly_tokens = Input_tokens + Output_tokens + Reasoning_tokens,
+    credit_intensity = if_else(
+      weekly_tokens > 0,
+      weekly_credits / (weekly_tokens / 1000),
+      NA_real_
+    )
+  ) |>
+  left_join(person_segment, by = "PersonId") |>
+  mutate(
+    positive_consumer = weekly_credits > 0,
+    positive_quartile = if_else(
+      positive_consumer,
+      ntile(if_else(positive_consumer, weekly_credits, NA_real_), 4L),
+      NA_integer_
+    ),
+    CreditQuartile = factor(
+      case_when(
+        !positive_consumer ~ "No consumption",
+        positive_quartile == 1L ~ "Q1 lowest",
+        positive_quartile == 2L ~ "Q2",
+        positive_quartile == 3L ~ "Q3",
+        TRUE ~ "Q4 highest"
+      ),
+      levels = c("No consumption", "Q1 lowest", "Q2", "Q3", "Q4 highest")
+    )
+  )
+
+person_consumption <- consumption |>
+  group_by(PersonId) |>
+  summarise(
+    weekly_credits = mean(Copilot_credits_consumed),
+    weekly_actions = mean(Total_Copilot_actions_taken),
+    weekly_tokens = mean(Input_tokens + Output_tokens + Reasoning_tokens),
+    total_tokens = sum(Input_tokens + Output_tokens + Reasoning_tokens),
+    reasoning_tokens = sum(Reasoning_tokens),
+    reasoning_share = if_else(total_tokens > 0,
+                              reasoning_tokens / total_tokens, NA_real_),
+    credit_intensity = if_else(
+      total_tokens > 0,
+      sum(Copilot_credits_consumed) / (total_tokens / 1000),
+      NA_real_
+    ),
+    .groups = "drop"
+  ) |>
+  mutate(
+    positive_consumer = weekly_credits > 0,
+    positive_quartile = if_else(
+      positive_consumer,
+      ntile(if_else(positive_consumer, weekly_credits, NA_real_), 4L),
+      NA_integer_
+    ),
+    CreditQuartile = case_when(
+      !positive_consumer ~ "No consumption",
+      positive_quartile == 1L ~ "Q1 lowest",
+      positive_quartile == 2L ~ "Q2",
+      positive_quartile == 3L ~ "Q3",
+      TRUE ~ "Q4 highest"
+    )
+  )
+
+reasoning_cut <- quantile(
+  person_consumption$reasoning_share[
+    person_consumption$positive_consumer &
+      person_consumption$total_tokens >= 10000
+  ],
+  0.75, na.rm = TRUE
+)
+
+person_base <- people |>
+  left_join(person_consumption, by = "PersonId") |>
+  left_join(person_segment, by = "PersonId") |>
+  mutate(
+    CreditQuartile = factor(
+      CreditQuartile,
+      levels = c("No consumption", "Q1 lowest", "Q2", "Q3", "Q4 highest")
+    ),
+    CreditBand = case_when(
+      CreditQuartile %in% c("Q3", "Q4 highest") ~ "High credit",
+      CreditQuartile %in% c("Q1 lowest", "Q2") ~ "Lower credit",
+      TRUE ~ "No consumption"
+    ),
+    ReasoningProfile = case_when(
+      !positive_consumer ~ "No consumption",
+      total_tokens < 10000 ~ "Insufficient token volume",
+      reasoning_share >= reasoning_cut ~ "Reasoning-intensive",
+      TRUE ~ "Standard-cost mix"
+    ),
+    ConsumptionProfile = case_when(
+      CreditBand == "High credit" &
+        ReasoningProfile == "Reasoning-intensive" ~
+          "High credit, reasoning-intensive",
+      CreditBand == "High credit" ~ "High credit, standard mix",
+      CreditBand == "Lower credit" &
+        ReasoningProfile == "Reasoning-intensive" ~
+          "Lower credit, reasoning-intensive",
+      CreditBand == "Lower credit" ~ "Lower credit, standard mix",
+      TRUE ~ "No consumption"
+    )
+  )
+
+WOW_METRICS <- c(
+  "Collaboration_hours", "Active_connected_hours",
+  "Email_hours", "Chat_hours", "Meeting_hours",
+  "Unscheduled_call_hours", "After_hours_collaboration_hours",
+  "Collaboration_span", "Weekend_collaboration_hours",
+  "Internal_network_size", "External_network_size"
+)
+
+person_wow <- pq |>
+  group_by(PersonId) |>
+  summarise(across(all_of(WOW_METRICS), \(x) mean(x, na.rm = TRUE)),
+            .groups = "drop") |>
+  left_join(person_base, by = "PersonId")
+
+function_summary <- person_wow |>
+  filter(weekly_credits > 0) |>
+  group_by(FunctionType) |>
+  summarise(
+    People = n(),
+    `Weekly credits` = mean(weekly_credits),
+    `Weekly tokens` = mean(weekly_tokens),
+    `Weekly actions` = mean(weekly_actions),
+    `Credit intensity` = weighted.mean(
+      credit_intensity, total_tokens, na.rm = TRUE),
+    `Reasoning-token share` = weighted.mean(
+      reasoning_share, total_tokens, na.rm = TRUE),
+    `Collaboration hours` = mean(Collaboration_hours),
+    `After-hours hours` = mean(After_hours_collaboration_hours),
+    `Collaboration span` = mean(Collaboration_span),
+    `Internal network size` = mean(Internal_network_size),
+    .groups = "drop"
+  ) |>
+  filter(People >= MIN_GROUP_N)
+
+FUNCTION_ORDER <- function_summary |>
+  arrange(`Weekly credits`) |>
+  pull(FunctionType)
+
+overall <- person_wow |>
+  summarise(
+    People = n(),
+    Consumers = sum(weekly_credits > 0),
+    `Weekly credits` = mean(weekly_credits),
+    `Weekly tokens` = mean(weekly_tokens),
+    `Credit intensity` = weighted.mean(
+      credit_intensity, total_tokens, na.rm = TRUE),
+    `Reasoning-token share` = weighted.mean(
+      reasoning_share, total_tokens, na.rm = TRUE)
+  )
+
+std_diff <- function(x, grp) {
+  a <- x[grp]
+  b <- x[!grp]
+  if (length(a) < MIN_GROUP_N || length(b) < MIN_GROUP_N) return(NA_real_)
+  pooled <- sqrt(((length(a) - 1) * var(a) + (length(b) - 1) * var(b)) /
+                   (length(a) + length(b) - 2))
+  if (is.na(pooled) || pooled == 0) return(NA_real_)
+  (mean(a) - mean(b)) / pooled
+}
+```
+
+<style>
+body {
+  font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  color: #374151;
+  background: #F4F4F4;
+}
+.navbar {
+  min-height: 52px;
+}
+.navbar-brand {
+  font-weight: 600;
+}
+.chart-wrapper {
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  box-shadow: none;
+}
+.chart-title {
+  color: #374151;
+  font-weight: 500;
+}
+.value-box {
+  min-height: 108px !important;
+  height: 108px !important;
+  color: #111827 !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E5E7EB;
+  border-top: 4px solid #3B82F6;
+  border-radius: 8px;
+  box-shadow: none;
+}
+.value-box-info { border-top-color: #14B8A6; }
+.value-box-success { border-top-color: #8B5CF6; }
+.value-box-warning { border-top-color: #F59E0B; }
+.value-box > .inner {
+  padding: 13px 18px !important;
+}
+.value-box .value {
+  color: #111827 !important;
+  font-size: 30px !important;
+  line-height: 1.05;
+}
+.value-box .caption {
+  color: #374151 !important;
+  font-size: 13px !important;
+  line-height: 1.25;
+}
+.value-box .icon i {
+  top: 15px !important;
+  right: 16px !important;
+  font-size: 52px !important;
+  color: rgba(17, 24, 39, 0.09) !important;
+}
+.insight-banner {
+  margin: 8px 8px 0 0;
+  padding: 12px 18px;
+  border-left: 4px solid #3B82F6;
+  border-radius: 8px;
+  background: #EFF6FF;
+  color: #1E3A5F;
+  font-size: 15px;
+}
+.synthetic-pill {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 2px 8px;
+  border: 1px solid #F59E0B;
+  border-radius: 999px;
+  background: #FFF7E6;
+  color: #92400E;
+  font-size: 12px;
+  font-weight: 600;
+}
+table {
+  font-variant-numeric: tabular-nums;
+}
+th {
+  background: #F9FAFB;
+}
+.chart-stage img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+@media (max-width: 767px) {
+  body { padding-left: 0 !important; }
+  html, body, #dashboard-container, .tab-content,
+  .dashboard-page-wrapper, .dashboard-column-orientation,
+  .dashboard-column, .chart-wrapper, .value-box {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .dashboard-row {
+    min-width: 0 !important;
+    flex-direction: column !important;
+  }
+  .chart-wrapper {
+    min-width: 0 !important;
+    width: calc(100% - 8px) !important;
+  }
+  .value-box {
+    min-height: 92px !important;
+    height: 92px !important;
+  }
+  .value-box .value { font-size: 27px !important; }
+  .chart-stage { overflow-x: auto !important; }
+  table { font-size: 12px; }
+}
+</style>
+
+Overview {data-icon="fa-dashboard"}
+=====================================
+
+<div class="insight-banner">
+<span class="synthetic-pill">Synthetic demonstration</span>
+Higher-credit users lean more towards chat and less towards email, while
+function and seniority explain more of total collaboration volume.
+</div>
+
+Row {data-height=120}
+-------------------------------------
+
+### People represented
+
+```{r}
+flexdashboard::valueBox(
+  comma(overall$People), "People in the analysis",
+  icon = "fa-users", color = "primary"
+)
+```
+
+### Positive users
+
+```{r}
+flexdashboard::valueBox(
+  percent(overall$Consumers / overall$People, accuracy = 0.1),
+  paste0(comma(overall$Consumers), " of ", comma(overall$People), " people"),
+  icon = "fa-bolt", color = "info"
+)
+```
+
+### Credits per person per week
+
+```{r}
+flexdashboard::valueBox(
+  format(round(overall$`Weekly credits`, 1), big.mark = ",", nsmall = 1),
+  "Credits / person / week (all people)",
+  icon = "fa-calculator", color = "success"
+)
+```
+
+### Credits per 1,000 tokens
+
+```{r}
+flexdashboard::valueBox(
+  format(round(overall$`Credit intensity`, 2), nsmall = 2),
+  "Credits / 1,000 tokens (positive users)",
+  icon = "fa-tachometer", color = "warning"
+)
+```
+
+Row {data-height=510}
+-------------------------------------
+
+### Consumption baselines by function
+
+```{r function-baseline, fig.height=4.4, fig.alt="Horizontal bars comparing average weekly Copilot tokens and credits per positive user across eight functions."}
+baseline_long <- function_summary |>
+  select(FunctionType, People, `Weekly credits`, `Weekly tokens`) |>
+  pivot_longer(c(`Weekly credits`, `Weekly tokens`),
+               names_to = "Measure", values_to = "Value") |>
+  mutate(Measure = recode(
+    Measure,
+    `Weekly credits` = "Credits / user / week",
+    `Weekly tokens` = "Tokens / user / week"
+  ),
+  Label = if_else(
+    Measure == "Tokens / user / week",
+    format(round(Value), big.mark = ","),
+    format(round(Value, 1), nsmall = 1)
+  ),
+  FunctionType = factor(FunctionType, levels = FUNCTION_ORDER))
+
+ggplot(baseline_long,
+       aes(FunctionType, Value, fill = Measure)) +
+  geom_col(position = position_dodge(width = 0.72), width = 0.66) +
+  geom_text(aes(label = Label),
+            position = position_dodge(width = 0.72),
+            hjust = -0.10, size = 3) +
+  coord_flip() +
+  facet_wrap(~Measure, scales = "free_x") +
+  scale_fill_manual(values = PAL[c(1, 3)], guide = "none") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.18))) +
+  theme_t() +
+  labs(
+    subtitle = "Positive users only (token volume is the primary usage baseline)",
+    x = NULL, y = NULL
+  )
+```
+
+### Baseline table
+
+```{r}
+function_summary |>
+  arrange(desc(`Weekly credits`)) |>
+  transmute(
+    Function = FunctionType,
+    People,
+    `Credits / user / week` = round(`Weekly credits`, 1),
+    `Actions / user / week` = round(`Weekly actions`, 1),
+    `Tokens / user / week` = format(round(`Weekly tokens`), big.mark = ","),
+    `Credits / 1,000 tokens` = round(`Credit intensity`, 2),
+    `Reasoning share` = percent(`Reasoning-token share`, accuracy = 0.1)
+  ) |>
+  kable(
+    caption = "Function baseline (credit intensity is credits per 1,000 tokens; lower means a less expensive token mix)."
+  )
+```
+
+Row {data-height=335}
+-------------------------------------
+
+### Population-level highlights
+
+**Consumption volume and consumption mix are separate.** The highest-credit
+people are not automatically the most reasoning-intensive, and the standard
+Power User definition is based on sustained actions rather than credit cost.
+
+**The clearest Ways of Working difference is channel mix.** Higher-credit
+users lean more towards chat and less towards email. Total collaboration
+volume is more sensitive to function and seniority than to consumption itself.
+
+**Reasoning-intensive use carries a weak workload signal in this simulation.**
+Within the same broad credit band, reasoning-intensive users have slightly
+more after-hours collaboration and a longer collaboration span. This is an
+association to investigate rather than evidence of harm.
+
+### How to read credit intensity
+
+**Credit intensity** is the number of credits consumed per 1,000 tokens. It is a
+cost-mix measure rather than a productivity or value measure. Lower intensity
+means the observed token mix consumes fewer credits. It does not establish that
+the work was more efficient, because the report does not observe output quality,
+task difficulty or business value.
+
+Token distribution {data-icon="fa-chart-area"}
+=====================================
+
+Row {data-height=470}
+-------------------------------------
+
+### Concentration of token consumption across users
+
+```{r token-concentration, fig.height=4.4, fig.alt="Concentration curve showing the cumulative share of tokens accounted for by the highest-volume share of users."}
+token_rank <- person_consumption |>
+  filter(positive_consumer) |>
+  arrange(desc(weekly_tokens)) |>
+  mutate(
+    n = n(),
+    `Share of users` = row_number() / n,
+    `Share of tokens` = cumsum(weekly_tokens) / sum(weekly_tokens)
+  )
+
+marker_x <- c(0.10, 0.25)
+marker_y <- vapply(marker_x, function(p) {
+  token_rank$`Share of tokens`[which.min(abs(token_rank$`Share of users` - p))]
+}, numeric(1))
+markers <- tibble(x = marker_x, y = marker_y,
+                  lbl = percent(marker_y, accuracy = 1))
+
+ggplot(token_rank, aes(`Share of users`, `Share of tokens`)) +
+  geom_area(fill = PAL[3], alpha = 0.35) +
+  geom_line(colour = PAL[1], linewidth = 1) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", colour = "grey55") +
+  geom_point(data = markers, aes(x, y), colour = PAL[6], size = 2.6,
+            inherit.aes = FALSE) +
+  geom_text(data = markers, aes(x, y, label = lbl), inherit.aes = FALSE,
+            vjust = -1.0, hjust = -0.15, size = 3.3, colour = PAL[6]) +
+  scale_x_continuous(labels = percent_format(accuracy = 1),
+                     expand = expansion(mult = c(0.01, 0.06))) +
+  scale_y_continuous(labels = percent_format(accuracy = 1),
+                     expand = expansion(mult = c(0.01, 0.10))) +
+  theme_t() +
+  labs(
+    title = "Cumulative share of tokens by user rank",
+    subtitle = paste0(
+      "Users ranked from the highest to the lowest weekly token volume; the ",
+      "dashed line marks equal consumption. A curve further above the line ",
+      "indicates more concentrated consumption"
+    ),
+    x = "Share of positive users (ranked highest to lowest)",
+    y = "Cumulative share of tokens",
+    caption = CHART_CAPTION
+  )
+```
+
+### Concentration bands
+
+```{r}
+band_levels <- c("Top 1%", "Next 4% (top 1-5%)", "Next 5% (top 5-10%)",
+                 "Next 15% (top 10-25%)", "Next 25% (top 25-50%)",
+                 "Bottom 50%")
+
+band_table <- token_rank |>
+  mutate(
+    Band = case_when(
+      `Share of users` <= 0.01 ~ band_levels[1],
+      `Share of users` <= 0.05 ~ band_levels[2],
+      `Share of users` <= 0.10 ~ band_levels[3],
+      `Share of users` <= 0.25 ~ band_levels[4],
+      `Share of users` <= 0.50 ~ band_levels[5],
+      TRUE ~ band_levels[6]
+    ),
+    Band = factor(Band, levels = band_levels)
+  ) |>
+  group_by(Band) |>
+  summarise(
+    People = n(),
+    `Weekly tokens (band total)` = sum(weekly_tokens),
+    .groups = "drop"
+  ) |>
+  arrange(Band) |>
+  mutate(
+    `Share of users` = percent(People / sum(People), accuracy = 1),
+    `Share of tokens` = percent(
+      `Weekly tokens (band total)` / sum(`Weekly tokens (band total)`),
+      accuracy = 1
+    )
+  ) |>
+  select(Band, People, `Share of users`, `Share of tokens`)
+
+band_table |>
+  kable(caption = paste0(
+    "Users ranked by average weekly tokens, positive users only (n = ",
+    comma(sum(band_table$People)), ")."
+  ))
+```
+
+Row {data-height=440}
+-------------------------------------
+
+### Shape of the token-volume distribution
+
+```{r token-histogram, fig.height=4.1, fig.alt="Histogram of average weekly tokens per positive user on a logarithmic scale, with median and mean reference lines."}
+token_stats <- person_consumption |>
+  filter(positive_consumer)
+
+med_tokens <- median(token_stats$weekly_tokens)
+mean_tokens <- mean(token_stats$weekly_tokens)
+ref_lines <- tibble(
+  stat = c("Median", "Mean"),
+  value = c(med_tokens, mean_tokens),
+  colour = c(PAL[1], PAL[6])
+)
+
+ggplot(token_stats, aes(weekly_tokens)) +
+  geom_histogram(bins = 40, fill = PAL[2], colour = "white", linewidth = 0.2) +
+  geom_vline(data = ref_lines, aes(xintercept = value, colour = stat),
+            linetype = "dashed", linewidth = 0.7, show.legend = TRUE) +
+  scale_colour_manual(values = c(Median = PAL[1], Mean = PAL[6])) +
+  scale_x_log10(labels = label_number(scale = 1 / 1000, suffix = "K")) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.10))) +
+  theme_t() +
+  labs(
+    title = "Distribution of weekly tokens per user",
+    subtitle = paste0(
+      "Logarithmic x-axis; positive users only. A long right tail indicates a ",
+      "small group of high-volume users; a more symmetric shape indicates ",
+      "more uniform usage"
+    ),
+    x = "Tokens / user / week (log scale)", y = "Number of users",
+    colour = NULL,
+    caption = CHART_CAPTION
+  )
+```
+
+### Why a concentration curve and a log histogram?
+
+Token and credit consumption in Copilot data is typically **right-skewed**: most
+people use a modest, fairly similar amount, while a small group of heavy users
+account for a disproportionate share of total volume. A boxplot or violin plot
+would compress this shape into a small number of summary points and understate
+how concentrated the top tail is.
+
+The concentration curve above answers the practical question directly: **what
+share of tokens does the top share of users account for?** The histogram (log
+scale) shows the shape that produces that concentration, and the gap between
+the median and mean lines is itself evidence of the right skew.
+
+This has a practical implication for interpreting averages elsewhere in this
+report. A mean such as "credits per person per week" can be pulled upward by a
+small number of heavy users, so organisational and segment comparisons should
+be read alongside this distribution rather than in isolation.
+
+Credit relationships
+=====================================
+
+Row {data-height=470}
+-------------------------------------
+
+### Ways of Working metrics by credit-consumption group
+
+```{r credit-heatmap, fig.height=4.4, fig.alt="Heatmap of standardised Ways of Working metric differences for five credit-consumption groups."}
+credit_levels <- c("No consumption", "Q1 lowest", "Q2", "Q3", "Q4 highest")
+
+scan <- expand_grid(
+  Metric = WOW_METRICS,
+  CreditQuartile = credit_levels
+) |>
+  rowwise() |>
+  mutate(d = std_diff(
+    person_wow[[Metric]],
+    person_wow$CreditQuartile == CreditQuartile
+  )) |>
+  ungroup() |>
+  filter(!is.na(d)) |>
+  mutate(
+    Metric = recode(
+      Metric,
+      Collaboration_hours = "Collaboration hours / person / week",
+      Active_connected_hours = "Active connected hours / person / week",
+      Email_hours = "Email hours / person / week",
+      Chat_hours = "Chat hours / person / week",
+      Meeting_hours = "Meeting hours / person / week",
+      Unscheduled_call_hours = "Unscheduled call hours / person / week",
+      After_hours_collaboration_hours =
+        "After-hours collaboration hours / person / week",
+      Collaboration_span = "Collaboration span (hours)",
+      Weekend_collaboration_hours =
+        "Weekend collaboration hours / person / week",
+      Internal_network_size = "Internal network size (people)",
+      External_network_size = "External network size (people)"
+    ),
+    CreditQuartile = factor(CreditQuartile, levels = rev(credit_levels))
+  )
+
+ggplot(scan, aes(CreditQuartile, reorder(Metric, d), fill = d)) +
+  geom_tile(colour = "white", linewidth = 0.6) +
+  geom_text(aes(label = sprintf("%+.2f", d)), size = 3) +
+  scale_fill_gradient2(
+    low = PAL[6], mid = "#F5F2EA", high = PAL[1],
+    midpoint = 0, limits = c(-1.3, 1.3), oob = squish
+  ) +
+  theme_t() +
+  theme(legend.position = "right") +
+  labs(
+    title = "Standardised difference against everyone outside the group",
+    subtitle = "Positive values indicate the group scores above the rest of the population on that measure",
+    x = NULL, y = NULL, fill = "Std. difference"
+  )
+```
+
+### Credit groups
+
+```{r}
+person_base |>
+  count(CreditQuartile, name = "People") |>
+  group_by(CreditQuartile) |>
+  mutate(
+    `Credits / person / week` = mean(
+      person_base$weekly_credits[
+        person_base$CreditQuartile == first(CreditQuartile)
+      ]
+    )
+  ) |>
+  ungroup() |>
+  mutate(
+    `Share of population` = percent(People / sum(People), accuracy = 0.1),
+    `Credits / person / week` = round(`Credits / person / week`, 1)
+  ) |>
+  kable(caption = "Credit-volume groups (quartiles are calculated among positive users).")
+```
+
+Row {data-height=455}
+-------------------------------------
+
+### Collaboration mode mix by credit-consumption group
+
+```{r mode-mix, fig.height=4.1, fig.alt="One hundred percent stacked bars comparing email, chat, meeting and unscheduled-call shares across credit groups."}
+modes <- c("Email_hours", "Chat_hours", "Meeting_hours",
+           "Unscheduled_call_hours")
+
+mode_share <- person_wow |>
+  group_by(CreditQuartile) |>
+  summarise(People = n(), across(all_of(modes), mean), .groups = "drop") |>
+  pivot_longer(all_of(modes), names_to = "Mode", values_to = "Hours") |>
+  group_by(CreditQuartile) |>
+  mutate(Share = Hours / sum(Hours)) |>
+  ungroup() |>
+  mutate(Mode = recode(
+    Mode,
+    Email_hours = "Email",
+    Chat_hours = "Chat",
+    Meeting_hours = "Meetings",
+    Unscheduled_call_hours = "Unscheduled calls"
+  ))
+
+ggplot(mode_share, aes(CreditQuartile, Share, fill = Mode)) +
+  geom_col(width = 0.68) +
+  geom_text(
+    aes(label = ifelse(Share >= 0.06, percent(Share, accuracy = 1), "")),
+    position = position_stack(vjust = 0.5),
+    colour = ifelse(mode_share$Mode %in% c("Meetings", "Unscheduled calls"),
+                    "#1F2937", "white"),
+    size = 3
+  ) +
+  coord_flip() +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  scale_fill_manual(values = PAL[1:4]) +
+  theme_t() +
+  labs(
+    title = "Share of collaboration hours by mode",
+    subtitle = "Mode hours are shown before deduplication, so shares may not sum exactly across modes",
+    x = NULL, y = NULL, fill = "Collaboration mode"
+  )
+```
+
+### Workload and network
+
+```{r credit-outcomes, fig.height=4.1, fig.alt="Four small bar charts comparing workload and network metrics across credit groups."}
+person_wow |>
+  group_by(CreditQuartile) |>
+  summarise(
+    People = n(),
+    `After-hours collaboration hours / person / week` =
+      mean(After_hours_collaboration_hours),
+    `Collaboration span (hours)` = mean(Collaboration_span),
+    `Internal network size (people)` = mean(Internal_network_size),
+    `External network size (people)` = mean(External_network_size),
+    .groups = "drop"
+  ) |>
+  pivot_longer(-c(CreditQuartile, People),
+               names_to = "Metric", values_to = "Value") |>
+  ggplot(aes(CreditQuartile, Value)) +
+  geom_col(fill = PAL[2], width = 0.66) +
+  geom_text(aes(label = round(Value, 1)), vjust = -0.35, size = 2.8) +
+  facet_wrap(~Metric, scales = "free_y", ncol = 2) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.16))) +
+  theme_t() +
+  theme(axis.text.x = element_text(angle = 25, hjust = 1)) +
+  labs(
+    title = "Workload and network by credit-volume group",
+    subtitle = "Average values by credit-volume group; compare with the function drill-down for organisational context",
+    x = NULL, y = NULL
+  )
+```
+
+Function drill-down {data-icon="fa-sitemap"}
+=====================================
+
+Row {data-height=505}
+-------------------------------------
+
+### Consumption and collaboration volume by function
+
+```{r bubble-collaboration, fig.height=4.5, fig.alt="Bubble plot of tokens and collaboration hours by function. Bubble size represents users and colour represents credits per one thousand tokens."}
+ggplot(
+  function_summary,
+  aes(`Weekly tokens`, `Collaboration hours`,
+      size = People, colour = `Credit intensity`, label = FunctionType)
+) +
+  geom_point(alpha = 0.85) +
+  geom_text_repel(size = 3.2, colour = "grey20", seed = 2026,
+                  min.segment.length = 0, max.overlaps = Inf,
+                  box.padding = 0.6, point.padding = 0.3) +
+  scale_size_area(max_size = 14) +
+  scale_colour_gradient(low = PAL[3], high = PAL[6]) +
+  scale_x_continuous(labels = label_number(scale = 1 / 1000, suffix = "K"),
+                     expand = expansion(mult = 0.18)) +
+  scale_y_continuous(expand = expansion(mult = 0.18)) +
+  theme_t() +
+  labs(
+    title = "Token consumption against collaboration hours, by function",
+    subtitle = "Bubble size shows population; colour shows credit intensity (credits per 1,000 tokens)",
+    x = "Tokens / user / week",
+    y = "Collaboration hours / user / week",
+    colour = "Credits / 1,000 tokens",
+    size = "Positive users",
+    caption = CHART_CAPTION
+  )
+```
+
+### Reading the chart
+
+The upper-right functions combine high token volume with high collaboration
+volume. That does not imply that one causes the other. Their role
+mix, seniority and working practices may raise both.
+
+The colour adds a third dimension. A darker point consumes more credits for the
+same number of tokens. This can indicate a more expensive reasoning mix, but it
+may also reflect harder work. The appropriate follow-up is to examine task mix
+and value, rather than treating lower intensity as automatically better.
+
+Row {data-height=490}
+-------------------------------------
+
+### Workload and credit intensity by function
+
+```{r bubble-workload, fig.height=4.4, fig.alt="Bubble plot of credits and after-hours collaboration by function. Bubble size represents users and colour represents credits per one thousand tokens."}
+ggplot(
+  function_summary,
+  aes(`Weekly credits`, `After-hours hours`,
+      size = People, colour = `Credit intensity`,
+      label = FunctionType)
+) +
+  geom_point(alpha = 0.85) +
+  geom_text_repel(size = 3.2, colour = "grey20", seed = 2026,
+                  min.segment.length = 0, max.overlaps = Inf,
+                  box.padding = 0.6, point.padding = 0.3) +
+  scale_size_area(max_size = 14) +
+  scale_colour_gradient(low = PAL[3], high = PAL[6]) +
+  scale_x_continuous(expand = expansion(mult = 0.18)) +
+  scale_y_continuous(expand = expansion(mult = 0.18)) +
+  theme_t() +
+  labs(
+    title = "Credit consumption against after-hours workload, by function",
+    subtitle = "Same bubble-size and colour encoding as the chart above, for comparison across functions",
+    x = "Credits / user / week",
+    y = "After-hours hours / user / week",
+    colour = "Credits / 1,000 tokens",
+    size = "Positive users",
+    caption = CHART_CAPTION
+  )
+```
+
+### Function comparison matrix
+
+```{r function-heatmap, fig.height=4.4, fig.alt="Indexed heatmap comparing six consumption and Ways of Working measures across eight functions."}
+heat_metrics <- c(
+  "Weekly credits", "Credit intensity", "Collaboration hours",
+  "After-hours hours", "Collaboration span", "Internal network size"
+)
+
+function_summary |>
+  mutate(FunctionType = factor(FunctionType, levels = FUNCTION_ORDER)) |>
+  select(FunctionType, all_of(heat_metrics)) |>
+  pivot_longer(-FunctionType, names_to = "Metric", values_to = "Value") |>
+  mutate(Metric = recode(
+    Metric,
+    `Weekly credits` = "Credits / user / week",
+    `Credit intensity` = "Credits / 1,000 tokens",
+    `Collaboration hours` = "Collaboration hours / person / week",
+    `After-hours hours` = "After-hours hours / person / week",
+    `Collaboration span` = "Collaboration span (hours)",
+    `Internal network size` = "Internal network size (people)"
+  )) |>
+  group_by(Metric) |>
+  mutate(Index = 100 * Value / mean(Value)) |>
+  ungroup() |>
+  ggplot(aes(FunctionType, Metric, fill = Index)) +
+  geom_tile(colour = "white", linewidth = 0.7) +
+  geom_text(aes(label = round(Index)), size = 3) +
+  scale_fill_gradient2(
+    low = "#E8EEF5", mid = "#F5F2EA", high = PAL[1], midpoint = 100
+  ) +
+  theme_t() +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1),
+        legend.position = "right") +
+  labs(
+    title = "Each metric indexed to the function average (100)",
+    subtitle = "A compact view of six dimensions across functions",
+    x = NULL, y = NULL, fill = "Index"
+  )
+```
+
+Consumption mix {data-icon="fa-adjust"}
+=====================================
+
+Row {data-height=480}
+-------------------------------------
+
+### Credit volume by credit band and reasoning-token profile
+
+```{r reasoning-profile, fig.height=4.3, fig.alt="Grouped bars comparing weekly credit volume for reasoning-intensive and standard-cost profiles within each credit band."}
+profile_summary <- person_wow |>
+  filter(ConsumptionProfile != "No consumption") |>
+  group_by(ConsumptionProfile) |>
+  summarise(
+    People = n(),
+    `Credits / person / week` = mean(weekly_credits),
+    `Weekly actions` = mean(weekly_actions),
+    `Reasoning share` = mean(reasoning_share, na.rm = TRUE),
+    `After-hours hours` = mean(After_hours_collaboration_hours),
+    `Collaboration span` = mean(Collaboration_span),
+    .groups = "drop"
+  )
+
+profile_grid <- profile_summary |>
+  mutate(
+    CreditBand = if_else(grepl("^High credit", ConsumptionProfile),
+                         "High credit", "Lower credit"),
+    `Reasoning-token profile` = if_else(
+      grepl("reasoning-intensive", ConsumptionProfile),
+      "Reasoning-intensive", "Standard-cost mix"
+    )
+  )
+
+ggplot(
+  profile_grid,
+  aes(CreditBand, `Credits / person / week`, fill = `Reasoning-token profile`)
+) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.6) +
+  geom_text(
+    aes(label = round(`Credits / person / week`, 1)),
+    position = position_dodge(width = 0.7), vjust = -0.4, size = 3.2
+  ) +
+  scale_fill_manual(values = c(
+    "Reasoning-intensive" = PAL[6], "Standard-cost mix" = PAL[3]
+  )) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.18))) +
+  theme_t() +
+  labs(
+    title = "Mix of credit volume and reasoning intensity",
+    subtitle = paste0(
+      "Similar bar heights within a credit band suggest the two dimensions are ",
+      "largely independent; a consistent gap suggests they move together"
+    ),
+    x = "Credit-volume band", y = "Credits / person / week",
+    fill = "Reasoning-token profile"
+  )
+```
+
+### Profile definitions
+
+| Profile component | Definition | Interpretation |
+|---|---|---|
+| High credit | Q3 or Q4 among positive users | Higher total credit volume |
+| Lower credit | Q1 or Q2 among positive users | Lower total credit volume |
+| Reasoning-intensive | Upper quartile of reasoning-token share among people with at least 10,000 tokens | More expensive token mix |
+| Standard-cost mix | Below the reasoning-intensive threshold | Less expensive observed token mix |
+
+The label **reasoning-intensive** describes the measurable consumption pattern
+without assuming recklessness. Business value and task difficulty are needed
+before judging whether the additional expense was warranted.
+
+Row {data-height=455}
+-------------------------------------
+
+### Workload by reasoning-token profile within credit bands
+
+```{r reasoning-outcomes, fig.height=4.1, fig.alt="Bars comparing after-hours collaboration and collaboration span across standard-cost and reasoning-intensive profiles."}
+profile_summary |>
+  select(ConsumptionProfile, People,
+         `After-hours hours`, `Collaboration span`) |>
+  pivot_longer(-c(ConsumptionProfile, People),
+               names_to = "Metric", values_to = "Value") |>
+  ggplot(
+    aes(reorder(ConsumptionProfile, Value), Value,
+        fill = grepl("reasoning-intensive", ConsumptionProfile))
+  ) +
+  geom_col(width = 0.65) +
+  geom_text(aes(label = round(Value, 2)), hjust = -0.12, size = 3) +
+  coord_flip() +
+  facet_wrap(~Metric, scales = "free_x") +
+  scale_fill_manual(
+    values = c(`TRUE` = PAL[6], `FALSE` = PAL[2]),
+    labels = c(`TRUE` = "Reasoning-intensive",
+               `FALSE` = "Standard-cost mix")
+  ) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.18))) +
+  theme_t() +
+  labs(
+    title = "Workload by reasoning-token profile, within credit bands",
+    subtitle = "Compared within the same broad credit band",
+    x = NULL, y = NULL, fill = "Reasoning-token profile"
+  )
+```
+
+### What work consumes the credits?
+
+```{r task-mix, fig.height=4.1, fig.alt="Stacked bars comparing the share of credits used by delegated task type for high-credit and lower-credit users."}
+credit_tasks |>
+  left_join(select(person_base, PersonId, CreditBand), by = "PersonId") |>
+  filter(CreditBand != "No consumption") |>
+  group_by(CreditBand, TaskType) |>
+  summarise(Credits = sum(credits), People = n_distinct(PersonId),
+            .groups = "drop") |>
+  filter(People >= MIN_GROUP_N) |>
+  group_by(CreditBand) |>
+  mutate(Share = Credits / sum(Credits)) |>
+  ungroup() |>
+  ggplot(aes(CreditBand, Share, fill = reorder(TaskType, Share))) +
+  geom_col(width = 0.68) +
+  geom_text(
+    aes(label = ifelse(Share >= 0.06, percent(Share, accuracy = 1), "")),
+    position = position_stack(vjust = 0.5),
+    colour = "grey15", size = 2.9
+  ) +
+  coord_flip() +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  scale_fill_brewer(palette = "Blues", direction = -1) +
+  theme_t() +
+  labs(
+    title = "Credit mix by delegated task type",
+    subtitle = "Share of credits by delegated task type, for high-credit and lower-credit groups",
+    x = NULL, y = "Share of credits", fill = "Delegated task type"
+  )
+```
+
+Usage segments {data-icon="fa-users"}
+=====================================
+
+Row {data-height=480}
+-------------------------------------
+
+### Credit-volume distribution within usage segments
+
+```{r segment-credit, fig.height=4.3, fig.alt="Stacked bars showing credit-consumption quartiles within Power, Habitual, Novice, Low and Non-user segments."}
+segment_credit <- segment_snapshot |>
+  count(Segment, CreditQuartile, name = "People") |>
+  group_by(Segment) |>
+  mutate(Share = People / sum(People)) |>
+  ungroup()
+
+ggplot(segment_credit, aes(Segment, Share, fill = CreditQuartile)) +
+  geom_col(width = 0.68) +
+  coord_flip() +
+  scale_x_discrete(limits = rev(SEGMENT_LEVELS)) +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  scale_fill_manual(values = PAL[c(5, 4, 3, 2, 1)]) +
+  theme_t() +
+  labs(
+    title = "Credit-volume distribution within standard usage segments",
+    subtitle = paste0(
+      "Latest observation week (", format(LATEST_OBS_WEEK, "%d %b %Y"),
+      "); segments use the trailing 12 weeks"
+    ),
+    x = NULL, y = NULL, fill = "Credit-volume group"
+  )
+```
+
+### Why keep both?
+
+The standard usage ladder answers an adoption question: is activity frequent
+and sustained? Credit volume answers a resource-consumption question: how much
+credit is used? A Power User can have a standard-cost token mix and moderate
+credit volume, while someone with fewer actions can consume more credit through
+longer or more reasoning-intensive requests.
+
+The report therefore keeps usage segments as a useful supporting view without
+letting them substitute for the unique information in the consumption query.
+
+Row {data-height=400}
+-------------------------------------
+
+### Segment baseline
+
+```{r}
+segment_snapshot |>
+  group_by(Segment) |>
+  summarise(
+    People = n(),
+    `Weekly actions` = mean(weekly_actions),
+    `Credits / person / week` = mean(weekly_credits),
+    `Tokens / person / week` = mean(weekly_tokens),
+    `Credit intensity` = weighted.mean(
+      credit_intensity, weekly_tokens, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  arrange(Segment) |>
+  mutate(
+    across(c(`Weekly actions`, `Credits / person / week`),
+           \(x) round(x, 2)),
+    `Credit intensity` = if_else(
+      is.na(`Credit intensity`) | is.nan(`Credit intensity`),
+      "N/A",
+      format(round(`Credit intensity`, 2), nsmall = 2)
+    ),
+    `Tokens / person / week` =
+      format(round(`Tokens / person / week`), big.mark = ",")
+  ) |>
+  kable(caption = paste0(
+    "Latest-week baseline (", format(LATEST_OBS_WEEK, "%d %b %Y"),
+    "); segment classification uses the trailing 12 weeks."
+  ))
+```
+
+### Interpretation guardrail
+
+Neither segment nor credit group is a performance category. They describe
+observed use. The table and chart align activity to the latest observation week,
+while the segment reflects sustained behaviour over its trailing 12-week window.
+Results should be reported for privacy-safe cohorts and interpreted alongside
+role, task mix, entitlement and organisational context.
+
+Methods and appendix {data-icon="fa-book"}
+=====================================
+
+Row {data-height=410}
+-------------------------------------
+
+### Join and aggregation workflow
+
+```{r workflow, fig.height=3.4}
+steps <- tibble(
+  x = c(1, 3, 5, 7, 9),
+  label = c(
+    "Consumption query\nPerson x week",
+    "Token and credit\nexposures",
+    "Person Query\nPerson x week",
+    "Join on PersonId\nand week",
+    "Population and\nfunction views"
+  )
+)
+
+ggplot(steps, aes(x, 1)) +
+  geom_segment(
+    aes(xend = x + 1.35, yend = 1),
+    arrow = grid::arrow(length = grid::unit(0.14, "in")),
+    colour = PAL[2], linewidth = 0.8
+  ) +
+  geom_label(
+    aes(label = label), fill = "#EAF2F8", colour = PAL[1],
+    label.size = 0.25, size = 3.1, lineheight = 0.95
+  ) +
+  coord_cartesian(xlim = c(0, 10.6), ylim = c(0.6, 1.4), clip = "off") +
+  theme_void() +
+  labs(title = "Time-aligned person-week panel")
+```
+
+### Core rules
+
+| Question | Rule |
+|---|---|
+| Organisational attributes | Use a disclosed Person Query snapshot when exact date matching is unnecessarily restrictive |
+| Weekly relationships | Aggregate consumption to person-week, then join on `PersonId` and weekly `MetricDate` |
+| Credit quartiles | Calculate among positive users and retain non-users separately |
+| Reasoning profile | Require sufficient token volume before classifying the token mix |
+| Network measures | Treat internal and external network size as stock measures; never sum them across weeks |
+| Privacy | Suppress organisational groups below the approved minimum population |
+
+Row {data-height=390}
+-------------------------------------
+
+### Simulation design
+
+This dashboard is a demonstration of analytical possibilities. Every person,
+token, credit and Ways of Working value is synthetic.
+
+The simulation creates 1,200 people across eight functions and 26 weeks. Function
+and level affect both AI appetite and some Ways of Working measures so that raw
+associations contain realistic compositional confounding. Credit consumption is
+derived from input, output and reasoning tokens using synthetic relative weights.
+Reasoning tokens have the highest weight, which makes credit intensity responsive
+to token mix rather than merely to volume.
+
+The following effects are deliberately modest:
+
+- Higher consumption is associated with more chat and less email as a share of
+  collaboration modes.
+- Total collaboration volume is raised mainly by organisational composition.
+- Internal network size has a small residual association after composition is
+  considered.
+- Reasoning-intensive use has a weak positive association with after-hours
+  collaboration and collaboration span.
+- External network size is a null.
+
+### Synthetic source assets
+
+The uncompressed source-shaped CSVs sit under:
+
+```text
+examples/utility-r/_data/consumption/
+  consumption-query/
+  person-query/
+  reference/
+```
+
+They are intended for demonstrations, workshops and adaptation of the template.
+They contain no customer data or real identifiers.
+
+Row {data-height=430}
+-------------------------------------
+
+### Definitions and limitations
+
+**Credit intensity** means credits consumed per 1,000 tokens. It is preferred
+over “token cost-efficiency” because the report observes resource consumption
+rather than the quality or value of the output.
+
+**Reasoning-intensive** means the upper quartile of reasoning-token share among
+people with at least 10,000 observed tokens. It is preferred over “reckless”
+because expensive reasoning can be appropriate for a difficult task.
+
+The example Consumption export that motivated this template did not expose input,
+output and reasoning-token fields. A real implementation can only reproduce the
+reasoning profile when those governed token fields and applicable credit weights
+are available. If they are absent, omit the profile rather than inferring it from
+total credits.
+
+The dashboard shows associations. It does not establish that AI consumption
+caused a working pattern, and it does not observe output quality, task difficulty
+or business value.
+
+### Replacing the synthetic data
+
+1. Replace the CSVs in `_data/consumption` with schema-aligned governed exports.
+2. Validate the identity crosswalk and disclose the match rate.
+3. Confirm whether missing consumption rows mean zero activity, suppression or
+   ineligibility.
+4. Recompute credit weights from the applicable governed rate card.
+5. Keep person-level averaging so each person carries equal analytical weight.
+6. Retain the privacy threshold and the organisational composition checks.

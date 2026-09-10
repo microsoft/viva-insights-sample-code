@@ -1,0 +1,628 @@
+---
+title: "Developer Experience and Copilot"
+output:
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+    theme: lumen
+    self_contained: true
+    mathjax: null
+    fig_mobile: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE,
+  fig.width=11, fig.height=4.2, dpi=120, fig.retina=1, out.width='100%', fig.align='center')
+source('github-developer-experience-helpers.R', local=knitr::knit_global())
+```
+
+<style>
+:root { --primary:#4f46e5; --green:#16a34a; --red:#dc2626; --yellow:#ca8a04; --bg:#f8f9fa; --border:#e5e7eb; }
+body { font-family:'Segoe UI',Arial,sans-serif; color:#253047; background:var(--bg); font-size:14px; }
+.navbar { background:#fff; border-bottom:1px solid var(--border); }
+.navbar-brand { color:#242742 !important; font-weight:650; font-size:17px; }
+.navbar-nav>li>a { color:#475569 !important; font-size:13px; }
+.navbar-nav>.active>a { background:#eef2ff !important; color:#3730a3 !important; }
+.chart-wrapper { border:1px solid var(--border); border-radius:8px; box-shadow:0 1px 3px #18203308; margin-bottom:12px; background:white; }
+.chart-title { font-size:15px; font-weight:600; padding:12px 18px; color:#303755; border-bottom:1px solid #f1f3f5; }
+.dashboard-row { height:auto !important; }
+.dashboard-page, .dashboard-row, .dashboard-column, .chart-wrapper, .chart-stage, .chart-shim { min-width:0 !important; max-width:100%; }
+.chart-wrapper { height:auto !important; min-height:0 !important; }
+.chart-stage { height:auto !important; flex:0 0 auto !important; }
+.chart-shim { position:relative !important; inset:auto !important; }
+.image-container { position:static !important; background:none !important; }
+.image-container img { opacity:1 !important; }
+.chart-stage .image-container { max-width:none; }
+.chart-stage { padding:14px 20px !important; overflow:auto !important; }
+.chart-stage p { max-width:1100px; line-height:1.55; }
+.chart-stage img { display:block; width:100%; height:auto; max-width:1320px; margin:0 auto; }
+.kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin:14px 0; }
+.kpi { border:1px solid var(--border); border-radius:8px; padding:12px 16px; background:white; }
+.kpi span,.kpi small { display:block; color:#475569; font-size:12px; }
+.kpi strong { display:block; font-size:27px; font-weight:650; color:#242742; margin:3px 0; }
+.pill { display:inline-block; border:1px solid #c7d2fe; border-radius:20px; padding:2px 9px; color:#3730a3; background:#eef2ff; font-size:12px; }
+.leadline { font-size:18px; color:#20243b; max-width:1080px; line-height:1.5; }
+.context { color:#526079; font-size:12px; margin:8px 0; }
+.definitions { border:1px solid var(--border); background:#f8fafc; border-radius:8px; padding:12px 16px; margin:10px 0; line-height:1.55; }
+.definitions p:last-child { margin-bottom:0; }
+details { margin:12px 0; border:1px solid var(--border); border-radius:8px; padding:10px 14px; }
+summary { cursor:pointer; font-weight:600; color:#3730a3; }
+details[open] summary { margin-bottom:12px; }
+.table-scroll { overflow:auto; max-height:440px; margin:12px 0; }
+table { width:100%; font-size:13px; font-variant-numeric:tabular-nums; border-collapse:collapse; }
+th { position:sticky; top:0; background:#f1f5f9; z-index:1; color:#303755; }
+th,td { padding:9px 12px !important; border-bottom:1px solid #e5e7eb; vertical-align:top; }
+caption { text-align:left; color:#526079; font-size:12px; padding:8px 0; }
+.plays { padding-left:20px; line-height:1.6; }
+.plays li { margin-bottom:6px; }
+.framework { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.framework>div { background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:14px; line-height:1.5; }
+a { color:#4338ca; }
+@media(min-width:1200px) { .dashboard-page-wrapper { max-width:1440px; margin:0 auto; } }
+@media(max-width:767px) {
+  body { padding-top:59px !important; }
+  .kpis { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .framework { grid-template-columns:1fr; }
+  .chart-stage { padding:12px !important; }
+  .chart-stage img { min-width:700px; }
+  .leadline { font-size:16px; }
+  .navbar-brand { font-size:16px; }
+}
+@media print { .navbar { position:static; } details { display:block; } .chart-stage { overflow:visible !important; } }
+</style>
+
+<script>
+// Close the mobile menu even when the current page is selected again.
+document.addEventListener('click', function(event) {
+  if (window.innerWidth < 768 && event.target.closest('.navbar-nav a')) {
+    window.jQuery('#navbar').collapse('hide');
+  }
+});
+</script>
+
+1 Landscape
+=====================================
+
+Row
+-------------------------------------
+
+### Who is represented, and what does their working week look like?
+
+<span class="pill">Synthetic demo · Provisional</span>
+<span class="context">Baseline: `r period_label` · 8 complete weeks · Week dates use UTC convention · Locale: en-US</span>
+
+<p class="leadline">The baseline covers <strong>`r num(nrow(baseline))` developers across six teams</strong>, with all eight Person Query weeks recorded for every developer. The median developer averaged <strong>`r f1(median(baseline$Collaboration_hours))` collaboration hours</strong>, including <strong>`r f1(median(baseline$Meeting_hours))` meeting hours</strong>, and <strong>`r f1(median(baseline$Uninterrupted_hours))` uninterrupted hours</strong> per week over this period.</p>
+
+```{r landscape-kpis, results='asis'}
+cat('<div class="kpis">')
+card('Developer roster',num(nrow(baseline)),'All eligible developers, regardless of Copilot use')
+card('Collaboration hours / week',f1(median(baseline$Collaboration_hours)),'Median. Includes meetings and scheduled calls')
+card('Meeting hours / week',f1(median(baseline$Meeting_hours)),'Median of each developer’s eight-week average')
+card('Uninterrupted hours / week',f1(median(baseline$Uninterrupted_hours)),'Median of each developer’s eight-week average')
+cat('</div>')
+```
+
+This is a manager view of working conditions and recorded AI use. The roster contains 1,080 synthetic people, of whom 900 are developers. The 180 other job-family records are excluded by the roster flag, rather than by tool activity. Eligibility for the Person Query and eligibility for each Copilot product are separate.
+
+<div class="definitions">
+<strong>Reading the working week.</strong> Collaboration hours include meeting hours, scheduled Teams calls, email and chat or instant-message time, so they must not be added to meeting hours. Uninterrupted hours identify blocks of at least one hour without the specified meeting, email or Teams activity. Neither calendar space nor the absence of that activity establishes coding time, deep work or psychological flow. All working-condition distributions below use each developer’s average across the same eight weeks.
+</div>
+
+Row
+-------------------------------------
+
+### Team and role composition
+
+```{r roster-composition, fig.height=4.4, fig.alt='Six team bars showing role composition. Every team contains 150 developers. Percentage labels and an exact table accompany the chart.'}
+stack_plot(team_context,'Roles represented in each team',
+  'Roster composition provides context for coordination needs.',
+  base_caption(unit='share of each team, 150 developers per team'))
+```
+
+<details><summary>Exact role mix, seniority and tenure</summary>
+
+```{r composition-details, results='asis'}
+html_table(composition_table(team_context),'Role shares use the 150 developers in each team as denominator.')
+composition_counts <- bind_rows(lapply(c('Role','Seniority','Tenure'),function(a)
+  baseline |> count(Category=.data[[a]],name='People') |> mutate(Attribute=a)))
+stopifnot(all(composition_counts$People>=MIN_GROUP_N))
+html_table(composition_counts |> transmute(Attribute,Category,`Developers (count)`=People,
+  `Share of 900 (%)`=pct(People/900)), 'Role, seniority and tenure are explicitly simulated roster attributes. No location or schedule attributes are simulated.')
+```
+
+</details>
+
+Row
+-------------------------------------
+
+### Team league table for workload, focus and recorded Copilot use
+
+<p class="leadline">Sorted by collaboration hours, <strong>`r team_league$Team[1]`</strong> is the busiest team at <strong>`r f1(team_league$Collaboration_hours[1])` hours/person/week</strong>. <strong>`r team_league$Team[which.max(team_league$GH_active_share)]`</strong> has the highest GitHub Copilot recorded-active share at <strong>`r pct(max(team_league$GH_active_share))`</strong>, <strong>`r team_league$Team[which.max(team_league$M365_active_share)]`</strong> leads M365 Copilot at <strong>`r pct(max(team_league$M365_active_share))`</strong>, and <strong>`r team_league$Team[which.max(team_league$Uninterrupted_hours)]`</strong> has the most uninterrupted time at <strong>`r f1(max(team_league$Uninterrupted_hours))` hours/person/week</strong>.</p>
+
+```{r landscape-tables, results='asis'}
+html_table(team_league |>
+  transmute(Rank, Team, `Developers (count)`=Developers,
+    `Collaboration hours`=f1(Collaboration_hours), `Meeting hours`=f1(Meeting_hours),
+    `Uninterrupted hours`=f1(Uninterrupted_hours),
+    `After-hours collaboration`=f1(After_hours_collaboration_hours),
+    `GitHub valid developers`=GH_valid_n, `GitHub active (%)`=pct(GH_active_share),
+    `GitHub intensity / person / week`=f1(GH_intensity),
+    `M365 valid developers`=M365_valid_n, `M365 active (%)`=pct(M365_active_share),
+    `M365 intensity / person / week`=f1(M365_intensity)),
+  paste('Sorted by collaboration hours descending | Hours/person/week | Product intensity units are suggestions for GitHub and illustrative actions for M365 |',period_label))
+html_table(work_summary,paste('Population percentiles across 900 developers’ eight-week averages | Hours/person/week |',period_label))
+html_table(joint_counts |> arrange(desc(Share)) |> transmute(`Recorded tool-use group`=Joint,`Developers (count)`=People,
+  `Share of 900 (%)`=pct(Share)), 'Joint footprint for the same baseline. Only fully observed, both-eligible developers enter the four tool-use groups.')
+```
+
+Row
+-------------------------------------
+
+### Ranked team view of headline metrics
+
+```{r team-league-visual, fig.height=10.5, fig.alt='Small-multiple ranked bars compare six teams on workload, focus, after-hours collaboration and product-specific recorded use.'}
+plot_league <- team_league_plot |>
+  group_by(Metric) |>
+  arrange(Value, .by_group=TRUE) |>
+  mutate(Team_metric=factor(paste(Team,Metric,sep=' | '), levels=paste(Team,Metric,sep=' | '))) |>
+  ungroup()
+ggplot(plot_league,aes(x=Value,y=Team_metric)) +
+  geom_col(fill='#2563eb',width=.62) +
+  geom_text(aes(label=Label),hjust=-.10,size=3.1,colour='#253047') +
+  facet_wrap(~Metric,scales='free',ncol=2,labeller=label_wrap_gen(26)) +
+  scale_y_discrete(labels=function(x) sub(' \\| .*','',x)) +
+  scale_x_continuous(expand=expansion(mult=c(0,.22))) + theme_report() +
+  chart_labs('Ranked team metrics for the baseline window',
+    'Each panel is ranked independently. Workload panels precede product panels. Recorded-active shares are shown in percentage points. Product denominators use eligible developers with complete eight-week coverage.',
+    paste(period_label,'| 150 developers per team | Hours are person-level weekly medians. Product intensity units are not added across products.'),
+    x=NULL,y=NULL)
+```
+
+<div class="definitions">
+<strong>Both, only and neither recorded</strong> refer to GitHub Copilot and M365 Copilot within this window. They say nothing about other AI tools. Developers who are not eligible for both products, or whose coverage is unresolved, stay in the working-conditions baseline. Page 4 separates product-specific denominators and use.
+</div>
+
+**Manager next step.** Use the team and role composition when discussing the distribution of working hours. Agree which coordination or tooling question needs investigation before setting a target. No performance judgement or individual action is supported by these data.
+
+2 Focus and coordination
+=====================================
+
+Row
+-------------------------------------
+
+### How much room is there for sustained work alongside coordination?
+
+<span class="pill">Synthetic demo · Provisional</span>
+<span class="context">`r period_label` · All 900 developers · 8 complete Person Query weeks each</span>
+
+<p class="leadline"><strong>`r team_league$Team[which.max(team_league$Meeting_hours)]`</strong> has the highest median meeting load at <strong>`r f1(max(team_league$Meeting_hours))` hours/person/week</strong>. <strong>`r team_league$Team[which.max(team_league$Uninterrupted_hours)]`</strong> has the most uninterrupted time at <strong>`r f1(max(team_league$Uninterrupted_hours))` hours/person/week</strong>. These are calendar-derived associations, not evidence of coding time or delivery quality.</p>
+
+<div class="definitions">
+<strong>Definitions, paraphrased from Microsoft Learn.</strong>
+<p><strong>Available-to-focus hours:</strong> working hours remaining after meetings and scheduled Teams calls. <strong>Uninterrupted hours:</strong> blocks of at least one hour without meeting attendance, reading or sending email or Teams chat, joining Teams calls, posting or replying to channel messages, or visiting Teams channels.</p>
+<p><strong>Open 1-hour block:</strong> a count of calendar blocks without scheduled meetings during the workday. It does not check email or Teams activity and is distinct from uninterrupted hours. Open blocks are defined here for clarity but are not a headline measure.</p>
+</div>
+
+Row
+-------------------------------------
+
+### Meeting and uninterrupted-time distributions
+
+```{r focus-intervals, fig.height=4.2, fig.alt='Team medians and interquartile ranges for meeting and uninterrupted hours. Separate panels have separately labelled horizontal scales.'}
+interval_plot(baseline,c('Meeting_hours','Uninterrupted_hours'),title='Meeting and uninterrupted-time distributions by team',
+  subtitle='Teams are ranked by meeting-hours median. Dot: median. Line: 25th to 75th percentile of person-level eight-week averages. Separate horizontal scales.')
+```
+
+Row
+-------------------------------------
+
+### Calendar availability and uninterrupted time
+
+```{r availability-intervals, fig.height=4.2, fig.alt='Team percentile intervals compare calendar time available to focus with uninterrupted hours.'}
+interval_plot(baseline,c('Available_to_focus_hours','Uninterrupted_hours'),
+  title='Calendar availability and uninterrupted time answer different questions',
+  subtitle='Dot: median. Line: middle half of developers. The simulation assumes a 40-hour scheduled week. Separate scales.')
+```
+
+Row
+-------------------------------------
+
+### Meeting characteristics that may warrant a conversation
+
+```{r meeting-characteristics, results='asis'}
+characteristics <- interval_data(baseline,c('Recurring_meeting_hours','Conflicting_meeting_hours','Meeting_hours_with_six_or_fewer_hours_of_advanced_notice')) |>
+  group_by(Metric) |> arrange(desc(p50), .by_group=TRUE) |> ungroup() |>
+  transmute(Team=Group,`Meeting characteristic`=Metric,`25th percentile`=f1(p25),Median=f1(p50),`75th percentile`=f1(p75))
+html_table(characteristics,paste('Hours/person/week |',period_label,'| 150 developers per team. Characteristics overlap and must not be added.'))
+```
+
+<div class="definitions">
+<strong>Recurring meeting hours:</strong> meetings set to recur. <strong>Conflicting meeting hours:</strong> only the overlapping portion of calendar meetings. <strong>Short-notice meeting hours:</strong> meetings scheduled six hours or less before their start. These are separate, potentially overlapping characteristics, not components of an additive stack. Definitions are paraphrased from <a href="https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics">Microsoft Learn</a>.
+</div>
+
+**Manager next step.** In the next team discussion, use these distributions to ask which meetings unblock work and which interrupt it. Combine the answer with feedback on review wait times and cognitive load before testing a calendar change. Fewer meetings are not inherently better.
+
+3 Sustainable workload
+=====================================
+
+Row
+-------------------------------------
+
+### How is collaboration outside working hours distributed and repeated?
+
+<span class="pill">Synthetic demo · Provisional</span>
+<span class="context">`r period_label` · All 900 developers · 8 observed weeks each</span>
+
+<p class="leadline"><strong>`r team_league$Team[which.max(team_league$After_hours_collaboration_hours)]`</strong> has the highest median after-hours collaboration at <strong>`r f1(max(team_league$After_hours_collaboration_hours))` hours/person/week</strong>. The population median is <strong>`r f1(median(baseline$After_hours_collaboration_hours))` hours</strong>, and the upper quartile begins at <strong>`r f1(quantile(baseline$After_hours_collaboration_hours,.75))` hours</strong>. These describe recorded collaboration outside scheduled hours, with no wellbeing outcome available.</p>
+
+<div class="definitions">
+<strong>After-hours collaboration, paraphrased from Microsoft Learn:</strong> time in meetings, email, Teams chats, calls and channels with at least one other person outside working hours, with overlapping activity deduplicated. It is not total work time. Flexible schedules, on-call duties and time zones may matter, but none is recorded here. Surveys about sustainable workload and the ability to disconnect are missing.
+</div>
+
+Row
+-------------------------------------
+
+### After-hours collaboration across teams
+
+```{r afterhours-distribution, fig.height=4.2, fig.alt='Six team medians and interquartile ranges of after-hours collaboration hours per developer per week.'}
+interval_plot(baseline,'After_hours_collaboration_hours',
+  title='After-hours collaboration distribution by team',
+  subtitle='Dot: median. Line: 25th to 75th percentile of each developer’s eight-week average. No health bands are assigned.')
+```
+
+Row
+-------------------------------------
+
+### Persistence over the observed weeks
+
+```{r persistence, fig.height=4.3, fig.alt='Bar chart of developers with zero, one to three, or four to eight weeks meeting an illustrative after-hours convention. Counts and percentages are labelled.'}
+persistence <- baseline |> mutate(Band=case_when(Weeks_above==0 ~ '0 weeks',
+  Weeks_above<PERSISTENCE_WEEKS ~ paste('1 to',PERSISTENCE_WEEKS-1,'weeks'),
+  TRUE ~ paste(PERSISTENCE_WEEKS,'to',BASELINE_WEEKS,'weeks'))) |>
+  count(Band,name='People') |> mutate(Share=People/900)
+stopifnot(sum(persistence$People)==900,all(persistence$People>=MIN_GROUP_N))
+ggplot(persistence,aes(x=People,y=factor(Band,levels=rev(c('0 weeks',paste('1 to',PERSISTENCE_WEEKS-1,'weeks'),paste(PERSISTENCE_WEEKS,'to',BASELINE_WEEKS,'weeks')))))) +
+  geom_col(fill='#c7d2fe',width=.55) +
+  geom_text(aes(label=paste0(num(People),' (',pct(Share),')')),hjust=-.12,size=3.7) +
+  scale_x_continuous(expand=expansion(mult=c(0,.23))) + theme_report() +
+  chart_labs('How often the illustrative convention was met',
+    paste('Convention:',AFTER_HOURS_CONVENTION,'or more after-hours collaboration hours in a week. No burnout diagnosis is implied.'),
+    base_caption(unit='developer counts and share of 900'),x='Developers (count)',y='Weeks at or above convention')
+```
+
+<div class="definitions">
+<strong>Configurable convention:</strong> `r AFTER_HOURS_CONVENTION` hours per week, with persistence defined as at least `r PERSISTENCE_WEEKS` of the `r BASELINE_WEEKS` observed weeks. Change <code>AFTER_HOURS_CONVENTION</code> and <code>PERSISTENCE_WEEKS</code> in the helper to explore sensitivity. These are illustrative discussion rules, not validated thresholds for healthy work or burnout. A zero means no recorded after-hours collaboration under the synthetic contract.
+</div>
+
+**Manager next step.** Before drawing a workload conclusion, validate work-schedule settings and seek anonymous feedback on sustainability and disconnection. Use a repeated survey alongside this distribution if the team tests a change. Do not target individual developers from these aggregates.
+
+4 AI use
+=====================================
+
+Row
+-------------------------------------
+
+### Where are both Copilot products used across developer work?
+
+<span class="pill">Synthetic demo · Provisional</span>
+<span class="context">`r period_label` · Same 900-developer roster · Product-specific eligibility and coverage</span>
+
+<p class="leadline"><strong>`r nrow(matched)` developers</strong> are eligible for both products and have complete coverage for all eight weeks. <strong>`r team_league$Team[which.max(team_league$GH_active_share)]`</strong> leads GitHub Copilot recorded-active share, while <strong>`r team_league$Team[which.max(team_league$M365_active_share)]`</strong> leads M365 Copilot recorded-active share. The other `r 900-nrow(matched)` developers remain visible as eligibility or coverage exceptions.</p>
+
+<div class="definitions">
+<strong>Use categories:</strong> at least one observed positive activity day in the window constitutes recorded use. All four categories require eligibility and complete coverage for both products throughout the baseline. <strong>Not both eligible</strong> takes precedence when either licence is absent. <strong>Coverage unresolved</strong> means both are eligible but one or more weeks lack confirmed coverage. Missing activity becomes zero only where the reference confirms eligibility and complete coverage.
+</div>
+
+Row
+-------------------------------------
+
+### Joint footprint with coverage exceptions retained
+
+```{r joint-footprint, fig.height=3.6, fig.alt='A labelled stacked bar reconciles both recorded, GitHub only, M365 only, neither recorded, not both eligible and unresolved coverage across 900 developers.'}
+joint_stack <- joint_counts |> transmute(Group='Developer roster',Category=Joint,People,Share)
+stack_plot(joint_stack,'Recorded product use and unresolved status',
+  'Only and neither refer to these two products. Segments below 6% are unlabelled. The table gives exact values.',
+  base_caption(unit='share of 900 developers'))
+```
+
+<details><summary>Exact joint categories and product denominators</summary>
+
+```{r joint-details, results='asis'}
+html_table(joint_counts |> transmute(`Tool-use status`=Joint,`Developers (count)`=People,`Share of roster (%)`=pct(Share)))
+eligibility_table <- bind_rows(lapply(c('GH','M365'),function(p) {
+  b <- baseline_panel |> group_by(PersonId) |>
+    summarise(eligible=all(.data[[paste0(p,'_eligible')]]),complete=all(.data[[paste0(p,'_complete')]]),.groups='drop')
+  tibble(Product=if(p=='GH') 'GitHub Copilot' else 'M365 Copilot',
+    `Not eligible (count)`=sum(!b$eligible),
+    `Eligible, incomplete (count)`=sum(b$eligible & !b$complete),
+    `Eligible, complete (count)`=sum(b$eligible & b$complete))
+}))
+stopifnot(all(rowSums(as.matrix(eligibility_table[-1]))==900),all(as.matrix(eligibility_table[-1])>=MIN_GROUP_N))
+html_table(eligibility_table,'Each product row reconciles to 900. Complete means all eight baseline weeks have coverage.')
+```
+
+</details>
+
+Row
+-------------------------------------
+
+### Product-specific frequency, intensity and concentration
+
+```{r product-usage, results='asis'}
+html_table(product_summary |> arrange(desc(`Recorded active (%)`)) |> mutate(across(-Product,as.character)) |>
+  pivot_longer(-Product,names_to='Product measure',values_to='Reported value') |>
+  pivot_wider(names_from=Product,values_from='Reported value'),paste(period_label,'| Each product uses its own all-eight-week eligible and complete population. Non-users remain in the frequency and intensity denominator.'))
+```
+
+The concentration row is the share of GitHub suggestions or M365 illustrative actions attributable to the highest-volume 10% of active developers for that product. The number of people is rounded up and shown. Identities and individual rankings are never displayed. These populations differ, so this is not a comparison of product effectiveness.
+
+Row
+-------------------------------------
+
+### Feature use within each product
+
+```{r feature-use, results='asis'}
+g <- baseline |> filter(GH_all_valid)
+m <- baseline |> filter(M365_all_valid)
+acceptance <- sum(g$GH_accepted)/sum(g$GH_suggestions)
+feature_table <- tibble(
+  Product=c(rep('GitHub Copilot',4),rep('M365 Copilot',3)),
+  Feature=c('Completion suggestions','Completion acceptance','User-initiated chat','Agent use',
+            'Drafting','Meeting assistance','Search and summarisation'),
+  Measure=c(paste(f1(mean(g$GH_suggestions)/8),'suggestions / developer / week'),
+    pct(acceptance),paste(f1(mean(g$GH_chats)/8),'requests / developer / week'),
+    paste(f1(mean(g$GH_agent_days)/8),'days / developer / week'),
+    pct(sum(m$M365_drafting)/sum(m$M365_actions)),
+    pct(sum(m$M365_meetings)/sum(m$M365_actions)),
+    pct(sum(m$M365_search)/sum(m$M365_actions))),
+  Denominator=c(paste(nrow(g),'valid developers'),
+    metric_count(sum(g$GH_suggestions),'suggestions'),paste(nrow(g),'valid developers'),
+    paste(nrow(g),'valid developers'),rep(metric_count(sum(m$M365_actions),'illustrative M365 actions'),3)))
+html_table(feature_table |> arrange(Product, desc(Measure)),paste(period_label,'| Product-specific units. Acceptance is total accepted divided by total suggested. Hover over abbreviated counts for exact values.'),escape=FALSE)
+```
+
+<div class="definitions">
+<strong>Completion acceptance</strong> records suggestions accepted, alongside the suggestion denominator. It does not establish correctness, productivity or time saved. <strong>M365 actions</strong> are mutually exclusive illustrative feature counts in this demo’s extended schema, not credits, tokens or a verified real-export metric. GitHub suggestions, chats and agent days stay separate. They are never added to M365 actions. Agent or model choice is not a maturity measure.
+</div>
+
+**Manager next step.** Resolve licence and coverage exceptions before discussing non-use. Ask developers which tasks each product supports, using the feature table to guide the conversation. Any enablement test should track developer feedback and quality outcomes as well as product-specific use.
+
+5 Working patterns
+=====================================
+
+Row
+-------------------------------------
+
+### How do working conditions differ across recorded tool-use groups?
+
+<span class="pill">Synthetic demo · Provisional</span>
+<span class="context">`r period_label` · `r nrow(matched)` both-eligible, fully observed developers · Same eight-week baseline</span>
+
+<p class="leadline">The comparison includes <strong>`r nrow(matched)` developers</strong> with common eligibility and complete observation for both products. The group with the highest median collaboration hours is <strong>`r interval_data(matched,'Collaboration_hours','Joint') |> arrange(desc(p50)) |> slice(1) |> pull(Group)`</strong>. Groups are descriptive categories based on recorded use in this same window, with no treatment assignment or causal estimate.</p>
+
+<div class="definitions">
+<strong>Common comparison population:</strong> eligible for both products and observed for all eight weeks in both feeds and the Person Query. This matches the eligibility and coverage rules, not people statistically. The `r sum(baseline$Joint=='Not both eligible')` not-both-eligible and `r sum(baseline$Joint=='Coverage unresolved')` unresolved developers remain in the 900-person baseline but do not become non-users in this comparison. Group membership uses the same window as working conditions, so temporal direction cannot be established.
+</div>
+
+Row
+-------------------------------------
+
+### Selected working-condition distributions
+
+```{r group-intervals, fig.height=4.4, fig.alt='Medians and interquartile ranges for meeting, uninterrupted and after-hours collaboration across four recorded product-use groups. No individual points or rankings.'}
+interval_plot(matched,c('Collaboration_hours','Meeting_hours','Uninterrupted_hours','After_hours_collaboration_hours'),group='Joint',
+  title='Working-condition distributions by recorded AI-use group',
+  subtitle='Dot: median. Line: middle half of each group’s person-level averages. Separate scales. Differences are unadjusted.')
+```
+
+<details><summary>Exact group sizes and percentile values</summary>
+
+```{r group-percentiles, results='asis'}
+sizes <- matched |> count(Joint,name='People',.drop=TRUE)
+html_table(interval_data(matched,c('Collaboration_hours','Meeting_hours','Uninterrupted_hours','After_hours_collaboration_hours'),'Joint') |>
+  left_join(sizes,by=c('Group'='Joint'),relationship='many-to-one') |>
+  group_by(Metric) |> arrange(desc(p50), .by_group=TRUE) |> ungroup() |>
+  transmute(Group,Metric,`Developers (count)`=People,`25th percentile`=f1(p25),Median=f1(p50),`75th percentile`=f1(p75)),
+  paste('Hours/person/week |',period_label,'| Each person contributes one eight-week average.'))
+```
+
+</details>
+
+Row
+-------------------------------------
+
+### Role and team context for the comparison
+
+```{r role-group-context, fig.height=3.8, fig.alt='Role composition within reportable joint product-use groups, with percentage labels and an exact table.'}
+stack_plot(role_context,'Role composition within the comparison groups',
+  'Group sizes and roles can shape the comparison. Any group with a role cell below 10 is omitted from this breakdown.',
+  base_caption(sum(role_context$People),unit='share of developers within each displayed use group'))
+```
+
+<details><summary>Exact role shares and team composition</summary>
+
+```{r group-context-tables, results='asis'}
+html_table(composition_table(role_context),'A role breakdown is withheld in full for any group containing a cell below 10 people.')
+html_table(composition_table(team_joint_context),'A team breakdown is withheld in full for any group containing a cell below 10 people. Shares use all developers in the displayed group.')
+```
+
+</details>
+
+**Privacy note.** Role breakdowns are withheld for `r paste(setdiff(joint_levels[1:4],as.character(unique(role_context$Group))),collapse=", ")`. Team breakdowns are withheld for `r paste(setdiff(joint_levels[1:4],as.character(unique(team_joint_context$Group))),collapse=", ")`. Each withheld breakdown contains at least one cell below 10 distinct people.
+
+**Interpretation.** Team, role, seniority, task selection and tenure can influence working patterns and tool use. These charts are intentionally limited to selected agreed measures. No broad metric scan, adjustment model, causal claim or preferred tool-use group is presented. The simulation applies separate product propensities with planted team signatures and does not assume that dual users have better outcomes.
+
+**Manager next step.** Discuss a specific workflow with the team before selecting an intervention. Define the intended feedback-loop, cognitive-load or flow improvement, then choose a direct measure for it. Recorded AI use alone cannot demonstrate that improvement.
+
+6 Trends and change
+=====================================
+
+Row
+-------------------------------------
+
+### What varies over time, and what would credible evaluation require?
+
+<span class="pill">Synthetic demo · Provisional</span>
+<span class="context">History: `r history_label` · 26 complete weeks · Baseline pages use only `r period_label`</span>
+
+<p class="leadline">All <strong>900 developers have Person Query coverage in every week</strong>. Across the 26 weeks, the median collaboration-hours line ranges from <strong>`r f1(min(trend$Collaboration_hours))` to `r f1(max(trend$Collaboration_hours))` hours/person/week</strong>. Product-use rates use separate eligible, adequately observed denominators in each week, so denominator movement is shown rather than hidden.</p>
+
+Row
+-------------------------------------
+
+### Weekly working conditions for the full developer population
+
+```{r working-trends, fig.height=4.2, fig.alt='Twenty-six weekly median trends for collaboration, meeting, uninterrupted and after-hours collaboration. All 900 developers contribute each week.'}
+trend_metrics <- c('Collaboration_hours','Meeting_hours','Uninterrupted_hours','After_hours_collaboration_hours')
+trend |> pivot_longer(all_of(trend_metrics),names_to='Metric',values_to='Hours') |>
+  mutate(Metric=factor(unname(metric_labels[Metric]),levels=unname(metric_labels[trend_metrics]))) |>
+  ggplot(aes(Week,Hours)) + geom_line(colour='#2563eb',linewidth=.9) +
+  facet_wrap(~Metric,nrow=1,scales='free_y',labeller=label_wrap_gen(22)) +
+  scale_x_date(date_breaks='2 months',date_labels='%d %b') + theme_report() +
+  chart_labs('Comparable weekly medians across the developer roster',
+    'Each point summarises that week’s records, unlike the eight-week averages on pages 1 to 5. Separate vertical scales.',
+    paste(history_label,'| 900 eligible, observed developers each week | Hours/person/week | UTC week starts.'),
+    x='Week beginning (2026)',y='Hours per person per week')
+```
+
+Row
+-------------------------------------
+
+### Recorded weekly product use with valid denominators
+
+```{r product-trends, fig.height=3.8, fig.alt='GitHub and M365 weekly recorded-active rates. Each product rate uses eligible developers with complete coverage in that week.'}
+trend |> select(Week,GH_rate,M365_rate) |>
+  pivot_longer(-Week,names_to='Product',values_to='Rate') |>
+  mutate(Product=recode(Product,GH_rate='GitHub Copilot',M365_rate='M365 Copilot')) |>
+  ggplot(aes(Week,Rate,colour=Product)) + geom_line(linewidth=.9) +
+  scale_colour_manual(values=c('#2563eb','#0f766e')) +
+  scale_y_continuous(labels=label_percent(),limits=c(0,1)) +
+  scale_x_date(date_breaks='1 month',date_labels='%d %b') + theme_report() +
+  chart_labs('Recorded active developers as a share of valid weekly coverage',
+    'At least one positive activity day that week. Weekly denominators may change as coverage changes.',
+    paste(history_label,'| Denominator: product-eligible developers with complete weekly coverage. Exact counts below. UTC week starts.'),
+    x='Week beginning (2026)',y='Recorded active (%)')
+```
+
+<details><summary>Coverage and numerators for every weekly window</summary>
+
+```{r weekly-coverage, results='asis'}
+html_table(trend |> transmute(`Week beginning (UTC)`=format(Week,'%Y-%m-%d'),
+  `PQ developers (count)`=PQ_n,`GH valid (count)`=GH_n,`GH active (count)`=GH_active,
+  `GH active (%)`=pct(GH_rate),`M365 valid (count)`=M365_n,
+  `M365 active (count)`=M365_active,`M365 active (%)`=pct(M365_rate),
+  `Both valid (count)`=Joint_n), 'Each rate equals the active count divided by the same product’s valid count in that row. Fixed eligibility, varying coverage. All 26 windows contain seven calendar days.')
+```
+
+</details>
+
+Row
+-------------------------------------
+
+### Evaluate a documented change with developer feedback and delivery outcomes
+
+<div class="framework">
+<div><strong>SPACE: multidimensional productivity</strong><p>Consider satisfaction and wellbeing, performance, activity, communication and collaboration, and efficiency and flow together. This report contributes activity and working-condition signals. It cannot establish overall productivity or wellbeing.</p></div>
+<div><strong>DevEx: feedback loops, cognitive load and flow</strong><p>Combine developer feedback with system measures. Add perceived review delays, cognitive load and ability to focus alongside measured build and review waits. Calendar-derived uninterrupted time cannot establish a psychological flow state.</p></div>
+<div><strong>DORA: delivery at service level</strong><p>Pair speed and delivery quality for one application or service. Add change lead time, deployment frequency, failed deployment recovery time, change fail rate and deployment rework rate. None is available in the current sources.</p></div>
+</div>
+
+<ol class="plays">
+<li><strong>Team manager, before the next pilot:</strong> document the actual change, start date, affected population and expected mechanism. Use this roster and coverage baseline to define eligibility before outcomes are observed.</li>
+<li><strong>Analyst and delivery owner, before launch:</strong> agree a comparator or randomised rollout where feasible. Check pre-change comparability, seasonality, staffing, observation coverage and concurrent changes. Track changes in composition rather than treating changing denominators as adoption.</li>
+<li><strong>Manager and developer representatives, at an agreed follow-up:</strong> combine a repeated anonymous DevEx survey with service-level delivery speed and quality, plus balancing measures such as rework and workload. Judge success against pre-agreed outcomes and uncertainty, rather than higher tool activity alone.</li>
+</ol>
+
+**Decision supported now.** Select a workflow question and close its measurement gaps. An intervention effect, productivity gain or wellbeing conclusion requires additional evidence. No operational action is justified by synthetic values.
+
+Appendix
+=====================================
+
+Row
+-------------------------------------
+
+### Definitions, sources and reporting contracts
+
+<span class="pill">Synthetic demo · Provisional</span>
+
+**Scope and units.** Pages 1 to 5 use the last eight complete weeks, `r period_label`. The full source window is `r history_label`, with Sunday-start weeks. Dates are ISO dates interpreted using a UTC convention. This is an illustrative date contract, not evidence about developers’ time zones. The generator assumes a 40-hour scheduled week for calendar availability. It does not simulate actual calendars or work schedules.
+
+**Aggregation.** Working-condition values are weekly Person Query metrics. Baseline charts first average each person’s eight weekly values and then compute group percentiles. Each developer has equal weight. Weekly trends instead take the cross-sectional median each week. Product-active rates divide active eligible, covered developers by all eligible, covered developers for that product and window. Baseline product tables require all eight weeks. Joint comparisons require both products throughout the window.
+
+**Source definitions.** Metric descriptions on pages 2 and 3 are paraphrased from the [Microsoft Viva Insights metrics reference](https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics), checked on 10 September 2026. The extended field names and synthetic generation are local demonstration contracts. They are not a claim that a real flexible query exports this exact schema. `Scheduled_call_hours` is an illustrative construction field. `Open_1_hour_block` is a calendar count, while uninterrupted time incorporates email and Teams activity. Collaboration hours are included as a Viva Insights-style metric and contain meeting hours and scheduled-call hours by definition.
+
+```{r source-contracts, results='asis'}
+contracts <- tibble(
+  `Relative file under _data/github`=c('reference/people-snapshot.csv','reference/coverage-weekly.csv',
+    'person-query/person-query-weekly.csv','github-query/activity-daily.csv',
+    'm365-query/activity-daily.csv','github-query/model-mix.csv','github-query/language-mix.csv'),
+  Grain=c('Person','Person × week','Person × week','Person × active day','Person × active day',
+    'Person × illustrative model, full window','Person × language, full window'),
+  Contract=c('1,080 people, 900 developers. Synthetic identifiers, team, role, seniority, tenure, product eligibility.',
+    '28,080 rows. Independent product eligibility and completeness flags, 0 or 7 covered days. PQ eligible and complete for all.',
+    '28,080 rows. Weekly collaboration, meeting, call, availability, focus, after-hours and open-block metrics, no survey or delivery outcome fields.',
+    'Sparse positive days. Suggestions, accepted suggestions, chat requests and agent-use indicator. Active days counted once.',
+    'Sparse positive days. Mutually exclusive illustrative drafting, meeting-assistance, search/summarisation actions and their total.',
+    'Secondary synthetic suggestion allocation, only people with suggestions. Shares total 1 per person. Not a maturity measure.',
+    'Secondary synthetic suggestion allocation, only people with suggestions. Shares total 1 per person. Not used as an outcome.'))
+html_table(contracts,'CSV files are readable directly in these folders. No zip or external download is required.')
+```
+
+**Joins and missingness.** The roster anchors the population. The coverage reference anchors the weekly panel. Daily feeds aggregate to unique person-week keys before left joins. One-to-one and many-to-one join assertions prevent row amplification. A missing activity day becomes zero only within an eligible, fully covered product-week. An incomplete or ineligible week remains `NA`, and any such week excludes the person from that product’s eight-week summary. Even a partially observed positive record would not prove complete observation. Zero-filling in a real tenant requires an independently verified source-completeness contract.
+
+**Zero, missing and not applicable.** `0` is an observed or justified zero. `NA` is unresolved measurement and is never silently replaced outside valid coverage. Ineligible people are labelled as eligibility exceptions rather than as non-users. An undefined ratio would be shown as `N/A`, not as zero. The synthetic completeness reference is reliable by construction. Production licences, eligibility dates, time zones and ingestion completeness must be independently validated.
+
+Row
+-------------------------------------
+
+### Privacy, reproducibility and simulation assumptions
+
+**Privacy floor.** At least 10 distinct people are required for a published group. Percentile visuals use `vivainsights::create_boxplot(..., mingroup = 10, return = "table")`. Composition breakdowns with any cell below 10 are withheld in full for that parent group, preventing subtraction from the parent total. No individual points, identifiers or individual leaderboards appear in the HTML. Source CSV identifiers are artificial and exist only to demonstrate joins. They must never be replaced with identifiable customer exports in a shareable repository.
+
+**Simulation.** Seed `r SEED` generates a shared roster, 26 Person Query weeks, separate sparse daily activity feeds and weekly eligibility/coverage references. Product-use propensities are generated separately for each product after applying the team signatures below. Working hours depend on simulated person-level variation, role/seniority context and the same team signatures. There is no planted intervention, time effect or dual-user advantage. Cross-sectional team differences are planted for illustration and carry no real-world meaning. M365 feature counts are explicit illustrative extensions, not consumption credits or tokens. Model and language files allocate synthetic suggestions for secondary exploration only. No PR, delivery, survey or wellbeing outcomes are fabricated.
+
+```{r team-effect-register, results='asis'}
+html_table(team_effect_register,'Planted cross-sectional team signatures in the synthetic generator. These effects exist only to make the demo report readable and must not be interpreted as real organisational findings.')
+```
+
+**Synthetic effect contract.** Automated checks require Platform to lead meeting and collaboration hours, Payments to lead after-hours collaboration, Developer Experience to lead GitHub Copilot recorded-active share and intensity, Data Engineering to lead M365 Copilot recorded-active share and intensity, and Mobile to lead uninterrupted time while sitting lowest on meeting hours, collaboration hours and recorded AI adoption.
+
+**Rerun.** Knit the canonical Rmd, or run `Rscript render-github-developer-experience.R` from this folder. The Rmd sources `github-developer-experience-helpers.R`, which generates and validates the CSVs before rendering. Set `RSTUDIO_PANDOC` to a local Pandoc folder if needed. All CSVs are regenerated from the seed. The HTML embeds its charts, styles and scripts. Reference links need a connection only when followed. The consumption report and its data are not read or modified.
+
+**Formatting.** Locale is en-US with British prose. Percentages use one decimal place. Counts use thousands separators, but identifiers never do. Plots label stacked segments of at least 6%, with exact counts and percentages in adjacent tables or expandable details. Rounded shares may not total exactly 100.0%. Neutral colours identify categories, not good or bad performance. On narrow screens, wide charts and tables scroll within their cards. Use a desktop for presentation, or browser zoom for smaller text. Charts are display-ready aggregates, not a certification of the underlying metrics.
+
+```{r validation-table, results='asis'}
+html_table(validation_summary,'Automated data-contract checks executed during this render.')
+```
+
+<details><summary>Runtime versions and package choice</summary>
+
+```{r versions, results='asis'}
+html_table(tibble(Component=c('R','dplyr','tidyr','ggplot2','vivainsights','rmarkdown','flexdashboard'),
+  Version=c(as.character(getRversion()),vapply(c('dplyr','tidyr','ggplot2','vivainsights','rmarkdown','flexdashboard'),
+    function(p) as.character(packageVersion(p)),character(1)))))
+```
+
+The [vivainsights function index](https://microsoft.github.io/vivainsights/llms.txt) was checked before implementation. The package’s person-averaged boxplot summary fits the percentile calculations. Custom joint coverage aggregation is necessary because single-product usage segments do not establish comparable observation for two products. Custom plot layouts keep units, periods and denominator captions visible.
+
+</details>
+
+Row
+-------------------------------------
+
+### Research framework and future extensions
+
+| Framework | What this report can contribute | Evidence still needed |
+|---|---|---|
+| SPACE | Activity, collaboration and calendar-derived working conditions across multiple dimensions | Satisfaction and wellbeing surveys, performance outcomes, direct evidence of efficiency and flow |
+| DevEx | Context for feedback loops, cognitive load and flow discussions | Anonymous developer feedback, build/test waits, review waits, task context and perceived ability to focus |
+| DORA | A framework for evaluating delivery change, without an outcome claim | Service boundaries, production deployments, change lead times, recovery events, failed changes and deployment rework |
+
+- [The SPACE of Developer Productivity](https://queue.acm.org/detail.cfm?id=3454124), ACM Queue, 2021. Productivity is multidimensional and cannot be reduced to one activity measure.
+- [DevEx: What Actually Drives Productivity](https://queue.acm.org/detail.cfm?id=3595878), ACM Queue, 2023. Connect feedback loops, cognitive load and flow with developer feedback and system measures.
+- [DORA’s software delivery performance metrics](https://dora.dev/guides/dora-metrics/). Current guidance, checked on 10 September 2026, describes five metrics across throughput and instability, best applied to one application or service at a time.
+- [Viva Insights metrics reference](https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics). Primary reference for the paraphrased collaboration and focus definitions.
+
+**Source-access limitation.** The ACM pages returned HTTP 403 during this rebuild. The citations and framework summaries above are retained, but a fresh full-text review could not be completed. Microsoft Learn, DORA and the package function reference were accessible.
+
+**Next step.** The manager, analyst and delivery owner should agree the workflow question, data owners, evaluation window and success measures before any real-data pilot. This synthetic report requires no operational response.
