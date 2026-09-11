@@ -39,6 +39,16 @@ A prompt card is a structured document that contains:
 | [Executive PowerPoint Deck](copilot-adoption/executive-powerpoint-deck.md) | Generate an exec-ready 10-15 page PowerPoint deck with editable native charts. |
 | [Copilot Causal Toolkit](copilot-adoption/copilot-causal-toolkit.md) | Run a causal inference analysis using the Copilot Causal Toolkit, then interpret results for senior leadership. Two prompts: one to run the analysis, one to interpret outputs. |
 
+### Query dashboards
+
+Use these R-first journeys to reuse the reference implementations rather than
+generate a new dashboard from scratch.
+
+| Prompt Card | Description |
+|---|---|
+| [Consumption Dashboard](copilot-dashboards/consumption-dashboard.md) | Reproduce the synthetic demo or build a credits-only report from documented exports. |
+| [Developer Experience Dashboard](copilot-dashboards/developer-experience-dashboard.md) | Reproduce/customise the demo or assess real GitHub input readiness; no verified real adapter in v1. |
+
 ### Purview Augmentation
 
 | Prompt Card | Description |

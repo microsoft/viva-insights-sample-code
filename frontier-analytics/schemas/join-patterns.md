@@ -39,8 +39,7 @@ combined = pd.concat([q1, q2], ignore_index=True)
 # Check for duplicates
 dupes = combined.duplicated(subset=['PersonId', 'MetricDate'], keep=False)
 if dupes.any():
-    print(f"Warning: {dupes.sum()} duplicate person-periods found")
-    combined = combined.drop_duplicates(subset=['PersonId', 'MetricDate'], keep='first')
+    raise ValueError(f"{dupes.sum()} duplicate person-period rows; resolve overlapping exports before joining")
 
 print(f"Combined: {combined['PersonId'].nunique()} persons, "
       f"{combined['MetricDate'].nunique()} periods, "
@@ -65,8 +64,7 @@ dupes <- combined |>
   filter(n() > 1)
 
 if (nrow(dupes) > 0) {
-  message(paste("Warning:", nrow(dupes), "duplicate person-periods found"))
-  combined <- combined |> distinct(PersonId, MetricDate, .keep_all = TRUE)
+  stop(paste(nrow(dupes), "duplicate person-period rows; resolve overlapping exports before joining"))
 }
 
 message(paste("Combined:",
@@ -79,7 +77,7 @@ message(paste("Combined:",
 
 - **Column name mismatches:** If exports come from different time periods, column names may differ (e.g., a new metric was added). Use `bind_rows()` (R) or `pd.concat()` (Python) — both handle mismatched columns gracefully by inserting `NA`/`NaN`.
 - **HR attribute changes:** A person's `Organization` or `LevelDesignation` may change between periods. This is expected — each row reflects their attributes at that `MetricDate`.
-- **Overlapping date ranges:** If both exports cover the same weeks, you will get duplicate rows. Always check for and remove duplicates after stacking.
+- **Overlapping date ranges:** Check duplicate keys and confirm an explicit reconciliation rule before proceeding. Do not retain an arbitrary first row.
 
 ---
 
@@ -107,12 +105,17 @@ mapping['UPN'] = mapping['UPN'].str.lower().str.strip()
 purview['user_id'] = purview['user_id'].str.lower().str.strip()
 
 # Join mapping to Purview, then join to person query
-purview_mapped = purview.merge(mapping, left_on='user_id', right_on='UPN', how='left')
+purview_mapped = purview.merge(mapping, left_on='user_id', right_on='UPN',
+                               how='left', validate='many_to_one')
+if purview_mapped['PersonId'].isna().any():
+    raise ValueError("Unmatched identities; confirm the mapping before joining")
 ```
 
-#### Option B: Join on HR attributes as a fuzzy bridge
+#### If no authorised mapping is available
 
-If no direct mapping is available, you can attempt a fuzzy join using shared HR attributes (Organization, LevelDesignation, etc.) combined with time-based aggregation. This is **less reliable** and should be used with caution.
+Stop the person-level join and request a verified identity bridge. Shared HR
+attributes are not unique identities; do not fuzzy-match employees. Separately
+aggregated group comparisons may be possible, but are not linked-person evidence.
 
 ### Time alignment
 
@@ -120,13 +123,13 @@ Person query data is aggregated to **weekly** periods, while Purview audit logs 
 
 ```python
 # Python — aggregate audit events to person-week
-purview['event_week'] = purview['creation_time'].dt.to_period('W-MON').apply(
+purview_mapped['event_week'] = purview_mapped['creation_time'].dt.to_period('W-SUN').apply(
     lambda x: x.start_time
 )
 
 purview_weekly = (
-    purview
-    .groupby(['user_id', 'event_week'])
+    purview_mapped
+    .groupby(['PersonId', 'event_week'])
     .agg(
         copilot_events=('event_id', 'count'),
         unique_operations=('operation', 'nunique'),
@@ -139,8 +142,9 @@ purview_weekly = (
 enriched = person_query.merge(
     purview_weekly,
     left_on=['PersonId', 'MetricDate'],
-    right_on=['user_id', 'event_week'],
-    how='left'
+    right_on=['PersonId', 'event_week'],
+    how='left',
+    validate='one_to_one'
 )
 ```
 
@@ -148,11 +152,20 @@ enriched = person_query.merge(
 # R — aggregate audit events to person-week
 library(lubridate)
 
-purview <- purview |>
+# Map Purview identities through the authorised identity bridge
+purview_mapped <- purview |>
+  left_join(mapping,
+            by = c("user_id" = "UPN"),
+            relationship = "many-to-one")
+if (any(is.na(purview_mapped$PersonId))) {
+  stop("Unmatched identities; confirm the mapping before joining")
+}
+
+purview_mapped <- purview_mapped |>
   mutate(event_week = floor_date(creation_time, unit = "week", week_start = 1))
 
-purview_weekly <- purview |>
-  group_by(user_id, event_week) |>
+purview_weekly <- purview_mapped |>
+  group_by(PersonId, event_week) |>
   summarise(
     copilot_events = n(),
     unique_operations = n_distinct(operation),
@@ -160,10 +173,11 @@ purview_weekly <- purview |>
     .groups = "drop"
   )
 
-# Join with person query (after PersonId - UserId mapping)
+# Join with person query
 enriched <- person_query |>
   left_join(purview_weekly,
-            by = c("PersonId" = "user_id", "MetricDate" = "event_week"))
+            by = c("PersonId", "MetricDate" = "event_week"),
+            relationship = "one-to-one")
 ```
 
 ### Pitfalls
@@ -183,7 +197,7 @@ enriched <- person_query |>
 | Person Query Key | HR System Key | Notes |
 |---|---|---|
 | `PersonId` | `EmployeeId` | Requires a mapping table (PersonId is anonymized). |
-| HR attributes (e.g., `Organization` + `LevelDesignation`) | Same attributes | Fuzzy / probabilistic — not recommended as a primary join. |
+| HR attributes (e.g., `Organization` + `LevelDesignation`) | Same attributes | Not a valid identity bridge; do not fuzzy-match people. |
 
 ### Python
 
@@ -265,7 +279,7 @@ Small mismatches are expected (license activation delays, mid-week changes). Lar
 Before executing any join:
 
 - [ ] Identify the join keys on both sides. Are they the same identifier type?
-- [ ] Normalize keys: lowercase, strip whitespace, consistent format.
+- [ ] Normalize only as the identity contract permits (for example case-insensitive UPNs). Preserve opaque PersonIds as strings; do not lowercase them or silently repair ambiguous identifiers.
 - [ ] Check cardinality: is the join 1:1, 1:many, or many:many? Use `.merge()` with `validate='one_to_one'` or equivalent to catch surprises.
 - [ ] Align time granularity: aggregate event-level data to the target period before joining.
 - [ ] Check join match rate: what percentage of left-side rows matched? Low match rates indicate key problems.

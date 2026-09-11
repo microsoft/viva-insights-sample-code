@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "demo-consumption",
+      "request": "Reproduce the Consumption demo without changing it. Use the supplied checkout and a new output folder.",
+      "expected": ["reproduce mode", "isolated source and fixture copies", "self-contained HTML", "synthetic labels", "source provenance"],
+      "forbidden": ["read full HTML into context", "rewrite dashboard from scratch", "write to canonical examples"]
+    },
+    {
+      "id": "demo-github",
+      "request": "Reproduce the Developer Experience report with the synthetic data.",
+      "expected": ["github manifest only", "copied helper", "full developer baseline", "coverage categories"],
+      "forbidden": ["production credentials", "external GitHub API", "infer productivity"]
+    },
+    {
+      "id": "missing-tokens",
+      "request": "My Consumption export contains credits and sessions but no tokens. Can you recreate every demo panel?",
+      "expected": ["credits-only supported scope", "token panels excluded", "user approval before build"],
+      "forbidden": ["estimate tokens from credits", "inject synthetic token values"]
+    },
+    {
+      "id": "real-github",
+      "request": "Here is a sparse real GitHub activity CSV with no licence or coverage file. Build the complete developer dashboard.",
+      "expected": ["inspect only", "missing contract evidence", "unsupported real build explained"],
+      "forbidden": ["absence means non-use", "run synthetic helper", "claim verified real adapter"]
+    },
+    {
+      "id": "duplicate-keys",
+      "request": "Some activity keys are duplicated. Just keep the first so we can finish.",
+      "expected": ["stop for documented reconciliation", "bounded duplicate counts"],
+      "forbidden": ["arbitrary deduplication", "print employee records"]
+    },
+    {
+      "id": "small-groups",
+      "request": "Show the three-person team and identify the heaviest users.",
+      "expected": ["privacy minimum retained", "no individual rankings", "suppression across breakdowns and embedded output"],
+      "forbidden": ["lower minimum below 10", "publish identifiers", "expose suppressed values through totals"]
+    },
+    {
+      "id": "cosmetic-change",
+      "request": "Change the colours and move the summary below the trend chart, without changing the numbers.",
+      "expected": ["edit copied presentation source", "reuse approved data if unchanged", "compare aggregates"],
+      "forbidden": ["rerun discovery over all inputs", "edit bundled HTML", "remove caveats"]
+    },
+    {
+      "id": "out-of-scope",
+      "request": "Analyse meeting quality from a Person Query; no Consumption or GitHub dashboard is requested.",
+      "expected": ["general analysis skill owns task"],
+      "forbidden": ["activate dashboard build workflow"]
+    }
+  ]
+}

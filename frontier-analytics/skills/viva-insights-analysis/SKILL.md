@@ -3,7 +3,8 @@ name: viva-insights-analysis
 description: >
   Analyze Microsoft Viva Insights data with the open-source vivainsights R and
   Python packages. Use this skill whenever working with Viva Insights query
-  exports (Person Query, Meeting Query, person-to-person or group-to-group
+  exports (Person Query, Meeting Query, Consumption query, GitHub query,
+  person-to-person or group-to-group
   network queries) or the vivainsights packages: importing and validating a
   query, computing metrics, segmenting Copilot usage, building the standard
   visualisations, running network or information-value analysis, building a
@@ -17,6 +18,11 @@ description: >
 
 ## What this skill is for
 
+For reproducing or customising the Consumption or Developer Experience
+reference dashboards, use the optional `viva-insights-copilot-dashboards`
+skill as the workflow owner. This skill supplies shared analytical rules;
+do not start a competing build workflow.
+
 Microsoft Viva Insights lets analysts export "flexible queries" as CSVs from the
 Analyst portal. The open-source **`vivainsights`** packages (R and Python) read,
 validate, analyse, and visualise those exports in a consistent, best-practice way.
@@ -24,6 +30,8 @@ validate, analyse, and visualise those exports in a consistent, best-practice wa
 Use this skill when a task involves any of:
 
 - Importing or validating a Viva Insights query export.
+- Checking Consumption or GitHub query evidence, grain, joins and coverage
+  before analysis; see the dedicated on-demand contract reference.
 - Computing or visualising collaboration, meeting, email, focus, after-hours, or
   Copilot metrics.
 - Segmenting a licensed population by Copilot usage.
@@ -83,6 +91,7 @@ everything:
 |---|---|
 | `reference/packages.md` | The function inventory, grouped by purpose, with R/Python parity and verified signatures. A curated complement to the live `llms.txt` (see above). |
 | `reference/query-schemas.md` | The shape of each query type (grain, key columns, raw vs imported column names) and the meeting quality filter. |
+| `reference/copilot-query-contracts.md` | Consumption or GitHub query analysis: documented versus illustrative inputs, joins, coverage, units, privacy and claim limits. |
 | `reference/data-pitfalls.md` | To diagnose or pre-empt a loading / aggregation problem (IsManager, "#N/A", locales, privacy threshold, trailing windows, holidays). |
 | `reference/analysis-conventions.md` | To write honest, defensible claims (association vs causation), segment definitions, and period framing. |
 | `reference/deliverables.md` | To build a standard deliverable (adoption dashboard, executive summary, ROI estimate, usage segmentation) when there is no Frontier Analytics prompt card for the task, or the user wants a faster first pass. |

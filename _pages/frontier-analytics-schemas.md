@@ -15,6 +15,7 @@ For authoritative and up-to-date metric definitions and column references, see:
 
 **On this page:**
 
+- [Consumption and GitHub queries](#consumption-and-github-queries) — Documented versus illustrative inputs, and supported AI-guided workflows.
 - [Person Query — Key Concepts](#person-query-key-concepts) — Panel structure, licensing logic, and what to watch for.
 - [Purview Audit Logs — Key Concepts](#purview-audit-log-key-concepts) — Structure, the AuditData column, and data quality.
 - [Join Patterns](#join-patterns) — How to join person query data with Purview audit logs, external HR data, and license records.
@@ -28,6 +29,21 @@ For authoritative and up-to-date metric definitions and column references, see:
 - [vivainsights Python package](https://microsoft.github.io/vivainsights-py/)
 
 ---
+
+## Consumption and GitHub queries
+
+These are not interchangeable with a Person Query.
+
+| Source | Contract boundary | Guided journey |
+|---|---|---|
+| Consumption | The public export has activity by person/service/date and people metadata joined through `PeopleHistoricalId`. Confirm day/week/month grouping. Credits and sessions do not establish tokens, task types or monetary value. | [Build a Consumption dashboard]({{ site.baseurl }}/frontier-analytics-prompt-consumption-dashboard/) |
+| GitHub demo | The source manifest is an extended synthetic schema, including illustrative M365 activity and coverage flags. A real GitHub export adapter is not verified in v1. | [Build a Developer Experience dashboard]({{ site.baseurl }}/frontier-analytics-prompt-developer-experience-dashboard/) |
+
+Read the [shared query contract](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/skills/viva-insights-analysis/reference/copilot-query-contracts.md)
+for keys, units, coverage, privacy and interpretation rules, and the
+[public Consumption documentation](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query)
+for its current export schema. Missing fields exclude panels; agents must not
+generate synthetic replacements in a real-data run.
 
 ## Person Query — Key Concepts {#person-query-key-concepts}
 
@@ -59,11 +75,12 @@ This distinction is critical for any Copilot adoption analysis:
 
 | Status | Meaning | How to detect |
 |--------|---------|---------------|
-| **Unlicensed** | User does not have a Copilot license | All Copilot columns are `null` / `NA` |
-| **Licensed but inactive** | User has a license but did not use Copilot | Copilot columns contain `0` values |
-| **Active** | User has a license and used Copilot | Copilot activity metric > 0 |
+| **Unlicensed** | User does not have a Copilot license | Explicit licence evidence for the period |
+| **Licensed but inactive** | User has a license but did not use Copilot | Confirmed licence, complete coverage and observed zero activity |
+| **Active** | Observed use of the selected Copilot metric | Verified activity metric > 0; licence status is a separate attribute |
+| **Unknown** | Eligibility or observation coverage is unresolved | Retain separately; do not infer from absence |
 
-> **Critical:** `null` ≠ `0` in Copilot columns. Replacing `NA` with `0` conflates unlicensed users with inactive licensed users, which inflates denominators and produces misleading adoption rates.
+> **Critical:** `null` is not `0`, and neither establishes licensing by itself. Use documented enabled-days or licence records and coverage evidence. If a denominator is unknown, report observed activity and omit adoption rates.
 
 ---
 
@@ -127,8 +144,8 @@ Stack (concatenate) exports vertically using `PersonId` as the key. Check for du
 The key challenge is that person query data uses an anonymized `PersonId` while Purview uses `UserId` (UPN/email). These are **not the same identifier**.
 
 **Mapping options:**
-- **Mapping table from Viva Insights admin** (preferred) — a direct `PersonId` → UPN lookup. Normalize keys (lowercase, strip whitespace) before joining.
-- **Fuzzy join on HR attributes** (fallback) — match using shared organizational attributes. Less reliable and should be used with caution.
+- **Authorised mapping table** — a verified `PersonId` → UPN lookup where available. Apply only contract-approved normalisation to UPNs; preserve opaque PersonIds exactly.
+- **No authorised identity bridge:** stop the person-level join; shared HR attributes are not unique identities and must not be used for fuzzy employee matching.
 
 **Time alignment:** Person query data is weekly; Purview logs are event-level. Aggregate audit events to the person-week level before joining. Ensure both use the same week-start day (typically Monday).
 
@@ -141,7 +158,7 @@ Both follow the same pattern: you need a mapping table to link the anonymized `P
 
 ### Checklist for joins
 
-- Identify and normalize join keys on both sides (lowercase, strip whitespace)
+- Identify join keys and apply only contract-approved normalisation; preserve opaque IDs exactly
 - Verify cardinality: is the join 1:1, 1:many, or many:many?
 - Align time granularity: aggregate event-level data to the target period before joining
 - Check join match rate: low match rates indicate key problems
@@ -159,7 +176,7 @@ Treating rows as independent observations when they are a person-time panel. Thi
 
 ### 2. Missing value confusion (NA ≠ zero)
 
-Replacing `null` with `0` in Copilot columns conflates unlicensed and inactive users. This inflates adoption rate denominators and produces misleading trends. Create explicit `is_licensed` and `is_active` flags instead. See [Licensed vs. unlicensed vs. active](#licensed-vs-unlicensed-vs-active).
+Replacing `null` with `0` conflates unknown coverage, ineligibility and observed inactivity. Keep those states separate, use explicit licence evidence, and omit adoption rates when the denominator is unresolved. See [Licensed vs. unlicensed vs. active](#licensed-vs-unlicensed-vs-active).
 
 ### 3. Survivorship bias
 

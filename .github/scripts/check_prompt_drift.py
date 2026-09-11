@@ -49,6 +49,8 @@ MAPPING: dict[str, str] = {
     "copilot-adoption/copilot-causal-toolkit.md": "frontier-analytics-prompt-causal-toolkit.md",
     "purview-augmentation/audit-log-parsing.md": "frontier-analytics-prompt-audit-parsing.md",
     "purview-augmentation/agent-usage-analysis.md": "frontier-analytics-prompt-agent-usage.md",
+    "copilot-dashboards/consumption-dashboard.md": "frontier-analytics-prompt-consumption-dashboard.md",
+    "copilot-dashboards/developer-experience-dashboard.md": "frontier-analytics-prompt-developer-experience-dashboard.md",
 }
 
 # Prompt cards that are intentionally repo-only, with no site-page mirror.
@@ -137,6 +139,14 @@ def main() -> int:
                 f"{pair_label}: 'Quick prompt (short version)' content differs "
                 "between the prompt card and the site page. They must match exactly."
             )
+
+        # New dashboard journeys share one workflow; their full entry prompts
+        # must not drift even though resource links differ on GitHub and Pages.
+        if card_rel.startswith("copilot-dashboards/"):
+            prompt_card = section_text(card_text, "Prompt")
+            prompt_page = section_text(page_text, "Prompt")
+            if not prompt_card or prompt_card != prompt_page:
+                hard_failures.append(f"{pair_label}: full Prompt sections must match exactly.")
 
         for keyword in PARITY_KEYWORDS:
             in_card = keyword in card_text

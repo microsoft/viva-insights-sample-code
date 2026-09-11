@@ -1,0 +1,10 @@
+{
+  "report": "github",
+  "mode": "real",
+  "repo_root": "../../../..",
+  "output_dir": "../../../../../copilot-dashboard-work/real-github",
+  "inputs": {
+    "activity": "../../../../../private-inputs/github-export.csv"
+  },
+  "privacy_min": 10
+}

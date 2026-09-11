@@ -1,0 +1,7 @@
+{
+  "report": "consumption",
+  "mode": "demo",
+  "repo_root": "../../../..",
+  "output_dir": "../../../../../copilot-dashboard-work/consumption-demo",
+  "privacy_min": 10
+}

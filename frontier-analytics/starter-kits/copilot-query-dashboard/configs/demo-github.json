@@ -1,0 +1,7 @@
+{
+  "report": "github",
+  "mode": "demo",
+  "repo_root": "../../../..",
+  "output_dir": "../../../../../copilot-dashboard-work/github-demo",
+  "privacy_min": 10
+}

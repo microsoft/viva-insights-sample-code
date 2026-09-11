@@ -70,6 +70,21 @@ You do not need to be a software engineer. If you can export a CSV from Viva Ins
 
 ## What's inside
 
+### Build or customise the query dashboards
+
+Use a guided prompt to reproduce a working R demo, then change only what you
+need. The agent inspects real inputs and asks you to approve supported analyses
+before building; it does not invent missing metrics or coverage.
+
+| Journey | Demo | Real-data support |
+|---|---|---|
+| [Consumption Dashboard]({{ site.baseurl }}/frontier-analytics-prompt-consumption-dashboard/) | Full synthetic reference | Documented credit consumption; token/task-type and Person Query panels excluded |
+| [Developer Experience Dashboard]({{ site.baseurl }}/frontier-analytics-prompt-developer-experience-dashboard/) | Full synthetic reference | Input-readiness assessment only; real adapter not yet verified |
+
+[Browse the dashboard examples]({{ site.baseurl }}/copilot-dashboards/) or
+[install the optional dashboard skill](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/skills/README.md#dashboard-skill-installation)
+for repeated work. Prompt-only use requires no skill installation.
+
 | Section | Description |
 |---------|-------------|
 | [Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/) | Data dictionaries for person query exports, Purview audit logs, join patterns, and common data pitfalls. |

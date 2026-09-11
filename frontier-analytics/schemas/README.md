@@ -18,6 +18,7 @@ This directory contains **data dictionaries and schema references** for the data
 | [Purview Audit Data Dictionary](purview-audit-data-dictionary.md) | Column definitions and nested JSON structure for Microsoft Purview unified audit log exports, including Copilot event data. |
 | [Join Patterns](join-patterns.md) | How to join person query data with Purview audit logs, external HR data, and license records — with code examples in R and Python. |
 | [Common Pitfalls](common-pitfalls.md) | Data quality issues, analytical mistakes, and edge cases to watch for when working with Viva Insights exports. |
+| [Consumption and GitHub query contracts](../skills/viva-insights-analysis/reference/copilot-query-contracts.md) | Shared, on-demand contract for documented Consumption fields versus synthetic GitHub inputs, safe joins, units, coverage and claim limits. |
 
 ## Important notes
 

@@ -36,9 +36,12 @@ Separate consumption volume from consumption mix: token concentration and percen
 [Get source](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-ways-of-working-simulation.Rmd) ·
 [Setup guide](#build-with-your-own-data)
 
+**[Build or customise with AI]({{ site.baseurl }}/frontier-analytics-prompt-consumption-dashboard/)**:
+reproduce the demo or build a scoped credits report with an agent and reusable R code.
+
 [![Consumption report overview]({{ site.baseurl }}/assets/images/reports/copilot-consumption-overview.png)]({{ site.baseurl }}/examples/utility-r/copilot-consumption-ways-of-working-simulation.html)
 
-**Required queries:** Consumption query for credits, tokens, and delegated task types, joined with a Person Query for collaboration and network metrics. See the [AI cost query documentation](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query) for schema and access details.
+**Demo inputs:** Synthetic credit, token and task-type data alongside Person Query and network fixtures. The [public Consumption schema](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query) establishes credits and sessions, but not this demo's token/task-type fields. The AI-guided real-data path therefore builds a narrower credits-only report and labels unsupported panels.
 
 **Interpretation:** Associations only. Credit intensity is a cost-mix measure, not a measure of value or quality. Concentration curves and banded percentiles help describe skewed consumption without relying on an average.
 
@@ -58,6 +61,9 @@ Establish a baseline of developer working conditions alongside GitHub and Micros
 **[View demo]({{ site.baseurl }}/examples/utility-r/github-copilot-developer-productivity-simulation.html)** ·
 [Get source](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/github-copilot-developer-productivity-simulation.Rmd) ·
 [Setup guide](#build-with-your-own-data)
+
+**[Build or customise with AI]({{ site.baseurl }}/frontier-analytics-prompt-developer-experience-dashboard/)**:
+reproduce the synthetic reference or assess real inputs. No verified real GitHub adapter is supplied yet.
 
 [![Developer experience report focus and coordination]({{ site.baseurl }}/assets/images/reports/github-copilot-devex-focus.png)]({{ site.baseurl }}/examples/utility-r/github-copilot-developer-productivity-simulation.html)
 
@@ -79,8 +85,8 @@ The developer demo uses an **extended illustrative schema**, not a drop-in flexi
 The demos need only a browser. To render or adapt the templates, use **R**, **Pandoc**, **R Markdown**, and **flexdashboard**. There is no Python version of these templates.
 
 1. **Get the files.** Start with the report source linked above. For Developer Experience, also get [github-developer-experience-helpers.R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/github-developer-experience-helpers.R) and [render-github-developer-experience.R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/render-github-developer-experience.R), keeping the repository folder structure.
-2. **Render the synthetic example first.** Dependencies include `vivainsights`, `dplyr`, `tidyr`, `ggplot2`, `scales`, `stringr`, `flexdashboard`, `knitr`, and `rmarkdown`. Follow the [template setup guide](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-github-demo-reports.md) for rendering instructions and simulated input contracts.
-3. **Adapt the inputs.** Use the guide to replace the simulation block with your query exports. Check query schemas, join keys, date ranges, eligibility, and coverage before interpreting results.
+2. **Render the synthetic example first.** Dependencies include `vivainsights`, `dplyr`, `tidyr`, `ggplot2`, `ggrepel`, `scales`, `stringr`, `flexdashboard`, `knitr`, and `rmarkdown`. The AI-guided journeys copy the required fixtures and source into an isolated output folder before rendering.
+3. **Adapt only supported inputs.** Use the [Consumption journey]({{ site.baseurl }}/frontier-analytics-prompt-consumption-dashboard/) for the scoped credits adapter. Use the [Developer Experience journey]({{ site.baseurl }}/frontier-analytics-prompt-developer-experience-dashboard/) for a real-input readiness assessment. Verify contracts before replacing any simulation; do not assume a CSV with similar headers is equivalent.
 4. **Review before sharing.** Update simulation labels and methodology to describe your actual inputs. Apply your organization's privacy requirements and retain the distinction between association and causation. Do not put customer exports in this sample repository or in shareable HTML.
 
 [Read the full template setup guide](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-github-demo-reports.md)
