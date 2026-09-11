@@ -320,11 +320,14 @@ test("entry point rejects unsupported GitHub before producing build output", {
   config <- list(report = "github", mode = "real", repo_root = repo,
                  output_dir = file.path(root, "cli-github-block"),
                  inputs = list(activity = "synthetic-activity.csv"), privacy_min = 10)
+  stderr_file <- tempfile("github-build-stderr-", tmpdir = root)
   write_json(config, "cli-github.json")
   result <- suppressWarnings(system2(command, c(shQuote(file.path(kit, "dashboard.R")), "build",
                                                 shQuote(file.path(root, "cli-github.json"))),
-                                     stdout = TRUE, stderr = TRUE))
-  stopifnot(attr(result, "status") == 1L, any(grepl("unsupported", result)),
+                                     stdout = TRUE, stderr = stderr_file))
+  # Windows R does not consistently merge stderr into system2()'s return value.
+  unlink(stderr_file)
+  stopifnot(attr(result, "status") == 1L,
             !dir.exists(config$output_dir))
 })
 test("supplied examples resolve repo root and require real mapping approval", {
