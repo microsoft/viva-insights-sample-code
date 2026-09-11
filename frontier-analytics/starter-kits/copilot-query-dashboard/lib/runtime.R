@@ -85,8 +85,10 @@ read_config <- function(path, kit) {
         anyDuplicated(names(cfg$inputs)) || any(!names(cfg$inputs) %in% c("activity", "people")))
       fail("inputs accepts only activity and people CSV paths; Person Query is not supported.")
     cfg$inputs <- lapply(cfg$inputs, resolve_path, base = base, existing = TRUE)
-    if (any(vapply(cfg$inputs, function(p) inside(p, cfg$output_dir), logical(1))))
-      fail("Input files cannot be inside output_dir.")
+    unsafe_input <- vapply(cfg$inputs, function(p)
+      inside(p, cfg$output_dir) || inside(p, cfg$repo_root) || inside(p, actual_repo), logical(1))
+    if (any(unsafe_input))
+      fail("Input files must be outside output_dir and both source repositories.")
   }
   cfg
 }
