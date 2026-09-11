@@ -152,11 +152,20 @@ enriched = person_query.merge(
 # R — aggregate audit events to person-week
 library(lubridate)
 
-purview <- purview |>
+# Map Purview identities through the authorised identity bridge
+purview_mapped <- purview |>
+  left_join(mapping,
+            by = c("user_id" = "UPN"),
+            relationship = "many-to-one")
+if (any(is.na(purview_mapped$PersonId))) {
+  stop("Unmatched identities; confirm the mapping before joining")
+}
+
+purview_mapped <- purview_mapped |>
   mutate(event_week = floor_date(creation_time, unit = "week", week_start = 1))
 
-purview_weekly <- purview |>
-  group_by(user_id, event_week) |>
+purview_weekly <- purview_mapped |>
+  group_by(PersonId, event_week) |>
   summarise(
     copilot_events = n(),
     unique_operations = n_distinct(operation),
@@ -164,10 +173,11 @@ purview_weekly <- purview |>
     .groups = "drop"
   )
 
-# Join with person query (after PersonId - UserId mapping)
+# Join with person query
 enriched <- person_query |>
   left_join(purview_weekly,
-            by = c("PersonId" = "user_id", "MetricDate" = "event_week"))
+            by = c("PersonId", "MetricDate" = "event_week"),
+            relationship = "one-to-one")
 ```
 
 ### Pitfalls
