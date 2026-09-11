@@ -75,6 +75,9 @@ read_config <- function(path, kit) {
     bounds <- strict_date(c(cfg$dates$start, cfg$dates$end))
     if (bounds[1] > bounds[2]) fail("dates.start must not exceed dates.end.")
   }
+  if (cfg$report == "github" && cfg$mode == "real" &&
+      any(c("dates", "group", "granularity", "mappings", "mapping_approval") %in% names(cfg)))
+    fail("Real GitHub inspection does not accept analytical filters, mappings, or approval settings because no verified adapter exists.")
   if (cfg$mode == "demo" && (!is.null(cfg$inputs) || !is.null(cfg$mappings)))
     fail("Demo mode does not accept real inputs or mappings.")
   if (cfg$mode == "demo" && (cfg$privacy_min != 10L || cfg$group ||

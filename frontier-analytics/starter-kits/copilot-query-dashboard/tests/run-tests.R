@@ -226,10 +226,26 @@ test("normalization collisions and malformed rows rejected", {
 test("real GitHub inspect only with actionable build blocker", {
   gh <- loaded
   gh$report <- "github"
+  gh$dates <- gh$group <- gh$granularity <- gh$mappings <- gh$mapping_approval <- NULL
   gh$output_dir <- file.path(root, "github-inspect")
   report <- inspect_dashboard(gh, kit)
   stopifnot(report$status == "inspect_only", grepl("unverified", report$blocker))
   blocked(build_dashboard(gh, kit), "unsupported")
+})
+test("real GitHub inspection rejects unapplied analytical settings", {
+  for (field in c("dates", "group", "granularity", "mappings", "mapping_approval")) {
+    gh <- list(report = "github", mode = "real", repo_root = repo,
+               output_dir = file.path(root, paste0("github-", field)),
+               inputs = list(activity = "synthetic-activity.csv"), privacy_min = 10)
+    gh[[field]] <- switch(field,
+      dates = list(start = "2026-06-01", end = "2026-06-02"),
+      group = TRUE,
+      granularity = "day",
+      mappings = cfg$mappings,
+      mapping_approval = cfg$mapping_approval)
+    write_json(gh, paste0("github-", field, ".json"))
+    blocked(read_config(paste0("github-", field, ".json"), kit), "does not accept analytical")
+  }
 })
 test("real mode cannot reproduce and demo mode cannot build", {
   blocked(reproduce_dashboard(loaded, kit), "demo-only")
@@ -301,9 +317,9 @@ test("entry point succeeds from an unrelated working directory", {
 })
 test("entry point rejects unsupported GitHub before producing build output", {
   command <- file.path(R.home("bin"), "Rscript")
-  config <- cfg
-  config$report <- "github"
-  config$output_dir <- file.path(root, "cli-github-block")
+  config <- list(report = "github", mode = "real", repo_root = repo,
+                 output_dir = file.path(root, "cli-github-block"),
+                 inputs = list(activity = "synthetic-activity.csv"), privacy_min = 10)
   write_json(config, "cli-github.json")
   result <- suppressWarnings(system2(command, c(shQuote(file.path(kit, "dashboard.R")), "build",
                                                 shQuote(file.path(root, "cli-github.json"))),
