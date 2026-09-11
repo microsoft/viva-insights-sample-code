@@ -12,12 +12,17 @@ user wants a faster first pass.
 
 ## Licensed, active, and unlicensed (used by every Copilot deliverable below)
 
-- **Licensed:** use `Total_Copilot_enabled_days > 0` when that column exists. Otherwise, treat a person-week as licensed if at least one Copilot metric is non-null and greater than zero.
-- **Active:** licensed and the primary activity metric (commonly `Total_Copilot_actions_taken`) is greater than zero.
-- **Unlicensed:** `Total_Copilot_enabled_days == 0` when available. Otherwise, all Copilot metric values are null or zero.
+- **Licensed:** use a documented enabled-days column such as
+  `Total_Copilot_enabled_days > 0`, or explicit licence records for the period.
+- **Active:** positive observed activity in the selected, verified metric.
+  Report adoption rates only when the eligible/licensed denominator is known.
+- **Unlicensed:** explicit licence evidence, not missing or zero activity.
+- **Unknown:** retain unresolved eligibility and incomplete coverage separately.
 
-Treat missing Copilot values as unlicensed rather than as zero usage, unless the
-data clearly indicates otherwise.
+Do not infer licensing from activity. Missing rows become zero only with
+independent eligibility and completeness evidence. For Consumption or GitHub,
+read [copilot-query-contracts.md](copilot-query-contracts.md) rather than
+assuming the Person Query's semantics apply.
 
 ## Copilot adoption dashboard
 
@@ -64,8 +69,8 @@ data clearly indicates otherwise.
 - Define the licensed population by enabled days for the period rather than by
   whether a person happened to take an action, to avoid conflating "not
   licensed" with "licensed but idle."
-- Use percentile-based thresholds so segment boundaries adapt to the data
-  instead of relying on fixed absolute cutoffs.
+- Use the package's documented segment definitions and required windows.
+  Do not substitute arbitrary percentiles or credits/tokens for action counts.
 
 ## Shared requirements across all of these
 

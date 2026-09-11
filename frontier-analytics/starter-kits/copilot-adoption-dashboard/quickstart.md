@@ -1,6 +1,7 @@
 # Quickstart — Copilot Adoption Dashboard
 
-Get a working Copilot adoption dashboard in under 5 minutes.
+Build a Copilot adoption dashboard with a coding agent. Runtime depends on data,
+dependencies and the agent; no fixed completion time is guaranteed.
 
 ## What you need
 
@@ -28,7 +29,7 @@ In your coding agent, type a brief context line and then paste the prompt:
 ```
 My person query CSV is at ./data/person-query.csv.
 The date column is MetricDate and the primary org column is Organization.
-Use Python with plotly for charts.
+Use Python with matplotlib for static charts embedded in self-contained HTML.
 
 [paste the full Dashboard Overview prompt here]
 ```
@@ -69,7 +70,7 @@ Once the core dashboard is working:
 |---|---|
 | Agent can't find the CSV | Provide the full absolute path to the file. |
 | Column names don't match | Prepend: _"In my data, the org column is called `Org` and the date column is `Date`."_ |
-| Charts are blank | Ensure `plotly` (Python) or `htmlwidgets` (R) is installed in the environment. |
+| Charts are blank | Check the plotting/rendering dependencies reported by the script: matplotlib for the Python path, or ggplot2 and rmarkdown for R. |
 | Too few data points | Confirm your export covers at least 4 weeks and includes Copilot metric columns. |
 | HTML file is very large | Ask the agent to downsample or aggregate data before charting. |
 

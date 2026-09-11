@@ -10,6 +10,12 @@ For general prerequisites and the overall workflow, see the [Frontier Analytics 
 |-------------|-------------|------------|----------------|
 | [Copilot Adoption Dashboard](copilot-adoption-dashboard/) | Interactive dashboard tracking Copilot adoption metrics over time, including usage trends, feature-level breakdowns, and user segmentation by HR attributes. | Intermediate | HTML dashboard |
 | [Executive Summary Report](executive-summary-report/) | One-page memo summarizing key collaboration and Copilot metrics for executive audiences. Designed for fast turnaround with minimal customization. | Beginner | Markdown / HTML memo |
+| [Consumption Dashboard](consumption-dashboard/) | Reproduce the synthetic reference or adapt documented Consumption exports to a scoped credits report. | Intermediate | HTML + provenance |
+| [Developer Experience Dashboard](developer-experience-dashboard/) | Reproduce/customise the synthetic reference; assess real GitHub inputs without inventing a contract. | Intermediate | Demo HTML or readiness assessment |
+
+The two query-dashboard kits use one [shared R runner](copilot-query-dashboard/).
+They support prompt-only use or an optional skill; no new web application stack
+is needed.
 
 ## What's in a starter kit?
 

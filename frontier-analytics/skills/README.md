@@ -22,10 +22,47 @@ The Skill format used here follows the convention introduced by Anthropic's Clau
 | Skill | Description |
 |---|---|
 | [viva-insights-analysis/](viva-insights-analysis/) | Analyzing Viva Insights data with the open-source vivainsights R and Python packages: importing and validating a query, computing and visualizing metrics, segmenting Copilot usage, building common deliverables (dashboards, executive summaries, ROI estimates), running network or information-value analysis, and avoiding well-known export data pitfalls. |
+| [viva-insights-copilot-dashboards/](viva-insights-copilot-dashboards/) | Optional, R-first workflow for the Consumption and Developer Experience reference dashboards: reproduce, inspect/adapt and customise. Uses shared analysis contracts rather than duplicating them. |
 
 ## Installing a skill
 
 Copy the skill's folder (for example `viva-insights-analysis/`, including its `reference/` and `examples/` subfolders) into the skills directory your agent reads from. Consult your agent's documentation for the exact location, since this varies by tool.
+
+## Dashboard skill installation
+
+For one-off use, copy a [dashboard prompt](../prompts/README.md#query-dashboards)
+instead; it reads the same workflow from the checkout without installation.
+
+For repeated use, obtain a local checkout of this repository and copy **both**
+`viva-insights-analysis` and `viva-insights-copilot-dashboards` from
+`frontier-analytics/skills/` into the same agent skills directory. Keep their
+subfolders intact and use the same checkout revision for both. The dashboard
+skill reads its sibling's contract directly; no automatic dependency resolution
+is assumed. Do not overwrite an existing customised skill without reviewing it.
+
+For example, from the checkout in PowerShell, install into a separate project:
+
+```powershell
+$destination = 'C:\path\to\your-project\.github\skills'
+New-Item -ItemType Directory -Force -Path $destination | Out-Null
+foreach ($name in @('viva-insights-analysis', 'viva-insights-copilot-dashboards')) {
+    if (Test-Path (Join-Path $destination $name)) {
+        throw "Skill already exists: $name. Review it before replacing."
+    }
+}
+foreach ($name in @('viva-insights-analysis', 'viva-insights-copilot-dashboards')) {
+    Copy-Item -LiteralPath (Join-Path 'frontier-analytics\skills' $name) -Destination $destination -Recurse
+}
+```
+
+Use the equivalent skills location for your agent. Keep the sample-code
+checkout available: the installed skill asks for its `repo_root` to find the
+runner and reference assets. Installing the skill does not install R/Pandoc or
+download dependencies. No private services, telemetry or credentials are needed.
+
+Start with: **"Reproduce the Consumption demo using the dashboard skill."**
+For real data, Consumption v1 supports a scoped credits report; GitHub supports
+inspection only until a verified real-data adapter is added.
 
 ## Contributing a new skill
 

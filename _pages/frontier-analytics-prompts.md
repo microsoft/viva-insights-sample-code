@@ -37,6 +37,16 @@ Each prompt card includes the purpose, required inputs, assumptions, the full pr
 | [Executive PowerPoint Deck]({{ site.baseurl }}/frontier-analytics-prompt-powerpoint/) | Generate an exec-ready 10–15 page PowerPoint deck with editable native charts. |
 | [Copilot Causal Toolkit]({{ site.baseurl }}/frontier-analytics-prompt-causal-toolkit/) | Run a causal inference analysis using the Copilot Causal Toolkit, then interpret results for senior leadership. Two prompts: one to run the analysis, one to interpret outputs. |
 
+### Query dashboards
+
+Start with the existing R reports and let an agent guide the next step. These
+journeys work with a pasted prompt or the optional dashboard skill.
+
+| Prompt Card | Description |
+|---|---|
+| [Consumption Dashboard]({{ site.baseurl }}/frontier-analytics-prompt-consumption-dashboard/) | Reproduce the synthetic demo or build a scoped credits report from documented exports. |
+| [Developer Experience Dashboard]({{ site.baseurl }}/frontier-analytics-prompt-developer-experience-dashboard/) | Reproduce/customise the demo or assess real GitHub input readiness; no verified real adapter in v1. |
+
 ### Purview Augmentation
 
 | Prompt Card | Description |

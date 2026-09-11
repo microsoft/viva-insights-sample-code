@@ -1,0 +1,35 @@
+{
+  "report": "consumption",
+  "mode": "real",
+  "repo_root": "../../../..",
+  "output_dir": "../../../../../copilot-dashboard-work/real-consumption",
+  "inputs": {
+    "activity": "../../../../../private-inputs/PersonServiceCreditsMetrics.csv",
+    "people": "../../../../../private-inputs/PeopleMetaData.csv"
+  },
+  "mappings": {
+    "activity": {
+      "person_id": "PersonId",
+      "service_id": "ServiceId",
+      "date": "MetricDate",
+      "people_id": "PeopleHistoricalId",
+      "credits": "Total Copilot Credits used"
+    },
+    "people": {
+      "people_id": "PeopleHistoricalId",
+      "licensed": "IsCopilotLicensed",
+      "group": "Organization"
+    }
+  },
+  "mapping_approval": {
+    "approved": false,
+    "evidence": "REPLACE with analyst-reviewed export contract or approval reference; do not insert customer records."
+  },
+  "granularity": "day",
+  "dates": {
+    "start": "2026-06-01",
+    "end": "2026-06-30"
+  },
+  "group": true,
+  "privacy_min": 10
+}

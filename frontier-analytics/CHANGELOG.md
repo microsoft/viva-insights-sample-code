@@ -8,6 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Two AI-guided query-dashboard journeys (Consumption and Developer Experience),
+  with prompt cards, site pages and starter kits sharing a reusable R runner.
+- Optional `viva-insights-copilot-dashboards` skill with reproduce, adapt and
+  customise modes; explicit paired installation with the general analysis skill.
+- Shared Consumption/GitHub evidence contract distinguishing documented fields
+  from synthetic-only inputs. Real Consumption support is scoped to credits;
+  real GitHub input supports inspection, not an unverified report adapter.
+- Full-prompt drift checks for the new dashboard prompt/page pairs.
+
 - **Skills library** at [skills/](skills/), with the first skill, [viva-insights-analysis](skills/viva-insights-analysis/), covering the open-source vivainsights R and Python packages.
 - [skills/README.md](skills/README.md) explaining what a Skill is, how it differs from a prompt card and from `vivainsights-context.md`, and which agents currently support the format.
 - **Skill Template** at [templates/skill-template.md](templates/skill-template.md), and an "Adding a new skill" section in [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -18,6 +27,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `reference/deliverables.md` in the `viva-insights-analysis` skill, distilling the same dashboard, executive summary, ROI, and segmentation conventions used in the prompt cards, so a Skill-driven session can produce those deliverables without a prompt card being pasted.
 
 ### Changed
+
+- Existing dashboard guidance now requires licence/coverage evidence, stops on
+  duplicate keys and uses privacy-protected groups rather than individual ranks.
+- Copilot dashboard examples link to the Frontier journeys. General skill
+  references route dashboard orchestration to the optional skill.
+- Corrected the adoption quickstart's plotting recommendation to match its
+  static-image prompt, and removed its unmeasured completion-time promise.
 
 - The "What's inside" table now flags [mcp/](mcp/) as a concept with no server implemented yet, so this is visible before opening the folder.
 - [vivainsights-context.md](../vivainsights-context.md) now points to the `viva-insights-analysis` skill for agents that support the Skill format, positioning itself as the fallback for agents that do not.

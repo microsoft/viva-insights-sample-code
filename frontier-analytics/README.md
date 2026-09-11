@@ -38,6 +38,17 @@ Once installed, open the agent in a folder that has R or Python available, then 
 
 ## What's inside
 
+### Build or customise query dashboards
+
+Start with the [Consumption](starter-kits/consumption-dashboard/) or
+[Developer Experience](starter-kits/developer-experience-dashboard/) journey.
+Both reuse the R reference demos, with prompt-only or
+[optional skill](skills/README.md#dashboard-skill-installation) entry points.
+Consumption real-data support is credits-only; real GitHub files receive a
+readiness assessment until their contract and adapter are verified. Synthetic
+reproduction is separate from real adaptation. No token/time savings are claimed
+without a measured comparison.
+
 | Folder | Description |
 |--------|-------------|
 | [prompts/](prompts/) | Prompt cards. Structured, ready-to-paste prompts for coding agents. Covers Copilot adoption tracking, user segmentation, ROI estimation, and Purview audit log analysis. |

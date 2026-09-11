@@ -23,7 +23,7 @@ After exporting a person query with Copilot activity metrics spanning at least 8
 - Data is at person-week granularity
 - `PersonId` is a consistent anonymized identifier
 - `MetricDate` is a date field representing the start of each week
-- Rows with missing Copilot metric values likely represent unlicensed users
+- Licensing and coverage require explicit evidence; missing activity alone is inconclusive
 - The `vivainsights` R or Python package is available in the environment
 
 ## Recommended output
@@ -38,10 +38,10 @@ Use this shorter prompt for a fast first pass that adapts to your data.
 Help me create a self-contained static HTML dashboard for people analytics and IT leaders that summarizes Copilot adoption trends and group differences from a Viva Insights person query export.
 Start by loading the actual CSV and printing the row count, column names, data types, date range, and number of unique people, then map the real metric and HR columns from what is present.
 Do not assume exact field names, and ask me to confirm the primary activity metric or any missing HR columns if the mapping is ambiguous.
-Separate licensed users from active users before calculating anything, treating missing Copilot metrics as unlicensed unless the data clearly indicates otherwise.
+Separate licensed users from active users using explicit licensing and coverage evidence. If those are unavailable, show observed activity and mark adoption rates unavailable; do not infer licensing from activity or missingness.
 Build weekly adoption metrics using distinct people per week, then add the most useful group views from the available HR attributes.
 The output must be a single self-contained static HTML file with inline assets and no server or external dependencies.
-Suppress any group with fewer than about 5 people, and note any skipped charts or missing segments.
+Suppress any group with fewer than 10 distinct people, or the stricter organisational minimum, and withhold breakdowns that could reveal suppressed cells. Do not publish individual rankings. Note skipped charts or missing segments.
 At the end, list any assumptions you made about metric selection, licensing logic, or field mappings.
 ```
 
@@ -57,7 +57,7 @@ DATA LOADING AND VALIDATION
 1. Load the person query CSV file into a DataFrame (use pandas in Python or readr/vroom in R).
 2. Parse the MetricDate column as a date type. Ensure PersonId is treated as a string.
 3. Verify the panel structure: each row should represent a unique PersonId × MetricDate combination.
-   If there are duplicates, flag them and keep the first occurrence.
+   If there are duplicates, report their count and stop for an explicit resolution rule.
 4. Print the shape of the data, the date range covered, and the number of unique persons.
 5. List all column names so I can verify the Copilot metric columns and HR attribute columns
    match what is expected. Auto-detect columns that start with "Copilot_" as Copilot metric columns.
@@ -66,9 +66,10 @@ IDENTIFYING LICENSED USERS
 6. A user is considered "Copilot-licensed" in a given week using this rule, in order:
    a. If an enabled-days column is present (for example `Total_Copilot_enabled_days`), the user
       is licensed when that column is greater than zero for the week.
-   b. Otherwise, the user is licensed if they have a non-null, non-zero value in at least one
-      Copilot metric column for that week.
-   Create a boolean column `is_licensed` to flag these rows.
+   b. Otherwise, use documented licence records for that period. If unavailable, retain
+      unknown licensing and omit adoption rates; do not infer licences from activity.
+   Create `is_licensed` with unknown values retained. Confirm coverage before filling absent
+   activity with zero.
 7. Also flag "active" users: licensed users who have Copilot_Actions > 0 (or the equivalent primary
    activity metric) in that week. Create a boolean column `is_active`.
 8. Print a summary: total person-weeks, licensed person-weeks, active person-weeks.
@@ -91,10 +92,10 @@ SEGMENTATION METRICS
     d. Mean Copilot_Actions per active user
 12. Store each in a separate DataFrame (e.g., `org_summary`, `function_summary`, `level_summary`).
 
-TOP USERS TABLE
-13. Compute a "top users" table: for each PersonId, calculate total Copilot_Actions across all weeks,
-    total active weeks, and average Copilot_Actions per active week. Rank by total actions descending.
-    Keep the top 20. Include their HR attributes for context.
+GROUP SUMMARY TABLE
+13. Compute activity summaries by an approved HR group using distinct people and the declared
+    time window. Apply privacy suppression to every cell and omit the entire breakdown if
+    remaining cells or totals could reveal a suppressed value. Do not publish person rows.
 
 SUMMARY STATISTICS PANEL
 14. Calculate overall summary statistics for the dashboard header:
@@ -126,7 +127,7 @@ DASHBOARD GENERATION
        - Grouped bar chart: Adoption rate by FunctionType (latest 4-week average)
        - Grouped bar chart: Adoption rate by LevelDesignation (latest 4-week average)
        - Heatmap: Adoption rate by Organization × week (if number of orgs <= 15)
-    e. TOP USERS TABLE: HTML table of top 20 users from step 13.
+    e. GROUP SUMMARY TABLE: privacy-protected aggregate table from step 13, with no identifiers.
     f. METHODOLOGY NOTE: Brief paragraph explaining how adoption rate is calculated, what
        "licensed" and "active" mean, and the data source.
 
@@ -139,19 +140,21 @@ DASHBOARD GENERATION
 IMPORTANT NOTES
 - Do NOT create interactive plots that require a running server (no plotly, no bokeh server).
   Static images embedded as base64 are preferred.
-- Handle missing values gracefully: NaN in Copilot columns means the user is unlicensed that week.
+- Preserve unknown coverage and eligibility. NaN is not proof of an unlicensed user.
+- Omit metrics without verified inputs, including assisted hours or licensing-dependent
+  summaries. Describe skipped panels rather than estimating missing values.
 - If any HR attribute column is missing from the data, skip that segmentation chart and note it.
 - Use the vivainsights package for any helper functions it provides, but do not depend on it for
   core logic — the dashboard should work with just pandas/matplotlib or base R/ggplot2.
 - All charts should have clear titles, axis labels, and legends.
-- If any segment has fewer than 5 users, suppress it from charts to protect privacy.
+- Use at least 10 distinct people per published group, or the stricter organisational minimum.
 ```
 
 ## Adaptation notes
 
 - Adjust HR attribute column names to match your export (e.g., `Organization` vs `Org`). Prepend a note to the prompt specifying your actual column names.
 - If your data is at person-day granularity, add an instruction: _"Aggregate person-day data to person-week by summing Copilot metrics per PersonId per week."_
-- For smaller organizations, increase the privacy threshold (e.g., from 5 to 10 users per segment) or remove segmentation breakdowns entirely.
+- Apply at least 10 distinct people per group, increase this if required by organisational policy, or omit segmentation entirely.
 - Add custom Copilot metrics by extending the list in step 5 (e.g., `Copilot_Edited_Hours`, `Copilot_Rewritten_Hours`).
 - If you prefer R over Python, add _"Use R with ggplot2 and R Markdown"_ at the start of the prompt.
 
