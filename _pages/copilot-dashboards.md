@@ -9,9 +9,10 @@ permalink: /copilot-dashboards/
 [Copilot Analytics]({{ site.baseurl }}/copilot/) / Interactive Dashboards
 
 **Just exploring?** Open either demo in your browser; no installation is required.
+
 **Building your own?** Review the required queries, get the source, and follow the setup guide below.
 
-Both seven-page reports use **synthetic data**, not real organizational results. They illustrate analysis approaches, not evidence of Copilot's impact. Assumptions and simulation details are included in each report's appendix.
+Both seven-page reports use **synthetic data**. They illustrate analysis approaches, not evidence of Copilot's impact. Assumptions and simulation details are included in each report's appendix.
 
 <div class="vi-card-grid" markdown="0">
   <a class="vi-card" href="#copilot-consumption-and-ways-of-working">
@@ -29,6 +30,26 @@ Both seven-page reports use **synthetic data**, not real organizational results.
 ## Copilot Consumption and Ways of Working
 
 **Synthetic data · R template · Seven-page HTML report**
+
+**When to use it:** reach for this report when you need to answer questions such as —
+*Are a small number of users or groups driving most of our token/credit spend?
+Do certain user groups consume disproportionately more tokens and credits, not just more "actions"?
+How does credit intensity (cost per 1,000 tokens) vary by task type or function?
+What does the delegated-task mix look like across usage segments?*
+It is built around the volume-vs-mix distinction: total consumption differs from
+*how efficiently* that consumption converts into credits.
+
+**Scope:** "consumption" here refers to **Microsoft 365 Copilot** usage only (credits,
+tokens, sessions), as captured by the Viva Insights Consumption Query. It does not
+cover GitHub Copilot consumption — for GitHub Copilot activity, see the
+[Developer Experience and Copilot](#developer-experience-and-copilot) report below.
+
+**Prerequisites for real data:** to run this on your own tenant's data you need both a
+**Person Query** export (for organisational attributes and HR groupings) and a
+**[Consumption Query](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query)**
+export (for credits and sessions). The demo additionally simulates token and
+delegated-task-type fields that are not part of the public Consumption schema, so the
+real-data path (see below) produces a narrower, credits-only report.
 
 Separate consumption volume from consumption mix: token concentration and percentile bands, credit intensity per 1,000 tokens, delegated task types, usage segments, and function drill-downs.
 
@@ -56,7 +77,30 @@ reproduce the demo or build a scoped credits report with an agent and reusable R
 
 **Synthetic data · R template · Seven-page HTML report**
 
-Establish a baseline of developer working conditions alongside GitHub and Microsoft 365 Copilot use. Explore meeting and uninterrupted hours, team comparisons, joint product-use patterns, model and language mix, and trends. Eligibility and coverage remain visible rather than treating missing activity as zero.
+**When to use it:** reach for this report when you need to answer questions such as —
+*Do developers who also use Microsoft 365 Copilot show different meeting load or
+uninterrupted-focus time than those who don't? How does GitHub Copilot use vary by
+team, model, or language? Are developers using GitHub Copilot and Microsoft 365
+Copilot jointly, or are the two adopted independently? Is missing activity actually
+zero usage, or a coverage/eligibility gap?* It establishes a baseline of developer
+working conditions alongside GitHub **and** Microsoft 365 Copilot use, and keeps
+eligibility and coverage visible rather than treating missing activity as zero.
+
+**Scope:** this report is the one place on this page that covers **both** products —
+**GitHub Copilot** (query activity, model mix, language mix) and **Microsoft 365
+Copilot** (feature actions, for the joint-use analysis only). This is distinct from
+the Consumption report above, which covers Microsoft 365 Copilot credits/tokens
+exclusively and does not touch GitHub Copilot.
+
+**Prerequisites for real data:** you need a **Person Query** export (working-pattern
+metrics and organisational attributes) plus GitHub query activity, model mix and
+language mix per the [GitHub data contract](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/_data/github/README.md),
+and Microsoft 365 Copilot feature-action data for the joint-use panels. There is no
+verified real-data adapter for the GitHub inputs yet (v1); treat the real-data path as
+a readiness assessment rather than a drop-in export, and confirm field definitions
+before adapting the demo's extended illustrative schema.
+
+Explore meeting and uninterrupted hours, team comparisons, joint product-use patterns, model and language mix, and trends.
 
 **[View demo]({{ site.baseurl }}/examples/utility-r/github-copilot-developer-productivity-simulation.html)** ·
 [Get source](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/github-copilot-developer-productivity-simulation.Rmd) ·
@@ -66,8 +110,6 @@ Establish a baseline of developer working conditions alongside GitHub and Micros
 reproduce the synthetic reference or assess real inputs. No verified real GitHub adapter is supplied yet.
 
 [![Developer experience report focus and coordination]({{ site.baseurl }}/assets/images/reports/github-copilot-devex-focus.png)]({{ site.baseurl }}/examples/utility-r/github-copilot-developer-productivity-simulation.html)
-
-**Required data:** GitHub query activity, model mix, and language mix; Person Query working-pattern metrics; and Microsoft 365 Copilot activity for the joint-use analysis. The [data contract](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/_data/github/README.md) documents coverage and reference inputs.
 
 The developer demo uses an **extended illustrative schema**, not a drop-in flexible-query export. Its M365 feature actions, eligibility flags, and completeness reference are demonstration contracts; confirm equivalent sources and definitions before adapting it.
 
