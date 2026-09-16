@@ -532,9 +532,9 @@ Overview {data-icon="fa-dashboard"}
 
 <div class="insight-banner">
 <span class="synthetic-pill">Synthetic demonstration</span>
-The rebuilt files now use real query-shaped exports: weekly Ways of Working,
-daily Microsoft 365 credit consumption by service, daily GitHub AI credits, and
-Consumption metadata joined through the activity-file crosswalk.
+Simulated values in real export schemas: a weekly Person query, daily Microsoft 365
+credit consumption by service, daily GitHub AI credits, and Consumption metadata
+joined through the activity-file crosswalk.
 </div>
 
 Row {data-height=120}

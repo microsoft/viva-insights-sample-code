@@ -64,3 +64,5 @@ Gemfile.lock
 assets/decks/
 *.pptx
 *.docx
+# Local tooling for scripts/capture-report-screenshots.js
+node_modules/

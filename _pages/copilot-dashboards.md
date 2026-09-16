@@ -69,7 +69,7 @@ reproduce the demo or build a scoped credits report with an agent and reusable R
 <details markdown="1">
 <summary>See the consumption distribution preview</summary>
 
-![Consumption report credit distribution]({{ site.baseurl }}/assets/images/reports/copilot-consumption-token-distribution.png)
+![Consumption report credit distribution]({{ site.baseurl }}/assets/images/reports/copilot-consumption-credit-distribution.png)
 
 </details>
 
