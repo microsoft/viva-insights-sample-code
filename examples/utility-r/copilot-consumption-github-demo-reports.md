@@ -60,7 +60,8 @@ cd examples/utility-r
 Rscript simulate-query-exports.R
 ```
 
-The generator is seeded and asserts its schema and reconciliation contracts before writing.
+The generator is seeded and validates the whole ordered schema bundle and synthetic
+allocation invariants before writing.
 It fails rather than exporting a broken file.
 
 ### Points where real exports catch people out
@@ -71,36 +72,44 @@ It fails rather than exporting a broken file.
   assumes one row per person per day silently over-counts.
 - **Consumption metric columns contain spaces** (`Total Copilot Credits used`,
   `Session count`). Read with `check.names = FALSE`.
-- **Empty `Spending policy limit` / `User limit` cells are meaningful** — they indicate no
-  spending policy applies, alongside the all-zero `SpendingPolicyId`.
+- **Empty policy/limit cells need a verified interpretation.** This recipe uses empty
+  values alongside an all-zero policy ID for no policy; a real empty value alone
+  does not establish absence of policy.
 - **The GitHub activity file contains explicit zero rows.** A zero row is observed
-  inactivity; a missing row is no provisioning. These are not the same thing.
-- **The four GitHub breakdown files are margins of one allocation**, so they reconcile with
-  each other and with the activity file. Real breakdowns are daily and two-dimensional;
-  there is no `Share` column and no full-window allocation.
+  inactivity; a missing row has unknown status, not proof of no provisioning.
+- **In this simulation only, the four breakdowns are margins of one allocation.**
+  Equality with activity and completion-model attribution are illustrative synthetic
+  invariants, not verified real-export semantics. Confirmed headers alone never justify
+  enforcing equality. The daily two-dimensional exports have no `Share` column.
 - **Product history is shorter than collaboration history.** Here the person query covers 26
   weeks and the product feeds the final 13. Do not assume the windows align.
 
 ## Deriving eligibility and coverage
 
 No Viva Insights query produces an eligibility or coverage file, so these signals must be
-derived rather than read:
+kept separate by evidence class:
 
 | Question | Real signal |
 |---|---|
-| Licensed for Microsoft Copilot? | `Total_Copilot_enabled_days > 0` in the person query, or `IsCopilotLicensed` in `PeopleMetaData` |
-| Provisioned for GitHub Copilot? | Presence of any row in `PersonGitHubActivityMetrics` |
+| M365 eligible in this week? | `Total_Copilot_enabled_days > 0`; static `IsCopilotLicensed` is context, not an override for zero-enabled weeks |
+| Provisioned for GitHub Copilot? | Independent provisioning evidence; a row establishes observation only and an absent row remains unknown |
 | Used Copilot on this day? | A row with a non-zero measure, not the absence of a row |
 
 Fill an absent activity record with zero **only** when eligibility is independently
 established. Against a real export you also need evidence of ingestion completeness and
 expected coverage before absence can be read as non-use. A sparse export does not by itself
-prove non-use.
+prove non-use. M365 completeness is unknown by default in the helper; no filename or
+schema match certifies it. Consumption missing person-weeks remain unknown; recorded
+sums divided by analysis weeks are lower bounds, not verified complete-period totals.
+
+M365 Copilot credits and GitHub AI credits remain separate units. No common-unit
+conversion, combined total or cross-product share is established.
 
 ## Privacy
 
 Every published group requires at least 10 distinct people. A composition breakdown with any
-cell below 10 is withheld for the whole parent group. Charts contain aggregates rather than
+cell below 10 is withheld with all linked margins. Positive contributors, overlapping
+membership patterns and complements also meet the floor. Charts contain aggregates rather than
 individual points. Identifiers in `_data/` are synthetic GUIDs that exist only to demonstrate
 joins.
 
@@ -131,9 +140,10 @@ report's appendix.
 
 ## Adapting to real data
 
-Replace the synthetic CSVs with governed exports of the same queries. Because the schemas
-already match, no column renaming should be required — but column parity is not semantic
-parity. Confirm population scope, person identifiers, date grains, licence history, expected
+Never replace committed fixtures with customer files. Use a separate approved workspace.
+The supplied real v1 runner is credits-only; sessions, Person Query associations and
+GitHub panels need separately implemented and verified adapters. Matching fixture headers
+is not a like-for-like real build or semantic certification. Confirm population scope, person identifiers, date grains, licence history, expected
 coverage, metric units, query filters and privacy before relying on the joins.
 `vivainsights::import_query()` can import supported flexible queries.
 

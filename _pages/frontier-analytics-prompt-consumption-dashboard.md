@@ -75,7 +75,8 @@ workspace. Keep the fixed seed/window and synthetic labels. Do not alter canonic
 For real mode, inspect the extracted CSVs locally and return bounded schema summaries,
 not rows or identifiers. Verify keys, grain, units and historical metadata joins.
 Present supported/excluded panels and mapping evidence; wait for my approval to build.
-Build from credits and sessions only. Do not generate
+Build only the supported M365 credits panels in real v1; sessions, Person Query
+associations and GitHub panels require separate verified adapters. Do not generate
 synthetic replacements, infer licences from activity, or sum policy limits.
 
 Use the existing R code. Check dependencies before requesting installation. Do not read

@@ -45,11 +45,12 @@ and also emits GitHub AI credits, so both appear in this report. For GitHub Copi
 *activity* — completions, chat, features, models and languages — see the
 [Developer Experience and Copilot](#developer-experience-and-copilot) report below.
 
-**Prerequisites for real data:** to run this on your own tenant's data you need both a
-**Person Query** export (for organisational attributes and HR groupings) and a
-**[Consumption Query](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query)**
-export. The demo fixtures already match the real Consumption schema, so the real-data
-path is a like-for-like substitution rather than a narrower report.
+**Real v1 capability:** the supplied runner builds a narrower **M365 credits-only**
+report from Consumption activity and its matching people metadata, with explicit
+mapping approval. Sessions, Person Query associations and GitHub panels are not
+implemented by that real adapter. Reproducing the full synthetic demonstration on
+governed inputs requires separately implemented and verified support; matching headers
+alone does not make it a like-for-like substitution.
 
 Separate consumption volume from consumption cost: credit concentration and percentile bands, cost per session, service mix, usage segments, and function drill-downs.
 

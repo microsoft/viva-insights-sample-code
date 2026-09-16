@@ -95,6 +95,30 @@ disclosable_split <- function(total, part, minimum = MIN_GROUP_N) {
     (total - part == 0 | total - part >= minimum)
 }
 
+# Protect differences between overlapping service/category supports as well as
+# each positive-contributor count. Every membership pattern includes the full
+# parent population, so absent/noncontributing complements cannot be inferred.
+support_release_safe <- function(data, groups, metrics, parent_ids) {
+  parent_ids <- unique(parent_ids)
+  if (length(parent_ids) < MIN_GROUP_N || anyNA(parent_ids)) return(FALSE)
+  if (!all(data$PersonId %in% parent_ids)) return(FALSE)
+  memberships <- setNames(rep('', length(parent_ids)), parent_ids)
+  for (metric in metrics) {
+    if (anyNA(data[[metric]]) || any(!is.finite(data[[metric]]))) return(FALSE)
+    cells <- interaction(data[groups], drop = TRUE, lex.order = TRUE)
+    for (cell in levels(cells)) {
+      rows <- cells == cell
+      observed <- unique(data$PersonId[rows])
+      positive <- unique(data$PersonId[rows & data[[metric]] > 0])
+      if (!disclosable_split(length(parent_ids), length(observed)) ||
+          !disclosable_split(length(parent_ids), length(positive))) return(FALSE)
+      memberships[observed] <- paste0(memberships[observed], '|', metric, ':', cell, ':row')
+      memberships[positive] <- paste0(memberships[positive], '|', metric, ':', cell, ':positive')
+    }
+  }
+  all(table(memberships) >= MIN_GROUP_N)
+}
+
 pq <- read_export('person-query', 'PersonQuery.csv') |>
   mutate(MetricDate = as.Date(MetricDate),
          Week = MetricDate,
@@ -201,6 +225,8 @@ person_history <- m365_raw |>
 person_history_counts <- person_history |> count(PersonId)
 stopifnot(all(person_history_counts$n == 1L))
 m365_product_weeks <- derive_m365_coverage(pq)
+# Historical internal name: GH_eligible denotes observed row presence only,
+# never an independently established GitHub licence or provisioning status.
 gh_eligibility <- gh_daily |>
   distinct(PersonId, Week) |>
   mutate(GH_eligible = TRUE)
@@ -230,8 +256,14 @@ m365_weekly <- m365_daily |>
             M365_sessions = sum(M365_sessions),
             M365_credits = sum(M365_credits),
             .groups = 'drop')
-m365_service_mix <- m365_raw |>
-  filter(MetricDate %in% baseline_weekdays) |>
+developer_ids <- people$PersonId[coalesce(people$IsDeveloper, FALSE)]
+m365_service_source <- m365_raw |>
+  filter(MetricDate %in% baseline_weekdays, PersonId %in% developer_ids) |>
+  mutate(ServiceName = missing_label(ServiceName))
+m365_service_safe <- support_release_safe(
+  m365_service_source, 'ServiceName', c('Session count', 'Total Copilot Credits used'),
+  developer_ids)
+m365_service_mix <- m365_service_source |>
   group_by(ServiceName) |>
   summarise(People = n_distinct(PersonId),
             Sessions = sum(`Session count`),
@@ -240,6 +272,7 @@ m365_service_mix <- m365_raw |>
   disclose_partition() |>
   arrange(desc(Credits)) |>
   mutate(Share = Credits / sum(Credits))
+if (!m365_service_safe) m365_service_mix <- m365_service_mix[0, ]
 
 github_credits_weekly <- github_credits_daily |>
   filter(as.POSIXlt(MetricDate)$wday %in% 1:5) |>
@@ -320,17 +353,17 @@ baseline <- baseline_panel |>
             .groups = 'drop') |>
   mutate(Joint = case_when(
     is.na(GH_eligible_all) | is.na(M365_eligible_all) ~ 'Observation unresolved',
-    !GH_eligible_all & !M365_eligible_all ~ 'Neither provisioned/licensed',
-    !GH_eligible_all ~ 'M365 only eligible',
-    !M365_eligible_all ~ 'GitHub only eligible',
+    !GH_eligible_all & !M365_eligible_all ~ 'Observation unresolved',
+    !GH_eligible_all ~ 'Observation unresolved',
+    !M365_eligible_all ~ 'GitHub observed; M365 not enabled all weeks',
     !GH_all_valid | !M365_all_valid ~ 'Observation unresolved',
     GH_active_days > 0 & M365_active_days > 0 ~ 'Both recorded',
     GH_active_days > 0 ~ 'GitHub only recorded',
     M365_active_days > 0 ~ 'M365 only recorded',
     TRUE ~ 'Neither recorded'))
 joint_levels <- c('Both recorded', 'GitHub only recorded', 'M365 only recorded',
-                  'Neither recorded', 'GitHub only eligible', 'M365 only eligible',
-                  'Neither provisioned/licensed', 'Observation unresolved')
+                  'Neither recorded', 'GitHub observed; M365 not enabled all weeks',
+                  'Observation unresolved')
 baseline$Joint <- factor(baseline$Joint, levels = joint_levels)
 matched <- baseline |> filter(GH_all_valid, M365_all_valid)
 
@@ -374,10 +407,10 @@ stopifnot(nrow(coverage) == N_ROSTER * length(weeks),
 # invariant here: matching headers do not establish real-export metric equality
 # or model attribution for completion counts.
 
-baseline_feature_daily <- feature_daily |> filter(MetricDate %in% baseline_weekdays)
-baseline_language_feature_daily <- language_feature_daily |> filter(MetricDate %in% baseline_weekdays)
-baseline_language_model_daily <- language_model_daily |> filter(MetricDate %in% baseline_weekdays)
-baseline_model_feature_daily <- model_feature_daily |> filter(MetricDate %in% baseline_weekdays)
+baseline_feature_daily <- feature_daily |> filter(MetricDate %in% baseline_weekdays, PersonId %in% developer_ids)
+baseline_language_feature_daily <- language_feature_daily |> filter(MetricDate %in% baseline_weekdays, PersonId %in% developer_ids)
+baseline_language_model_daily <- language_model_daily |> filter(MetricDate %in% baseline_weekdays, PersonId %in% developer_ids)
+baseline_model_feature_daily <- model_feature_daily |> filter(MetricDate %in% baseline_weekdays, PersonId %in% developer_ids)
 agent_features <- c('chat_panel_agent_mode', 'agent_edit', 'copilot_cli', 'copilot_app')
 feature_mix <- baseline_feature_daily |>
   group_by(Feature) |>
@@ -421,7 +454,14 @@ language_feature_mix <- baseline_language_feature_daily |>
   ungroup()
 breakdown_safe <- all(vapply(list(feature_mix, model_mix, language_mix,
   model_feature_mix, language_model_mix, language_feature_mix),
-  function(x) all(x$People >= MIN_GROUP_N), logical(1)))
+  function(x) all(x$People >= MIN_GROUP_N), logical(1))) &&
+  support_release_safe(baseline_feature_daily, 'Feature', 'Feature Usage Count', developer_ids) &&
+  support_release_safe(baseline_model_feature_daily, c('Model', 'Feature'),
+                       'Usage count by model and feature', developer_ids) &&
+  support_release_safe(baseline_language_model_daily, c('Language', 'Model'),
+                       'Usage count by language and model', developer_ids) &&
+  support_release_safe(baseline_language_feature_daily, c('Language', 'Feature'),
+                       'Usage count by language and feature', developer_ids)
 if (!breakdown_safe) {
   feature_mix <- feature_mix[0, ]
   model_mix <- model_mix[0, ]
@@ -492,7 +532,7 @@ interval_plot <- function(data, metrics, group = 'Team', title, subtitle, captio
 composition <- function(data, group, category) {
   counts <- data |> count(Group = missing_label(.data[[group]]),
                          Category = missing_label(.data[[category]]), name = 'People', .drop = TRUE)
-  counts <- counts |> group_by(Group) |> filter(all(People >= MIN_GROUP_N)) |> ungroup()
+  counts <- disclose_partition(counts)
   counts |> group_by(Group) |> mutate(Share = People / sum(People)) |> ungroup()
 }
 unavailable_plot <- function(title = NULL) {
@@ -551,12 +591,27 @@ joint_counts_public <- joint_counts |>
 team_context <- composition(baseline, 'Team', 'Role')
 role_context <- composition(matched, 'Joint', 'Role')
 team_joint_context <- composition(matched, 'Joint', 'Team')
+composition_counts <- bind_rows(lapply(c('Role','Seniority','Tenure'), function(a)
+  baseline |> count(Category=.data[[a]], name='People') |> mutate(Attribute=a)))
+# One shared gate for every linked HR margin and cross-tab in this report.
+hr_cells <- baseline |> count(Team, Role, Seniority, Tenure, Joint, name='People')
+hr_release_safe <- nrow(disclose_partition(hr_cells)) > 0L
+if (!hr_release_safe) {
+  team_context <- team_context[0, ]
+  role_context <- role_context[0, ]
+  team_joint_context <- team_joint_context[0, ]
+  composition_counts <- composition_counts[0, ]
+}
 work_summary <- bind_rows(lapply(c('Collaboration_hours', 'Meeting_hours', 'Available_to_focus_hours',
                                    'Uninterrupted_hours', 'Interrupted_hours',
                                    'After_hours_collaboration_hours'), function(m) tibble(
   Metric = metric_labels[[m]], `25th percentile` = f1(quantile(baseline[[m]], .25)),
   Median = f1(median(baseline[[m]])), `75th percentile` = f1(quantile(baseline[[m]], .75)))))
 
+credit_release_safe <- setNames(vapply(c('GH', 'M365'), function(product) {
+  valid <- baseline |> filter(.data[[paste0(product, '_all_valid')]])
+  support_release_safe(valid, 'Team', paste0(product, '_credits'), baseline$PersonId)
+}, logical(1)), c('GH', 'M365'))
 product_summary <- bind_rows(lapply(c('GH', 'M365'), function(product) {
   gh <- product == 'GH'
   valid <- baseline |> filter(if (gh) GH_all_valid else M365_all_valid)
@@ -565,8 +620,11 @@ product_summary <- bind_rows(lapply(c('GH', 'M365'), function(product) {
   split_safe <- disclosable_split(nrow(baseline), nrow(valid)) &&
     disclosable_split(nrow(valid), nrow(active))
   top_n <- ceiling(.1 * nrow(active))
-  top_safe <- split_safe && top_n >= MIN_GROUP_N &&
-    nrow(active) - top_n >= MIN_GROUP_N
+  top_ids <- order(active[[volume]], decreasing = TRUE)[seq_len(top_n)]
+  top_safe <- split_safe && credit_release_safe[[product]] &&
+    top_n >= MIN_GROUP_N && nrow(active) - top_n >= MIN_GROUP_N &&
+    sum(active[[volume]][top_ids] > 0) >= MIN_GROUP_N &&
+    sum(active[[volume]][-top_ids] > 0) >= MIN_GROUP_N
   share <- if (top_safe) safe_div(
     sum(sort(active[[volume]], decreasing = TRUE)[seq_len(top_n)]),
     sum(active[[volume]])) else NA_real_
@@ -575,7 +633,7 @@ product_summary <- bind_rows(lapply(c('GH', 'M365'), function(product) {
          `Recorded active (count)` = num(if (split_safe) nrow(active) else NA_integer_),
          `Recorded active (%)` = pct(if (split_safe) safe_div(nrow(active), nrow(valid)) else NA_real_),
          `Active days / developer / week (mean)` = f1(if (split_safe) mean(if (gh) valid$GH_active_days else valid$M365_active_days) / BASELINE_WEEKS else NA_real_),
-         `Credits / developer / week (mean)` = f1(if (split_safe) mean(valid[[volume]]) / BASELINE_WEEKS else NA_real_),
+         `Credits / developer / week (mean)` = f1(if (split_safe && credit_release_safe[[product]]) mean(valid[[volume]]) / BASELINE_WEEKS else NA_real_),
          `Session or request unit` = if (gh) 'GitHub credits' else 'M365 credits',
          `Top 10% active credit share (%)` = pct(share),
          `Top group (count)` = num(if (top_safe) top_n else NA_integer_))
@@ -610,6 +668,8 @@ team_league <- baseline |>
   arrange(desc(Collaboration_hours)) |>
   mutate(Rank = row_number(), .before = Team)
 for (product in c('GH', 'M365')) {
+  if (!credit_release_safe[[product]])
+    team_league[[paste0(product, '_intensity')]] <- NA_real_
   if (!all(team_league[[paste0(product, '_safe')]])) {
     for (measure in c('_valid_n', '_active_n', '_active_share', '_intensity')) {
       team_league[[paste0(product, measure)]] <- NA_real_
@@ -682,13 +742,13 @@ source_contracts <- tibble(
 coverage_derivation <- tibble(
   Question = c('Person Query roster and weekly completeness',
                'Microsoft 365 Copilot eligibility',
-               'GitHub Copilot provisioning',
+               'GitHub Copilot observation',
                'GitHub weekly coverage',
                'Microsoft 365 weekly observation',
                'Recorded product use'),
   `Signal used` = c('PersonQuery.csv has one row per PersonId x week in this sample.',
                     'Person Query Total_Copilot_enabled_days in the relevant week; static metadata never overrides zero enabled days.',
-                    'An activity row supplies positive evidence for that week. Absence leaves provisioning unknown, never false.',
+                    'An activity row establishes observation for that week, not licence or provisioning status. Absence is unknown.',
                     'Five explicit weekday activity rows and five credit rows; weekday-only reporting convention, not an ingestion certificate. No absent GitHub values are zero-filled.',
                     'Unknown by default. Independent completeness evidence is required; licence metadata and a calendar are insufficient.',
                     'Positive observations are not proof of complete collection. M365 zero filling requires independently evidenced completeness and positive weekly enabled days.'))

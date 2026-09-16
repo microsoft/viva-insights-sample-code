@@ -1497,10 +1497,9 @@ observed calendar and collaboration patterns only.
 2. Validate the identity crosswalk and disclose the match rate.
 3. Require independent, week-relevant eligibility and ingestion/coverage evidence
    before zero filling. Missing rows alone do not establish zero activity or no
-   provisioning; M365 enabled days do not establish GitHub provisioning. This
-   synthetic report assumes zero for absent rows solely for fixture arithmetic,
-   not because the export proves completeness. Do not reuse that assumption for
-   real data.
+   provisioning; M365 enabled days do not establish GitHub provisioning. Missing
+   person-weeks remain unknown here. Recorded sums per analysis week are lower
+   bounds when completeness is unknown, not complete-period consumption.
 4. Preserve the daily service grain until after service-level totals are needed;
    aggregate services before computing person-week rates.
 5. Keep person-level averaging so each person carries equal analytical weight.

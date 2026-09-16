@@ -114,10 +114,6 @@ stack_plot(team_context, 'Roles represented in each team',
 
 ```{r composition-details, results='asis'}
 html_table(composition_table(team_context), 'Role shares use the 60 developers in each team as denominator.')
-composition_counts <- bind_rows(lapply(c('Role','Seniority','Tenure'), function(a)
-  baseline |> count(Category=.data[[a]], name='People') |> mutate(Attribute=a)))
-composition_counts <- composition_counts |>
-  group_by(Attribute) |> filter(all(People >= MIN_GROUP_N)) |> ungroup()
 html_table(composition_counts |> transmute(Attribute, Category, `Developers (count)`=People,
   `Share of developers (%)`=pct(People/nrow(baseline))), 'Role, seniority and tenure are illustrative HR attributes carried by the query exports.')
 ```
@@ -283,7 +279,7 @@ Row
 <span class="pill">Synthetic demo · Real export schema</span>
 <span class="context">`r period_label` · same `r num(nrow(baseline))`-developer roster · GitHub rows distinguish zero from missing</span>
 
-<p class="leadline">Common complete-window observation is unavailable without independent Microsoft 365 collection evidence. GitHub activity rows supply positive provisioning evidence for the observed week; absence leaves provisioning unknown. Microsoft 365 eligibility uses that week's <code>Total_Copilot_enabled_days</code>: static metadata cannot override a zero-enabled week. The product windows deliberately start later than the Person Query history.</p>
+<p class="leadline">Common complete-window observation is unavailable without independent Microsoft 365 collection evidence. GitHub activity rows establish observation, not licensing or provisioning; absence leaves status unknown. Microsoft 365 eligibility uses that week's <code>Total_Copilot_enabled_days</code>: static metadata cannot override a zero-enabled week. The product windows deliberately start later than the Person Query history.</p>
 
 <div class="definitions">
 <strong>Zero versus missing.</strong> The synthetic GitHub activity file includes explicit zero rows for inactive weekdays: these are measured zero, whereas an absent row leaves status unknown. Microsoft 365 consumption rows cannot certify their own collection completeness. The product calendar and static licence metadata are not completeness evidence. Missing Microsoft 365 values stay <code>NA</code> unless independent person-week coverage and positive enabled days justify a zero; the default report has no such evidence.
@@ -311,7 +307,7 @@ eligibility_table <- bind_rows(lapply(c('GH','M365'), function(p) {
     summarise(eligible=all(.data[[paste0(p,'_eligible')]]),
               valid=all(.data[[paste0(p,'_valid')]]), .groups='drop') |>
     mutate(Status=case_when(
-      is.na(eligible) ~ 'Eligibility or provisioning unknown',
+      is.na(eligible) ~ 'Eligibility or observation unknown',
       !eligible ~ 'Not eligible for the full window',
       !valid ~ 'Eligible; completeness unresolved or incomplete',
       TRUE ~ 'Eligible and valid'))
@@ -555,7 +551,7 @@ Row
 
 ### Privacy, reproducibility and validation
 
-**Privacy floor.** At least 10 distinct people are required for a published group. Percentile visuals use `vivainsights::create_boxplot(..., mingroup = 10, return = "table")`. Composition breakdowns with any positive cell below 10 are withheld in full for that parent group, including the joint-use and eligibility partitions. Linked GitHub margins and cross-tabs are withheld together to avoid subtraction across tables. Product rates check both numerator and complement; unavailable values are labelled, not plotted as zero. Missing category labels are shown as “Unknown / not supplied”. No individual points, identifiers or individual leaderboards appear in the HTML.
+**Privacy floor.** At least 10 distinct people are required for a published group. Percentile visuals use `vivainsights::create_boxplot(..., mingroup = 10, return = "table")`. Linked HR margins and cross-tabs share one release gate; unsafe intersection cells withhold the entire family. Joint-use and eligibility partitions are withheld in full when unsafe. Linked GitHub margins and cross-tabs are withheld together. Service releases check positive contributors and overlapping membership-pattern complements within the developer roster. Product rates check both numerator and complement; unavailable values are labelled, not plotted as zero. Missing category labels are shown as “Unknown / not supplied”. No individual points, identifiers or individual leaderboards appear in the HTML.
 
 **Simulation boundary.** The CSV values are synthetic, but the report no longer invents CSV schemas or writes files. It does not use a standalone eligibility or coverage export, fabricated Microsoft 365 action categories, model or language share files, or an agent-use indicator that is absent from the real GitHub activity export. It parses the real `Agent adoption` field and derives all shares locally.
 

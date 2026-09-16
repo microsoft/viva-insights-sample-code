@@ -141,3 +141,92 @@ test("Consumption keeps missing weeks unknown and GitHub units cannot affect M36
             all(baseline$person_base$ConsumptionProfile[
               baseline$person_base$total_m365_sessions < 10] == "Limited M365 sessions"))
 })
+test("overlapping supports reject one-person contributors and membership complements", {
+  d <- data.frame(PersonId = sprintf("synthetic-%02d", 1:20),
+                  Service = "A", Credits = 1)
+  stopifnot(github$support_release_safe(d, "Service", "Credits", d$PersonId))
+  overlapping <- rbind(d, transform(d[1:19, ], Service = "B"))
+  stopifnot(!github$support_release_safe(overlapping, "Service", "Credits", d$PersonId))
+  d$Credits <- c(77, rep(0, 19))
+  stopifnot(!github$support_release_safe(d, "Service", "Credits", d$PersonId))
+})
+load_github <- function(directory) {
+  env <- new.env()
+  old <- getwd()
+  tryCatch({
+    setwd(directory)
+    sys.source(file.path(utility, "github-developer-experience-helpers.R"), env)
+  }, finally = setwd(old))
+  env
+}
+test("developer service totals are invariant to non-developer volume changes", {
+  m <- bundle[["consumption-query/PersonM365CreditsMetrics.csv"]]
+  m$ServiceName <- "SyntheticService"
+  write.csv(m, mpath, row.names = FALSE, na = "")
+  before <- load_github(copy)
+  stopifnot(nrow(before$m365_service_mix) > 0,
+            all(before$m365_service_source$PersonId %in% before$developer_ids))
+  other <- !m$PersonId %in% before$developer_ids
+  stopifnot(any(other))
+  m[["Total Copilot Credits used"]][other] <- m[["Total Copilot Credits used"]][other] * 1000
+  m[["Session count"]][other] <- m[["Session count"]][other] * 1000
+  write.csv(m, mpath, row.names = FALSE, na = "")
+  after <- load_github(copy)
+  stopifnot(identical(before$m365_service_mix, after$m365_service_mix))
+})
+test("all linked HR margins and one-contributor service totals are withheld", {
+  ppath <- file.path(copy, "_data", "person-query", "PersonQuery.csv")
+  p <- bundle[["person-query/PersonQuery.csv"]]
+  ids <- sort(unique(p$PersonId[p$IsDeveloper == "Yes"]))
+  stopifnot(length(ids) == 360L)
+  index <- match(p$PersonId, ids)
+  dev <- !is.na(index)
+  p$Team[dev] <- ifelse(index[dev] <= 180, "SyntheticTeamA", "SyntheticTeamB")
+  p$Role[dev] <- ifelse(index[dev] <= 90 | (index[dev] > 180 & index[dev] <= 351),
+                        "PrivacyRoleA", "PrivacyRoleB")
+  write.csv(p, ppath, row.names = FALSE)
+  m <- bundle[["consumption-query/PersonM365CreditsMetrics.csv"]]
+  m[["Session count"]] <- 0
+  m[["Total Copilot Credits used"]] <- 0
+  one <- which(m$PersonId %in% ids & as.Date(m$MetricDate) >= as.Date("2026-05-10"))[1]
+  m[["Session count"]][one] <- 1
+  m[["Total Copilot Credits used"]][one] <- 9876543
+  write.csv(m, mpath, row.names = FALSE, na = "")
+  g <- bundle[["consumption-query/PersonGitHubCreditsMetrics.csv"]]
+  g[["Total GitHub AI Credits used"]] <- 0
+  g[["Total GitHub AI Credits used"]][which(g$PersonId %in% ids &
+     as.Date(g$MetricDate) >= as.Date("2026-05-10"))[1]] <- 8765432
+  write.csv(g, gpath, row.names = FALSE, na = "")
+  adversarial <- load_github(copy)
+  stopifnot(!adversarial$hr_release_safe, !adversarial$m365_service_safe,
+            nrow(adversarial$team_context) == 0,
+            nrow(adversarial$composition_counts) == 0,
+            nrow(adversarial$role_context) == 0,
+            nrow(adversarial$m365_service_mix) == 0,
+            !adversarial$credit_release_safe[["GH"]],
+            all(is.na(adversarial$team_league$GH_intensity)),
+            all(grepl("unavailable", adversarial$product_summary[["Credits / developer / week (mean)"]])))
+  if (exists("cli") && "--render-demos" %in% cli) {
+    for (name in c("github-copilot-developer-productivity-simulation.Rmd",
+                   "github-developer-experience-helpers.R"))
+      file.copy(file.path(utility, name), file.path(copy, name), overwrite = TRUE)
+    html <- rmarkdown::render(file.path(copy, "github-copilot-developer-productivity-simulation.Rmd"),
+                             output_file = "adversarial-publication.html", quiet = TRUE)
+    text <- readLines(html, warn = FALSE)
+    stopifnot(!any(grepl("PrivacyRoleA|PrivacyRoleB|9,876,543|9876543|8765432|8,765,432", text)),
+              any(grepl("Unavailable: independent coverage", text, fixed = TRUE)))
+  }
+})
+test("reuse guidance rejects old coverage equality and real-adapter promises", {
+  guide <- readLines(file.path(utility, "copilot-consumption-github-demo-reports.md"))
+  stopifnot(!any(grepl("missing row is no provisioning|so they reconcile with", guide)),
+            any(grepl("independent|independently", guide)),
+            any(grepl("synthetic", guide)),
+            any(grepl("credits-only", guide)))
+  for (path in c("frontier-analytics/prompts/copilot-dashboards/consumption-dashboard.md",
+                 "_pages/frontier-analytics-prompt-consumption-dashboard.md")) {
+    prose <- readLines(file.path(repo, path))
+    stopifnot(!any(grepl("Build from credits and sessions only", prose)),
+              any(grepl("supported M365 credits panels", prose)))
+  }
+})
