@@ -299,7 +299,7 @@ test("demo source isolation preflight: tracked references and exact copy targets
     demo <- list(report = report, mode = "demo", repo_root = repo,
                  output_dir = file.path(root, paste0(report, "-demo")), privacy_min = 10, group = FALSE)
     refs <- reference_files(demo)
-    stopifnot(length(refs) == if (report == "consumption") 6 else 2,
+    stopifnot(length(refs) == if (report == "consumption") 5 else 2,
               all(vapply(refs, function(x) inside(x, repo), logical(1))),
               !inside(demo$output_dir, repo))
   }
