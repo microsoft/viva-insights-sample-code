@@ -87,11 +87,12 @@ zero usage, or a coverage/eligibility gap?* It establishes a baseline of develop
 working conditions alongside GitHub **and** Microsoft 365 Copilot use, and keeps
 eligibility and coverage visible rather than treating missing activity as zero.
 
-**Scope:** this report is the one place on this page that covers **both** products —
-**GitHub Copilot** (activity plus feature, model and language breakdowns) and
-**Microsoft 365 Copilot** (credit consumption, for the joint-use analysis). This is
-distinct from the Consumption report above, which covers Microsoft 365 Copilot credits
-exclusively and does not touch GitHub Copilot.
+**Scope:** this report adds **GitHub Copilot activity** and feature, model and language
+breakdowns to a developer working-conditions baseline, alongside **Microsoft 365
+Copilot** credit records. The Consumption demo above also contains both products'
+credit measures, in separately named units; it does not include the GitHub activity
+breakdowns. Neither demo establishes credit-unit equivalence. These synthetic-demo
+capabilities do not expand the narrower M365 credits-only real-v1 adapter.
 
 **Prerequisites for real data:** you need a **Person Query** export (working-pattern
 metrics and organisational attributes), the five GitHub query files and the Consumption
