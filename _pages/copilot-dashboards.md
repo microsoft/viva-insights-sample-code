@@ -111,7 +111,7 @@ reproduce the synthetic reference or assess real inputs. No verified real GitHub
 
 [![Developer experience report focus and coordination]({{ site.baseurl }}/assets/images/reports/github-copilot-devex-focus.png)]({{ site.baseurl }}/examples/utility-r/github-copilot-developer-productivity-simulation.html)
 
-The developer demo uses an **extended illustrative schema**, not a drop-in flexible-query export. Its M365 feature actions, eligibility flags, and completeness reference are demonstration contracts; confirm equivalent sources and definitions before adapting it.
+The developer demo uses **synthetic values in confirmed export headers**, not a certified real-data adapter. Weekly M365 eligibility uses enabled days; ingestion completeness remains unknown without independent evidence. GitHub row presence is observation, not provisioning. Breakdown/model allocations are illustrative synthetic invariants, not verified real-export semantics. M365 Copilot credits and GitHub AI credits remain separately named units; no cross-product total or share is supported.
 
 **Interpretation:** Associations only. Acceptance rate is not code quality, after-hours activity is not burnout, and calendar space does not establish coding time.
 

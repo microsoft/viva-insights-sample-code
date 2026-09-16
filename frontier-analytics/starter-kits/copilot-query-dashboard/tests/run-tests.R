@@ -294,12 +294,24 @@ test("HTML attribute values escaped and CSV formulas neutralized", {
   csv <- read.csv(file.path(bad$output_dir, "build", "aggregates.csv"))
   stopifnot(all(csv$group == "'=1+1"))
 })
+source(file.path(kit, "tests", "query-fixture-tests.R"))
 test("demo source isolation preflight: tracked references and exact copy targets", {
   for (report in c("consumption", "github")) {
     demo <- list(report = report, mode = "demo", repo_root = repo,
                  output_dir = file.path(root, paste0(report, "-demo")), privacy_min = 10, group = FALSE)
     refs <- reference_files(demo)
-    stopifnot(length(refs) == if (report == "consumption") 5 else 2,
+    expected <- if (report == "consumption") c(
+      "copilot-consumption-ways-of-working-simulation.Rmd",
+      "_data/consumption-query/PeopleMetaData.csv",
+      "_data/consumption-query/PersonM365CreditsMetrics.csv",
+      "_data/consumption-query/PersonGitHubCreditsMetrics.csv",
+      "_data/person-query/PersonQuery.csv") else c(
+        "github-copilot-developer-productivity-simulation.Rmd",
+        "github-developer-experience-helpers.R",
+        paste0("_data/", names(query_export_headers)))
+    utility <- file.path(repo, "examples", "utility-r")
+    stopifnot(setequal(gsub("\\\\", "/", unname(refs)), file.path(utility, expected)),
+              length(refs) == length(expected),
               all(vapply(refs, function(x) inside(x, repo), logical(1))),
               !inside(demo$output_dir, repo))
   }

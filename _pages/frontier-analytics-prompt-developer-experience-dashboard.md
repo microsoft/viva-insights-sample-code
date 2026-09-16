@@ -34,8 +34,10 @@ GitHub API analytics or an evaluation of developer productivity.
 
 ## Assumptions
 
-The demo uses an extended illustrative schema. M365 feature actions and
-eligibility/completeness flags are not a verified flexible-query export.
+The demo uses synthetic values in confirmed export headers. Weekly M365
+eligibility uses enabled days; completeness requires independent evidence.
+GitHub row presence is observation, not provisioning. Breakdown equality and
+model attribution are synthetic-only. M365 and GitHub credits remain separate units.
 Real GitHub data can be inspected, but v1 has no verified real build adapter.
 
 ## Recommended output

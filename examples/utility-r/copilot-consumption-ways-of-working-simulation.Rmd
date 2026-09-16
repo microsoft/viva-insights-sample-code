@@ -21,6 +21,7 @@ library(knitr)
 library(ggrepel)
 
 MIN_GROUP_N <- 10L
+MIN_M365_SESSIONS <- 10L
 PAL <- c("#1F4E79", "#2E75B6", "#7FA8D0", "#BDD3E8",
          "#C9C9C9", "#B03A2E", "#5B8C5A", "#7D5BA6")
 
@@ -60,6 +61,55 @@ safe_divide <- function(num, den) {
   valid <- !is.na(den) & den > 0
   out[valid] <- num[valid] / den[valid]
   out
+}
+
+# Release complete partitions only: dropping one small cell still exposes it
+# through the population total, another panel, or a percentage denominator.
+publication_partition <- function(data, groups, contributors = character(),
+                                  min_n = MIN_GROUP_N) {
+  stopifnot(length(min_n) == 1L, is.finite(min_n), min_n >= 10L)
+  cells <- data |>
+    group_by(across(all_of(groups))) |>
+    summarise(People = n_distinct(PersonId), .groups = "drop")
+  safe <- nrow(cells) > 0L && all(cells$People >= min_n) &&
+    !anyNA(data$PersonId) && all(nzchar(as.character(data$PersonId)))
+  for (metric in contributors) {
+    support <- data |>
+      group_by(across(all_of(groups))) |>
+      summarise(
+        People = n_distinct(PersonId),
+        Positive = n_distinct(PersonId[!is.na(.data[[metric]]) &
+                                         .data[[metric]] > 0]),
+        .groups = "drop"
+      )
+    safe <- safe && all(is.finite(data[[metric]])) &&
+      all(support$Positive == 0L | support$Positive >= min_n) &&
+      all(support$People - support$Positive == 0L |
+            support$People - support$Positive >= min_n)
+  }
+  if (safe) data else data[0, , drop = FALSE]
+}
+
+publication_count <- function(n, total, min_n = MIN_GROUP_N) {
+  stopifnot(length(min_n) == 1L, is.finite(min_n), min_n >= 10L)
+  ifelse(total >= min_n & (n == 0 | n >= min_n) &
+           (total - n == 0 | total - n >= min_n), n, NA_real_)
+}
+
+consumption_profile <- function(credit_band, sessions, cost_profile) {
+  case_when(
+    is.na(sessions) | sessions < MIN_M365_SESSIONS ~
+      "Limited M365 sessions",
+    credit_band == "High credit" &
+      cost_profile == "High cost per session" ~
+        "High credit, high cost/session",
+    credit_band == "High credit" ~ "High credit, standard cost/session",
+    credit_band == "Lower credit" &
+      cost_profile == "High cost per session" ~
+        "Lower credit, high cost/session",
+    credit_band == "Lower credit" ~ "Lower credit, standard cost/session",
+    TRUE ~ "No observed M365 credits"
+  )
 }
 
 people_meta <- read_demo("consumption-query", "PeopleMetaData.csv")
@@ -175,10 +225,6 @@ person_week <- pq |>
   left_join(select(github_weekly, PersonId, MetricDate, github_credits),
             by = c("PersonId", "MetricDate")) |>
   mutate(
-    m365_sessions = replace_na(m365_sessions, 0),
-    m365_credits = replace_na(m365_credits, 0),
-    github_credits = replace_na(github_credits, 0),
-    total_credits = m365_credits + github_credits,
     credits_per_m365_session = safe_divide(m365_credits, m365_sessions)
   )
 
@@ -213,50 +259,43 @@ metric_labels <- c(
 person_consumption <- person_week |>
   group_by(PersonId) |>
   summarise(
-    weekly_total_credits = mean(total_credits),
-    weekly_m365_credits = mean(m365_credits),
-    weekly_github_credits = mean(github_credits),
-    weekly_m365_sessions = mean(m365_sessions),
-    active_weeks = sum(total_credits > 0),
-    total_credits = sum(total_credits),
-    total_m365_credits = sum(m365_credits),
-    total_github_credits = sum(github_credits),
-    total_m365_sessions = sum(m365_sessions),
+    # Recorded sums per analysis week are lower bounds when coverage is unknown.
+    # Missing person-weeks above remain missing, never measured zero.
+    weekly_m365_credits = sum(m365_credits, na.rm = TRUE) / n(),
+    weekly_github_credits = sum(github_credits, na.rm = TRUE) / n(),
+    weekly_m365_sessions = sum(m365_sessions, na.rm = TRUE) / n(),
+    active_weeks = sum(m365_credits > 0, na.rm = TRUE),
+    total_m365_credits = sum(m365_credits, na.rm = TRUE),
+    total_github_credits = sum(github_credits, na.rm = TRUE),
+    total_m365_sessions = sum(m365_sessions, na.rm = TRUE),
     product_weeks = n(),
     credits_per_m365_session =
-      safe_divide(sum(m365_credits), sum(m365_sessions)),
+      safe_divide(sum(m365_credits, na.rm = TRUE), sum(m365_sessions, na.rm = TRUE)),
     .groups = "drop"
   ) |>
   mutate(
-    positive_consumer = total_credits > 0,
+    positive_consumer = total_m365_credits > 0,
     active_week_share = active_weeks / product_weeks,
     positive_quartile = if_else(
       positive_consumer,
-      ntile(if_else(positive_consumer, weekly_total_credits, NA_real_), 4L),
+      ntile(if_else(positive_consumer, weekly_m365_credits, NA_real_), 4L),
       NA_integer_
     ),
     CreditQuartile = factor(
       case_when(
-        !positive_consumer ~ "No consumption",
+        !positive_consumer ~ "No observed M365 credits",
         positive_quartile == 1L ~ "Q1 lowest",
         positive_quartile == 2L ~ "Q2",
         positive_quartile == 3L ~ "Q3",
         TRUE ~ "Q4 highest"
       ),
-      levels = c("No consumption", "Q1 lowest", "Q2", "Q3", "Q4 highest")
+      levels = c("No observed M365 credits", "Q1 lowest", "Q2", "Q3", "Q4 highest")
     )
   )
 
-high_credit_cut <- quantile(
-  person_consumption$weekly_total_credits[
-    person_consumption$positive_consumer
-  ],
-  0.75, na.rm = TRUE
-)
-
 high_cost_cut <- quantile(
   person_consumption$credits_per_m365_session[
-    person_consumption$total_m365_sessions >= MIN_GROUP_N
+    person_consumption$total_m365_sessions >= MIN_M365_SESSIONS
   ],
   0.75, na.rm = TRUE
 )
@@ -282,44 +321,35 @@ person_base <- person_attributes |>
   left_join(person_keys, by = "PersonId") |>
   left_join(person_consumption, by = "PersonId") |>
   mutate(
-    across(c(weekly_total_credits, weekly_m365_credits,
-             weekly_github_credits, weekly_m365_sessions, total_credits,
+    across(c(weekly_m365_credits,
+             weekly_github_credits, weekly_m365_sessions,
              total_m365_credits, total_github_credits,
              total_m365_sessions, active_weeks, active_week_share),
            \(x) replace_na(x, 0)),
     positive_consumer = replace_na(positive_consumer, FALSE),
     CreditQuartile = replace_na(as.character(CreditQuartile),
-                                "No consumption"),
+                                "No observed M365 credits"),
     CreditQuartile = factor(
       CreditQuartile,
-      levels = c("No consumption", "Q1 lowest", "Q2", "Q3", "Q4 highest")
+      levels = c("No observed M365 credits", "Q1 lowest", "Q2", "Q3", "Q4 highest")
     ),
     CreditBand = case_when(
-      weekly_total_credits >= high_credit_cut & positive_consumer ~
-        "High credit",
+      CreditQuartile == "Q4 highest" ~ "High credit",
       positive_consumer ~ "Lower credit",
-      TRUE ~ "No consumption"
+      TRUE ~ "No observed M365 credits"
     ),
     CostPerSessionProfile = case_when(
-      !positive_consumer ~ "No consumption",
-      total_m365_sessions < MIN_GROUP_N ~ "Limited M365 sessions",
+      total_m365_sessions < MIN_M365_SESSIONS ~ "Limited M365 sessions",
+      !positive_consumer ~ "No observed M365 credits",
       credits_per_m365_session >= high_cost_cut ~ "High cost per session",
       TRUE ~ "Standard cost per session"
     ),
-    ConsumptionProfile = case_when(
-      CreditBand == "High credit" &
-        CostPerSessionProfile == "High cost per session" ~
-          "High credit, high cost/session",
-      CreditBand == "High credit" ~ "High credit, standard cost/session",
-      CreditBand == "Lower credit" &
-        CostPerSessionProfile == "High cost per session" ~
-          "Lower credit, high cost/session",
-      CreditBand == "Lower credit" ~ "Lower credit, standard cost/session",
-      TRUE ~ "No consumption"
+    ConsumptionProfile = consumption_profile(
+      CreditBand, total_m365_sessions, CostPerSessionProfile
     ),
     CreditActivitySegment = case_when(
       !positive_consumer ~ "Non-user",
-      active_weeks >= 10 & weekly_total_credits >= high_credit_cut ~
+      active_weeks >= 10 & CreditBand == "High credit" ~
         "Power User",
       active_weeks >= 8 ~ "Habitual User",
       active_weeks >= 3 ~ "Novice User",
@@ -340,14 +370,56 @@ person_wow <- person_week |>
             .groups = "drop") |>
   left_join(person_base, by = "PersonId")
 
-function_summary <- person_wow |>
+if (n_distinct(person_base$PersonId) < MIN_GROUP_N) {
+  stop("Publication withheld: population does not meet the minimum group size.")
+}
+
+m365_contributors <- c("total_m365_credits", "total_m365_sessions")
+pooled_functions <- person_wow |>
+  group_by(FunctionType) |>
+  summarise(
+    People = n_distinct(PersonId),
+    CreditPeople = n_distinct(PersonId[total_m365_credits > 0]),
+    SessionPeople = n_distinct(PersonId[total_m365_sessions > 0]),
+    .groups = "drop"
+  ) |>
+  filter(People < MIN_GROUP_N |
+           is.na(publication_count(CreditPeople, People)) |
+           is.na(publication_count(SessionPeople, People))) |>
+  pull(FunctionType)
+function_people <- person_wow |>
+  mutate(FunctionType = if_else(FunctionType %in% pooled_functions,
+                                "Other functions (pooled)", FunctionType))
+function_public <- publication_partition(
+  function_people, "FunctionType", m365_contributors
+)
+# Pool unsafe function cells first, then recheck the complete partition;
+# a still-small pooled remainder withholds every function output.
+credit_public <- publication_partition(
+  person_wow, "CreditQuartile", m365_contributors
+)
+# Both segment outputs use the same joint gate; a baseline must not restore
+# the denominator of a suppressed segment-by-quartile composition.
+segment_public <- publication_partition(
+  person_wow, c("CreditActivitySegment", "CreditQuartile"),
+  m365_contributors
+)
+profile_public <- publication_partition(
+  person_wow, c("ConsumptionProfile", "CreditQuartile"), m365_contributors
+)
+github_public <- publication_partition(
+  person_base, character(), "total_github_credits"
+)
+overall_public <- publication_partition(
+  person_base, character(), m365_contributors
+)
+
+function_summary <- function_public |>
   group_by(FunctionType) |>
   summarise(
     People = n(),
-    `Positive users` = sum(positive_consumer),
-    `Weekly credits` = mean(weekly_total_credits),
+    `Weekly credits` = mean(weekly_m365_credits),
     `M365 credits` = mean(weekly_m365_credits),
-    `GitHub credits` = mean(weekly_github_credits),
     `M365 sessions` = mean(weekly_m365_sessions),
     `M365 credits / session` =
       safe_divide(sum(total_m365_credits), sum(total_m365_sessions)),
@@ -359,8 +431,7 @@ function_summary <- person_wow |>
     `Interrupted hours` = mean(Interrupted_hours),
     `Internal network size` = mean(Internal_network_size),
     .groups = "drop"
-  ) |>
-  filter(People >= MIN_GROUP_N)
+  )
 
 FUNCTION_ORDER <- function_summary |>
   arrange(`Weekly credits`) |>
@@ -369,35 +440,22 @@ FUNCTION_ORDER <- function_summary |>
 overall <- person_base |>
   summarise(
     People = n(),
-    Developers = sum(IsDeveloper == "Yes"),
-    Licensed = sum(IsCopilotLicensed == "true"),
-    Consumers = sum(positive_consumer),
-    `Weekly credits` = mean(weekly_total_credits),
-    `M365 credits / session` =
-      safe_divide(sum(total_m365_credits), sum(total_m365_sessions)),
-    `M365 share` =
-      safe_divide(sum(total_m365_credits), sum(total_credits)),
-    `GitHub share` =
-      safe_divide(sum(total_github_credits), sum(total_credits))
+    Developers = publication_count(sum(IsDeveloper == "Yes"), n()),
+    Licensed = publication_count(sum(IsCopilotLicensed == "true"), n()),
+    Consumers = publication_count(sum(positive_consumer), n()),
+    `Weekly credits` = if (nrow(overall_public)) mean(weekly_m365_credits)
+      else NA_real_,
+    `M365 credits / session` = if (nrow(overall_public))
+      safe_divide(sum(total_m365_credits), sum(total_m365_sessions))
+      else NA_real_
   )
-
-population_counts <- tibble(
-  Metric = c("People", "Developers", "Organisations", "Functions"),
-  Value = c(
-    nrow(person_base),
-    sum(person_base$IsDeveloper == "Yes"),
-    n_distinct(person_base$Organization),
-    n_distinct(person_base$FunctionType)
-  )
-)
 
 CHART_CAPTION <- sprintf(
   paste0(
-    "Synthetic data | n = %s people (%s developers) | ",
+    "Synthetic data | n = %s people | ",
     "product window %s to %s"
   ),
   comma(overall$People),
-  comma(overall$Developers),
   format(PRODUCT_WINDOW_START, "%d %b %Y"),
   format(PRODUCT_WINDOW_END, "%d %b %Y")
 )
@@ -535,6 +593,8 @@ Overview {data-icon="fa-dashboard"}
 Simulated values in real export schemas: a weekly Person query, daily Microsoft 365
 credit consumption by service, daily GitHub AI credits, and Consumption metadata
 joined through the activity-file crosswalk.
+Main volume panels use M365 credits only; GitHub AI credits are shown separately.
+Empty panels and NA values denote withholding or undefined rates, not zero.
 </div>
 
 Row {data-height=120}
@@ -549,22 +609,22 @@ flexdashboard::valueBox(
 )
 ```
 
-### Licensed population
+### Observed M365 enabled population
 
 ```{r}
 flexdashboard::valueBox(
   percent(overall$Licensed / overall$People, accuracy = 0.1),
-  paste0(comma(overall$Licensed), " licensed people"),
+  "Any M365 enabled days observed; NA means withheld",
   icon = "fa-id-card", color = "info"
 )
 ```
 
-### Credits per person per week
+### M365 credits per person per week
 
 ```{r}
 flexdashboard::valueBox(
   format(round(overall$`Weekly credits`, 1), big.mark = ",", nsmall = 1),
-  "M365 + GitHub credits / person / week",
+  "M365 Copilot credits / person / week",
   icon = "fa-calculator", color = "success"
 )
 ```
@@ -584,7 +644,10 @@ Row {data-height=510}
 
 ### Consumption baselines by function
 
-```{r function-baseline, fig.height=4.4, fig.alt="Horizontal bars comparing average weekly Copilot credits and Microsoft 365 sessions per person across eight functions."}
+```{r function-baseline, fig.height=4.4, fig.alt="Horizontal bars comparing average weekly M365 credits and sessions per person across disclosure-safe function cohorts."}
+if (!nrow(function_summary)) {
+  cat("Function partition withheld: one or more cells or complements are below the publication floor.")
+} else {
 baseline_long <- function_summary |>
   select(FunctionType, People, `Weekly credits`, `M365 sessions`) |>
   pivot_longer(c(`Weekly credits`, `M365 sessions`),
@@ -616,12 +679,13 @@ ggplot(baseline_long,
   theme_t() +
   labs(
     subtitle = paste0(
-      "Person-level averages across the product window; groups below n = ",
-      MIN_GROUP_N, " are suppressed"
+      "Small cells/complements are pooled; the complete partition requires n >= ",
+      MIN_GROUP_N
     ),
     x = NULL, y = NULL,
     caption = CHART_CAPTION
   )
+}
 ```
 
 ### Baseline table
@@ -632,15 +696,12 @@ function_summary |>
   transmute(
     Function = FunctionType,
     People,
-    `Positive users` = `Positive users`,
-    `Credits / person / week` = round(`Weekly credits`, 1),
     `M365 credits / person / week` = round(`M365 credits`, 1),
-    `GitHub credits / person / week` = round(`GitHub credits`, 1),
     `M365 sessions / person / week` = round(`M365 sessions`, 1),
     `M365 credits / session` = round(`M365 credits / session`, 2)
   ) |>
   kable(
-    caption = "Function baseline. Credits per session is calculated from observed Microsoft 365 sessions, not inferred from tokens."
+    caption = "Function baseline; unsafe contributor/complement cells are pooled before release. Credits per session uses observed Microsoft 365 sessions, not tokens."
   )
 ```
 
@@ -649,9 +710,11 @@ Row {data-height=335}
 
 ### Population-level highlights
 
-**Consumption volume and cost intensity are separate.** Credit volume is total
-resource use. M365 credits per session is a cost-intensity measure calculated
-from real consumption fields.
+**Consumption volume and cost intensity are separate.** All main credit-volume
+bands, rankings and comparisons use **M365 Copilot credits only**. M365 credits
+per session is an intensity measure, not a currency price. GitHub AI credits
+have their own panel: no common unit or conversion has been confirmed, so the
+two measures are never added, compared as shares, or put in a shared denominator.
 
 **Service mix is now observable.** The Consumption query exposes ServiceName, so
 the report can show whether credits are concentrated in Analyst, Cowork,
@@ -677,50 +740,33 @@ Credit distribution {data-icon="fa-chart-area"}
 Row {data-height=470}
 -------------------------------------
 
-### Concentration of credit consumption across users
+### M365 consumption in coarse groups
 
-```{r credit-concentration, fig.height=4.4, fig.alt="Concentration curve showing the cumulative share of Copilot credits accounted for by the highest-credit share of users."}
-credit_rank <- person_consumption |>
+```{r credit-concentration, fig.height=4.4, fig.alt="Bars showing M365 credit shares for disclosure-safe positive-user quartiles, not individual ranks."}
+concentration <- credit_public |>
   filter(positive_consumer) |>
-  arrange(desc(weekly_total_credits)) |>
+  group_by(CreditQuartile) |>
+  summarise(
+    People = n_distinct(PersonId),
+    Credits = sum(weekly_m365_credits),
+    .groups = "drop"
+  ) |>
   mutate(
-    n = n(),
-    `Share of users` = row_number() / n,
-    `Share of credits` =
-      cumsum(weekly_total_credits) / sum(weekly_total_credits)
+    `Share of users` = safe_divide(People, sum(People)),
+    `Share of M365 credits` = safe_divide(Credits, sum(Credits))
   )
 
-marker_x <- c(0.10, 0.25)
-marker_y <- vapply(marker_x, function(p) {
-  credit_rank$`Share of credits`[
-    which.min(abs(credit_rank$`Share of users` - p))
-  ]
-}, numeric(1))
-markers <- tibble(x = marker_x, y = marker_y,
-                  lbl = percent(marker_y, accuracy = 1))
-
-ggplot(credit_rank, aes(`Share of users`, `Share of credits`)) +
-  geom_area(fill = PAL[3], alpha = 0.35) +
-  geom_line(colour = PAL[1], linewidth = 1) +
-  geom_abline(slope = 1, intercept = 0, linetype = "dashed",
-              colour = "grey55") +
-  geom_point(data = markers, aes(x, y), colour = PAL[6], size = 2.6,
-             inherit.aes = FALSE) +
-  geom_text(data = markers, aes(x, y, label = lbl), inherit.aes = FALSE,
-            vjust = -1.0, hjust = -0.15, size = 3.3, colour = PAL[6]) +
-  scale_x_continuous(labels = percent_format(accuracy = 1),
-                     expand = expansion(mult = c(0.01, 0.06))) +
-  scale_y_continuous(labels = percent_format(accuracy = 1),
-                     expand = expansion(mult = c(0.01, 0.10))) +
+ggplot(concentration, aes(CreditQuartile, `Share of M365 credits`)) +
+  geom_col(fill = PAL[2], width = 0.68) +
+  geom_text(aes(label = percent(`Share of M365 credits`, accuracy = 1)),
+            vjust = -0.3) +
+  scale_y_continuous(labels = percent_format(),
+                     expand = expansion(mult = c(0, 0.15))) +
   theme_t() +
   labs(
-    title = "Cumulative share of credits by user rank",
-    subtitle = paste0(
-      "Users ranked from highest to lowest weekly credit volume; the dashed ",
-      "line marks equal consumption"
-    ),
-    x = "Share of positive users (ranked highest to lowest)",
-    y = "Cumulative share of credits",
+    title = "M365 credit concentration by positive-user quartile",
+    subtitle = "Whole partition withheld if any cell is too small; no individual ranks or top-1% points",
+    x = NULL, y = "Share of positive users' M365 credits",
     caption = CHART_CAPTION
   )
 ```
@@ -728,118 +774,56 @@ ggplot(credit_rank, aes(`Share of users`, `Share of credits`)) +
 ### Concentration bands
 
 ```{r}
-band_levels <- c("Top 1%", "Next 4% (top 1-5%)", "Next 5% (top 5-10%)",
-                 "Next 15% (top 10-25%)", "Next 25% (top 25-50%)",
-                 "Bottom 50%")
-
-band_table <- credit_rank |>
-  mutate(
-    Band = case_when(
-      `Share of users` <= 0.01 ~ band_levels[1],
-      `Share of users` <= 0.05 ~ band_levels[2],
-      `Share of users` <= 0.10 ~ band_levels[3],
-      `Share of users` <= 0.25 ~ band_levels[4],
-      `Share of users` <= 0.50 ~ band_levels[5],
-      TRUE ~ band_levels[6]
-    ),
-    Band = factor(Band, levels = band_levels)
-  ) |>
-  group_by(Band) |>
-  summarise(
-    People = n(),
-    `Weekly credits (band total)` = sum(weekly_total_credits),
-    .groups = "drop"
-  ) |>
-  arrange(Band) |>
-  mutate(
-    `Share of users` = percent(People / sum(People), accuracy = 1),
-    `Share of credits` = percent(
-      `Weekly credits (band total)` / sum(`Weekly credits (band total)`),
-      accuracy = 1
-    )
-  ) |>
-  select(Band, People, `Share of users`, `Share of credits`)
+band_table <- concentration |>
+  transmute(
+    Band = CreditQuartile, People,
+    `Share of users` = percent(`Share of users`, accuracy = 1),
+    `Share of M365 credits` = percent(`Share of M365 credits`, accuracy = 1)
+  )
 
 band_table |>
-  kable(caption = paste0(
-    "Users ranked by average weekly credits, positive users only (n = ",
-    comma(sum(band_table$People)), ")."
-  ))
+  kable(caption = "Positive M365 users in coarse quartiles; an empty table means the complete partition is withheld.")
 ```
 
 Row {data-height=440}
 -------------------------------------
 
-### Shape of the credit-volume distribution
+### Average M365 volume in the same coarse groups
 
-```{r credit-histogram, fig.height=4.1, fig.alt="Histogram of average weekly Copilot credits per positive user on a logarithmic scale, with median and mean reference lines."}
-credit_stats <- person_consumption |>
-  filter(positive_consumer, weekly_total_credits > 0)
-
-med_credits <- median(credit_stats$weekly_total_credits)
-mean_credits <- mean(credit_stats$weekly_total_credits)
-ref_lines <- tibble(
-  stat = c("Median", "Mean"),
-  value = c(med_credits, mean_credits),
-  colour = c(PAL[1], PAL[6])
-)
-
-ggplot(credit_stats, aes(weekly_total_credits)) +
-  geom_histogram(bins = 40, fill = PAL[2], colour = "white",
-                 linewidth = 0.2) +
-  geom_vline(data = ref_lines, aes(xintercept = value, colour = stat),
-             linetype = "dashed", linewidth = 0.7, show.legend = TRUE) +
-  scale_colour_manual(values = c(Median = PAL[1], Mean = PAL[6])) +
-  scale_x_log10(labels = label_number()) +
+```{r credit-histogram, fig.height=4.1, fig.alt="Average weekly M365 credits in the same disclosure-safe quartiles as the concentration table."}
+ggplot(concentration, aes(CreditQuartile, Credits / People)) +
+  geom_col(fill = PAL[2], width = 0.68) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.10))) +
   theme_t() +
   labs(
-    title = "Distribution of weekly credits per user",
-    subtitle = paste0(
-      "Logarithmic x-axis; positive users only. The right tail shows whether ",
-      "a small group accounts for a disproportionate share of credits"
-    ),
-    x = "Credits / user / week (log scale)", y = "Number of users",
-    colour = NULL,
+    title = "M365 volume by positive-user quartile",
+    subtitle = "No fine histogram bins, observed extrema or individual data points are published",
+    x = NULL, y = "M365 credits / person / week",
     caption = CHART_CAPTION
   )
 ```
 
-### M365 and GitHub credit split
+### GitHub AI credits — separate unit
 
-```{r credit-source-split, fig.height=4.1, fig.alt="Stacked bars showing the share of total credits from Microsoft 365 and GitHub by credit-volume group."}
-source_split <- person_base |>
-  group_by(CreditQuartile) |>
+```{r credit-source-split}
+if (!nrow(github_public)) {
+  cat("GitHub AI credit panel withheld: population, contributors or their complement are below the publication floor.")
+} else {
+github_public |>
   summarise(
     People = n(),
-    `Microsoft 365` = sum(total_m365_credits),
-    GitHub = sum(total_github_credits),
-    .groups = "drop"
+    `People with observed GitHub AI credits` = sum(total_github_credits > 0),
+    `GitHub AI credits / person / week` = round(mean(weekly_github_credits), 1)
   ) |>
-  pivot_longer(c(`Microsoft 365`, GitHub),
-               names_to = "Source", values_to = "Credits") |>
-  group_by(CreditQuartile) |>
-  mutate(Share = safe_divide(Credits, sum(Credits))) |>
-  ungroup() |>
-  filter(!is.na(Share))
-
-ggplot(source_split, aes(CreditQuartile, Share, fill = Source)) +
-  geom_col(width = 0.68) +
-  geom_text(
-    aes(label = ifelse(Share >= 0.06, percent(Share, accuracy = 1), "")),
-    position = position_stack(vjust = 0.5),
-    colour = "white", size = 3
-  ) +
-  coord_flip() +
-  scale_y_continuous(labels = percent_format(accuracy = 1)) +
-  scale_fill_manual(values = c("Microsoft 365" = PAL[1], GitHub = PAL[7])) +
-  theme_t() +
-  labs(
-    title = "Credit source mix by credit-volume group",
-    subtitle = "GitHub credits are observed separately from Microsoft 365 Consumption-query credits",
-    x = NULL, y = "Share of credits", fill = "Credit source"
-  )
+  kable(caption = "GitHub AI credits only. The denominator is the synthetic analysis population, not a provisioned or licensed GitHub cohort.")
+}
 ```
+
+Absence of GitHub rows does **not** establish absence of provisioning. M365
+enabled days do not establish GitHub eligibility or provisioning. Missing person-weeks
+remain unknown. Published credit/session figures sum only supplied records and divide
+by analysis weeks; they are recorded-volume lower bounds, not verified complete-period
+consumption. “No observed credits” means no positive supplied record, not verified inactivity.
 
 Credit relationships
 =====================================
@@ -850,7 +834,7 @@ Row {data-height=470}
 ### Ways of Working metrics by credit-consumption group
 
 ```{r credit-heatmap, fig.height=4.4, fig.alt="Heatmap of standardised Ways of Working metric differences for five credit-consumption groups."}
-credit_levels <- c("No consumption", "Q1 lowest", "Q2", "Q3", "Q4 highest")
+credit_levels <- c("No observed M365 credits", "Q1 lowest", "Q2", "Q3", "Q4 highest")
 
 scan <- expand_grid(
   Metric = WOW_METRICS,
@@ -858,8 +842,8 @@ scan <- expand_grid(
 ) |>
   rowwise() |>
   mutate(d = std_diff(
-    person_wow[[Metric]],
-    person_wow$CreditQuartile == CreditQuartile
+    credit_public[[Metric]],
+    credit_public$CreditQuartile == CreditQuartile
   )) |>
   ungroup() |>
   filter(!is.na(d)) |>
@@ -887,11 +871,11 @@ ggplot(scan, aes(CreditQuartile, reorder(Metric, d), fill = d)) +
 ### Credit groups
 
 ```{r}
-person_base |>
+credit_public |>
   group_by(CreditQuartile) |>
   summarise(
     People = n(),
-    `Credits / person / week` = mean(weekly_total_credits),
+    `Credits / person / week` = mean(weekly_m365_credits),
     `M365 credits / session` =
       safe_divide(sum(total_m365_credits), sum(total_m365_sessions)),
     .groups = "drop"
@@ -917,7 +901,7 @@ Row {data-height=455}
 modes <- c("Email_hours", "Chat_hours", "Meeting_hours",
            "Unscheduled_call_hours")
 
-mode_share <- person_wow |>
+mode_share <- credit_public |>
   group_by(CreditQuartile) |>
   summarise(People = n(), across(all_of(modes), mean), .groups = "drop") |>
   pivot_longer(all_of(modes), names_to = "Mode", values_to = "Hours") |>
@@ -955,7 +939,10 @@ ggplot(mode_share, aes(CreditQuartile, Share, fill = Mode)) +
 ### Workload, focus and network
 
 ```{r credit-outcomes, fig.height=4.1, fig.alt="Small bar charts comparing after-hours collaboration, available-to-focus hours, uninterrupted hours, interrupted hours and network metrics across credit groups."}
-person_wow |>
+if (!nrow(credit_public)) {
+  cat("Credit-group partition withheld: one or more cells or complements are below the publication floor.")
+} else {
+credit_public |>
   group_by(CreditQuartile) |>
   summarise(
     People = n(),
@@ -983,6 +970,7 @@ person_wow |>
     subtitle = "Network measures come directly from the weekly person query and are averaged, not summed",
     x = NULL, y = NULL
   )
+}
 ```
 
 Function drill-down {data-icon="fa-sitemap"}
@@ -993,11 +981,11 @@ Row {data-height=505}
 
 ### Consumption and collaboration volume by function
 
-```{r bubble-collaboration, fig.height=4.5, fig.alt="Bubble plot of weekly credits and collaboration hours by function. Bubble size represents positive users and colour represents Microsoft 365 credits per session."}
+```{r bubble-collaboration, fig.height=4.5, fig.alt="Bubble plot of weekly M365 credits and collaboration hours by function. Bubble size represents all people in the function and colour represents Microsoft 365 credits per session."}
 ggplot(
   function_summary,
   aes(`Weekly credits`, `Collaboration hours`,
-      size = `Positive users`, colour = `M365 credits / session`,
+      size = People, colour = `M365 credits / session`,
       label = FunctionType)
 ) +
   geom_point(alpha = 0.85) +
@@ -1011,11 +999,11 @@ ggplot(
   theme_t() +
   labs(
     title = "Credit consumption against collaboration hours, by function",
-    subtitle = "Bubble size shows positive users; colour shows Microsoft 365 credits per observed session",
-    x = "Credits / user / week",
+    subtitle = "Bubble size shows all people; colour shows Microsoft 365 credits per observed session",
+    x = "M365 credits / person / week",
     y = "Collaboration hours / user / week",
     colour = "M365 credits / session",
-    size = "Positive users",
+    size = "People",
     caption = CHART_CAPTION
   )
 ```
@@ -1036,11 +1024,11 @@ Row {data-height=490}
 
 ### Workload and credit intensity by function
 
-```{r bubble-workload, fig.height=4.4, fig.alt="Bubble plot of credits and after-hours collaboration by function. Bubble size represents positive users and colour represents Microsoft 365 credits per session."}
+```{r bubble-workload, fig.height=4.4, fig.alt="Bubble plot of M365 credits and after-hours collaboration by function. Bubble size represents all people and colour represents Microsoft 365 credits per session."}
 ggplot(
   function_summary,
   aes(`Weekly credits`, `After-hours hours`,
-      size = `Positive users`, colour = `M365 credits / session`,
+      size = People, colour = `M365 credits / session`,
       label = FunctionType)
 ) +
   geom_point(alpha = 0.85) +
@@ -1055,17 +1043,17 @@ ggplot(
   labs(
     title = "Credit consumption against after-hours workload, by function",
     subtitle = "Same bubble-size and colour encoding as the chart above, for comparison across functions",
-    x = "Credits / user / week",
+    x = "M365 credits / person / week",
     y = "After-hours hours / user / week",
     colour = "M365 credits / session",
-    size = "Positive users",
+    size = "People",
     caption = CHART_CAPTION
   )
 ```
 
 ### Function comparison matrix
 
-```{r function-heatmap, fig.height=4.4, fig.alt="Indexed heatmap comparing consumption and Ways of Working measures across eight functions."}
+```{r function-heatmap, fig.height=4.4, fig.alt="Indexed heatmap comparing M365 consumption and Ways of Working measures across disclosure-safe function cohorts."}
 heat_metrics <- c(
   "Weekly credits", "M365 credits / session", "Collaboration hours",
   "After-hours hours", "Available-to-focus hours", "Uninterrupted hours",
@@ -1117,28 +1105,33 @@ Row {data-height=480}
 ### Credit volume by cost-per-session profile
 
 ```{r cost-profile, fig.height=4.3, fig.alt="Grouped bars comparing weekly credit volume for high cost per session and standard cost per session profiles within each credit band."}
-profile_summary <- person_wow |>
-  filter(ConsumptionProfile != "No consumption") |>
+profile_summary <- profile_public |>
   group_by(ConsumptionProfile) |>
   summarise(
     People = n(),
-    `Credits / person / week` = mean(weekly_total_credits),
+    `Credits / person / week` = mean(weekly_m365_credits),
     `M365 credits / session` =
-      safe_divide(sum(total_m365_credits), sum(total_m365_sessions)),
+      if (isTRUE(first(ConsumptionProfile) == "Limited M365 sessions")) NA_real_
+      else safe_divide(sum(total_m365_credits), sum(total_m365_sessions)),
     `After-hours hours` = mean(After_hours_collaboration_hours),
     `Available-to-focus hours` = mean(Available_to_focus_hours),
     `Uninterrupted hours` = mean(Uninterrupted_hours),
     .groups = "drop"
-  ) |>
-  filter(People >= MIN_GROUP_N)
+  )
 
 profile_grid <- profile_summary |>
   mutate(
-    CreditBand = if_else(grepl("^High credit", ConsumptionProfile),
-                         "High credit", "Lower credit"),
-    `Cost-per-session profile` = if_else(
-      grepl("high cost/session", ConsumptionProfile),
-      "High cost per session", "Standard cost per session"
+    CreditBand = case_when(
+      ConsumptionProfile == "Limited M365 sessions" ~ "Limited M365 sessions",
+      grepl("^High credit", ConsumptionProfile) ~ "High credit",
+      grepl("^Lower credit", ConsumptionProfile) ~ "Lower credit",
+      TRUE ~ "No observed M365 credits"
+    ),
+    `Cost-per-session profile` = case_when(
+      ConsumptionProfile == "Limited M365 sessions" ~ "Limited M365 sessions",
+      grepl("high cost/session", ConsumptionProfile) ~ "High cost per session",
+      grepl("standard cost/session", ConsumptionProfile) ~ "Standard cost per session",
+      TRUE ~ "No observed M365 credits"
     )
   )
 
@@ -1154,14 +1147,16 @@ ggplot(
   ) +
   scale_fill_manual(values = c(
     "High cost per session" = PAL[6],
-    "Standard cost per session" = PAL[3]
+    "Standard cost per session" = PAL[3],
+    "Limited M365 sessions" = PAL[5],
+    "No observed M365 credits" = PAL[4]
   )) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.18))) +
   theme_t() +
   labs(
     title = "Credit volume and M365 cost intensity",
-    subtitle = "Cost intensity is based on observed Consumption-query sessions, not token mix",
-    x = "Credit-volume band", y = "Credits / person / week",
+    subtitle = "Insufficient-session people remain separate and are not standard-cost comparators",
+    x = "M365 credit-volume band", y = "M365 credits / person / week",
     fill = "Cost-per-session profile"
   )
 ```
@@ -1170,13 +1165,19 @@ ggplot(
 
 | Profile component | Definition | Interpretation |
 |---|---|---|
-| High credit | Upper quartile of average weekly total credits among positive users | Higher total credit volume |
-| Lower credit | Other positive users | Lower total credit volume |
+| High credit | Upper quartile of average weekly M365 credits among positive M365 users | Higher M365 credit volume |
+| Lower credit | Other positive M365 users | Lower M365 credit volume |
 | High cost per session | Upper quartile of M365 credits per session among people with at least 10 observed M365 sessions | More credits used per observed M365 session |
 | Standard cost per session | Below the high-cost threshold, with enough observed sessions | Lower observed M365 cost intensity |
+| Limited M365 sessions | Fewer than 10 observed M365 sessions, including zero-session and GitHub-only people | Insufficient sessions; never included in standard/high-cost comparisons |
 
 The label **high cost per session** describes a measurable consumption pattern.
 It is not a wellbeing, productivity or value judgement.
+
+```{r profile-table}
+profile_summary |>
+  kable(digits = 2, caption = "M365 profiles, including the distinct insufficient-session cohort. Empty means the entire profile partition is withheld.")
+```
 
 Row {data-height=455}
 -------------------------------------
@@ -1184,45 +1185,66 @@ Row {data-height=455}
 ### Workload by cost-per-session profile within credit bands
 
 ```{r cost-outcomes, fig.height=4.1, fig.alt="Bars comparing after-hours collaboration, available-to-focus hours and uninterrupted hours across standard-cost and high-cost-per-session profiles."}
-profile_summary |>
-  select(ConsumptionProfile, People,
+if (!nrow(profile_grid)) {
+  cat("Profile partition withheld: one or more cells or complements are below the publication floor.")
+} else {
+profile_grid |>
+  select(ConsumptionProfile, People, `Cost-per-session profile`,
          `After-hours hours`, `Available-to-focus hours`,
          `Uninterrupted hours`) |>
-  pivot_longer(-c(ConsumptionProfile, People),
+  pivot_longer(-c(ConsumptionProfile, People, `Cost-per-session profile`),
                names_to = "Metric", values_to = "Value") |>
   ggplot(
     aes(reorder(ConsumptionProfile, Value), Value,
-        fill = grepl("high cost/session", ConsumptionProfile))
+        fill = `Cost-per-session profile`)
   ) +
   geom_col(width = 0.65) +
   geom_text(aes(label = round(Value, 2)), hjust = -0.12, size = 3) +
   coord_flip() +
   facet_wrap(~Metric, scales = "free_x") +
   scale_fill_manual(
-    values = c(`TRUE` = PAL[6], `FALSE` = PAL[2]),
-    labels = c(`TRUE` = "High cost per session",
-               `FALSE` = "Standard cost per session")
+    values = c("High cost per session" = PAL[6],
+               "Standard cost per session" = PAL[2],
+               "Limited M365 sessions" = PAL[5],
+               "No observed M365 credits" = PAL[4])
   ) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.18))) +
   theme_t() +
   labs(
     title = "Workload by M365 cost intensity, within credit bands",
-    subtitle = "Compared within the same broad credit-volume band",
+    subtitle = "Limited-session people are displayed separately, not assigned a cost-intensity class",
     x = NULL, y = NULL, fill = "Cost-per-session profile"
   )
+}
 ```
 
 ### Service mix
 
 ```{r service-mix, fig.height=4.1, fig.alt="Stacked bars comparing the share of Microsoft 365 credits used by service for high-credit and lower-credit users."}
-m365_service_weekly |>
+service_people <- m365_service_weekly |>
   left_join(select(person_base, PersonId, CreditBand),
             by = "PersonId") |>
-  filter(CreditBand != "No consumption") |>
+  filter(!is.na(CreditBand), CreditBand != "No observed M365 credits")
+service_public <- publication_partition(
+  service_people, c("CreditBand", "ServiceName"),
+  c("m365_credits", "m365_sessions")
+)
+service_support <- service_people |>
+  distinct(CreditBand, ServiceName, PersonId) |>
+  count(CreditBand, ServiceName, name = "Contributors") |>
+  left_join(count(person_base, CreditBand, name = "ParentPeople"),
+            by = "CreditBand")
+if (any(is.na(publication_count(service_support$Contributors,
+                               service_support$ParentPeople)))) {
+  service_public <- service_public[0, ]
+}
+if (!nrow(service_public)) {
+  cat("The entire service-mix partition is withheld: a service cohort or its complement is below the publication floor. No partial shares or totals are shown.")
+} else {
+service_public |>
   group_by(CreditBand, ServiceName) |>
   summarise(Credits = sum(m365_credits), People = n_distinct(PersonId),
             .groups = "drop") |>
-  filter(People >= MIN_GROUP_N) |>
   group_by(CreditBand) |>
   mutate(Share = Credits / sum(Credits)) |>
   ungroup() |>
@@ -1242,6 +1264,7 @@ m365_service_weekly |>
     subtitle = "ServiceName is a real Consumption-query dimension",
     x = NULL, y = "Share of M365 credits", fill = "Service"
   )
+}
 ```
 
 Usage segments {data-icon="fa-users"}
@@ -1253,12 +1276,15 @@ Row {data-height=480}
 ### Credit-volume distribution within activity segments
 
 ```{r segment-credit, fig.height=4.3, fig.alt="Stacked bars showing credit-consumption quartiles within Power, Habitual, Novice, Low and Non-user credit activity segments."}
-segment_credit <- person_base |>
+segment_credit <- segment_public |>
   count(CreditActivitySegment, CreditQuartile, name = "People") |>
   group_by(CreditActivitySegment) |>
   mutate(Share = People / sum(People)) |>
   ungroup()
 
+if (!nrow(segment_credit)) {
+  cat("The entire segment/quartile partition and its segment baseline are withheld: one or more cells are below the publication floor.")
+} else {
 ggplot(segment_credit, aes(CreditActivitySegment, Share,
                            fill = CreditQuartile)) +
   geom_col(width = 0.68) +
@@ -1270,12 +1296,13 @@ ggplot(segment_credit, aes(CreditActivitySegment, Share,
   labs(
     title = "Credit-volume distribution within credit activity segments",
     subtitle = paste0(
-      "Segments are based on active product weeks and observed total credits ",
+      "Segments are based on active M365 weeks and observed M365 credits ",
       "from ", format(PRODUCT_WINDOW_START, "%d %b %Y"), " to ",
       format(PRODUCT_WINDOW_END, "%d %b %Y")
     ),
     x = NULL, y = NULL, fill = "Credit-volume group"
   )
+}
 ```
 
 ### Why replace standard usage segments?
@@ -1292,23 +1319,19 @@ Row {data-height=400}
 ### Segment baseline
 
 ```{r}
-person_base |>
+segment_public |>
   group_by(CreditActivitySegment) |>
   summarise(
     People = n(),
     `Active weeks` = mean(active_weeks),
-    `Credits / person / week` = mean(weekly_total_credits),
     `M365 credits / person / week` = mean(weekly_m365_credits),
-    `GitHub credits / person / week` = mean(weekly_github_credits),
     `M365 credits / session` =
       safe_divide(sum(total_m365_credits), sum(total_m365_sessions)),
     .groups = "drop"
   ) |>
   arrange(CreditActivitySegment) |>
   mutate(
-    across(c(`Active weeks`, `Credits / person / week`,
-             `M365 credits / person / week`,
-             `GitHub credits / person / week`),
+    across(c(`Active weeks`, `M365 credits / person / week`),
            \(x) round(x, 2)),
     `M365 credits / session` = if_else(
       is.na(`M365 credits / session`),
@@ -1318,7 +1341,7 @@ person_base |>
   ) |>
   kable(caption = paste0(
     "Segment baseline across ", length(product_weeks),
-    " product weeks. Non-users are people with no observed M365 or GitHub credits."
+    " product weeks. Non-users have no observed M365 credits, not necessarily no GitHub activity. Empty means the joint segment/quartile partition is withheld."
   ))
 ```
 
@@ -1372,21 +1395,18 @@ ggplot(steps, aes(x, 1)) +
 | Metadata | Join Consumption activity to `PeopleMetaData` with `PeopleHistoricalId`; use person-query attributes for whole-population grouping because a person query alone has no `PeopleHistoricalId` |
 | Weekly relationships | Aggregate daily product records to person-week, then join to person-query weeks by `PersonId` and `MetricDate` |
 | Service grain | Aggregate across `ServiceName` before computing person-week M365 credits or credits per session |
-| Credit quartiles | Calculate among positive users and retain non-users separately |
+| Credit quartiles | Use M365 credits only; calculate among positive M365 users and retain people with no observed M365 credits separately |
 | Cost intensity | Use M365 credits per observed M365 session; do not infer token mix |
 | Focus identity | Check that meetings, scheduled calls and available-to-focus hours reconcile to the configured working-hours basis, and that uninterrupted plus interrupted hours reconcile to available-to-focus hours |
 | Network measures | Use weekly person-query network metrics and average them across weeks; never sum them |
-| Privacy | Suppress organisational groups below the approved minimum population |
+| Privacy | At least 10 distinct people per published cell, contributing cohort and non-empty contributor complement. Pool unsafe function cells, then recheck; withhold an entire failing partition consistently across tables, charts, shares and ranks |
 
 ### Key crosswalk check
 
 ```{r}
 unmatched_key_counts |>
-  kable(caption = paste0(
-    "Identity checks report counts only. The crosswalk has ",
-    comma(nrow(person_keys)),
-    " distinct PersonId / PeopleHistoricalId pairs observed in credit files."
-  ))
+  transmute(Check, Status = if_else(Count == 0, "Pass", "Review required")) |>
+  kable(caption = "Crosswalk diagnostics are qualitative: no small exception counts or reconstructible crosswalk totals are published.")
 ```
 
 Row {data-height=390}
@@ -1397,11 +1417,8 @@ Row {data-height=390}
 This dashboard is a demonstration of analytical possibilities. Every person,
 credit, session and Ways of Working value is synthetic.
 
-The current source set represents `r comma(population_counts$Value[population_counts$Metric == "People"])`
-people, including `r comma(population_counts$Value[population_counts$Metric == "Developers"])`
-developers, across `r population_counts$Value[population_counts$Metric == "Organisations"]`
-organisations and `r population_counts$Value[population_counts$Metric == "Functions"]`
-functions. The person query spans 26 Sunday-start weeks. The M365 and GitHub
+The current source set represents `r comma(overall$People)` synthetic
+people. The person query spans 26 Sunday-start weeks. The M365 and GitHub
 credit feeds cover the final `r length(product_weeks)` weeks at weekday daily
 grain, which is why this report filters Ways of Working measures to the product
 window before relating them to credits.
@@ -1453,11 +1470,13 @@ meetings and scheduled Teams calls. `Uninterrupted_hours` and
 working-hours basis is tenant-configurable; the 40-hour identity checked here is
 specific to this synthetic dataset.
 
-**Credit concentration** ranks people by average weekly total credits and shows
-what share of credits is accounted for by the highest-consuming users.
+**Credit concentration** uses only coarse positive-user M365 quartiles, shared
+with the credit-group panels. No individual curve, top-1% point, fine histogram,
+observed extrema or individual ranking is published. If any quartile or the
+no-observed-M365 group falls below the floor, the entire partition is withheld.
 
 **Credit activity segments** are based on active product weeks and observed
-credit volume. They are not the standard `vivainsights` action-based segments,
+M365 credit volume. They are not the standard `vivainsights` action-based segments,
 because this source set does not include a Copilot actions metric.
 
 **PeopleHistoricalId** is the documented join key between the Consumption
@@ -1476,9 +1495,20 @@ observed calendar and collaboration patterns only.
 
 1. Replace the four CSVs listed above with schema-aligned governed exports.
 2. Validate the identity crosswalk and disclose the match rate.
-3. Confirm whether missing consumption rows mean zero activity, suppression or
-   ineligibility before filling absence with zero.
+3. Require independent, week-relevant eligibility and ingestion/coverage evidence
+   before zero filling. Missing rows alone do not establish zero activity or no
+   provisioning; M365 enabled days do not establish GitHub provisioning. This
+   synthetic report assumes zero for absent rows solely for fixture arithmetic,
+   not because the export proves completeness. Do not reuse that assumption for
+   real data.
 4. Preserve the daily service grain until after service-level totals are needed;
    aggregate services before computing person-week rates.
 5. Keep person-level averaging so each person carries equal analytical weight.
-6. Retain the privacy threshold and the organisational composition checks.
+6. Retain the minimum of 10 and whole-partition disclosure gates, including
+   contributor complements and shared gates for related tables/charts. Blank
+   charts, empty tables and NA values mean withheld (or undefined rates), not
+   zero. Overlapping releases require a governed cross-report disclosure review;
+   these within-report checks are not a certification of arbitrary real data.
+7. Keep M365 Copilot credits and GitHub AI credits in separate panels and
+   denominators unless an authoritative common-unit/conversion contract is
+   established.

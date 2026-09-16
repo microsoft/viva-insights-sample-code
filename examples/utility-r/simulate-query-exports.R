@@ -30,6 +30,7 @@ set.seed(SEED)
 options(OutDec = ".", stringsAsFactors = FALSE)
 
 DATA_DIR <- "_data"
+source("query-export-contracts.R")
 N_PEOPLE <- 480L
 N_DEVELOPERS <- 360L
 
@@ -164,10 +165,9 @@ latent <- people |>
 # ---------------------------------------------------------------------------
 # Person query, weekly, 26 weeks.
 #
-# Every metric below is a genuine Viva Insights person-query metric. Metrics
-# that did not survive verification against the metric reference (for example
-# an "available to focus hours" field) have been removed: the real pair is
-# Uninterrupted_hours and Interrupted_hours.
+# Every selected metric below is a genuine Viva Insights person-query metric.
+# Available-to-focus hours is partitioned into uninterrupted and interrupted
+# hours; the hyphens in the published metric name matter when locating it.
 # ---------------------------------------------------------------------------
 pq <- expand_grid(PersonId = people$PersonId, MetricDate = weeks) |>
   left_join(latent, by = "PersonId", relationship = "many-to-one") |>
@@ -510,8 +510,9 @@ stopifnot(
   all(gh_credits$`Total GitHub AI Credits used` >= 0)
 )
 
-# Every breakdown file must be an exact margin of the same allocation, and the
-# feature margin must reconcile to the activity file.
+# Synthetic allocation invariant only, not a verified real-export definition.
+# Model assignment to completions is illustrative. Never impose these equalities
+# on replacement data without authoritative metric-definition evidence.
 recon <- feature_metrics |>
   group_by(PersonId, MetricDate) |>
   summarise(feature_total = sum(`Feature Usage Count`), .groups = "drop") |>
@@ -549,33 +550,18 @@ stopifnot(
 # ---------------------------------------------------------------------------
 # Export
 # ---------------------------------------------------------------------------
-export_csv <- function(data, folder, filename) {
-  dest <- file.path(DATA_DIR, folder)
-  dir.create(dest, recursive = TRUE, showWarnings = FALSE)
-  chr <- data |> select(where(is.character))
-  if (ncol(chr) && any(vapply(chr, function(x) any(grepl('[,"]', x)), logical(1)))) {
-    stop("Unquoted export would be corrupted by a comma or quote in ", filename)
-  }
-  if (any(grepl('[,"]', names(data)))) stop("Header contains a delimiter in ", filename)
-  write.table(data, file.path(dest, filename), sep = ",", quote = FALSE,
-              row.names = FALSE, na = "", fileEncoding = "UTF-8")
-  message(sprintf("  %-52s %8d rows", file.path(folder, filename), nrow(data)))
-}
-
-message("Writing exports ...")
-export_csv(pq, "person-query", "PersonQuery.csv")
-
-export_csv(people_metadata, "consumption-query", "PeopleMetaData.csv")
-export_csv(m365_credits, "consumption-query", "PersonM365CreditsMetrics.csv")
-export_csv(gh_credits, "consumption-query", "PersonGitHubCreditsMetrics.csv")
-
-export_csv(gh_activity, "github-query", "PersonGitHubActivityMetrics.csv")
-export_csv(feature_metrics, "github-query", "GitHubActivityBreakdownByFeatureMetrics.csv")
-export_csv(language_feature_metrics, "github-query",
-           "GitHubActivityBreakdownByLanguageFeatureMetrics.csv")
-export_csv(language_model_metrics, "github-query",
-           "GitHubActivityBreakdownByLanguageModelMetrics.csv")
-export_csv(model_feature_metrics, "github-query",
-           "GitHubActivityBreakdownByModelFeatureMetrics.csv")
+bundle <- list(
+  "person-query/PersonQuery.csv" = pq,
+  "consumption-query/PeopleMetaData.csv" = people_metadata,
+  "consumption-query/PersonM365CreditsMetrics.csv" = m365_credits,
+  "consumption-query/PersonGitHubCreditsMetrics.csv" = gh_credits,
+  "github-query/PersonGitHubActivityMetrics.csv" = gh_activity,
+  "github-query/GitHubActivityBreakdownByFeatureMetrics.csv" = feature_metrics,
+  "github-query/GitHubActivityBreakdownByLanguageFeatureMetrics.csv" = language_feature_metrics,
+  "github-query/GitHubActivityBreakdownByLanguageModelMetrics.csv" = language_model_metrics,
+  "github-query/GitHubActivityBreakdownByModelFeatureMetrics.csv" = model_feature_metrics
+)
+message("Validating entire bundle before writing exports ...")
+write_query_bundle(bundle, DATA_DIR)
 
 message("Done.")

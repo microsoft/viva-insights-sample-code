@@ -20,8 +20,11 @@ generation belongs to `simulate-query-exports.R`.
 The demo establishes a working-conditions baseline for its whole developer
 roster, not just active or licensed Copilot users. It uses the GitHub query
 activity and breakdown files alongside Consumption query credit records, and
-derives eligibility and coverage rather than reading them, because no query
-produces an eligibility or completeness file.
+uses weekly enabled days for M365 eligibility. M365 completeness stays unknown
+without independent ingestion evidence; GitHub weekday row counts describe observed
+coverage, not provisioning. No query produces an eligibility or completeness file.
+Breakdown equality/model attribution are synthetic-only invariants, not real-data
+validation rules. M365 Copilot credits and GitHub AI credits remain separate units.
 
 In v1, real GitHub files are inspectable but **no verified real build adapter
 is supplied**. Ask for the actual query contract before proposing an adapter.

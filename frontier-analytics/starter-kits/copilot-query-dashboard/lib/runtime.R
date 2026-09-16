@@ -251,7 +251,17 @@ reference_files <- function(cfg) {
   utility <- file.path(cfg$repo_root, "examples", "utility-r")
   if (cfg$report == "github") {
     relative <- c("github-copilot-developer-productivity-simulation.Rmd",
-                  "github-developer-experience-helpers.R")
+                  "github-developer-experience-helpers.R",
+                  file.path("_data", c(
+                    "person-query/PersonQuery.csv",
+                    "consumption-query/PeopleMetaData.csv",
+                    "consumption-query/PersonM365CreditsMetrics.csv",
+                    "consumption-query/PersonGitHubCreditsMetrics.csv",
+                    "github-query/PersonGitHubActivityMetrics.csv",
+                    "github-query/GitHubActivityBreakdownByFeatureMetrics.csv",
+                    "github-query/GitHubActivityBreakdownByLanguageFeatureMetrics.csv",
+                    "github-query/GitHubActivityBreakdownByLanguageModelMetrics.csv",
+                    "github-query/GitHubActivityBreakdownByModelFeatureMetrics.csv")))
   } else {
     relative <- c("copilot-consumption-ways-of-working-simulation.Rmd",
                   file.path("_data", c(

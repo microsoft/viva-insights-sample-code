@@ -13,7 +13,7 @@ replace this contract when the website or an export changes.
 | Source | Established here | Not established here |
 |---|---|---|
 | [Consumption query](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query) | Activity at PersonId, ServiceId, MetricDate; daily/weekly/monthly query grouping; people metadata joined by PeopleHistoricalId; credit and session metrics | Tokens, delegated task types, currency cost, or a complete licensed population denominator |
-| GitHub reference demo | Synthetic daily activity, full-window model/language allocations, Person Query, roster, eligibility and coverage fixtures | A verified real GitHub flexible-query export schema; completeness or identity mappings inferred from sparse activity |
+| GitHub reference demo | Synthetic values in confirmed daily activity/breakdown headers, Person Query and roster | Real breakdown metric equalities/model attribution, provisioning or ingestion completeness inferred from sparse activity |
 | Person Query | Person-period collaboration metrics, subject to the selected query and metric definitions | Coding time, developer output, health, or a causal effect |
 
 The Consumption documentation is not evidence for a GitHub query schema.
@@ -41,7 +41,9 @@ metadata keys before a many-to-one metadata join. Keep historical metadata
 attached through `PeopleHistoricalId`, not a latest-person snapshot. Report
 unmatched key counts without printing identifiers; do not silently drop them.
 
-Credit totals are additive only over non-overlapping activity records.
+Credit totals are additive only within the same verified unit over non-overlapping activity records.
+M365 Copilot credits and GitHub AI credits remain separate; no common-unit conversion
+or cross-product share is established here.
 Session counts are not distinct people. Limits are not consumption and must
 not be summed across service rows. Credits are not dollars. Token intensity
 requires verified compatible token counts; never derive tokens from credits.
@@ -53,10 +55,12 @@ person ratios, its population and its zero-denominator rule.
 The reference demo's manifest lives at
 `examples/utility-r/_data/README.md` in the sample-code repository. Its
 fixtures carry synthetic values in real export schemas, so file names, column
-names and keys match a genuine download. Eligibility and coverage are derived
-there, not read, because no query emits them. Feature, model and language
-breakdowns are daily two-dimension files that reconcile to the activity file;
-they carry no share column and no full-window allocation.
+names and keys match a genuine download. Weekly M365 eligibility uses enabled days;
+M365 ingestion completeness remains unknown without independent evidence. GitHub
+row presence describes observation, not provisioning. Feature, model and language
+breakdowns are daily two-dimension files with no exported share column. Their
+cross-breakdown equality and model allocation (including completions) are synthetic
+invariants only, not verified real-export validation rules.
 
 For real data, require evidence for identifiers, units, dates, population,
 product eligibility and coverage, and any model/language allocation periods.

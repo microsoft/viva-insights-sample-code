@@ -93,7 +93,7 @@ card('Uninterrupted hours / week', f1(median(baseline$Uninterrupted_hours)), 'Pa
 cat('</div>')
 ```
 
-This is a manager view of working conditions and recorded Copilot use from committed synthetic CSVs whose column names match Viva Insights query exports. The roster contains `r num(nrow(people))` synthetic people, of whom `r num(sum(people$IsDeveloper))` are developers. Other job-family records are excluded by the `IsDeveloper` attribute, not by product activity. The helper reads the CSVs and derives coverage; it does not generate or overwrite data.
+This is a manager view of working conditions and recorded Copilot use from committed synthetic CSVs whose column names match Viva Insights query exports. The roster contains `r num(nrow(people))` synthetic people, of whom `r num(sum(people$IsDeveloper))` are developers. Other job-family records are excluded by the `IsDeveloper` attribute, not by product activity. The helper does not generate or overwrite data. Microsoft 365 collection completeness is unknown by default: its complete-window rates and common-product comparisons are unavailable, not zero. Matching a fixture filename or schema never certifies coverage.
 
 <div class="definitions">
 <strong>Reading the working week.</strong> Collaboration hours include meeting hours, scheduled calls, email and chat activity, so they must not be added to meeting hours. Available-to-focus hours are the hours remaining during working hours after excluding meetings and scheduled Teams calls. Uninterrupted hours and interrupted hours partition available-to-focus hours. The working-hours basis is configurable per tenant through metric rules, so the 40-hour basis in this synthetic file is not universal. Available-to-focus hours are calendar availability; they do not measure coding time or psychological flow.
@@ -116,7 +116,8 @@ stack_plot(team_context, 'Roles represented in each team',
 html_table(composition_table(team_context), 'Role shares use the 60 developers in each team as denominator.')
 composition_counts <- bind_rows(lapply(c('Role','Seniority','Tenure'), function(a)
   baseline |> count(Category=.data[[a]], name='People') |> mutate(Attribute=a)))
-stopifnot(all(composition_counts$People >= MIN_GROUP_N))
+composition_counts <- composition_counts |>
+  group_by(Attribute) |> filter(all(People >= MIN_GROUP_N)) |> ungroup()
 html_table(composition_counts |> transmute(Attribute, Category, `Developers (count)`=People,
   `Share of developers (%)`=pct(People/nrow(baseline))), 'Role, seniority and tenure are illustrative HR attributes carried by the query exports.')
 ```
@@ -128,7 +129,7 @@ Row
 
 ### Team league table for workload and recorded Copilot use
 
-<p class="leadline">Sorted by collaboration hours, <strong>`r team_league$Team[1]`</strong> is the busiest team at <strong>`r f1(team_league$Collaboration_hours[1])` hours/person/week</strong>. <strong>`r team_league$Team[which.max(team_league$GH_active_share)]`</strong> has the highest GitHub Copilot recorded-active share at <strong>`r pct(max(team_league$GH_active_share))`</strong>, and <strong>`r team_league$Team[which.max(team_league$M365_active_share)]`</strong> has the highest Microsoft 365 Copilot recorded-active share at <strong>`r pct(max(team_league$M365_active_share))`</strong>.</p>
+<p class="leadline">Sorted by collaboration hours, <strong>`r team_league$Team[1]`</strong> has the highest median collaboration at <strong>`r f1(team_league$Collaboration_hours[1])` hours/person/week</strong>. Highest reportable GitHub recorded-active share: <strong>`r leader_label(team_league$Team, team_league$GH_active_share)`</strong>, <strong>`r pct(suppressWarnings(max(team_league$GH_active_share, na.rm=TRUE)))`</strong>. Highest reportable Microsoft 365 recorded-active share: <strong>`r leader_label(team_league$Team, team_league$M365_active_share)`</strong>, <strong>`r pct(suppressWarnings(max(team_league$M365_active_share, na.rm=TRUE)))`</strong>. Unavailable means missing coverage evidence or privacy suppression, not inactivity.</p>
 
 ```{r landscape-tables, results='asis'}
 html_table(team_league |>
@@ -137,9 +138,9 @@ html_table(team_league |>
     `Available-to-focus hours`=f1(Available_to_focus_hours),
     `Uninterrupted hours`=f1(Uninterrupted_hours), `Interrupted hours`=f1(Interrupted_hours),
     `After-hours collaboration`=f1(After_hours_collaboration_hours),
-    `GitHub valid developers`=GH_valid_n, `GitHub active (%)`=pct(GH_active_share),
+    `GitHub valid developers`=num(GH_valid_n), `GitHub active (%)`=pct(GH_active_share),
     `GitHub credits / person / week`=f1(GH_intensity),
-    `M365 valid developers`=M365_valid_n, `M365 active (%)`=pct(M365_active_share),
+    `M365 valid developers`=num(M365_valid_n), `M365 active (%)`=pct(M365_active_share),
     `M365 credits / person / week`=f1(M365_intensity)),
   paste('Sorted by collaboration hours descending | Hours/person/week and credits/person/week |', period_label))
 html_table(work_summary, paste('Population percentiles across', num(nrow(baseline)), 'developers’ eight-week averages | Hours/person/week |', period_label))
@@ -157,8 +158,11 @@ plot_league <- team_league_plot |>
   mutate(Team_metric=factor(paste(Team, Metric, sep=' | '), levels=paste(Team, Metric, sep=' | '))) |>
   ungroup()
 ggplot(plot_league, aes(x=Value, y=Team_metric)) +
-  geom_col(fill='#2563eb', width=.62) +
-  geom_text(aes(label=Label), hjust=-.10, size=3.1, colour='#253047') +
+  geom_col(data=filter(plot_league, is.finite(Value)), fill='#2563eb', width=.62) +
+  geom_text(data=filter(plot_league, is.finite(Value)),
+    aes(label=Label), hjust=-.10, size=3.1, colour='#253047') +
+  geom_text(data=filter(plot_league, !is.finite(Value)),
+    aes(x=0, label='Unavailable / withheld'), hjust=0, size=3.1, colour='#526079') +
   facet_wrap(~Metric, scales='free', ncol=2, labeller=label_wrap_gen(26)) +
   scale_y_discrete(labels=function(x) sub(' \\| .*', '', x)) +
   scale_x_continuous(expand=expansion(mult=c(0,.25))) + theme_report() +
@@ -254,7 +258,9 @@ persistence <- baseline |> mutate(Band=case_when(Weeks_above==0 ~ '0 weeks',
   Weeks_above<PERSISTENCE_WEEKS ~ paste('1 to', PERSISTENCE_WEEKS-1, 'weeks'),
   TRUE ~ paste(PERSISTENCE_WEEKS, 'to', BASELINE_WEEKS, 'weeks'))) |>
   count(Band, name='People') |> mutate(Share=People/nrow(baseline))
-stopifnot(sum(persistence$People)==nrow(baseline), all(persistence$People>=MIN_GROUP_N))
+stopifnot(sum(persistence$People)==nrow(baseline))
+persistence <- disclose_partition(persistence)
+if (!nrow(persistence)) unavailable_plot('Persistence composition withheld') else
 ggplot(persistence, aes(x=People, y=factor(Band, levels=rev(c('0 weeks', paste('1 to', PERSISTENCE_WEEKS-1, 'weeks'), paste(PERSISTENCE_WEEKS, 'to', BASELINE_WEEKS, 'weeks')))))) +
   geom_col(fill='#c7d2fe', width=.55) +
   geom_text(aes(label=paste0(num(People), ' (', pct(Share), ')')), hjust=-.12, size=3.7) +
@@ -277,10 +283,10 @@ Row
 <span class="pill">Synthetic demo · Real export schema</span>
 <span class="context">`r period_label` · same `r num(nrow(baseline))`-developer roster · GitHub rows distinguish zero from missing</span>
 
-<p class="leadline"><strong>`r nrow(matched)` developers</strong> are valid for both product feeds throughout the baseline window. GitHub Copilot provisioning is derived from presence in <code>PersonGitHubActivityMetrics.csv</code>, while Microsoft 365 Copilot eligibility is derived from <code>PeopleMetaData.csv</code> licence status. The product windows deliberately start later than the Person Query history.</p>
+<p class="leadline">Common complete-window observation is unavailable without independent Microsoft 365 collection evidence. GitHub activity rows supply positive provisioning evidence for the observed week; absence leaves provisioning unknown. Microsoft 365 eligibility uses that week's <code>Total_Copilot_enabled_days</code>: static metadata cannot override a zero-enabled week. The product windows deliberately start later than the Person Query history.</p>
 
 <div class="definitions">
-<strong>Zero versus missing.</strong> GitHub Copilot exports include explicit zero rows for provisioned inactive weekdays; a zero row is observed inactivity and a missing row means not provisioned or not observed. Microsoft 365 consumption exports do not provide an independent completeness file here, so the final 13-week product feed is treated as the observation window. Missing product activity is filled as zero only after eligibility and observation are established.
+<strong>Zero versus missing.</strong> The synthetic GitHub activity file includes explicit zero rows for inactive weekdays: these are measured zero, whereas an absent row leaves status unknown. Microsoft 365 consumption rows cannot certify their own collection completeness. The product calendar and static licence metadata are not completeness evidence. Missing Microsoft 365 values stay <code>NA</code> unless independent person-week coverage and positive enabled days justify a zero; the default report has no such evidence.
 </div>
 
 Row
@@ -288,10 +294,10 @@ Row
 
 ### Joint footprint with privacy-safe exceptions retained
 
-```{r joint-footprint, fig.height=3.8, fig.alt='A labelled stacked bar reconciles recorded product use and eligibility exceptions across the developer roster, combining sub-10 categories.'}
+```{r joint-footprint, fig.height=3.8, fig.alt='A labelled stacked bar shows product-use and observation status only when every positive cell meets the privacy floor.'}
 joint_stack <- joint_counts_public |> transmute(Group='Developer roster', Category=Display, People, Share)
 stack_plot(joint_stack, 'Recorded product use and eligibility or observation status',
-  'Only and neither refer to GitHub Copilot and Microsoft 365 Copilot in this baseline. Sub-10 categories are combined.',
+  'Only and neither require established eligibility and observation. Any sub-10 cell withholds the entire partition.',
   base_caption(unit=paste('share of', num(nrow(baseline)), 'developers')))
 ```
 
@@ -299,17 +305,21 @@ stack_plot(joint_stack, 'Recorded product use and eligibility or observation sta
 
 ```{r joint-details, results='asis'}
 html_table(joint_counts_public |> transmute(`Published tool-use status`=Display, `Developers (count)`=People, `Share of roster (%)`=pct(Share)),
-  'Small cells are combined before publication to preserve the privacy floor.')
+  'The entire partition is withheld if any positive cell is below the privacy floor; totals cannot reveal a withheld remainder.')
 eligibility_table <- bind_rows(lapply(c('GH','M365'), function(p) {
   b <- baseline_panel |> group_by(PersonId) |>
-    summarise(eligible=all(.data[[paste0(p,'_eligible')]]), complete=all(.data[[paste0(p,'_complete')]]), .groups='drop')
-  tibble(Product=if(p=='GH') 'GitHub Copilot' else 'Microsoft 365 Copilot',
-    `Not eligible/provisioned (count)`=sum(!b$eligible),
-    `Eligible, incomplete or outside observation (count)`=sum(b$eligible & !b$complete),
-    `Eligible and valid (count)`=sum(b$eligible & b$complete))
+    summarise(eligible=all(.data[[paste0(p,'_eligible')]]),
+              valid=all(.data[[paste0(p,'_valid')]]), .groups='drop') |>
+    mutate(Status=case_when(
+      is.na(eligible) ~ 'Eligibility or provisioning unknown',
+      !eligible ~ 'Not eligible for the full window',
+      !valid ~ 'Eligible; completeness unresolved or incomplete',
+      TRUE ~ 'Eligible and valid'))
+  b |> count(Status, name='People') |> disclose_partition() |>
+    mutate(Product=if(p=='GH') 'GitHub Copilot' else 'Microsoft 365 Copilot', .before=1)
 }))
-html_table(eligibility_table, paste('Each product row reconciles to', num(nrow(baseline)), 'developers. GitHub complete means observed weekday rows; Microsoft 365 valid means licensed within the product observation window.'))
-html_table(coverage_derivation, 'Eligibility and coverage are derived from real export fields; no standalone coverage or eligibility file is read.')
+html_table(eligibility_table, 'Each reportable product partition reconciles to the roster. An unsafe partition is withheld in full, including its complementary cells.')
+html_table(coverage_derivation, 'No standalone coverage export is invented. Weekly eligibility and independent completeness are separate requirements.')
 ```
 
 </details>
@@ -326,7 +336,7 @@ html_table(product_summary |> arrange(desc(`Recorded active (%)`)) |> mutate(acr
   paste(period_label, '| Each product uses its own eligible and valid population. Non-users remain in the frequency and intensity denominator.'))
 html_table(m365_service_mix |> transmute(Service=ServiceName, `People (count)`=People,
   `Sessions`=num(Sessions), `Credits`=num(Credits), `Credit share (%)`=pct(Share)),
-  'Microsoft 365 Copilot consumption by ServiceName after aggregating the person-service-day export over the baseline weekdays.')
+  'Recorded Microsoft 365 service rows over baseline weekdays. These observed sums and shares do not establish complete collection or complete-window population rates.')
 ```
 
 The concentration row is the share of GitHub credits or Microsoft 365 credits attributable to the highest-volume 10% of active developers for that product. Identities and individual rankings are never displayed. Credits, sessions, completion suggestions and chat requests are different units and are not added together.
@@ -340,12 +350,12 @@ Row
 ### What GitHub Copilot features, models and languages appear in the real breakdown files?
 
 <span class="pill">Synthetic demo · Real export schema</span>
-<span class="context">Daily GitHub breakdowns · `r period_label` weekdays · margins reconcile before rendering</span>
+<span class="context">Daily GitHub breakdowns · `r period_label` weekdays · synthetic allocation, not verified real-export semantics</span>
 
-<p class="leadline">The GitHub breakdown files are daily margins of a shared Feature × Language × Model allocation. Over the baseline, <strong>`r feature_mix$Feature[1]`</strong> accounts for <strong>`r pct(feature_mix$Share[1])`</strong> of reconciled GitHub feature usage, and <strong>`r model_mix$Model[1]`</strong> is the largest model margin at <strong>`r pct(model_mix$Share[1])`</strong>.</p>
+<p class="leadline">In this synthetic fixture only, the breakdown files are daily margins of a shared Feature × Language × Model allocation. Largest reportable feature: <strong>`r leader_label(feature_mix$Feature, feature_mix$Share)`</strong>, <strong>`r pct(feature_mix$Share[1])`</strong>. Largest reportable model: <strong>`r leader_label(model_mix$Model, model_mix$Share)`</strong>, <strong>`r pct(model_mix$Share[1])`</strong>. These illustrative shares do not validate real-export model attribution.</p>
 
 <div class="definitions">
-<strong>Reconciliation contract.</strong> For every person-day, feature usage, language-feature usage, language-model usage and model-feature usage reconcile to the same total: accepted code completions plus user-initiated chat requests. <code>Share</code> is calculated in this report; it is not an export column.
+<strong>Synthetic allocation invariant.</strong> The generator constructs all four breakdown totals from accepted completions plus user-initiated chats and checks its own internal consistency. This is not an authoritative real-export metric definition, and the reader does not reject inputs whose totals differ. Model attribution is illustrative, including attribution of code completions to models. An exact authoritative metric-definition source is required before enforcing these equalities or interpreting completion-model allocation on real data. <code>Share</code> is calculated in this report within each supplied breakdown; it is not an export column.
 </div>
 
 Row
@@ -362,6 +372,7 @@ margin_plot <- bind_rows(
   arrange(Share, .by_group=TRUE) |>
   mutate(Category_margin=factor(paste(Category, Margin, sep=' | '), levels=paste(Category, Margin, sep=' | '))) |>
   ungroup()
+if (!nrow(margin_plot)) unavailable_plot('GitHub breakdowns unavailable or withheld') else
 ggplot(margin_plot, aes(x=Share, y=Category_margin)) +
   geom_col(fill='#2563eb', width=.65) +
   geom_text(aes(label=pct(Share)), hjust=-.1, size=3.1) +
@@ -370,9 +381,9 @@ ggplot(margin_plot, aes(x=Share, y=Category_margin)) +
   scale_x_continuous(labels=label_percent(), expand=expansion(mult=c(0,.18))) +
   theme_report() +
   chart_labs('GitHub Copilot usage margins from daily breakdown exports',
-    'Each margin uses the baseline weekdays and suppresses categories observed for fewer than 10 people.',
-    paste(period_label, '| Usage count is accepted completions plus user-initiated chat requests after reconciliation.'),
-    x='Share of reconciled GitHub usage', y=NULL)
+    'All linked margins and cross-tabs are withheld if any cell has fewer than 10 people.',
+    paste(period_label, '| Shared allocation and completion-model attribution are synthetic illustrations only.'),
+    x='Share of the supplied breakdown usage', y=NULL)
 ```
 
 Row
@@ -416,9 +427,9 @@ Row
 ### How do working conditions differ across recorded tool-use groups?
 
 <span class="pill">Synthetic demo · Real export schema</span>
-<span class="context">`r period_label` · `r nrow(matched)` developers valid for both products · Same eight-week baseline</span>
+<span class="context">`r period_label` · Common-product comparisons require independent completeness evidence · Same eight-week baseline</span>
 
-<p class="leadline">The comparison includes <strong>`r nrow(matched)` developers</strong> with common product observation. The group with the highest median collaboration hours is <strong>`r interval_data(matched,'Collaboration_hours','Joint') |> arrange(desc(p50)) |> slice(1) |> pull(Group)`</strong>. Groups are descriptive categories based on recorded use in this same window, with no treatment assignment or causal estimate.</p>
+<p class="leadline">No common-product comparison is available by default because Microsoft 365 completeness is not established by these exports. Missing coverage is not recorded non-use. If independent evidence is supplied during an adaptation, compare only people observed throughout the same window and apply the privacy floor to every group. Such comparisons remain descriptive, not causal.</p>
 
 <div class="definitions">
 <strong>Common comparison population:</strong> developers valid for both product feeds and the Person Query throughout the baseline. This is not statistical matching. Eligibility exceptions remain in the `r num(nrow(baseline))`-person developer landscape and do not become non-users in this comparison. Group membership uses the same window as working conditions, so temporal direction cannot be established.
@@ -486,7 +497,7 @@ trend |> select(Week, GH_rate, M365_rate) |>
   scale_y_continuous(labels=label_percent(), limits=c(0,1)) +
   scale_x_date(date_breaks='1 month', date_labels='%d %b') + theme_report() +
   chart_labs('Recorded active developers as a share of valid weekly observation',
-    'At least one positive activity day that week. Product feeds begin in the final 13 weeks, so earlier weekly rates are not drawn.',
+    'At least one positive activity day that week. Missing coverage is not inactivity; Microsoft 365 rates are unavailable by default without independent completeness evidence.',
     paste(history_label, '| Denominator: product-eligible developers with valid observation in that week. UTC week starts.'),
     x='Week beginning (2026)', y='Recorded active (%)')
 ```
@@ -495,11 +506,11 @@ trend |> select(Week, GH_rate, M365_rate) |>
 
 ```{r weekly-coverage, results='asis'}
 html_table(trend |> transmute(`Week beginning (UTC)`=format(Week,'%Y-%m-%d'),
-  `PQ developers (count)`=PQ_n, `GH valid (count)`=GH_n, `GH active (count)`=GH_active,
-  `GH active (%)`=pct(GH_rate), `M365 valid (count)`=M365_n,
-  `M365 active (count)`=M365_active, `M365 active (%)`=pct(M365_rate),
-  `Both valid (count)`=Joint_n),
-  'Rates are N/A before product feeds enter the observation window. GitHub coverage counts observed weekdays, not seven calendar days.')
+  `PQ developers (count)`=num(PQ_n), `GH valid (count)`=num(GH_n), `GH active (count)`=num(GH_active),
+  `GH active (%)`=pct(GH_rate), `M365 valid (count)`=num(M365_n),
+  `M365 active (count)`=num(M365_active), `M365 active (%)`=pct(M365_rate),
+  `Both valid (count)`=num(Joint_n)),
+  'N/A means coverage unavailable or privacy withholding, not inactivity. GitHub requires five explicit weekday activity and credit rows; this is a weekday-only convention, not a collection certificate.')
 ```
 
 </details>
@@ -544,9 +555,11 @@ Row
 
 ### Privacy, reproducibility and validation
 
-**Privacy floor.** At least 10 distinct people are required for a published group. Percentile visuals use `vivainsights::create_boxplot(..., mingroup = 10, return = "table")`. Composition breakdowns with any cell below 10 are withheld in full for that parent group. Small joint-use or exception categories are combined before publication. No individual points, identifiers or individual leaderboards appear in the HTML.
+**Privacy floor.** At least 10 distinct people are required for a published group. Percentile visuals use `vivainsights::create_boxplot(..., mingroup = 10, return = "table")`. Composition breakdowns with any positive cell below 10 are withheld in full for that parent group, including the joint-use and eligibility partitions. Linked GitHub margins and cross-tabs are withheld together to avoid subtraction across tables. Product rates check both numerator and complement; unavailable values are labelled, not plotted as zero. Missing category labels are shown as “Unknown / not supplied”. No individual points, identifiers or individual leaderboards appear in the HTML.
 
 **Simulation boundary.** The CSV values are synthetic, but the report no longer invents CSV schemas or writes files. It does not use a standalone eligibility or coverage export, fabricated Microsoft 365 action categories, model or language share files, or an agent-use indicator that is absent from the real GitHub activity export. It parses the real `Agent adoption` field and derives all shares locally.
+
+**Coverage boundary.** There is no default fixture-completeness exception or filename-based trust. `derive_m365_coverage(person_weeks, evidence = NULL)` returns unknown completeness unless a caller explicitly supplies independently obtained, person-week-specific evidence with its source. That is an in-memory analysis input, not a fabricated export column or file. A calendar, static licence status, observed positive rows, or missing rows cannot supply that evidence. A future fixture-only opt-in would need validated provenance tied to the exact files; assumptions must not survive replacement or row deletion.
 
 ```{r validation-table, results='asis'}
 html_table(validation_summary, 'Automated data-contract checks executed during this render.')

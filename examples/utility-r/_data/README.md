@@ -16,7 +16,11 @@ Rscript simulate-query-exports.R
 ```
 
 The script is deterministic (`SEED <- 20260916`) and fails rather than exporting if
-any schema or reconciliation contract breaks.
+any ordered fixture schema or synthetic allocation invariant breaks. The independent
+header vectors in `query-export-contracts.R` specify all eight fixed exports,
+the selected HR attributes and this custom Person Query recipe. All nine outputs
+are validated before any file is written; changing the selected custom metrics or
+HR attributes requires an explicit recipe-contract update.
 
 ## Why this matters
 
@@ -59,8 +63,8 @@ meaningful, exactly as it would be in a real tenant.
   normal real-world case — do not assume the windows always align.
 - Dates are ISO `YYYY-MM-DD` on a UTC convention. They are not a record of personal
   time zones.
-- Decimal point, no thousands separators. Empty cells mean the field was not set,
-  which is how real exports represent an absent spending policy or user limit.
+- Decimal point, no thousands separators. Empty policy/limit cells mean no policy
+  in this simulation. A real empty value does not by itself establish policy absence.
 
 ## Consumption query
 
@@ -89,14 +93,20 @@ will silently over-count.
 
 `PersonId, ServiceId, ServiceName, SpendingPolicyId, MetricDate, Session count, Spending policy limit, Total Copilot Credits used, User limit, PeopleHistoricalId`
 
-`SpendingPolicyId` is the all-zero GUID when no policy applies, in which case
-`Spending policy limit` and `User limit` are empty.
+In this fixture `SpendingPolicyId` is the all-zero GUID when no policy applies,
+and `Spending policy limit` and `User limit` are empty. Validate real null semantics
+against the supplied query contract rather than inferring them from this recipe.
 
 ### `PersonGitHubCreditsMetrics.csv`
 
 One row per `PersonId` × `MetricDate`.
 
 `PersonId, MetricDate, Total GitHub AI Credits used, PeopleHistoricalId`
+
+**Units are separate:** M365 Copilot credits and GitHub AI credits have no verified
+common-unit conversion here. Do not add them, calculate cross-product shares, or
+use GitHub AI credits in an M365 credits-per-session denominator. The Consumption
+report uses M365-only volume bands and a separately labelled GitHub panel.
 
 ## GitHub Copilot query
 
@@ -109,9 +119,9 @@ One row per `PersonId` × `MetricDate`.
 
 `PersonId, MetricDate, Agent adoption, Code completions accepted, Code completions suggested, User-initiated chat requests`
 
-Real exports include explicit **zero rows** for provisioned users on days with no
-activity, and those are reproduced here. A zero row and a missing row mean different
-things: the first is observed inactivity, the second is no provisioning.
+The fixture includes explicit **zero rows** for simulated provisioned users on days
+with no activity. A measured zero is observed inactivity; a missing row is unknown,
+not proof of no provisioning. Presence demonstrates observation, not a licence record.
 `Code completions accepted` never exceeds `Code completions suggested`.
 
 ### Breakdown files
@@ -123,10 +133,13 @@ things: the first is observed inactivity, the second is no provisioning.
 | `GitHubActivityBreakdownByLanguageModelMetrics.csv` | `PersonId`, `MetricDate`, `Language`, `Model` | `Usage count by language and model` |
 | `GitHubActivityBreakdownByModelFeatureMetrics.csv` | `PersonId`, `MetricDate`, `Model`, `Feature` | `Usage count by model and feature` |
 
-All four are exact margins of one underlying Feature × Language × Model allocation,
-so they reconcile with each other, and the feature margin reconciles to
+In this simulation only, all four are exact margins of one underlying
+Feature × Language × Model allocation, so they reconcile with each other, and the feature margin reconciles to
 `Code completions accepted` + `User-initiated chat requests` in the activity file.
-The generator asserts this before writing.
+The generator asserts this synthetic allocation invariant before writing. Model
+attribution, including to completion counts, is illustrative. Confirmed headers
+do not establish these equalities or attribution rules for real exports; the report
+loader does not reject replacement data for failing them.
 
 Feature values use the real vocabulary: `code_completion`, `chat_inline`,
 `chat_panel_ask_mode`, `chat_panel_edit_mode`, `chat_panel_agent_mode`,
@@ -157,18 +170,21 @@ additively**.
 
 ## Deriving eligibility and coverage
 
-There is no eligibility or coverage file, because no query produces one. Derive
-these signals instead:
+There is no eligibility or coverage export file. Keep these evidence classes separate:
 
 | Question | Real signal |
 |---|---|
-| Was this person licensed for Microsoft Copilot? | `Total_Copilot_enabled_days > 0` in the Person query, or `IsCopilotLicensed` in `PeopleMetaData` |
-| Was this person provisioned for GitHub Copilot? | Presence of any row for them in `PersonGitHubActivityMetrics` |
+| Was this person eligible for M365 in this week? | `Total_Copilot_enabled_days > 0`; a static `IsCopilotLicensed` snapshot cannot override a zero-enabled week |
+| Was this person provisioned for GitHub Copilot? | Independent provisioning evidence; missing activity means unknown and M365 licensing is not GitHub licensing |
+| Was this person observed in GitHub? | Presence of a measured row; the demo checks observed weekday rows, not verified ingestion completeness |
+| Is the sparse M365 export complete? | Unknown by default, even with observed positive rows; independent ingestion evidence is required |
 | Did this person use Copilot on this day? | A row with a non-zero measure, not the absence of a row |
 
-Fill an absent activity record with zero **only** when eligibility is independently
-established. Against a real export you also need evidence of ingestion completeness
-and expected coverage before absence can be read as zero.
+Fill an absent activity record with zero **only** when period eligibility and independent
+ingestion completeness/expected coverage are established. The helper accepts an
+analyst-side evidence object through `derive_m365_coverage`; this is not a fabricated
+query-export column or file. Without it, M365 complete-week and joint-product panels
+remain unavailable. Sparse source totals are labelled observed records, not full-window totals.
 
 ## Organisational attributes
 
