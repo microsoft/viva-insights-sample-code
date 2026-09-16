@@ -94,4 +94,4 @@ adapter. Do not rename public GitHub API fields into an assumed Viva contract.
 - [Starter kit](../../starter-kits/developer-experience-dashboard/README.md)
 - [Shared runner](../../starter-kits/copilot-query-dashboard/README.md)
 - [Optional skill installation](../../skills/README.md#dashboard-skill-installation)
-- [Synthetic schema manifest](../../../examples/utility-r/_data/github/README.md)
+- [Synthetic schema manifest](../../../examples/utility-r/_data/README.md)

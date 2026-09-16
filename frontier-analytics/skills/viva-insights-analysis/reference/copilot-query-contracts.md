@@ -51,10 +51,12 @@ person ratios, its population and its zero-denominator rule.
 ## GitHub: demonstration versus real adaptation
 
 The reference demo's manifest lives at
-`examples/utility-r/_data/github/README.md` in the sample-code repository.
-Its separate M365 feature counts, eligibility flags and completeness reference
-are illustrative contracts, not certified exports. Its model/language mixes
-cover the entire synthetic window and cannot be reused as weekly observations.
+`examples/utility-r/_data/README.md` in the sample-code repository. Its
+fixtures carry synthetic values in real export schemas, so file names, column
+names and keys match a genuine download. Eligibility and coverage are derived
+there, not read, because no query emits them. Feature, model and language
+breakdowns are daily two-dimension files that reconcile to the activity file;
+they carry no share column and no full-window allocation.
 
 For real data, require evidence for identifiers, units, dates, population,
 product eligibility and coverage, and any model/language allocation periods.

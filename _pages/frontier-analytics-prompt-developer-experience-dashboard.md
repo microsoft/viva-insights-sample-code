@@ -103,6 +103,6 @@ adapter. Do not rename public GitHub API fields into an assumed Viva contract.
 - [Starter kit](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/starter-kits/developer-experience-dashboard)
 - [Shared runner](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/starter-kits/copilot-query-dashboard)
 - [Optional skill installation](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/skills/README.md#dashboard-skill-installation)
-- [Synthetic schema manifest](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/_data/github/README.md)
+- [Synthetic schema manifest](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/_data/README.md)
 
 {% include responsible-use.html %}

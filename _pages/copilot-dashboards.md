@@ -32,26 +32,26 @@ Both seven-page reports use **synthetic data**. They illustrate analysis approac
 **Synthetic data · R template · Seven-page HTML report**
 
 **When to use it:** reach for this report when you need to answer questions such as —
-*Are a small number of users or groups driving most of our token/credit spend?
-Do certain user groups consume disproportionately more tokens and credits, not just more "actions"?
-How does credit intensity (cost per 1,000 tokens) vary by task type or function?
-What does the delegated-task mix look like across usage segments?*
+*Are a small number of users or groups driving most of our credit spend?
+Do certain user groups consume disproportionately more credits, not just more sessions?
+How does cost per session vary by service, organisation or function?
+Which Copilot services account for the most consumption across usage segments?*
 It is built around the volume-vs-mix distinction: total consumption differs from
-*how efficiently* that consumption converts into credits.
+*how expensive* each session of that consumption is.
 
-**Scope:** "consumption" here refers to **Microsoft 365 Copilot** usage only (credits,
-tokens, sessions), as captured by the Viva Insights Consumption Query. It does not
-cover GitHub Copilot consumption — for GitHub Copilot activity, see the
+**Scope:** "consumption" here refers to **Copilot credit consumption** as captured by
+the Viva Insights Consumption Query. That query covers Microsoft 365 Copilot services
+and also emits GitHub AI credits, so both appear in this report. For GitHub Copilot
+*activity* — completions, chat, features, models and languages — see the
 [Developer Experience and Copilot](#developer-experience-and-copilot) report below.
 
 **Prerequisites for real data:** to run this on your own tenant's data you need both a
 **Person Query** export (for organisational attributes and HR groupings) and a
 **[Consumption Query](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query)**
-export (for credits and sessions). The demo additionally simulates token and
-delegated-task-type fields that are not part of the public Consumption schema, so the
-real-data path (see below) produces a narrower, credits-only report.
+export. The demo fixtures already match the real Consumption schema, so the real-data
+path is a like-for-like substitution rather than a narrower report.
 
-Separate consumption volume from consumption mix: token concentration and percentile bands, credit intensity per 1,000 tokens, delegated task types, usage segments, and function drill-downs.
+Separate consumption volume from consumption cost: credit concentration and percentile bands, cost per session, service mix, usage segments, and function drill-downs.
 
 **[View demo]({{ site.baseurl }}/examples/utility-r/copilot-consumption-ways-of-working-simulation.html)** ·
 [Get source](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-ways-of-working-simulation.Rmd) ·
@@ -62,14 +62,14 @@ reproduce the demo or build a scoped credits report with an agent and reusable R
 
 [![Consumption report overview]({{ site.baseurl }}/assets/images/reports/copilot-consumption-overview.png)]({{ site.baseurl }}/examples/utility-r/copilot-consumption-ways-of-working-simulation.html)
 
-**Demo inputs:** Synthetic credit, token and task-type data alongside Person Query and network fixtures. The [public Consumption schema](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query) establishes credits and sessions, but not this demo's token/task-type fields. The AI-guided real-data path therefore builds a narrower credits-only report and labels unsupported panels.
+**Demo inputs:** Synthetic Consumption query fixtures (`PeopleMetaData`, `PersonM365CreditsMetrics`, `PersonGitHubCreditsMetrics`) alongside a Person Query fixture. These carry simulated values in the real [public Consumption schema](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query), so credits, sessions, service grain and the `PeopleHistoricalId` join key all match a genuine export. Earlier versions of this demo carried token and task-type fields that exist in no export; those have been removed.
 
-**Interpretation:** Associations only. Credit intensity is a cost-mix measure, not a measure of value or quality. Concentration curves and banded percentiles help describe skewed consumption without relying on an average.
+**Interpretation:** Associations only. Credit intensity is a cost measure, not a measure of value or quality. Concentration curves and banded percentiles help describe skewed consumption without relying on an average.
 
 <details markdown="1">
-<summary>See the token distribution preview</summary>
+<summary>See the consumption distribution preview</summary>
 
-![Consumption report token distribution]({{ site.baseurl }}/assets/images/reports/copilot-consumption-token-distribution.png)
+![Consumption report credit distribution]({{ site.baseurl }}/assets/images/reports/copilot-consumption-token-distribution.png)
 
 </details>
 
@@ -87,18 +87,18 @@ working conditions alongside GitHub **and** Microsoft 365 Copilot use, and keeps
 eligibility and coverage visible rather than treating missing activity as zero.
 
 **Scope:** this report is the one place on this page that covers **both** products —
-**GitHub Copilot** (query activity, model mix, language mix) and **Microsoft 365
-Copilot** (feature actions, for the joint-use analysis only). This is distinct from
-the Consumption report above, which covers Microsoft 365 Copilot credits/tokens
+**GitHub Copilot** (activity plus feature, model and language breakdowns) and
+**Microsoft 365 Copilot** (credit consumption, for the joint-use analysis). This is
+distinct from the Consumption report above, which covers Microsoft 365 Copilot credits
 exclusively and does not touch GitHub Copilot.
 
 **Prerequisites for real data:** you need a **Person Query** export (working-pattern
-metrics and organisational attributes) plus GitHub query activity, model mix and
-language mix per the [GitHub data contract](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/_data/github/README.md),
-and Microsoft 365 Copilot feature-action data for the joint-use panels. There is no
-verified real-data adapter for the GitHub inputs yet (v1); treat the real-data path as
-a readiness assessment rather than a drop-in export, and confirm field definitions
-before adapting the demo's extended illustrative schema.
+metrics and organisational attributes), the five GitHub query files and the Consumption
+query files, per the [data contract](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/_data/README.md).
+The demo fixtures already match the real export schemas, so no column renaming should be
+needed — but column parity is not semantic parity. Confirm population scope, identifiers,
+date grains, licence history and expected coverage before adapting, and note that
+eligibility and coverage must be derived because no query emits them.
 
 Explore meeting and uninterrupted hours, team comparisons, joint product-use patterns, model and language mix, and trends.
 

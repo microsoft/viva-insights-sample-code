@@ -4,49 +4,115 @@ Two self-contained R Markdown flexdashboards demonstrate different analysis ques
 All data used by these two demos are generated synthetic data. Neither report establishes
 causal effects, wellbeing or overall productivity from tool activity.
 
-Both reports are built around the Consumption query and GitHub query, both accessible from the
-**Customised query** tab under **Create analysis** in the Viva Insights analyst experience. See the
+Both reports are built around the Consumption query and the GitHub Copilot query, both
+accessible from the **Customised query** tab under **Create analysis** in the Viva Insights
+analyst experience. See the
 [AI cost query documentation](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query)
-for the official schema and access details — the `_data/` folders in this directory are
-illustrative synthetic exports, not a substitute for that reference.
+and the
+[metric reference](https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics)
+for the official contracts.
 
 | Report | Source | Rendered report | Scope |
 |---|---|---|---|
-| Copilot Consumption and Ways of Working | [Rmd](copilot-consumption-ways-of-working-simulation.Rmd) | [HTML](copilot-consumption-ways-of-working-simulation.html) | Consumption credits/tokens alongside collaboration patterns. This report and its data are unchanged by the developer-experience rebuild. |
-| Developer Experience and Copilot | [Rmd](github-copilot-developer-productivity-simulation.Rmd) | [HTML](github-copilot-developer-productivity-simulation.html) | Baseline working conditions for all 900 developers, with separate GitHub Copilot and M365 Copilot use, coverage-aware comparisons and an evaluation framework. |
+| Copilot Consumption and Ways of Working | [Rmd](copilot-consumption-ways-of-working-simulation.Rmd) | [HTML](copilot-consumption-ways-of-working-simulation.html) | Copilot credit consumption alongside collaboration patterns, by service, organisation and function. |
+| Developer Experience and Copilot | [Rmd](github-copilot-developer-productivity-simulation.Rmd) | [HTML](github-copilot-developer-productivity-simulation.html) | Baseline working conditions for the developer population, with GitHub Copilot activity, feature/model/language breakdowns, M365 Copilot credit consumption and an evaluation framework. |
 
-The developer report keeps its canonical filename so existing links continue to work.
+## Simulated values, real schema
 
-## Developer Experience and Copilot
+The `_data/` folder contains **fully synthetic values in real export schemas**. Every file
+name, column name and key matches a real Viva Insights query export. This is a deliberate
+correction: an earlier version of these demos simulated the schema as well as the values,
+and carried columns that exist in no export — token counts, a task-type breakdown, an
+eligibility/coverage reference file, and an M365 actions feed with no corresponding
+query.
 
-The manager-facing report contains six pages and an appendix:
+Sample code written against an invented schema cannot be pointed at a real export without
+rework, so the fixtures were rebuilt against the published contracts. The single
+deterministic generator is [simulate-query-exports.R](simulate-query-exports.R), and
+[_data/README.md](_data/README.md) is the authoritative manifest for keys, fields, grains
+and join rules.
 
-1. **Developer landscape:** the 900-developer population, six teams, simulated role,
-   seniority and tenure, working-week variation and compact joint-product footprint.
-2. **Focus and coordination:** team medians and interquartile ranges, separate meeting
-   characteristics, and inline distinctions between calendar availability and uninterrupted time.
-3. **Sustainable workload:** after-hours distribution and persistence over observed weeks.
-   The configurable convention is illustrative, not a health or burnout threshold.
-4. **AI use:** joint use for both-eligible, fully covered developers, separate licence and
-   coverage exceptions, product-specific frequency, feature use, acceptance and concentration.
-5. **Working patterns:** three selected descriptive comparisons on a common eligible and
-   observed population, with role and team context. No metric fishing or individual rankings.
-6. **Trends and change:** 26 weekly windows with explicit valid denominators, followed by
-   an evaluation framework requiring a documented intervention, comparator and balancing measures.
-7. **Appendix:** source definitions, units, grains, joins, privacy, reproducibility,
-   simulation assumptions, research references and missing evidence.
+```
+_data/
+  person-query/
+    PersonQuery.csv
+  consumption-query/
+    PeopleMetaData.csv
+    PersonM365CreditsMetrics.csv
+    PersonGitHubCreditsMetrics.csv
+  github-query/
+    PersonGitHubActivityMetrics.csv
+    GitHubActivityBreakdownByFeatureMetrics.csv
+    GitHubActivityBreakdownByLanguageFeatureMetrics.csv
+    GitHubActivityBreakdownByLanguageModelMetrics.csv
+    GitHubActivityBreakdownByModelFeatureMetrics.csv
+```
 
-Pages 1 to 5 use **10 May to 4 July 2026**, the final eight complete weeks of the
-**4 January to 4 July 2026** source window. Week starts are Sundays and dates use a UTC
-convention. The previous end label omitted the final week’s six remaining days.
-The report’s historical synthetic window is explicit and is not presented as current telemetry.
+One folder per query, mirroring an unpacked download. All three outputs describe one
+shared population, so cross-query joins are meaningful exactly as they would be in a real
+tenant. The CSVs are ordinary readable files with no zip dependency. The generated HTML
+embeds its charts, styles and scripts, and embeds no person identifiers or local paths.
 
-### Rerun
+Regenerate everything with:
 
-Knit the Rmd in RStudio, or run this file-based command from `examples/utility-r`:
+```powershell
+cd examples/utility-r
+Rscript simulate-query-exports.R
+```
+
+The generator is seeded and asserts its schema and reconciliation contracts before writing.
+It fails rather than exporting a broken file.
+
+### Points where real exports catch people out
+
+- **`PeopleHistoricalId`, not `PersonId`, joins the Consumption activity files to
+  `PeopleMetaData`.** The metadata file has no `PersonId` column at all.
+- **`PersonM365CreditsMetrics` is one row per person _per service_ per day.** Code that
+  assumes one row per person per day silently over-counts.
+- **Consumption metric columns contain spaces** (`Total Copilot Credits used`,
+  `Session count`). Read with `check.names = FALSE`.
+- **Empty `Spending policy limit` / `User limit` cells are meaningful** — they indicate no
+  spending policy applies, alongside the all-zero `SpendingPolicyId`.
+- **The GitHub activity file contains explicit zero rows.** A zero row is observed
+  inactivity; a missing row is no provisioning. These are not the same thing.
+- **The four GitHub breakdown files are margins of one allocation**, so they reconcile with
+  each other and with the activity file. Real breakdowns are daily and two-dimensional;
+  there is no `Share` column and no full-window allocation.
+- **Product history is shorter than collaboration history.** Here the person query covers 26
+  weeks and the product feeds the final 13. Do not assume the windows align.
+
+## Deriving eligibility and coverage
+
+No Viva Insights query produces an eligibility or coverage file, so these signals must be
+derived rather than read:
+
+| Question | Real signal |
+|---|---|
+| Licensed for Microsoft Copilot? | `Total_Copilot_enabled_days > 0` in the person query, or `IsCopilotLicensed` in `PeopleMetaData` |
+| Provisioned for GitHub Copilot? | Presence of any row in `PersonGitHubActivityMetrics` |
+| Used Copilot on this day? | A row with a non-zero measure, not the absence of a row |
+
+Fill an absent activity record with zero **only** when eligibility is independently
+established. Against a real export you also need evidence of ingestion completeness and
+expected coverage before absence can be read as non-use. A sparse export does not by itself
+prove non-use.
+
+## Privacy
+
+Every published group requires at least 10 distinct people. A composition breakdown with any
+cell below 10 is withheld for the whole parent group. Charts contain aggregates rather than
+individual points. Identifiers in `_data/` are synthetic GUIDs that exist only to demonstrate
+joins.
+
+Do not put customer exports in this sample repository or in shareable HTML.
+
+## Rerun
+
+Knit either Rmd in RStudio, or from `examples/utility-r`:
 
 ```powershell
 Rscript render-github-developer-experience.R
+Rscript -e "rmarkdown::render('copilot-consumption-ways-of-working-simulation.Rmd')"
 ```
 
 The render script also works when passed by full path from another working directory.
@@ -54,80 +120,22 @@ It checks existing packages and Pandoc, renders the HTML and prints data-validat
 If Pandoc is not found, set `RSTUDIO_PANDOC` to its installed folder before running the script.
 The script does not install packages.
 
-The Rmd sources [github-developer-experience-helpers.R](github-developer-experience-helpers.R).
-The helper contains deterministic simulation, source-key and population assertions, coverage-aware
-aggregation, CSV exports and plot/table helpers. Seed `20260910` reproduces the exports.
-The package’s `create_boxplot(..., mingroup = 10, return = "table")` supplies person-level
-percentile summaries. Custom logic handles the extended joint-product coverage contract.
+The developer report sources
+[github-developer-experience-helpers.R](github-developer-experience-helpers.R), which reads
+the committed CSVs and performs derivation, validation, aggregation and presentation. It no
+longer generates data; that responsibility belongs to `simulate-query-exports.R`.
 
 Dependencies: R, Pandoc, `rmarkdown`, `flexdashboard`, `knitr`, `dplyr`, `tidyr`,
-`ggplot2`, `scales`, `stringr` and `vivainsights`. Runtime package versions appear in the appendix.
+`ggplot2`, `scales`, `stringr` and `vivainsights`. Runtime package versions appear in each
+report's appendix.
 
-For the unchanged consumption demo, knit its Rmd or call
-`rmarkdown::render("copilot-consumption-ways-of-working-simulation.Rmd")` from an R script.
+## Adapting to real data
 
-## Synthetic files and schema boundaries
-
-```
-_data/
-  consumption/                 # unchanged, separate report
-    consumption-query/
-    person-query/
-    reference/
-  github/
-    README.md                  # extended illustrative schema manifest
-    github-query/              # daily activity, full-window model/language allocations
-    m365-query/                # separate illustrative M365 daily activity
-    person-query/              # all 1,080 roster people, 26 weekly records each
-    reference/                 # shared roster and weekly eligibility/coverage
-```
-
-See [_data/github/README.md](_data/github/README.md) for exact file keys, fields and source contracts.
-The CSVs are ordinary readable files, with no zip dependency. The generated HTML embeds its charts,
-styles and scripts and does not embed person identifiers or local paths.
-
-The developer data are an **extended illustrative schema**, not a drop-in representation of a real
-Viva Insights flexible query. In particular, the M365 feature actions, separate eligibility flags
-and completeness reference are invented demonstration contracts. They are not Copilot consumption
-credits or tokens. The helper generates product propensities independently, with no assumed advantage
-for people who use both tools. Model/language allocations are secondary details, not maturity measures.
-
-### Coverage and privacy
-
-The roster includes 1,080 synthetic people, of whom 900 are developers. All 900 contribute to
-working-condition baselines regardless of Copilot use. Daily feeds are sparse. The report aggregates
-them to person-week before joining to the roster-led reference, with key and join-cardinality assertions.
-Missing activity becomes zero only for product-eligible, fully covered weeks. Unresolved observation
-remains missing, while ineligibility stays distinct from non-use. Joint categories require both
-products’ eligibility and coverage throughout the eight-week window.
-
-Every published group requires at least 10 distinct people. A composition breakdown with any cell
-below 10 is withheld for that whole parent group. Charts contain aggregates rather than individual
-points. The highest-volume decile’s aggregate share is shown separately for each product without
-publishing identities or individual ranks. No charts combine M365 actions with GitHub suggestions,
-chat requests or agent days into a common volume.
-
-### Adapting to real data
-
-Replace generation only after validating the actual export contracts. `vivainsights::import_query()`
-can import supported flexible queries, but column renaming alone does not establish semantic parity.
-Confirm population scope, person identifiers, date grains, licence history, expected coverage, metric
-units, query filters and privacy before using the joins. Real sparse exports do not by themselves
-prove non-use. Do not put customer exports in this sample repository or in shareable HTML.
-
-## Rebuild validation
-
-- RMarkdown rendered with R 4.6.1 and the package versions recorded in the appendix.
-  A second render reproduced all seven CSV exports and the HTML byte-for-byte.
-- Independent CSV checks confirmed unique keys, 900 developers, 23,400 developer-weeks,
-  7,200 baseline developer-weeks, eligibility/coverage reconciliation, acceptance bounds,
-  feature totals, model/language allocations and after-hours persistence.
-- Microsoft Edge browser QA covered all seven pages at widths of 1440, 1280 and 390 pixels.
-  All ten embedded plot images were visually inspected. Navigation and expandable tables
-  worked, with no JavaScript errors, external asset requests or page-level horizontal overflow.
-  Wide charts and tables intentionally scroll inside their cards on mobile.
-- SHA-256 checks confirmed the consumption Rmd, HTML and five CSVs were unchanged.
-  `git diff --check` passed. Temporary QA scripts and screenshots remain outside the repository.
+Replace the synthetic CSVs with governed exports of the same queries. Because the schemas
+already match, no column renaming should be required — but column parity is not semantic
+parity. Confirm population scope, person identifiers, date grains, licence history, expected
+coverage, metric units, query filters and privacy before relying on the joins.
+`vivainsights::import_query()` can import supported flexible queries.
 
 ## Research and measurement gaps
 
@@ -140,15 +148,12 @@ prove non-use. Do not put customer exports in this sample repository or in share
 - [Viva Insights metric definitions](https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics):
   primary source for paraphrased meeting, focus and after-hours definitions.
 
-Learn, DORA and the [vivainsights function index](https://microsoft.github.io/vivainsights/llms.txt)
-were checked during the rebuild. The ACM pages returned HTTP 403, so the report records that a fresh
-full-text review was unavailable.
-
 Survey, pull-request, delivery and service-quality outcomes are absent. No outcome fields were
-fabricated to complete the framework. Calendar availability does not measure coding or psychological
-flow. After-hours collaboration does not measure total work time or diagnose burnout. Collaboration
-span was removed from the developer simulation and report rather than assigned an unsupported definition.
+fabricated to complete the framework. Calendar availability does not measure coding or
+psychological flow. After-hours collaboration does not measure total work time and does not
+diagnose burnout. Credit consumption measures resource use, not the quality or value of the
+output.
 
-**Next step for real use:** the manager, analyst and delivery owner should agree the workflow question,
-measurement owners, comparison design and success criteria before running a pilot. Synthetic values
-require no operational response.
+**Next step for real use:** the manager, analyst and delivery owner should agree the workflow
+question, measurement owners, comparison design and success criteria before running a pilot.
+Synthetic values require no operational response.

@@ -58,9 +58,10 @@ work folder. Only tracked, unmodified reference files are accepted; never replac
 demo fixtures with customer data. Rendering and intermediate files stay in the
 work/output folder, and original hashes are checked after rendering.
 
-The full reference reports contain illustrative measures and narratives that are
-**not** verified real-query fields or real-world findings. In particular, the
-Consumption demo's tokens/task types cannot be inferred from the official export.
+The full reference reports contain illustrative narratives and synthetic values that
+are **not** real-world findings. Their fields do match the real query schemas, but
+schema parity is not semantic parity, and tokens and task types are absent from both
+the demo and the official export.
 
 ## Exact JSON configuration
 

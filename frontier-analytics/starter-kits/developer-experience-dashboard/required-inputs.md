@@ -6,9 +6,11 @@
 - R, Pandoc and the packages checked by the shared runner.
 - A new output workspace. No customer data or real GitHub credentials needed.
 
-The helper creates the fixed synthetic roster, activity and coverage records.
-Read the [synthetic manifest](../../../examples/utility-r/_data/github/README.md)
-for their exact grain and meaning.
+The committed fixtures supply the roster, activity and credit records; the helper
+reads them rather than generating them. Read the
+[synthetic manifest](../../../examples/utility-r/_data/README.md) for their exact
+grain and meaning, and regenerate them with
+`examples/utility-r/simulate-query-exports.R` if needed.
 
 ## Assess real-data readiness
 

@@ -33,6 +33,10 @@ DATA_DIR <- "_data"
 N_PEOPLE <- 480L
 N_DEVELOPERS <- 360L
 
+# Scheduled working hours per week. In a real tenant this basis is configurable
+# through metric rules, so it should not be treated as universal.
+WORKING_HOURS_PER_WEEK <- 40
+
 # The Person query covers 26 weeks. Product feeds cover a shorter, more recent
 # window, which is the common real-world case: Copilot and GitHub telemetry is
 # typically available for a shorter history than collaboration metrics.
@@ -181,9 +185,16 @@ pq <- expand_grid(PersonId = people$PersonId, MetricDate = weeks) |>
     External_collaboration_hours = pmax(0, Collaboration_hours *
       pmin(.45, pmax(0, rbeta(n(), 2, 12)))),
 
-    Uninterrupted_hours = pmax(0, 16 - .55 * Meeting_hours + focus_base + rnorm(n(), 0, 1.8)),
-    Interrupted_hours = pmax(0, 9 - .25 * Meeting_hours + rnorm(n(), 0, 2.2)),
-    Open_1_hour_block = pmax(0, round(22 - .6 * Meeting_hours + rnorm(n(), 0, 2))),
+    # "Available-to-focus hours" is the hours remaining during working hours
+    # after excluding meetings and scheduled calls. Uninterrupted and
+    # interrupted hours partition it.
+    Available_to_focus_hours = pmax(0, WORKING_HOURS_PER_WEEK - Meeting_hours -
+      Scheduled_call_hours),
+    Uninterrupted_hours = pmin(Available_to_focus_hours,
+      pmax(0, 16 - .55 * Meeting_hours + focus_base + rnorm(n(), 0, 1.8))),
+    Interrupted_hours = Available_to_focus_hours - Uninterrupted_hours,
+    Open_1_hour_block = pmin(floor(Available_to_focus_hours),
+      pmax(0, round(22 - .6 * Meeting_hours + rnorm(n(), 0, 2)))),
 
     Recurring_meeting_hours = Meeting_hours *
       pmin(.90, pmax(.05, runif(n(), .35, .75) + recurring_delta)),
@@ -221,7 +232,8 @@ pq <- expand_grid(PersonId = people$PersonId, MetricDate = weeks) |>
     Collaboration_hours, Meeting_hours, Email_hours, Chat_hours,
     Scheduled_call_hours, Unscheduled_call_hours, Channel_message_hours,
     Active_connected_hours, External_collaboration_hours,
-    Uninterrupted_hours, Interrupted_hours, Open_1_hour_block,
+    Available_to_focus_hours, Uninterrupted_hours, Interrupted_hours,
+    Open_1_hour_block,
     Recurring_meeting_hours, Conflicting_meeting_hours,
     Meeting_hours_with_six_or_fewer_hours_of_advanced_notice,
     Emails_sent, Chats_sent, Meetings, Calls,
@@ -486,6 +498,12 @@ stopifnot(
   all(pq$Conflicting_meeting_hours <= pq$Meeting_hours + 1e-9),
   all(pq$Meeting_hours_with_six_or_fewer_hours_of_advanced_notice <= pq$Meeting_hours + 1e-9),
   all(pq$Collaboration_hours + 1e-9 >= pq$Meeting_hours),
+  all(pq$Uninterrupted_hours <= pq$Available_to_focus_hours + 1e-9),
+  max(abs(pq$Available_to_focus_hours - pq$Uninterrupted_hours -
+            pq$Interrupted_hours)) <= .0011,
+  max(abs(pq$Meeting_hours + pq$Scheduled_call_hours +
+            pq$Available_to_focus_hours - WORKING_HOURS_PER_WEEK)) <= .0011,
+  all(pq$Open_1_hour_block <= pq$Available_to_focus_hours + 1e-9),
   all(pq$Total_Copilot_enabled_days %in% c(0L, 7L)),
   all(m365_credits$`Session count` >= 1),
   all(m365_credits$`Total Copilot Credits used` >= 0),

@@ -22,10 +22,10 @@ any schema or reconciliation contract breaks.
 
 An earlier version of this folder simulated the schema as well as the values. It
 carried columns that do not exist in any export — token counts, task-type
-breakdowns, a coverage/eligibility reference file, an "available to focus hours"
-metric, and an M365 actions feed with no corresponding query. Sample code written
-against an invented schema cannot be pointed at a real export without rework, so
-the folder has been rebuilt against the published contracts.
+breakdowns, a coverage/eligibility reference file, and an M365 actions feed with no
+corresponding query. Sample code written against an invented schema cannot be pointed
+at a real export without rework, so the folder has been rebuilt against the published
+contracts.
 
 ## Layout
 
@@ -143,8 +143,14 @@ tenant and by analyst. What does not vary is that every selected metric must be 
 real one. Each metric in this file was verified against the
 [metric reference](https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics):
 collaboration and mode hours, meeting characteristics, after-hours and weekend
-collaboration, `Uninterrupted_hours` / `Interrupted_hours`, `Open_1_hour_block`,
-network size and tie metrics, and `Total_Copilot_enabled_days`.
+collaboration, `Available_to_focus_hours` / `Uninterrupted_hours` / `Interrupted_hours`,
+`Open_1_hour_block`, network size and tie metrics, and `Total_Copilot_enabled_days`.
+
+`Available_to_focus_hours` is the hours remaining during working hours after excluding
+meetings and scheduled calls, and `Uninterrupted_hours` plus `Interrupted_hours`
+partition it. The working-hours basis is configurable per tenant through metric rules,
+so the 40-hour basis used here is not universal. Available-to-focus hours measure
+calendar availability; they do not measure coding or psychological flow.
 
 The three meeting-characteristic metrics overlap and **must not be stacked
 additively**.
