@@ -1178,39 +1178,23 @@ credit_public |>
   kable(caption = "M365 credit-volume groups. Quartiles are calculated among people with positive observed M365 credits; people with no observed M365 credits are retained separately.")
 ```
 
-Row {data-height=430}
+Row {data-height=115}
 -------------------------------------
 
-### Credit volume by cost-per-session profile
+### Cost-intensity profile availability
 
-```{r cost-profile, fig.height=4.3, fig.alt="Grouped bars comparing weekly credit volume for high cost per session and standard cost per session profiles within each credit band."}
-ggplot(
-  profile_grid,
-  aes(CreditBand, `Credits / person / week`,
-      fill = `Cost-per-session profile`)
-) +
-  geom_col(position = position_dodge(width = 0.7), width = 0.6) +
-  geom_text(
-    aes(label = round(`Credits / person / week`, 1)),
-    position = position_dodge(width = 0.7), vjust = -0.4, size = 3.2
-  ) +
-  scale_fill_manual(values = c(
-    "High cost per session" = PAL[6],
-    "Standard cost per session" = PAL[3],
-    "Limited M365 sessions" = PAL[5],
-    "No observed M365 credits" = PAL[4]
-  )) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.18))) +
-  theme_t() +
-  labs(
-    title = "Credit volume and M365 cost intensity",
-    subtitle = "Insufficient-session people remain separate and are not standard-cost comparators",
-    x = "M365 credit-volume band", y = "M365 credits / person / week",
-    fill = "Cost-per-session profile"
-  )
+```{r cost-profile-note}
+if (!nrow(profile_grid)) {
+  cat("Profile partition withheld: one or more cost-intensity cells or complements are below the publication floor.")
+} else {
+  cat("Profile partition is publishable. See the after-hours page for the cost-intensity workload comparison and the baseline table below for profile definitions.")
+}
 ```
 
-### Profile definitions and baseline
+Row {data-height=340}
+-------------------------------------
+
+### Profile definitions
 
 | Profile component | Definition | Interpretation |
 |---|---|---|
@@ -1223,9 +1207,18 @@ ggplot(
 The label **high cost per session** describes a measurable consumption pattern.
 It is not a wellbeing, productivity or value judgement.
 
+Row {data-height=115}
+-------------------------------------
+
+### Profile baseline
+
 ```{r profile-table}
-profile_summary |>
-  kable(digits = 2, caption = "M365 profiles, including the distinct insufficient-session cohort. Empty means the entire profile partition is withheld.")
+if (!nrow(profile_summary)) {
+  cat("Profile baseline withheld: the complete ConsumptionProfile by CreditQuartile partition does not meet the publication floor.")
+} else {
+  profile_summary |>
+    kable(digits = 2, caption = "M365 profiles, including the distinct insufficient-session cohort.")
+}
 ```
 
 Methods and appendix {data-icon="fa-book"}
