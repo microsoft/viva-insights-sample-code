@@ -390,3 +390,91 @@ test("sparse GitHub credit rows never void observed activity", {
             !developer$GH_credits_all_valid, !is.na(developer$GH_active_days),
             is.na(developer$GH_credits))
 })
+
+test("no published label asserts non-use from absent M365 data", {
+  env <- run_setup(stage_fixtures("consumption-honest-label"))
+  segments <- levels(env$person_base$CreditActivitySegment)
+  absent <- "No observed M365 credits"
+  # The segment and the cost profile share the condition !positive_consumer, so
+  # they must share the honest label. "Non-user" would assert non-use from data
+  # this report states is not established as complete.
+  stopifnot(absent %in% segments,
+            !any(grepl("non.?users?", segments, ignore.case = TRUE)),
+            sum(env$person_base$CreditActivitySegment == absent) > 0L,
+            all(env$person_base$CostPerSessionProfile[
+              env$person_base$CreditActivitySegment == absent] %in%
+                c(absent, "Limited M365 sessions")),
+            !any(grepl("non.?users?", levels(env$person_base$CreditQuartile),
+                       ignore.case = TRUE)))
+  page <- paste(readLines(file.path(utility,
+    "copilot-consumption-ways-of-working-simulation.html"), warn = FALSE),
+    collapse = "")
+  stopifnot(!grepl("non.?users?", page, ignore.case = TRUE),
+            grepl(absent, page, fixed = TRUE))
+})
+test("crosswalk rejects a shared historical key and an unbacked historical key", {
+  mpath_for <- function(directory) file.path(directory, "_data", "consumption-query",
+                                             "PersonM365CreditsMetrics.csv")
+  shared <- stage_fixtures("crosswalk-shared-key")
+  m <- read.csv(mpath_for(shared), check.names = FALSE, stringsAsFactors = FALSE)
+  keys <- unique(m[, c("PersonId", "PeopleHistoricalId")])
+  stopifnot(nrow(keys) > 1L)
+  # Two different people now carry one PeopleHistoricalId. Counting only
+  # PeopleHistoricalId per PersonId still sees exactly one each, so this passes
+  # a one-directional check while the metadata join is no longer 1:1.
+  m$PeopleHistoricalId[m$PersonId == keys$PersonId[2]] <- keys$PeopleHistoricalId[1]
+  write.csv(m, mpath_for(shared), row.names = FALSE, na = "")
+  expect_error(load_github(shared), "maps to more than one PersonId")
+  unbacked <- stage_fixtures("crosswalk-unbacked-key")
+  m <- read.csv(mpath_for(unbacked), check.names = FALSE, stringsAsFactors = FALSE)
+  meta <- bundle[["consumption-query/PeopleMetaData.csv"]]
+  orphan <- "synthetic-history-absent-from-metadata"
+  stopifnot(!orphan %in% meta$PeopleHistoricalId)
+  # Both cardinalities still hold; the key simply has no metadata row.
+  m$PeopleHistoricalId[m$PersonId == keys$PersonId[1]] <- orphan
+  write.csv(m, mpath_for(unbacked), row.names = FALSE, na = "")
+  expect_error(load_github(unbacked), "absent from PeopleMetaData")
+})
+test("credit validity compares credit dates, not matching day counts", {
+  directory <- stage_fixtures("credit-date-mismatch")
+  before <- load_github(directory)
+  candidates <- before$panel[before$panel$GH_activity_valid &
+                               !is.na(before$panel$GH_billable_days) &
+                               before$panel$GH_billable_days > 0L &
+                               before$panel$GH_billable_days < 5L, ]
+  stopifnot(nrow(candidates) > 0L)
+  victim <- candidates$PersonId[1]
+  week <- candidates$Week[1]
+  activity <- before$gh_daily[before$gh_daily$PersonId == victim &
+                                before$gh_daily$Week == week, ]
+  billable <- as.character(activity$MetricDate[
+    activity[["Code completions accepted"]] > 0 |
+      activity[["User-initiated chat requests"]] > 0])
+  quiet <- setdiff(as.character(activity$MetricDate), billable)
+  stopifnot(length(billable) > 0L, length(quiet) > 0L)
+  path <- file.path(directory, "_data", "consumption-query",
+                    "PersonGitHubCreditsMetrics.csv")
+  credits <- read.csv(path, check.names = FALSE, stringsAsFactors = FALSE)
+  moved <- which(credits$PersonId == victim & credits$MetricDate %in% billable)[1]
+  stopifnot(!is.na(moved))
+  # Move one credit row off a billable day onto an observed non-billable day in
+  # the same week. The credit-day count and the billable-day count both stay
+  # put, so a count comparison still reads 1 == 1 while a billable day has lost
+  # its credit row and another date has gained one it should not have.
+  credits$MetricDate[moved] <- quiet[1]
+  write.csv(credits, path, row.names = FALSE, na = "")
+  after <- load_github(directory)
+  row_before <- before$panel[before$panel$PersonId == victim &
+                               before$panel$Week == week, ]
+  row_after <- after$panel[after$panel$PersonId == victim &
+                             after$panel$Week == week, ]
+  stopifnot(nrow(row_before) == 1L, nrow(row_after) == 1L,
+            row_before$GH_credit_valid,
+            identical(row_before$GH_credit_days, row_after$GH_credit_days),
+            identical(row_before$GH_billable_days, row_after$GH_billable_days),
+            !row_after$GH_credit_valid,
+            row_after$GH_missing_credit_days == 1L,
+            row_after$GH_unexpected_credit_days == 1L,
+            is.na(row_after$GH_credits),
+            row_after$GH_activity_valid, !is.na(row_after$GH_active_days))
+})
