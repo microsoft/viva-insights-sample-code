@@ -230,8 +230,16 @@ person_history <- m365_raw |>
   distinct(PersonId, PeopleHistoricalId) |>
   bind_rows(github_credits_daily |> distinct(PersonId, PeopleHistoricalId)) |>
   distinct(PersonId, PeopleHistoricalId)
-person_history_counts <- person_history |> count(PersonId)
-stopifnot(all(person_history_counts$n == 1L))
+# A 1:1 crosswalk needs BOTH cardinalities plus metadata coverage. Counting one
+# direction alone would accept two different people sharing one historical key,
+# or a crosswalk key that PeopleMetaData never carries, and the report claims a
+# validated join rather than an unchecked one.
+if (any(count(person_history, PersonId)$n > 1L))
+  stop('Crosswalk invariant failed: a PersonId carries more than one PeopleHistoricalId.')
+if (any(count(person_history, PeopleHistoricalId)$n > 1L))
+  stop('Crosswalk invariant failed: a PeopleHistoricalId maps to more than one PersonId.')
+if (!all(person_history$PeopleHistoricalId %in% people_meta$PeopleHistoricalId))
+  stop('Crosswalk invariant failed: a crosswalk PeopleHistoricalId is absent from PeopleMetaData.')
 m365_product_weeks <- derive_m365_coverage(pq)
 # Historical internal name: GH_eligible denotes observed row presence only,
 # never an independently established GitHub licence or provisioning status.
@@ -287,6 +295,26 @@ github_credits_weekly <- github_credits_daily |>
   group_by(PersonId, Week) |>
   summarise(GH_credit_days = n_distinct(MetricDate[as.POSIXlt(MetricDate)$wday %in% 1:5]),
             GH_credits = sum(`Total GitHub AI Credits used`), .groups = 'drop')
+# Equal day COUNTS do not prove equal DATES: a missing credit row on a billable
+# Monday and a spurious credit row on a non-billable Tuesday both balance to
+# 1 == 1. Compare the distinct (PersonId, MetricDate) SETS instead, in both
+# directions, so a missing credit date and an unexpected credit date each fail.
+gh_billable_dates <- gh_daily |>
+  filter(as.POSIXlt(MetricDate)$wday %in% 1:5,
+         `Code completions accepted` > 0 | `User-initiated chat requests` > 0) |>
+  distinct(PersonId, Week, MetricDate) |>
+  mutate(Billable = TRUE)
+gh_credit_dates <- github_credits_daily |>
+  filter(as.POSIXlt(MetricDate)$wday %in% 1:5) |>
+  distinct(PersonId, Week, MetricDate) |>
+  mutate(Credited = TRUE)
+gh_credit_date_match <- full_join(gh_billable_dates, gh_credit_dates,
+                                  by = c('PersonId', 'Week', 'MetricDate'),
+                                  relationship = 'one-to-one') |>
+  group_by(PersonId, Week) |>
+  summarise(GH_missing_credit_days = sum(is.na(Credited)),
+            GH_unexpected_credit_days = sum(is.na(Billable)),
+            .groups = 'drop')
 gh_weekly <- gh_daily |>
   filter(as.POSIXlt(MetricDate)$wday %in% 1:5) |>
   group_by(PersonId, Week) |>
@@ -304,7 +332,8 @@ gh_weekly <- gh_daily |>
             GH_chats = sum(`User-initiated chat requests`),
             GH_agent_days = sum(`Agent adoption`),
             .groups = 'drop') |>
-  left_join(github_credits_weekly, by = c('PersonId', 'Week'), relationship = 'one-to-one')
+  left_join(github_credits_weekly, by = c('PersonId', 'Week'), relationship = 'one-to-one') |>
+  left_join(gh_credit_date_match, by = c('PersonId', 'Week'), relationship = 'one-to-one')
 
 coverage <- expand_grid(PersonId = people$PersonId, Week = weeks) |>
   left_join(pq_eligibility |> select(PersonId, PQ_eligible, PQ_complete),
@@ -329,18 +358,28 @@ panel <- coverage |>
                                     coalesce(GH_billable_days, 0L), NA_integer_),
          GH_credit_days = if_else(GH_activity_valid,
                                   coalesce(GH_credit_days, 0L), NA_integer_),
+         GH_missing_credit_days = if_else(GH_activity_valid,
+                                          coalesce(GH_missing_credit_days, 0L),
+                                          NA_integer_),
+         GH_unexpected_credit_days = if_else(GH_activity_valid,
+                                             coalesce(GH_unexpected_credit_days, 0L),
+                                             NA_integer_),
          # Two different coverage questions, deliberately separated. The
          # activity export carries explicit weekday zero rows, so its five rows
          # establish that the week was observed whether or not the person used
          # anything. The credit export is SPARSE: it carries a row only where
          # billable usage occurred, so requiring five credit rows would discard
          # fully observed but partly inactive weeks. Credit coverage is instead
-         # resolved when every observed billable day carries a credit row, and a
-         # week with no billable day resolves to a measured zero. This is
-         # coverage logic, not a privacy control: each flag gates only the
-         # measures it actually governs.
+         # resolved when the credit dates are exactly the observed billable
+         # dates -- every billable day carries a credit row and no credit row
+         # lands on an unexpected date -- and a week with no billable day and no
+         # credit row resolves to a measured zero. Comparing day counts alone
+         # would accept a week whose missing and spurious credit dates cancel
+         # out. This is coverage logic, not a privacy control: each flag gates
+         # only the measures it actually governs.
          GH_credit_valid = coalesce(GH_activity_valid &
-                                      GH_credit_days == GH_billable_days, FALSE),
+                                      GH_missing_credit_days == 0L &
+                                      GH_unexpected_credit_days == 0L, FALSE),
          M365_valid = coalesce(M365_eligible & M365_complete, FALSE),
          across(c(GH_active_days, GH_suggestions, GH_accepted, GH_chats,
                   GH_agent_days),
