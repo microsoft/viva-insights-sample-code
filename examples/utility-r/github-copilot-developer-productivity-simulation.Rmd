@@ -338,7 +338,7 @@ Row
 html_table(product_summary |> arrange(desc(`Recorded active (%)`)) |> mutate(across(-Product, as.character)) |>
   pivot_longer(-Product, names_to='Product measure', values_to='Reported value') |>
   pivot_wider(names_from=Product, values_from='Reported value'),
-  paste(period_label, '| Each product uses its own eligible and valid population. Non-users remain in the frequency and intensity denominator. Microsoft 365 rows are unavailable because no developer has independently established Microsoft 365 coverage; GitHub credit measures use the credit-resolved population, which is derived separately from activity coverage.'))
+  paste(period_label, '| Each product uses its own eligible and valid population. People with no recorded use remain in the frequency and intensity denominator. Microsoft 365 rows are unavailable because no developer has independently established Microsoft 365 coverage; GitHub credit measures use the credit-resolved population, which is derived separately from activity coverage.'))
 html_table(m365_service_mix |> transmute(Service=ServiceName, `People (count)`=People,
   `Sessions`=num(Sessions), `Credits`=num(Credits), `Credit share (%)`=pct(Share)),
   'Recorded Microsoft 365 service rows over baseline weekdays. These observed sums and shares do not establish complete collection or complete-window population rates.')
@@ -437,7 +437,7 @@ Row
 <p class="leadline">The GitHub activity export resolves its own observation from explicit weekday zero rows, so working conditions can be compared across <strong>`r num(sum(gh_observed$GH_use == 'GitHub use recorded'))` developers with recorded GitHub use</strong> and <strong>`r num(sum(gh_observed$GH_use == 'No GitHub use recorded'))` observed developers with none</strong>. A <em>two-product</em> comparison remains unavailable by default, because Microsoft 365 completeness is not established by these exports and missing coverage is not recorded non-use. If independent evidence is supplied during an adaptation, compare only people observed throughout the same window and apply the privacy floor to every group. All of these comparisons remain descriptive, not causal.</p>
 
 <div class="definitions">
-<strong>Comparison population:</strong> developers valid for the Person Query and for GitHub activity coverage throughout the baseline. The `r num(sum(baseline$GH_use == 'GitHub observation unresolved'))` developers whose GitHub observation is unresolved stay in the `r num(nrow(baseline))`-person landscape and are excluded here rather than being recoded as non-users. This is not statistical matching. Group membership uses the same window as working conditions, so temporal direction cannot be established.
+<strong>Comparison population:</strong> developers valid for the Person Query and for GitHub activity coverage throughout the baseline. The `r num(sum(baseline$GH_use == 'GitHub observation unresolved'))` developers whose GitHub observation is unresolved stay in the `r num(nrow(baseline))`-person landscape and are excluded here rather than being recoded as having no use. This is not statistical matching. Group membership uses the same window as working conditions, so temporal direction cannot be established.
 </div>
 
 Row

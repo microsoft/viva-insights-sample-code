@@ -347,8 +347,11 @@ person_base <- person_attributes |>
     ConsumptionProfile = consumption_profile(
       CreditBand, total_m365_sessions, CostPerSessionProfile
     ),
+    # The same condition that labels CostPerSessionProfile. Absent credit rows
+    # are unresolved coverage, not established non-use, so the segment records
+    # what was observed rather than asserting that the person used nothing.
     CreditActivitySegment = case_when(
-      !positive_consumer ~ "Non-user",
+      !positive_consumer ~ "No observed M365 credits",
       active_weeks >= 10 & CreditBand == "High credit" ~
         "Power User",
       active_weeks >= 8 ~ "Habitual User",
@@ -358,7 +361,7 @@ person_base <- person_attributes |>
     CreditActivitySegment = factor(
       CreditActivitySegment,
       levels = c("Power User", "Habitual User", "Novice User",
-                 "Low User", "Non-user"),
+                 "Low User", "No observed M365 credits"),
       ordered = TRUE
     ),
     IsCopilotLicensed = if_else(IsCopilotLicensed, "true", "false")
@@ -889,7 +892,7 @@ credit_public |>
       format(round(`M365 credits / session`, 2), nsmall = 2)
     )
   ) |>
-  kable(caption = "Credit-volume groups. Quartiles are calculated among positive users; non-users are retained separately.")
+  kable(caption = "Credit-volume groups. Quartiles are calculated among people with positive observed M365 credits; people with no observed M365 credits are retained as their own group.")
 ```
 
 Row {data-height=455}
@@ -1275,7 +1278,7 @@ Row {data-height=480}
 
 ### Credit-volume distribution within activity segments
 
-```{r segment-credit, fig.height=4.3, fig.alt="Stacked bars showing credit-consumption quartiles within Power, Habitual, Novice, Low and Non-user credit activity segments."}
+```{r segment-credit, fig.height=4.3, fig.alt="Stacked bars showing credit-consumption quartiles within the Power, Habitual, Novice, Low and no-observed-M365-credits credit activity segments."}
 segment_credit <- segment_public |>
   count(CreditActivitySegment, CreditQuartile, name = "People") |>
   group_by(CreditActivitySegment) |>
@@ -1341,7 +1344,7 @@ segment_public |>
   ) |>
   kable(caption = paste0(
     "Segment baseline across ", length(product_weeks),
-    " product weeks. Non-users have no observed M365 credits, not necessarily no GitHub activity. Empty means the joint segment/quartile partition is withheld."
+    " product weeks. The no-observed-M365-credits segment records absent M365 credit rows in this window; absence of data is not evidence of non-use, and it says nothing about GitHub activity. Empty means the joint segment/quartile partition is withheld."
   ))
 ```
 
