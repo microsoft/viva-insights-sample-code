@@ -144,26 +144,16 @@ build_copilot_super_panel <- function(data_dir = "_data") {
       .groups = "drop"
     )
 
-  m365_person_day <- m365_daily_raw |>
-    group_by(PersonId, PeopleHistoricalId, MetricDate, WeekStart) |>
-    summarise(
-      m365_sessions = sum(`Session count`, na.rm = TRUE),
-      m365_credits = sum(`Total Copilot Credits used`, na.rm = TRUE),
-      m365_service_count = n_distinct(ServiceName),
-      .groups = "drop"
-    )
-  assert_unique_key(m365_person_day, c("PersonId", "MetricDate"),
-                    "M365 consumption aggregated to person-day")
-
-  m365_weekly <- m365_person_day |>
+  m365_weekly <- m365_daily_raw |>
     mutate(Day = MetricDate) |>
     group_by(PersonId, MetricDate = WeekStart) |>
     summarise(
       m365_observed_days = n_distinct(Day),
-      m365_active_days = n_distinct(Day[m365_sessions > 0 | m365_credits > 0]),
-      m365_sessions = sum(m365_sessions, na.rm = TRUE),
-      m365_credits = sum(m365_credits, na.rm = TRUE),
-      m365_service_count = max(m365_service_count, na.rm = TRUE),
+      m365_active_days = n_distinct(Day[`Session count` > 0 |
+                                           `Total Copilot Credits used` > 0]),
+      m365_sessions = sum(`Session count`, na.rm = TRUE),
+      m365_credits = sum(`Total Copilot Credits used`, na.rm = TRUE),
+      m365_service_count = n_distinct(ServiceName),
       .groups = "drop"
     )
   assert_unique_key(m365_weekly, c("PersonId", "MetricDate"),

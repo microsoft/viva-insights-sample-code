@@ -20,6 +20,14 @@ test("super panel joins all product files without multiplying person-weeks", {
   panel <- joined$panel
   person_query <- bundle[["person-query/PersonQuery.csv"]]
   m365 <- bundle[["consumption-query/PersonM365CreditsMetrics.csv"]]
+  m365$MetricDate <- as.Date(m365$MetricDate)
+  m365$WeekStart <- super_helpers$week_start_sunday(m365$MetricDate)
+  expected_services <- aggregate(ServiceName ~ PersonId + WeekStart, m365,
+                                 function(x) length(unique(x)))
+  service_match <- match(paste(joined$m365_weekly$PersonId,
+                               joined$m365_weekly$MetricDate),
+                         paste(expected_services$PersonId,
+                               expected_services$WeekStart))
   stopifnot(nrow(panel) == nrow(person_query),
             !anyDuplicated(panel[c("PersonId", "MetricDate")]),
             anyDuplicated(m365[c("PersonId", "MetricDate")]) > 0L,
@@ -31,6 +39,9 @@ test("super panel joins all product files without multiplying person-weeks", {
             max(joined$github_credits_weekly$github_credit_days) > 1L,
             max(joined$m365_weekly$m365_active_days) > 1L,
             max(joined$github_activity_weekly$github_active_days) > 1L,
+            all(!is.na(service_match)),
+            all(joined$m365_weekly$m365_service_count ==
+                  expected_services$ServiceName[service_match]),
             all(c("m365_credits", "m365_sessions", "github_credits",
                   "github_code_acceptances", "github_chat_requests",
                   "github_feature_usage_count", "github_language_model_usage_count",
@@ -63,6 +74,12 @@ test("consumption setup derives product mix and enabled population from people",
                   env$person_base$m365_observed_weeks > 0] /
                 env$person_base$m365_observed_weeks[
                   env$person_base$m365_observed_weeks > 0]),
+            all(env$person_base$active_weeks ==
+                  vapply(env$person_base$PersonId, function(id) {
+                    sum(with(env$person_week[env$person_week$PersonId == id, ],
+                             m365_credits > 0 | m365_sessions > 0),
+                        na.rm = TRUE)
+                  }, numeric(1))),
             env$overall$Licensed ==
               env$publication_count(sum(env$person_base$M365EnabledUser),
                                     nrow(env$person_base)))

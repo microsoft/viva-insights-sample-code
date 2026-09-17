@@ -227,7 +227,7 @@ person_consumption <- person_week |>
       sum(m365_sessions, na.rm = TRUE) / m365_observed_weeks,
       0
     ),
-    active_weeks = sum(m365_credits > 0, na.rm = TRUE),
+    active_weeks = sum(m365_credits > 0 | m365_sessions > 0, na.rm = TRUE),
     total_m365_credits = sum(m365_credits, na.rm = TRUE),
     total_github_credits = sum(github_credits, na.rm = TRUE),
     total_m365_sessions = sum(m365_sessions, na.rm = TRUE),
