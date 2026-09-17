@@ -53,6 +53,23 @@ shared population, so cross-query joins are meaningful exactly as they would be 
 tenant. The CSVs are ordinary readable files with no zip dependency. The generated HTML
 embeds its charts, styles and scripts, and embeds no person identifiers or local paths.
 
+### The rendered HTML is excluded from CodeQL
+
+Because the rendered reports are self-contained, `rmarkdown` inlines vendored
+third-party JavaScript into each one — minified Bootstrap 3, the jQuery
+`stickyTableHeaders` plugin and flexdashboard's own bundle. CodeQL raises DOM-XSS
+alerts inside that vendored code. None of it is written here, flexdashboard 0.6.3
+still ships Bootstrap 3 so there is no upgrade path, and editing minified vendor code
+inside a generated file would be discarded on the next render.
+
+`.github/codeql/codeql-config.yml` therefore scopes CodeQL away from
+`examples/**/*.html`. Only the generated build artifacts are out of scope: the
+authored sources that produce them (`.Rmd`, `.R`), the authored JavaScript under
+`assets/js/` and `scripts/`, and the Jekyll templates all remain scanned. The config
+becomes active only when the repository property `github-codeql-config-file` is set
+to `.github/codeql/codeql-config.yml`; the repository uses CodeQL default setup, so
+no `.github/workflows/codeql.yml` should be added.
+
 Regenerate everything with:
 
 ```powershell
@@ -85,9 +102,10 @@ It fails rather than exporting a broken file.
   The credit file carries a row only where billable usage occurred, so activity coverage
   and credit coverage are two different questions. Requiring five credit rows a week to
   accept an activity week discards every fully observed but partly inactive week — in
-  these fixtures that was 89% of them. Resolve credit coverage on its own terms: every
-  observed billable day should carry a credit row, and a week with no billable day is a
-  measured zero.
+  these fixtures that was 89% of them. Resolve credit coverage on its own terms: the
+  set of credit dates must equal the set of observed billable dates, and a week with
+  no billable day is a measured zero. Compare the dates rather than their counts — a
+  missing credit date offset by a spurious one leaves the counts equal.
 - **Category membership in the breakdown files is persistent, not per-day noise.**
   Developers keep stable languages, models and surfaces, so cohorts share the same
   breakdown cells. A simulation that re-rolls those categories each day gives almost
@@ -110,7 +128,7 @@ kept separate by evidence class:
 | M365 eligible in this week? | `Total_Copilot_enabled_days > 0`; static `IsCopilotLicensed` is context, not an override for zero-enabled weeks |
 | Provisioned for GitHub Copilot? | Independent provisioning evidence; a row establishes observation only and an absent row remains unknown |
 | Was this GitHub week observed? | The weekday activity rows, including their measured zeros — not the sparse credit rows |
-| Are this week's GitHub credits resolved? | Every observed billable day carries a credit row; a week with no billable day resolves to a measured zero |
+| Are this week's GitHub credits resolved? | The credit dates match the observed billable dates exactly, with no missing and no unexpected date; a week with no billable day resolves to a measured zero |
 | Used Copilot on this day? | A row with a non-zero measure, not the absence of a row |
 
 Fill an absent activity record with zero **only** when eligibility is independently

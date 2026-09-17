@@ -1,0 +1,41 @@
+# CodeQL analysis scope for this repository.
+#
+# WHY THESE PATHS ARE EXCLUDED
+#
+# `examples/**/*.html` are *generated build artifacts*, not authored source. They
+# are the self-contained HTML rendered by `rmarkdown` / `flexdashboard` from the
+# `.Rmd` files that sit next to them, and they are committed only so the published
+# example outputs can be linked from the documentation site.
+#
+# To be self-contained, `rmarkdown` inlines vendored third-party JavaScript into
+# every one of those files: minified Bootstrap 3, the jQuery `stickyTableHeaders`
+# plugin, and flexdashboard's own bundle. Every CodeQL JavaScript alert raised on
+# these files is a DOM-XSS finding inside that vendored code. None of it is
+# authored here, and none of it can be fixed here:
+#
+#   * flexdashboard 0.6.3 is the current release and still ships Bootstrap 3, so
+#     there is no upgrade that removes the vendored library.
+#   * Editing the minified vendor code inside a generated file would be discarded
+#     the next time the report is rendered.
+#
+# This is ANALYSIS SCOPING, not suppression of a real finding in our own code. The
+# authored sources that actually need scanning stay fully in scope:
+#
+#   * `scripts/capture-report-screenshots.js` and everything under `assets/js/`
+#     (authored JavaScript)
+#   * all `.R`, `.Rmd` and `.py` sources, including the report sources that
+#     produce the excluded HTML
+#   * `_includes/`, `_layouts/` and the rest of the authored Jekyll site
+#
+# If a rendered report ever starts carrying JavaScript we wrote ourselves, that
+# code belongs in a scanned source file rather than inside a build artifact.
+#
+# NOTE: this file only takes effect once the repository property
+# `github-codeql-config-file` is set to `.github/codeql/codeql-config.yml`.
+# This repository uses CodeQL *default setup*; do not add an advanced-setup
+# `.github/workflows/codeql.yml`, which would conflict with it.
+
+name: "viva-insights-sample-code CodeQL config"
+
+paths-ignore:
+  - "examples/**/*.html"
