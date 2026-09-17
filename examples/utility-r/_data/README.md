@@ -220,12 +220,12 @@ when adapting a report, and keep `AgentId` as the stable analytical key, because
 agent names and creator metadata change over time.
 
 The sample sits under `github/agent-query/` and covers 53 Sunday-start weeks
-from `2025-09-07` to `2026-09-06`, across 4,999 people and 2,140 agents.
+from `2025-09-07` to `2026-09-06`, across 300 people and 914 agents.
 
 ### `AgentMetadata.csv`
 
 One row per `AgentId`, covering 3,000 agents. It is a superset of the agents
-that appear in the fact files, so 860 rows have no matching activity, which is
+that appear in the fact files, so most rows have no matching activity, which is
 normal for a dimension table.
 
 `AgentId, AgentName, CreatorType, PublishingSource`
