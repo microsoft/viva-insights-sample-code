@@ -302,6 +302,7 @@ test("demo source isolation preflight: tracked references and exact copy targets
     refs <- reference_files(demo)
     expected <- if (report == "consumption") c(
       "copilot-consumption-ways-of-working-simulation.Rmd",
+      "copilot-super-panel-helpers.R",
       "_data/consumption-query/PeopleMetaData.csv",
       "_data/consumption-query/PersonM365CreditsMetrics.csv",
       "_data/consumption-query/PersonGitHubCreditsMetrics.csv",
