@@ -17,10 +17,11 @@ Rscript simulate-query-exports.R
 
 The script is deterministic (`SEED <- 20260916`) and fails rather than exporting if
 any ordered fixture schema or synthetic allocation invariant breaks. The independent
-header vectors in `query-export-contracts.R` specify all eight fixed exports,
-the selected HR attributes and this custom Person Query recipe. All nine outputs
-are validated before any file is written; changing the selected custom metrics or
-HR attributes requires an explicit recipe-contract update.
+header vectors in `query-export-contracts.R` specify all nine exports: seven with a
+fully fixed header, plus `PeopleMetaData.csv` with the selected HR attributes and
+this custom Person Query recipe. All nine outputs are validated before any file is
+written; changing the selected custom metrics or HR attributes requires an explicit
+recipe-contract update.
 
 ## Why this matters
 
@@ -120,9 +121,11 @@ This file is **sparse**: it carries a row only for days with billable usage, unl
 the activity file which carries explicit weekday zeros. Activity coverage and credit
 coverage are therefore two different questions. Do not require one credit row per
 weekday to accept an observed activity week — that discards every fully observed but
-partly inactive week. Resolve credit coverage on its own terms: every observed
-billable day should carry a credit row, and a week with no billable day resolves to
-a measured zero.
+partly inactive week. Resolve credit coverage on its own terms: the set of credit
+dates should equal the set of observed billable dates, and a week with no billable
+day resolves to a measured zero. Compare the dates, not their counts — a credit row
+missing on one billable day and a spurious credit row on another date leave the
+counts equal while the week is incomplete.
 
 **Units are separate:** M365 Copilot credits and GitHub AI credits have no verified
 common-unit conversion here. Do not add them, calculate cross-product shares, or
@@ -224,7 +227,7 @@ There is no eligibility or coverage export file. Keep these evidence classes sep
 | Was this person eligible for M365 in this week? | `Total_Copilot_enabled_days > 0`; a static `IsCopilotLicensed` snapshot cannot override a zero-enabled week |
 | Was this person provisioned for GitHub Copilot? | Independent provisioning evidence; missing activity means unknown and M365 licensing is not GitHub licensing |
 | Was this person observed in GitHub? | Presence of a measured row; the demo checks observed weekday rows, not verified ingestion completeness |
-| Are this person-week's GitHub credits resolved? | Every observed billable day carries a credit row. The credit export is sparse, so a week with no billable day resolves to a measured zero and a partly inactive week is not invalid |
+| Are this person-week's GitHub credits resolved? | The credit dates match the observed billable dates exactly — no missing and no unexpected credit date. The credit export is sparse, so a week with no billable day resolves to a measured zero and a partly inactive week is not invalid |
 | Is the sparse M365 export complete? | Unknown by default, even with observed positive rows; independent ingestion evidence is required |
 | Did this person use Copilot on this day? | A row with a non-zero measure, not the absence of a row |
 
