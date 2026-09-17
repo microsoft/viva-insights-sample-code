@@ -396,6 +396,9 @@ joint_levels <- c('Both recorded', 'GitHub only recorded', 'M365 only recorded',
                   'Neither recorded', 'GitHub observed; M365 not enabled all weeks',
                   'Observation unresolved')
 baseline$Joint <- factor(baseline$Joint, levels = joint_levels)
+# Developers valid for BOTH product feeds. Empty by default: Microsoft 365
+# completeness is not established by these exports, which is why the two-product
+# comparison stays unavailable and the page-6 comparison uses gh_observed below.
 matched <- baseline |> filter(GH_all_valid, M365_all_valid)
 
 # The GitHub feed resolves its own observation from explicit weekday zero rows,
