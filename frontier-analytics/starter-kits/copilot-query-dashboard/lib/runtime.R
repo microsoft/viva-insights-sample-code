@@ -251,15 +251,24 @@ reference_files <- function(cfg) {
   utility <- file.path(cfg$repo_root, "examples", "utility-r")
   if (cfg$report == "github") {
     relative <- c("github-copilot-developer-productivity-simulation.Rmd",
-                  "github-developer-experience-helpers.R")
+                  "github-developer-experience-helpers.R",
+                  file.path("_data", c(
+                    "person-query/PersonQuery.csv",
+                    "consumption-query/PeopleMetaData.csv",
+                    "consumption-query/PersonM365CreditsMetrics.csv",
+                    "consumption-query/PersonGitHubCreditsMetrics.csv",
+                    "github-query/PersonGitHubActivityMetrics.csv",
+                    "github-query/GitHubActivityBreakdownByFeatureMetrics.csv",
+                    "github-query/GitHubActivityBreakdownByLanguageFeatureMetrics.csv",
+                    "github-query/GitHubActivityBreakdownByLanguageModelMetrics.csv",
+                    "github-query/GitHubActivityBreakdownByModelFeatureMetrics.csv")))
   } else {
     relative <- c("copilot-consumption-ways-of-working-simulation.Rmd",
-                  file.path("_data", "consumption", c(
-                    "reference/people-snapshot.csv",
-                    "consumption-query/consumption-weekly.csv",
-                    "consumption-query/consumption-task-types.csv",
-                    "person-query/person-query-weekly.csv",
-                    "person-query/network-monthly.csv")))
+                  file.path("_data", c(
+                    "consumption-query/PeopleMetaData.csv",
+                    "consumption-query/PersonM365CreditsMetrics.csv",
+                    "consumption-query/PersonGitHubCreditsMetrics.csv",
+                    "person-query/PersonQuery.csv")))
   }
   paths <- file.path(utility, relative)
   if (!all(file.exists(paths))) fail("Reference report or supplied synthetic fixtures are missing.")

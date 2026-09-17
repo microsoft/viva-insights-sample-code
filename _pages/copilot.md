@@ -57,7 +57,7 @@ Open a demo in your browser without installing anything. Both reports use **synt
   <a class="vi-card" id="copilot-consumption-and-ways-of-working" href="{{ site.baseurl }}/examples/utility-r/copilot-consumption-ways-of-working-simulation.html">
     <img src="{{ site.baseurl }}/assets/images/reports/copilot-consumption-overview.png" alt="Consumption report overview preview" loading="lazy">
     <span class="vi-card-title">Copilot Consumption and Ways of Working</span>
-    <span class="vi-card-desc">Explore token consumption, credit intensity, and their associations with collaboration patterns.</span>
+    <span class="vi-card-desc">Explore Copilot credit consumption, cost per session, and their associations with collaboration patterns.</span>
     <span class="vi-card-more">View demo →</span>
   </a>
   <a class="vi-card" id="developer-experience-and-copilot" href="{{ site.baseurl }}/examples/utility-r/github-copilot-developer-productivity-simulation.html">

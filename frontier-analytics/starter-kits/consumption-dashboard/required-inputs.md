@@ -2,7 +2,8 @@
 
 ## Reproduce the synthetic demo
 
-- Repository checkout containing the Rmd and `_data/consumption` fixtures.
+- Repository checkout containing the Rmd and the `_data/consumption-query` and
+  `_data/person-query` fixtures.
 - R, Pandoc and packages checked by the shared runner (including `ggrepel`).
 - A new output workspace; do not point it at the repository or a data directory.
 
@@ -17,6 +18,6 @@
 
 See the [shared contract](../../skills/viva-insights-analysis/reference/copilot-query-contracts.md)
 and [runner config schema](../copilot-query-dashboard/README.md).
-There is no required token field for the credits-only path. Person Query
-associations, task types and policy-limit analyses are not part of that adapter.
+There is no token field in the Consumption schema. Person Query associations,
+task types and policy-limit analyses are not part of that adapter.
 Do not assume every person is observed just because they appear in metadata.

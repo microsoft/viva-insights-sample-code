@@ -34,8 +34,15 @@ GitHub API analytics or an evaluation of developer productivity.
 
 ## Assumptions
 
-The demo uses an extended illustrative schema. M365 feature actions and
-eligibility/completeness flags are not a verified flexible-query export.
+The demo uses synthetic values in confirmed export headers. Weekly M365
+eligibility uses enabled days; completeness requires independent evidence.
+GitHub row presence is observation, not provisioning, and GitHub activity coverage
+is resolved separately from GitHub credit coverage: the credit export is sparse, so
+sparse credit rows must never void an observed activity week. Breakdown equality and
+model attribution are synthetic-only, and breakdown category membership is a
+persistent cohort property rather than a per-day draw. `PeopleHistoricalId` is
+opaque: read the activity-file crosswalk instead of reconstructing it from
+`PersonId`. M365 and GitHub credits remain separate units.
 Real GitHub data can be inspected, but v1 has no verified real build adapter.
 
 ## Recommended output
@@ -103,6 +110,6 @@ adapter. Do not rename public GitHub API fields into an assumed Viva contract.
 - [Starter kit](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/starter-kits/developer-experience-dashboard)
 - [Shared runner](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/starter-kits/copilot-query-dashboard)
 - [Optional skill installation](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/skills/README.md#dashboard-skill-installation)
-- [Synthetic schema manifest](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/_data/github/README.md)
+- [Synthetic schema manifest](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/_data/README.md)
 
 {% include responsible-use.html %}

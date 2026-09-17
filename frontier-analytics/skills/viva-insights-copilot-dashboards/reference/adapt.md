@@ -19,11 +19,12 @@ Present a short supported/excluded/reason table. In v1:
 - Documented Consumption inputs can support a descriptive credits report.
   Confirm the activity and historical-metadata keys, grain, group mapping
   and units. Show the runner's required approval/evidence fields to the user.
-- Token intensity, task types, Person Query associations and policy analysis
-  are not automatically supported by that credits-only adapter.
+- Person Query associations and policy analysis are not automatically supported
+  by that credits-only adapter. Token intensity and task-type mix are not
+  supported at all, because no Consumption export contains those fields.
 - Real GitHub input can be inspected, but its build adapter is not verified.
-  Stop with the required source contract. Do not run the synthetic helper on
-  real data or claim the demo matches those files.
+  Stop with the required source contract. The demo fixtures match the real
+  export schema, but schema parity is not semantic parity.
 
 Ask for approval of the mappings and scope through prompt mode. Only then
 record approval in the configuration and run

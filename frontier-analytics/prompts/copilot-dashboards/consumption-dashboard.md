@@ -26,9 +26,10 @@ a skill; frequent users can install the optional dashboard skill.
 
 ## Assumptions
 
-The demo's tokens and delegated task types are illustrative. The real v1
-adapter supports documented credit consumption, not the full demo. Missing
-tokens do not block a credits-only report; they exclude token-based panels.
+The demo fixtures carry synthetic values in the real Consumption schema, so the
+demo and a governed export describe the same fields. Tokens and delegated task
+types are not part of that schema and are not present in the demo; do not expect
+or reconstruct them.
 
 ## Recommended output
 
@@ -65,7 +66,8 @@ workspace. Keep the fixed seed/window and synthetic labels. Do not alter canonic
 For real mode, inspect the extracted CSVs locally and return bounded schema summaries,
 not rows or identifiers. Verify keys, grain, units and historical metadata joins.
 Present supported/excluded panels and mapping evidence; wait for my approval to build.
-Support a credits-only output when tokens or task types are unavailable. Do not generate
+Build only the supported M365 credits panels in real v1; sessions, Person Query
+associations and GitHub panels require separate verified adapters. Do not generate
 synthetic replacements, infer licences from activity, or sum policy limits.
 
 Use the existing R code. Check dependencies before requesting installation. Do not read

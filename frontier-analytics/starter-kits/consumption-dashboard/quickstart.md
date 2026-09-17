@@ -19,6 +19,5 @@ list, then approve explicit mappings before `dashboard.R build <config.json>`.
 See the runner README for paths and approval fields; commands are run from
 the shared runner directory or by supplying its full path.
 
-Missing token or task-type fields exclude those panels. Do not translate
-credits into actions, dollars or tokens. If a required contract is unknown,
-finish with a readiness assessment rather than a misleading dashboard.
+Do not translate credits into actions, dollars or tokens. If a required contract
+is unknown, finish with a readiness assessment rather than a misleading dashboard.
