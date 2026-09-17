@@ -105,11 +105,24 @@ In this fixture `SpendingPolicyId` is the all-zero GUID when no policy applies,
 and `Spending policy limit` and `User limit` are empty. Validate real null semantics
 against the supplied query contract rather than inferring them from this recipe.
 
+Service adoption is a persistent property of a person rather than a fresh daily draw:
+two services are used organisation-wide and each team adds its own. This mirrors how
+teams standardise on a small set of Copilot surfaces, and it is what makes a service
+mix publishable — see [Category membership is persistent](#category-membership-is-persistent-not-a-daily-draw).
+
 ### `PersonGitHubCreditsMetrics.csv`
 
 One row per `PersonId` × `MetricDate`.
 
 `PersonId, MetricDate, Total GitHub AI Credits used, PeopleHistoricalId`
+
+This file is **sparse**: it carries a row only for days with billable usage, unlike
+the activity file which carries explicit weekday zeros. Activity coverage and credit
+coverage are therefore two different questions. Do not require one credit row per
+weekday to accept an observed activity week — that discards every fully observed but
+partly inactive week. Resolve credit coverage on its own terms: every observed
+billable day should carry a credit row, and a week with no billable day resolves to
+a measured zero.
 
 **Units are separate:** M365 Copilot credits and GitHub AI credits have no verified
 common-unit conversion here. Do not add them, calculate cross-product shares, or
@@ -154,6 +167,32 @@ Feature values use the real vocabulary: `code_completion`, `chat_inline`,
 `chat_panel_plan_mode`, `chat_panel_custom_mode`, `chat_panel_unknown_mode`,
 `agent_edit`, `copilot_cli`, `copilot_app`.
 
+#### Category membership is persistent, not a daily draw
+
+Which features, languages and models a simulated developer appears under is a
+**stable property of that developer's cohort**, and only the volumes move day to
+day:
+
+- `code_completion`, `chat_panel_ask_mode` and `chat_inline` are used by every
+  adopting developer; each team adds two further surfaces of its own.
+- Languages follow team ownership — three per team — plus `unknown`, which turns up
+  everywhere.
+- The enabled model list is organisation-wide, because model availability is a
+  tenant-level setting.
+- A developer revisits the whole of their profile at least once every four weeks, so
+  any four consecutive weeks contain the complete cohort profile.
+
+This is not cosmetic. Real developers do not re-roll their languages and models every
+morning, and a simulation that does gives almost every person a unique pattern of cell
+membership. Linked cross-tabs built on that pattern can never clear a group-size floor:
+withholding them is correct, and the fix belongs in the data rather than the disclosure
+rule. The generator asserts the floor — every cell, every complement and every
+membership signature — over its own output before writing, so an unpublishable fixture
+fails the build. `PersonM365CreditsMetrics.csv` service adoption follows the same
+persistent-profile rule, and GitHub provisioning, GitHub adoption and the Team × Role
+mix are fixed per team so that published team cells and their complements clear the
+floor too.
+
 ## Person query
 
 `person-query/PersonQuery.csv` — one row per `PersonId` × `MetricDate` (Sunday week
@@ -185,6 +224,7 @@ There is no eligibility or coverage export file. Keep these evidence classes sep
 | Was this person eligible for M365 in this week? | `Total_Copilot_enabled_days > 0`; a static `IsCopilotLicensed` snapshot cannot override a zero-enabled week |
 | Was this person provisioned for GitHub Copilot? | Independent provisioning evidence; missing activity means unknown and M365 licensing is not GitHub licensing |
 | Was this person observed in GitHub? | Presence of a measured row; the demo checks observed weekday rows, not verified ingestion completeness |
+| Are this person-week's GitHub credits resolved? | Every observed billable day carries a credit row. The credit export is sparse, so a week with no billable day resolves to a measured zero and a partly inactive week is not invalid |
 | Is the sparse M365 export complete? | Unknown by default, even with observed positive rows; independent ingestion evidence is required |
 | Did this person use Copilot on this day? | A row with a non-zero measure, not the absence of a row |
 

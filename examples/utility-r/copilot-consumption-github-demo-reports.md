@@ -67,7 +67,11 @@ It fails rather than exporting a broken file.
 ### Points where real exports catch people out
 
 - **`PeopleHistoricalId`, not `PersonId`, joins the Consumption activity files to
-  `PeopleMetaData`.** The metadata file has no `PersonId` column at all.
+  `PeopleMetaData`.** The metadata file has no `PersonId` column at all, and the key is
+  **opaque**: read the `PersonId` → `PeopleHistoricalId` crosswalk out of the activity
+  files rather than reconstructing it. A real download may coincidentally show the same
+  constant numeric suffix on every row; that is not a contract. These fixtures mint the
+  key independently of `PersonId`, so reconstruction fails here instead of in production.
 - **`PersonM365CreditsMetrics` is one row per person _per service_ per day.** Code that
   assumes one row per person per day silently over-counts.
 - **Consumption metric columns contain spaces** (`Total Copilot Credits used`,
@@ -77,6 +81,18 @@ It fails rather than exporting a broken file.
   does not establish absence of policy.
 - **The GitHub activity file contains explicit zero rows.** A zero row is observed
   inactivity; a missing row has unknown status, not proof of no provisioning.
+- **`PersonGitHubCreditsMetrics` is sparse, but `PersonGitHubActivityMetrics` is not.**
+  The credit file carries a row only where billable usage occurred, so activity coverage
+  and credit coverage are two different questions. Requiring five credit rows a week to
+  accept an activity week discards every fully observed but partly inactive week — in
+  these fixtures that was 89% of them. Resolve credit coverage on its own terms: every
+  observed billable day should carry a credit row, and a week with no billable day is a
+  measured zero.
+- **Category membership in the breakdown files is persistent, not per-day noise.**
+  Developers keep stable languages, models and surfaces, so cohorts share the same
+  breakdown cells. A simulation that re-rolls those categories each day gives almost
+  everybody a unique membership signature, and a linked cross-tab family built on that
+  can never be published under a group-size floor.
 - **In this simulation only, the four breakdowns are margins of one allocation.**
   Equality with activity and completion-model attribution are illustrative synthetic
   invariants, not verified real-export semantics. Confirmed headers alone never justify
@@ -93,6 +109,8 @@ kept separate by evidence class:
 |---|---|
 | M365 eligible in this week? | `Total_Copilot_enabled_days > 0`; static `IsCopilotLicensed` is context, not an override for zero-enabled weeks |
 | Provisioned for GitHub Copilot? | Independent provisioning evidence; a row establishes observation only and an absent row remains unknown |
+| Was this GitHub week observed? | The weekday activity rows, including their measured zeros — not the sparse credit rows |
+| Are this week's GitHub credits resolved? | Every observed billable day carries a credit row; a week with no billable day resolves to a measured zero |
 | Used Copilot on this day? | A row with a non-zero measure, not the absence of a row |
 
 Fill an absent activity record with zero **only** when eligibility is independently
