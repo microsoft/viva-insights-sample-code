@@ -49,19 +49,34 @@ product_start <- min(product_weeks)
 # ---------------------------------------------------------------------------
 # Identifiers
 #
-# Real PersonId values are GUIDs. PeopleHistoricalId, the join key between the
-# Consumption activity files and PeopleMetaData, is the PersonId with a numeric
-# suffix appended. Both shapes are reproduced here.
+# Real PersonId values are GUIDs. PeopleHistoricalId is the join key between the
+# Consumption activity files and PeopleMetaData. It is an OPAQUE key: analyst
+# code must read the PersonId -> PeopleHistoricalId crosswalk out of the
+# activity files, never reconstruct it from PersonId. A real export may happen
+# to show a constant numeric suffix across one download, but that coincidence
+# is not a contract and silently breaks on real tenants.
+#
+# These fixtures therefore mint the historical key INDEPENDENTLY: it keeps the
+# same opaque GUID-plus-digits shape, but no string operation on PersonId
+# reproduces it. Code that reconstructs the key fails here instead of passing
+# the demo and failing in production.
 # ---------------------------------------------------------------------------
 hex <- function(n) paste0(sample(c(0:9, letters[1:6]), n, replace = TRUE), collapse = "")
 make_guid <- function() {
   paste(hex(8), hex(4), paste0("3", hex(3)), paste0(sample(c("8", "9", "a", "b"), 1), hex(3)),
         hex(12), sep = "-")
 }
-HISTORICAL_SUFFIX <- "1784160000"
+make_history_id <- function() {
+  paste0(make_guid(), paste0(sample(0:9, 10L, replace = TRUE), collapse = ""))
+}
 
 person_ids <- vapply(seq_len(N_PEOPLE), function(i) make_guid(), character(1))
-stopifnot(!anyDuplicated(person_ids))
+historical_ids <- vapply(seq_len(N_PEOPLE), function(i) make_history_id(), character(1))
+stopifnot(!anyDuplicated(person_ids), !anyDuplicated(historical_ids),
+          !any(person_ids %in% historical_ids),
+          !any(startsWith(historical_ids, person_ids)),
+          !any(endsWith(historical_ids, person_ids)),
+          !any(mapply(grepl, person_ids, historical_ids, MoreArgs = list(fixed = TRUE))))
 
 # ---------------------------------------------------------------------------
 # Roster and organisational attributes
@@ -119,7 +134,7 @@ people <- tibble(
   mutate(
     IsManager = if_else(LevelDesignation == "Individual Contributor", "No", "Yes"),
     IsDeveloperFlag = if_else(IsDeveloper, "Yes", "No"),
-    PeopleHistoricalId = paste0(PersonId, HISTORICAL_SUFFIX)
+    PeopleHistoricalId = historical_ids
   )
 
 stopifnot(all(table(people$Team[people$IsDeveloper]) == N_DEVELOPERS / length(teams)))
@@ -545,6 +560,24 @@ stopifnot(
   all(gh_credits$PersonId %in% provisioned_ids),
   all(m365_credits$PeopleHistoricalId %in% people_metadata$PeopleHistoricalId),
   all(gh_credits$PeopleHistoricalId %in% people_metadata$PeopleHistoricalId)
+)
+
+# The historical key must stay opaque. Every published crosswalk row is checked
+# against naive reconstruction from PersonId, including the constant-suffix
+# pattern a real download can coincidentally display.
+crosswalk <- bind_rows(distinct(m365_credits, PersonId, PeopleHistoricalId),
+                       distinct(gh_credits, PersonId, PeopleHistoricalId)) |>
+  distinct(PersonId, PeopleHistoricalId)
+observed_suffixes <- unique(substr(crosswalk$PeopleHistoricalId,
+                                   nchar(crosswalk$PersonId) + 1L,
+                                   nchar(crosswalk$PeopleHistoricalId)))
+stopifnot(
+  nrow(count(crosswalk, PersonId) |> filter(n > 1L)) == 0L,
+  !any(startsWith(crosswalk$PeopleHistoricalId, crosswalk$PersonId)),
+  !any(mapply(grepl, crosswalk$PersonId, crosswalk$PeopleHistoricalId,
+              MoreArgs = list(fixed = TRUE))),
+  !any(outer(crosswalk$PersonId, observed_suffixes, paste0) ==
+         crosswalk$PeopleHistoricalId)
 )
 
 # ---------------------------------------------------------------------------
