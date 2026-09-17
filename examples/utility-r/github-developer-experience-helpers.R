@@ -94,6 +94,14 @@ disclosable_split <- function(total, part, minimum = MIN_GROUP_N) {
     (part == 0 | part >= minimum) &
     (total - part == 0 | total - part >= minimum)
 }
+# An empty population has nobody to protect, and this report already publishes
+# zero cells elsewhere (see disclose_partition). This decides WHERE the split
+# gate is required; it does not change the gate. Suppressing "0 developers were
+# validly observed" taught nothing and hid the coverage story it exists to tell.
+split_or_empty <- function(total, part, minimum = MIN_GROUP_N) {
+  (!is.na(total) & total == 0 & !is.na(part) & part == 0) |
+    disclosable_split(total, part, minimum)
+}
 
 # Protect differences between overlapping service/category supports as well as
 # each positive-contributor count. Every membership pattern includes the full
@@ -286,6 +294,11 @@ gh_weekly <- gh_daily |>
             GH_active_days = n_distinct(MetricDate[`Code completions suggested` > 0 |
               `Code completions accepted` > 0 | `User-initiated chat requests` > 0 |
               `Agent adoption`]),
+            # Days the sparse credit export is expected to carry: the credit
+            # feed only records billable usage, so a day with suggestions but
+            # no accepted completion or chat request legitimately has no row.
+            GH_billable_days = n_distinct(MetricDate[`Code completions accepted` > 0 |
+              `User-initiated chat requests` > 0]),
             GH_suggestions = sum(`Code completions suggested`),
             GH_accepted = sum(`Code completions accepted`),
             GH_chats = sum(`User-initiated chat requests`),
@@ -311,11 +324,28 @@ panel <- coverage |>
             by = c('PersonId', 'Week'), relationship = 'one-to-one') |>
   left_join(gh_weekly, by = c('PersonId', 'Week'), relationship = 'one-to-one') |>
   left_join(m365_weekly, by = c('PersonId', 'Week'), relationship = 'one-to-one') |>
-  mutate(GH_valid = coalesce(GH_eligible & GH_complete & GH_credit_days == 5L, FALSE),
+  mutate(GH_activity_valid = coalesce(GH_eligible & GH_complete, FALSE),
+         GH_billable_days = if_else(GH_activity_valid,
+                                    coalesce(GH_billable_days, 0L), NA_integer_),
+         GH_credit_days = if_else(GH_activity_valid,
+                                  coalesce(GH_credit_days, 0L), NA_integer_),
+         # Two different coverage questions, deliberately separated. The
+         # activity export carries explicit weekday zero rows, so its five rows
+         # establish that the week was observed whether or not the person used
+         # anything. The credit export is SPARSE: it carries a row only where
+         # billable usage occurred, so requiring five credit rows would discard
+         # fully observed but partly inactive weeks. Credit coverage is instead
+         # resolved when every observed billable day carries a credit row, and a
+         # week with no billable day resolves to a measured zero. This is
+         # coverage logic, not a privacy control: each flag gates only the
+         # measures it actually governs.
+         GH_credit_valid = coalesce(GH_activity_valid &
+                                      GH_credit_days == GH_billable_days, FALSE),
          M365_valid = coalesce(M365_eligible & M365_complete, FALSE),
          across(c(GH_active_days, GH_suggestions, GH_accepted, GH_chats,
-                  GH_agent_days, GH_credits),
-                ~if_else(GH_valid, .x, NA_real_)),
+                  GH_agent_days),
+                ~if_else(GH_activity_valid, .x, NA_real_)),
+         GH_credits = if_else(GH_credit_valid, coalesce(GH_credits, 0), NA_real_),
          across(c(M365_active_days, M365_sessions, M365_credits),
                 ~observed_or_missing(.x, M365_eligible, M365_complete)))
 assert_key(panel, c('PersonId', 'Week'))
@@ -337,15 +367,16 @@ baseline <- baseline_panel |>
   summarise(Weeks_observed = n(),
             Weeks_above = sum(After_hours_collaboration_hours >= AFTER_HOURS_CONVENTION),
             across(all_of(work_metrics), mean),
-            GH_all_valid = all(GH_valid),
+            GH_all_valid = all(GH_activity_valid),
+            GH_credits_all_valid = all(GH_credit_valid),
             M365_all_valid = all(M365_valid),
-            GH_active_days = if (all(GH_valid)) sum(GH_active_days) else NA_real_,
+            GH_active_days = if (all(GH_activity_valid)) sum(GH_active_days) else NA_real_,
             M365_active_days = if (all(M365_valid)) sum(M365_active_days) else NA_real_,
-            GH_suggestions = if (all(GH_valid)) sum(GH_suggestions) else NA_real_,
-            GH_accepted = if (all(GH_valid)) sum(GH_accepted) else NA_real_,
-            GH_chats = if (all(GH_valid)) sum(GH_chats) else NA_real_,
-            GH_agent_days = if (all(GH_valid)) sum(GH_agent_days) else NA_real_,
-            GH_credits = if (all(GH_valid)) sum(GH_credits) else NA_real_,
+            GH_suggestions = if (all(GH_activity_valid)) sum(GH_suggestions) else NA_real_,
+            GH_accepted = if (all(GH_activity_valid)) sum(GH_accepted) else NA_real_,
+            GH_chats = if (all(GH_activity_valid)) sum(GH_chats) else NA_real_,
+            GH_agent_days = if (all(GH_activity_valid)) sum(GH_agent_days) else NA_real_,
+            GH_credits = if (all(GH_credit_valid)) sum(GH_credits) else NA_real_,
             M365_sessions = if (all(M365_valid)) sum(M365_sessions) else NA_real_,
             M365_credits = if (all(M365_valid)) sum(M365_credits) else NA_real_,
             GH_eligible_all = all(GH_eligible),
@@ -366,6 +397,19 @@ joint_levels <- c('Both recorded', 'GitHub only recorded', 'M365 only recorded',
                   'Observation unresolved')
 baseline$Joint <- factor(baseline$Joint, levels = joint_levels)
 matched <- baseline |> filter(GH_all_valid, M365_all_valid)
+
+# The GitHub feed resolves its own observation from explicit weekday zero rows,
+# so a recorded-use comparison is available on that population without inventing
+# Microsoft 365 completeness evidence. The two-product comparison above stays
+# unavailable by default; this one is the part the exports can actually support.
+gh_use_levels <- c('GitHub use recorded', 'No GitHub use recorded',
+                   'GitHub observation unresolved')
+baseline <- baseline |>
+  mutate(GH_use = factor(case_when(
+    !GH_all_valid ~ 'GitHub observation unresolved',
+    GH_active_days > 0 ~ 'GitHub use recorded',
+    TRUE ~ 'No GitHub use recorded'), levels = gh_use_levels))
+gh_observed <- baseline |> filter(GH_all_valid)
 
 measure_values <- c(
   unlist(pq |> select(where(is.numeric), -Total_Copilot_enabled_days), use.names = FALSE),
@@ -388,9 +432,13 @@ stopifnot(nrow(coverage) == N_ROSTER * length(weeks),
           all(is.finite(measure_values)),
           all(measure_values >= 0),
           all(gh_daily$`Code completions accepted` <= gh_daily$`Code completions suggested`),
-          all(panel$GH_active_days[panel$GH_valid] <= panel$GH_covered_days[panel$GH_valid]),
+          all(panel$GH_active_days[panel$GH_activity_valid] <=
+                panel$GH_covered_days[panel$GH_activity_valid]),
           all(panel$M365_active_days[panel$M365_valid] <= panel$M365_covered_days[panel$M365_valid]),
-          all(is.na(panel$GH_active_days[!panel$GH_valid])),
+          all(is.na(panel$GH_active_days[!panel$GH_activity_valid])),
+          all(is.na(panel$GH_credits[!panel$GH_credit_valid])),
+          all(!panel$GH_credit_valid | !is.na(panel$GH_credits)),
+          all(!panel$GH_credit_valid | panel$GH_activity_valid),
           all(is.na(panel$M365_active_days[!panel$M365_valid])),
           max(abs(pq$Meeting_hours + pq$Scheduled_call_hours +
                     pq$Available_to_focus_hours - working_hours_basis)) <= .0011,
@@ -479,6 +527,11 @@ pct <- function(x) ifelse(!is.finite(x), 'N/A — unavailable or withheld',
                           scales::percent(x, accuracy = .1, decimal.mark = '.', big.mark = ','))
 num <- function(x) ifelse(is.na(x), 'N/A — unavailable or withheld',
                          format(x, big.mark = ',', scientific = FALSE, trim = TRUE))
+# A rate over an empty valid population is undefined, not withheld. Saying so
+# is more honest than one suppression marker doing both jobs.
+pct_or_reason <- function(rate, denominator) ifelse(
+  !is.na(denominator) & denominator == 0, 'Undefined — no valid denominator',
+  pct(rate))
 leader_label <- function(labels, values) {
   keep <- is.finite(values)
   if (!any(keep)) return('Unavailable')
@@ -518,7 +571,9 @@ interval_plot <- function(data, metrics, group = 'Team', title, subtitle, captio
   d <- interval_data(data, metrics, group)
   if (!nrow(d)) return(unavailable_plot(title))
   first_metric <- unname(metric_labels[metrics[1]])
-  group_order <- if (group == 'Joint') joint_levels[1:4] else d |>
+  group_order <- if (group == 'Joint') joint_levels[1:4]
+    else if (group == 'GH_use') gh_use_levels[1:2]
+    else d |>
     filter(Metric == first_metric) |> arrange(desc(p50)) |> pull(Group)
   d$Group <- factor(d$Group, levels = rev(group_order))
   d$Metric <- factor(d$Metric, levels = unname(metric_labels[metrics]))
@@ -589,13 +644,25 @@ joint_counts_public <- joint_counts |>
   mutate(Display = Joint) |>
   arrange(Display)
 team_context <- composition(baseline, 'Team', 'Role')
-role_context <- composition(matched, 'Joint', 'Role')
-team_joint_context <- composition(matched, 'Joint', 'Team')
+role_context <- composition(gh_observed, 'GH_use', 'Role')
+team_joint_context <- composition(gh_observed, 'GH_use', 'Team')
 composition_counts <- bind_rows(lapply(c('Role','Seniority','Tenure'), function(a)
   baseline |> count(Category=.data[[a]], name='People') |> mutate(Attribute=a)))
-# One shared gate for every linked HR margin and cross-tab in this report.
-hr_cells <- baseline |> count(Team, Role, Seniority, Tenure, Joint, name='People')
-hr_release_safe <- nrow(disclose_partition(hr_cells)) > 0L
+# One shared gate for every linked HR margin and cross-tab in this report. A
+# family is published only when every cell of every published margin meets the
+# floor, so no published margin can be differenced against another to expose a
+# sub-floor group. Gating instead on the full Team x Role x Seniority x Tenure
+# intersection withheld the whole family unconditionally: at this population
+# size that intersection can never reach ten people, and it is never published.
+hr_published <- list(
+  baseline |> count(Team, Role, name = 'People'),
+  baseline |> count(Role, name = 'People'),
+  baseline |> count(Seniority, name = 'People'),
+  baseline |> count(Tenure, name = 'People'),
+  gh_observed |> count(GH_use, Role, name = 'People', .drop = TRUE),
+  gh_observed |> count(GH_use, Team, name = 'People', .drop = TRUE))
+hr_release_safe <- all(vapply(hr_published,
+  function(x) nrow(x) > 0L && nrow(disclose_partition(x)) > 0L, logical(1)))
 if (!hr_release_safe) {
   team_context <- team_context[0, ]
   role_context <- role_context[0, ]
@@ -609,7 +676,8 @@ work_summary <- bind_rows(lapply(c('Collaboration_hours', 'Meeting_hours', 'Avai
   Median = f1(median(baseline[[m]])), `75th percentile` = f1(quantile(baseline[[m]], .75)))))
 
 credit_release_safe <- setNames(vapply(c('GH', 'M365'), function(product) {
-  valid <- baseline |> filter(.data[[paste0(product, '_all_valid')]])
+  flag <- if (product == 'GH') 'GH_credits_all_valid' else 'M365_all_valid'
+  valid <- baseline |> filter(.data[[flag]])
   support_release_safe(valid, 'Team', paste0(product, '_credits'), baseline$PersonId)
 }, logical(1)), c('GH', 'M365'))
 product_summary <- bind_rows(lapply(c('GH', 'M365'), function(product) {
@@ -617,23 +685,31 @@ product_summary <- bind_rows(lapply(c('GH', 'M365'), function(product) {
   valid <- baseline |> filter(if (gh) GH_all_valid else M365_all_valid)
   active <- valid |> filter(if (gh) GH_active_days > 0 else M365_active_days > 0)
   volume <- if (gh) 'GH_credits' else 'M365_credits'
+  # Credit coverage is resolved separately from activity coverage, so the
+  # credit population is its own denominator and gets its own release check.
+  credited <- baseline |> filter(if (gh) GH_credits_all_valid else M365_all_valid)
+  credit_pop_safe <- disclosable_split(nrow(baseline), nrow(credited))
   split_safe <- disclosable_split(nrow(baseline), nrow(valid)) &&
-    disclosable_split(nrow(valid), nrow(active))
-  top_n <- ceiling(.1 * nrow(active))
-  top_ids <- order(active[[volume]], decreasing = TRUE)[seq_len(top_n)]
-  top_safe <- split_safe && credit_release_safe[[product]] &&
-    top_n >= MIN_GROUP_N && nrow(active) - top_n >= MIN_GROUP_N &&
-    sum(active[[volume]][top_ids] > 0) >= MIN_GROUP_N &&
-    sum(active[[volume]][-top_ids] > 0) >= MIN_GROUP_N
+    split_or_empty(nrow(valid), nrow(active))
+  credit_active <- credited |> filter(.data[[volume]] > 0)
+  top_n <- ceiling(.1 * nrow(credit_active))
+  top_ids <- order(credit_active[[volume]], decreasing = TRUE)[seq_len(top_n)]
+  top_safe <- credit_pop_safe && credit_release_safe[[product]] &&
+    top_n >= MIN_GROUP_N && nrow(credit_active) - top_n >= MIN_GROUP_N &&
+    sum(credit_active[[volume]][top_ids] > 0) >= MIN_GROUP_N &&
+    sum(credit_active[[volume]][-top_ids] > 0) >= MIN_GROUP_N
   share <- if (top_safe) safe_div(
-    sum(sort(active[[volume]], decreasing = TRUE)[seq_len(top_n)]),
-    sum(active[[volume]])) else NA_real_
+    sum(sort(credit_active[[volume]], decreasing = TRUE)[seq_len(top_n)]),
+    sum(credit_active[[volume]])) else NA_real_
+  credits_mean <- if (credit_pop_safe && credit_release_safe[[product]] && nrow(credited))
+    mean(credited[[volume]]) / BASELINE_WEEKS else NA_real_
   tibble(Product = if (gh) 'GitHub Copilot' else 'Microsoft 365 Copilot',
          `Valid developers (count)` = num(if (split_safe) nrow(valid) else NA_integer_),
          `Recorded active (count)` = num(if (split_safe) nrow(active) else NA_integer_),
-         `Recorded active (%)` = pct(if (split_safe) safe_div(nrow(active), nrow(valid)) else NA_real_),
+         `Recorded active (%)` = if (split_safe) pct_or_reason(safe_div(nrow(active), nrow(valid)), nrow(valid)) else pct(NA_real_),
          `Active days / developer / week (mean)` = f1(if (split_safe) mean(if (gh) valid$GH_active_days else valid$M365_active_days) / BASELINE_WEEKS else NA_real_),
-         `Credits / developer / week (mean)` = f1(if (split_safe && credit_release_safe[[product]]) mean(valid[[volume]]) / BASELINE_WEEKS else NA_real_),
+         `Credit-resolved developers (count)` = num(if (credit_pop_safe) nrow(credited) else NA_integer_),
+         `Credits / developer / week (mean)` = f1(credits_mean),
          `Session or request unit` = if (gh) 'GitHub credits' else 'M365 credits',
          `Top 10% active credit share (%)` = pct(share),
          `Top group (count)` = num(if (top_safe) top_n else NA_integer_))
@@ -650,25 +726,32 @@ team_league <- baseline |>
             GH_valid_n = sum(GH_all_valid),
             GH_active_n = sum(GH_all_valid & coalesce(GH_active_days, 0) > 0),
             GH_active_share = safe_div(GH_active_n, GH_valid_n),
-            GH_intensity = mean(GH_credits[GH_all_valid], na.rm = TRUE) / BASELINE_WEEKS,
+            GH_credit_n = sum(GH_credits_all_valid),
+            GH_intensity = mean(GH_credits[GH_credits_all_valid], na.rm = TRUE) / BASELINE_WEEKS,
             M365_valid_n = sum(M365_all_valid),
             M365_active_n = sum(M365_all_valid & coalesce(M365_active_days, 0) > 0),
             M365_active_share = safe_div(M365_active_n, M365_valid_n),
+            M365_credit_n = sum(M365_all_valid),
             M365_intensity = mean(M365_credits[M365_all_valid], na.rm = TRUE) / BASELINE_WEEKS,
             .groups = 'drop') |>
   filter(Developers >= MIN_GROUP_N) |>
   mutate(GH_safe = disclosable_split(Developers, GH_valid_n) &
-                    disclosable_split(GH_valid_n, GH_active_n),
+                    split_or_empty(GH_valid_n, GH_active_n),
+         GH_credit_safe = GH_safe & disclosable_split(Developers, GH_credit_n),
          M365_safe = disclosable_split(Developers, M365_valid_n) &
-                      disclosable_split(M365_valid_n, M365_active_n),
-         across(c(GH_valid_n, GH_active_n, GH_active_share, GH_intensity),
+                      split_or_empty(M365_valid_n, M365_active_n),
+         M365_credit_safe = M365_safe & disclosable_split(Developers, M365_credit_n),
+         across(c(GH_valid_n, GH_active_n, GH_active_share),
                 ~if_else(GH_safe, .x, NA_real_)),
-         across(c(M365_valid_n, M365_active_n, M365_active_share, M365_intensity),
-                ~if_else(M365_safe, .x, NA_real_))) |>
+         GH_intensity = if_else(GH_credit_safe, GH_intensity, NA_real_),
+         across(c(M365_valid_n, M365_active_n, M365_active_share),
+                ~if_else(M365_safe, .x, NA_real_)),
+         M365_intensity = if_else(M365_credit_safe, M365_intensity, NA_real_)) |>
   arrange(desc(Collaboration_hours)) |>
   mutate(Rank = row_number(), .before = Team)
 for (product in c('GH', 'M365')) {
-  if (!credit_release_safe[[product]])
+  if (!credit_release_safe[[product]] ||
+      !all(team_league[[paste0(product, '_credit_safe')]]))
     team_league[[paste0(product, '_intensity')]] <- NA_real_
   if (!all(team_league[[paste0(product, '_safe')]])) {
     for (measure in c('_valid_n', '_active_n', '_active_share', '_intensity')) {
@@ -699,11 +782,11 @@ trend <- panel |> filter(IsDeveloper, PQ_eligible, PQ_complete) |>
     across(all_of(c('Collaboration_hours', 'Meeting_hours', 'Available_to_focus_hours',
                     'Uninterrupted_hours', 'Interrupted_hours',
                     'After_hours_collaboration_hours')), median),
-    GH_n = sum(GH_valid), GH_active = sum(GH_active_days > 0, na.rm = TRUE),
+    GH_n = sum(GH_activity_valid), GH_active = sum(GH_active_days > 0, na.rm = TRUE),
     M365_n = sum(M365_valid), M365_active = sum(M365_active_days > 0, na.rm = TRUE),
-    Joint_n = sum(GH_valid & M365_valid), .groups = 'drop') |>
-  mutate(GH_safe = disclosable_split(PQ_n, GH_n) & disclosable_split(GH_n, GH_active),
-         M365_safe = disclosable_split(PQ_n, M365_n) & disclosable_split(M365_n, M365_active),
+    Joint_n = sum(GH_activity_valid & M365_valid), .groups = 'drop') |>
+  mutate(GH_safe = disclosable_split(PQ_n, GH_n) & split_or_empty(GH_n, GH_active),
+         M365_safe = disclosable_split(PQ_n, M365_n) & split_or_empty(M365_n, M365_active),
          GH_rate = if_else(GH_safe, safe_div(GH_active, GH_n), NA_real_),
          M365_rate = if_else(M365_safe, safe_div(M365_active, M365_n), NA_real_),
          across(c(GH_n, GH_active), ~if_else(GH_safe, .x, NA_real_)),
@@ -743,26 +826,32 @@ coverage_derivation <- tibble(
   Question = c('Person Query roster and weekly completeness',
                'Microsoft 365 Copilot eligibility',
                'GitHub Copilot observation',
-               'GitHub weekly coverage',
+               'GitHub weekly activity coverage',
+               'GitHub weekly credit coverage',
                'Microsoft 365 weekly observation',
                'Recorded product use'),
   `Signal used` = c('PersonQuery.csv has one row per PersonId x week in this sample.',
                     'Person Query Total_Copilot_enabled_days in the relevant week; static metadata never overrides zero enabled days.',
                     'An activity row establishes observation for that week, not licence or provisioning status. Absence is unknown.',
-                    'Five explicit weekday activity rows and five credit rows; weekday-only reporting convention, not an ingestion certificate. No absent GitHub values are zero-filled.',
+                    'Five explicit weekday activity rows, including measured zeros; a weekday-only reporting convention, not an ingestion certificate. No absent GitHub values are zero-filled.',
+                    'The credit export is sparse and carries a row only for billable usage, so coverage is resolved when every observed billable day has a credit row. A week with no billable day resolves to a measured zero. Credit coverage never invalidates observed activity.',
                     'Unknown by default. Independent completeness evidence is required; licence metadata and a calendar are insufficient.',
                     'Positive observations are not proof of complete collection. M365 zero filling requires independently evidenced completeness and positive weekly enabled days.'))
 validation_summary <- tibble(
   Check = c('Population', 'Teams', 'Person Query developer-weeks', 'Baseline developer-weeks',
             'Focus-time identities', 'Source keys and joins', 'Non-negative metrics and acceptance bounds',
             'GitHub synthetic allocation invariant', 'Eligibility and observation derivation',
-            'Joint reconciliation', 'Privacy floor'),
+            'Activity and credit coverage separated', 'Joint reconciliation', 'Privacy floor'),
   Result = c(paste(num(nrow(people)), 'people;', num(sum(people$IsDeveloper)), 'developers'),
              'Team metrics require the privacy floor; complementary product cells are withheld together.',
              num(nrow(pq |> filter(IsDeveloper))), num(nrow(baseline_panel)),
              'Available-to-focus hours = working-hours basis minus meetings and scheduled calls; uninterrupted + interrupted = available-to-focus',
-             'Unique keys; no join amplification', 'Passed',
+             'Unique keys; no join amplification. PeopleHistoricalId is read from the activity crosswalk, never reconstructed from PersonId.',
+             'Passed',
              'Checked only by the synthetic generator; not enforced as a real-export contract. Model attribution is illustrative, including completions.',
              'Weekly enabled days govern M365 eligibility; independent M365 completeness unavailable by default. No coverage file invented.',
+             paste(num(sum(baseline$GH_all_valid)), 'developers have complete GitHub activity weeks;',
+                   num(sum(baseline$GH_credits_all_valid)),
+                   'also have resolved credit coverage. Sparse credit rows never void observed activity.'),
              'Internal joint counts reconcile to the roster; public partitions are withheld if any positive cell is below the privacy floor.',
              paste('At least', MIN_GROUP_N, 'distinct people in every published group')))
