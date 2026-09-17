@@ -230,3 +230,163 @@ test("reuse guidance rejects old coverage equality and real-adapter promises", {
               any(grepl("supported M365 credits panels", prose)))
   }
 })
+stage_fixtures <- function(name) {
+  dest <- file.path(root, name)
+  for (path in names(bundle)) {
+    target <- file.path(dest, "_data", path)
+    dir.create(dirname(target), recursive = TRUE, showWarnings = FALSE)
+    stopifnot(file.copy(file.path(utility, "_data", path), target))
+  }
+  dest
+}
+# Smallest number of developers sharing an identical pattern of cell membership.
+# support_release_safe requires this to reach the privacy floor, which is exactly
+# what a fresh per-person-day category draw destroys.
+signature_floor <- function(data, groups, parent_ids) {
+  cells <- interaction(data[groups], drop = TRUE, lex.order = TRUE)
+  memberships <- setNames(rep("", length(parent_ids)), parent_ids)
+  for (cell in levels(cells)) {
+    observed <- unique(data$PersonId[cells == cell])
+    memberships[observed] <- paste0(memberships[observed], "|", cell)
+  }
+  min(table(memberships))
+}
+breakdown_groups <- list(
+  list(file = "GitHubActivityBreakdownByFeatureMetrics.csv", source = "baseline_feature_daily",
+       groups = "Feature", measure = "Feature Usage Count"),
+  list(file = "GitHubActivityBreakdownByModelFeatureMetrics.csv", source = "baseline_model_feature_daily",
+       groups = c("Model", "Feature"), measure = "Usage count by model and feature"),
+  list(file = "GitHubActivityBreakdownByLanguageModelMetrics.csv", source = "baseline_language_model_daily",
+       groups = c("Language", "Model"), measure = "Usage count by language and model"),
+  list(file = "GitHubActivityBreakdownByLanguageFeatureMetrics.csv", source = "baseline_language_feature_daily",
+       groups = c("Language", "Feature"), measure = "Usage count by language and feature"))
+test("breakdown margins and cross-tabs are released for the committed fixtures", {
+  released <- load_github(stage_fixtures("breakdown-released"))
+  mixes <- list(Feature = released$feature_mix, Model = released$model_mix,
+                Language = released$language_mix, ModelFeature = released$model_feature_mix,
+                LanguageModel = released$language_model_mix,
+                LanguageFeature = released$language_feature_mix)
+  stopifnot(released$breakdown_safe,
+            all(vapply(mixes, nrow, integer(1)) > 0L),
+            all(vapply(mixes, function(x) all(x$People >= 10L), logical(1))),
+            nrow(released$feature_mix) >= 5L, nrow(released$model_mix) >= 2L,
+            nrow(released$language_mix) >= 5L, nrow(released$model_feature_mix) >= 10L,
+            nrow(released$language_model_mix) >= 10L,
+            nrow(released$language_feature_mix) >= 10L)
+  for (spec in breakdown_groups) {
+    source <- released[[spec$source]]
+    stopifnot(released$support_release_safe(source, spec$groups, spec$measure,
+                                            released$developer_ids),
+              signature_floor(source, spec$groups, released$developer_ids) >= 10L)
+  }
+  page <- paste(readLines(file.path(utility,
+    "github-copilot-developer-productivity-simulation.html"), warn = FALSE), collapse = "")
+  # Only the ranked cross-tab cells are published as HTML text; the margins are
+  # published as chart images, so assert against what the tables actually print.
+  top_rows <- function(x, n = 15L) x[order(-x$Count), ][seq_len(min(n, nrow(x))), ]
+  shown <- c(top_rows(released$model_feature_mix)$Model,
+             top_rows(released$model_feature_mix)$Feature,
+             top_rows(released$language_model_mix)$Language,
+             top_rows(released$language_model_mix)$Model,
+             top_rows(released$language_feature_mix, 20L)$Language,
+             top_rows(released$language_feature_mix, 20L)$Feature)
+  stopifnot(!grepl("GitHub breakdowns unavailable or withheld", page, fixed = TRUE),
+            grepl("Largest reportable Model x Feature cells", page, fixed = TRUE),
+            grepl("Largest reportable Language x Model cells", page, fixed = TRUE),
+            grepl("Largest reportable Language x Feature cells", page, fixed = TRUE),
+            length(unique(shown)) >= 6L,
+            all(vapply(unique(shown), function(x) grepl(x, page, fixed = TRUE), logical(1))))
+})
+test("per-person-day category redraws lose the shared support and stay withheld", {
+  redrawn <- stage_fixtures("breakdown-redrawn")
+  set.seed(20260917L)
+  for (spec in breakdown_groups) {
+    path <- file.path(redrawn, "_data", "github-query", spec$file)
+    d <- read.csv(path, check.names = FALSE, stringsAsFactors = FALSE)
+    for (column in spec$groups) {
+      vocabulary <- sort(unique(d[[column]]))
+      # Each person draws a private subset, then each row draws inside it: the
+      # per-person-day allocation the generator used to produce.
+      subsets <- lapply(unique(d$PersonId), function(p)
+        sample(vocabulary, sample(2:max(2L, length(vocabulary) - 2L), 1L)))
+      names(subsets) <- unique(d$PersonId)
+      d[[column]] <- vapply(seq_len(nrow(d)),
+        function(i) sample(subsets[[d$PersonId[i]]], 1L), character(1))
+    }
+    keys <- c("PersonId", "MetricDate", spec$groups)
+    d <- aggregate(d[spec$measure], d[keys], sum)[, c(keys, spec$measure)]
+    write.csv(d, path, row.names = FALSE)
+  }
+  scrambled <- load_github(redrawn)
+  stopifnot(!scrambled$breakdown_safe,
+            nrow(scrambled$feature_mix) == 0L, nrow(scrambled$model_mix) == 0L,
+            nrow(scrambled$language_mix) == 0L, nrow(scrambled$model_feature_mix) == 0L,
+            nrow(scrambled$language_model_mix) == 0L,
+            nrow(scrambled$language_feature_mix) == 0L)
+  floors <- vapply(breakdown_groups, function(spec)
+    signature_floor(scrambled[[spec$source]], spec$groups, scrambled$developer_ids),
+    integer(1))
+  stopifnot(any(floors < 10L))
+})
+test("PeopleHistoricalId is opaque and joins only through the activity crosswalk", {
+  meta <- bundle[["consumption-query/PeopleMetaData.csv"]]
+  columns <- c("PersonId", "PeopleHistoricalId")
+  crosswalk <- unique(rbind(
+    bundle[["consumption-query/PersonM365CreditsMetrics.csv"]][, columns],
+    bundle[["consumption-query/PersonGitHubCreditsMetrics.csv"]][, columns]))
+  stopifnot(nrow(crosswalk) >= 10L, !anyDuplicated(crosswalk$PersonId),
+            !anyDuplicated(crosswalk$PeopleHistoricalId))
+  # Every constant suffix a naive reader could infer from this crosswalk, plus
+  # the literal suffix an earlier revision of the generator used.
+  suffixes <- c(unique(substr(crosswalk$PeopleHistoricalId,
+                             nchar(crosswalk$PersonId) + 1L,
+                             nchar(crosswalk$PeopleHistoricalId))), "1784160000")
+  stopifnot(length(suffixes) > 1L,
+            !any(outer(crosswalk$PersonId, suffixes, paste0) ==
+                   crosswalk$PeopleHistoricalId),
+            !any(startsWith(crosswalk$PeopleHistoricalId, crosswalk$PersonId)),
+            !any(endsWith(crosswalk$PeopleHistoricalId, crosswalk$PersonId)),
+            !any(mapply(grepl, crosswalk$PersonId, crosswalk$PeopleHistoricalId,
+                        MoreArgs = list(fixed = TRUE))),
+            !any(substr(crosswalk$PeopleHistoricalId, 1L,
+                        nchar(crosswalk$PersonId)) == crosswalk$PersonId))
+  # Reading the crosswalk still resolves every credit row to its metadata row.
+  stopifnot(all(crosswalk$PeopleHistoricalId %in% meta$PeopleHistoricalId))
+  env <- load_github(stage_fixtures("history-crosswalk"))
+  stopifnot(nrow(env$person_history) == nrow(crosswalk),
+            all(env$person_history$PeopleHistoricalId %in% meta$PeopleHistoricalId),
+            setequal(env$person_history$PersonId, crosswalk$PersonId))
+})
+test("sparse GitHub credit rows never void observed activity", {
+  directory <- stage_fixtures("credit-sparsity")
+  env <- load_github(directory)
+  weeks <- env$panel
+  sparse <- weeks[weeks$GH_activity_valid & !is.na(weeks$GH_credit_days) &
+                    weeks$GH_credit_days < 5L, ]
+  stopifnot(nrow(sparse) >= 10L, all(sparse$GH_credit_valid),
+            all(!is.na(sparse$GH_active_days)), all(!is.na(sparse$GH_suggestions)),
+            all(!is.na(sparse$GH_credits)))
+  quiet <- weeks[weeks$GH_activity_valid & weeks$GH_billable_days == 0L, ]
+  stopifnot(nrow(quiet) >= 10L, all(quiet$GH_credit_valid), all(quiet$GH_credits == 0))
+  # Losing the credit rows for an observed billable week unresolves the credit
+  # measures only; the observed activity week stays valid.
+  billable <- weeks[weeks$GH_activity_valid & !is.na(weeks$GH_credit_days) &
+                      weeks$GH_credit_days > 0L & weeks$Week >= env$baseline_start, ]
+  victim <- billable$PersonId[1]
+  week <- billable$Week[1]
+  path <- file.path(directory, "_data", "consumption-query",
+                    "PersonGitHubCreditsMetrics.csv")
+  credits <- read.csv(path, check.names = FALSE, stringsAsFactors = FALSE)
+  keep <- !(credits$PersonId == victim & env$week_start(credits$MetricDate) == week)
+  stopifnot(any(!keep))
+  write.csv(credits[keep, ], path, row.names = FALSE)
+  after <- load_github(directory)
+  row <- after$panel[after$panel$PersonId == victim & after$panel$Week == week, ]
+  developer <- after$baseline[after$baseline$PersonId == victim, ]
+  stopifnot(nrow(row) == 1L, row$GH_activity_valid, !row$GH_credit_valid,
+            !is.na(row$GH_active_days), !is.na(row$GH_suggestions),
+            !is.na(row$GH_accepted), is.na(row$GH_credits),
+            nrow(developer) == 1L, developer$GH_all_valid,
+            !developer$GH_credits_all_valid, !is.na(developer$GH_active_days),
+            is.na(developer$GH_credits))
+})
