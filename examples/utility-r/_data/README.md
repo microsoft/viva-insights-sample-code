@@ -80,6 +80,15 @@ Bear in mind too that M365 Copilot credits and GitHub AI credits have no
 verified common unit. Do not add them together, calculate cross-product shares,
 or put GitHub AI credits into an M365 credits-per-session denominator.
 
+The sample code for this repository now includes a reusable join example in
+`../copilot-super-panel-helpers.R`. Its `build_copilot_super_panel()` helper
+reads the Person, Consumption and GitHub Copilot folders, validates the opaque
+`PersonId` / `PeopleHistoricalId` crosswalk, aggregates daily and dimensional
+exports to a Sunday-start person-week grain, and returns a single
+Person × week panel for analysis. It also returns the service, feature, language
+and model facts separately so drilldowns can be built without multiplying rows
+in the core panel.
+
 ## Person query
 
 Source: [Person query](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/person-query).

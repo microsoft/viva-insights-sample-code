@@ -264,11 +264,17 @@ reference_files <- function(cfg) {
                     "github-query/GitHubActivityBreakdownByModelFeatureMetrics.csv")))
   } else {
     relative <- c("copilot-consumption-ways-of-working-simulation.Rmd",
+                  "copilot-super-panel-helpers.R",
                   file.path("_data", c(
+                    "person-query/PersonQuery.csv",
                     "consumption-query/PeopleMetaData.csv",
                     "consumption-query/PersonM365CreditsMetrics.csv",
                     "consumption-query/PersonGitHubCreditsMetrics.csv",
-                    "person-query/PersonQuery.csv")))
+                    "github-query/PersonGitHubActivityMetrics.csv",
+                    "github-query/GitHubActivityBreakdownByFeatureMetrics.csv",
+                    "github-query/GitHubActivityBreakdownByLanguageFeatureMetrics.csv",
+                    "github-query/GitHubActivityBreakdownByLanguageModelMetrics.csv",
+                    "github-query/GitHubActivityBreakdownByModelFeatureMetrics.csv")))
   }
   paths <- file.path(utility, relative)
   if (!all(file.exists(paths))) fail("Reference report or supplied synthetic fixtures are missing.")

@@ -302,10 +302,16 @@ test("demo source isolation preflight: tracked references and exact copy targets
     refs <- reference_files(demo)
     expected <- if (report == "consumption") c(
       "copilot-consumption-ways-of-working-simulation.Rmd",
+      "copilot-super-panel-helpers.R",
+      "_data/person-query/PersonQuery.csv",
       "_data/consumption-query/PeopleMetaData.csv",
       "_data/consumption-query/PersonM365CreditsMetrics.csv",
       "_data/consumption-query/PersonGitHubCreditsMetrics.csv",
-      "_data/person-query/PersonQuery.csv") else c(
+      "_data/github-query/PersonGitHubActivityMetrics.csv",
+      "_data/github-query/GitHubActivityBreakdownByFeatureMetrics.csv",
+      "_data/github-query/GitHubActivityBreakdownByLanguageFeatureMetrics.csv",
+      "_data/github-query/GitHubActivityBreakdownByLanguageModelMetrics.csv",
+      "_data/github-query/GitHubActivityBreakdownByModelFeatureMetrics.csv") else c(
         "github-copilot-developer-productivity-simulation.Rmd",
         "github-developer-experience-helpers.R",
         paste0("_data/", names(query_export_headers)))

@@ -9,9 +9,80 @@ bundle <- lapply(names(query_export_headers), function(path)
   read.csv(file.path(utility, "_data", path), check.names = FALSE,
            stringsAsFactors = FALSE))
 names(bundle) <- names(query_export_headers)
+super_helpers <- new.env()
+sys.source(file.path(utility, "copilot-super-panel-helpers.R"), super_helpers)
 test("all nine synthetic exports have independently specified ordered headers", {
   stopifnot(length(query_export_headers) == 9L)
   validate_query_bundle(bundle)
+})
+test("super panel joins all product files without multiplying person-weeks", {
+  joined <- super_helpers$build_copilot_super_panel(file.path(utility, "_data"))
+  panel <- joined$panel
+  person_query <- bundle[["person-query/PersonQuery.csv"]]
+  m365 <- bundle[["consumption-query/PersonM365CreditsMetrics.csv"]]
+  m365$MetricDate <- as.Date(m365$MetricDate)
+  m365$WeekStart <- super_helpers$week_start_sunday(m365$MetricDate)
+  expected_services <- aggregate(ServiceName ~ PersonId + WeekStart, m365,
+                                 function(x) length(unique(x)))
+  service_match <- match(paste(joined$m365_weekly$PersonId,
+                               joined$m365_weekly$MetricDate),
+                         paste(expected_services$PersonId,
+                               expected_services$WeekStart))
+  stopifnot(nrow(panel) == nrow(person_query),
+            !anyDuplicated(panel[c("PersonId", "MetricDate")]),
+            anyDuplicated(m365[c("PersonId", "MetricDate")]) > 0L,
+            !anyDuplicated(joined$m365_weekly[c("PersonId", "MetricDate")]),
+            !anyDuplicated(joined$github_activity_weekly[c("PersonId", "MetricDate")]),
+            !anyDuplicated(joined$github_feature_weekly[c("PersonId", "MetricDate")]),
+            max(joined$m365_weekly$m365_observed_days) == 5L,
+            max(joined$github_activity_weekly$github_observed_days) == 5L,
+            max(joined$github_credits_weekly$github_credit_days) > 1L,
+            max(joined$m365_weekly$m365_active_days) > 1L,
+            max(joined$github_activity_weekly$github_active_days) > 1L,
+            all(!is.na(service_match)),
+            all(joined$m365_weekly$m365_service_count ==
+                  expected_services$ServiceName[service_match]),
+            all(c("m365_credits", "m365_sessions", "github_credits",
+                  "github_code_acceptances", "github_chat_requests",
+                  "github_feature_usage_count", "github_language_model_usage_count",
+                  "github_model_feature_usage_count") %in% names(panel)),
+            all(joined$m365_weekly$PersonId %in% person_query$PersonId),
+            all(joined$github_activity_weekly$PersonId %in% person_query$PersonId))
+})
+test("consumption setup derives product mix and enabled population from people", {
+  rmd_lines <- readLines(file.path(utility,
+                                   "copilot-consumption-ways-of-working-simulation.Rmd"))
+  setup_start <- grep("^```\\{r setup", rmd_lines)[1] + 1L
+  setup_end <- which(seq_along(rmd_lines) > setup_start &
+                       rmd_lines == "```")[1] - 1L
+  env <- new.env()
+  old <- getwd()
+  tryCatch({
+    setwd(utility)
+    eval(parse(text = rmd_lines[setup_start:setup_end]), env)
+  }, finally = setwd(old))
+  stopifnot("ProductUsageMix" %in% names(env$person_base),
+            setequal(levels(env$person_base$ProductUsageMix),
+                     c("Observed both", "Observed M365 only",
+                       "Observed GitHub only", "No observed product use")),
+            all(table(env$person_base$ProductUsageMix) >= 10L),
+            !any(grepl("non.?users?", levels(env$person_base$ProductUsageMix),
+                       ignore.case = TRUE)),
+            all(env$person_base$weekly_m365_credits[
+              env$person_base$m365_observed_weeks > 0] ==
+                env$person_base$total_m365_credits[
+                  env$person_base$m365_observed_weeks > 0] /
+                env$person_base$m365_observed_weeks[
+                  env$person_base$m365_observed_weeks > 0]),
+            all(env$person_base$active_weeks ==
+                  vapply(env$person_base$PersonId, function(id) {
+                    sum(with(env$person_week[env$person_week$PersonId == id, ],
+                             m365_credits > 0 | m365_sessions > 0),
+                        na.rm = TRUE)
+                  }, numeric(1))),
+            env$overall$Licensed ==
+              env$publication_count(sum(env$person_base$M365EnabledUser),
+                                    nrow(env$person_base)))
 })
 test("rename drop extra and order mutations fail before any output is written", {
   for (path in names(bundle)) for (mutation in c("rename", "drop", "extra", "order")) {
@@ -35,7 +106,7 @@ test("bundle write validation includes late-file delimiter failures", {
 consumption <- new.env()
 lines <- readLines(file.path(utility, "copilot-consumption-ways-of-working-simulation.Rmd"))
 start <- grep("^```\\{r setup", lines)[1] + 1L
-end <- grep("^people_meta <-", lines)[1] - 1L
+end <- grep("^super <-", lines)[1] - 1L
 eval(parse(text = lines[start:end]), consumption)
 test("publication floors count distinct people and suppress complementary cells", {
   d <- data.frame(PersonId = sprintf("synthetic-%02d", 1:20),
