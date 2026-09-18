@@ -12,7 +12,7 @@ permalink: /copilot-dashboards/
 
 **Building your own?** Review the required queries, get the source, and follow the setup guide below.
 
-Both seven-page reports use **synthetic data**. They illustrate analysis approaches, not evidence of Copilot's impact. Assumptions and simulation details are included in each report's appendix.
+Both reports use **synthetic data**. They illustrate analysis approaches, not evidence of Copilot's impact. Assumptions and simulation details are included in each report's methods or appendix.
 
 <div class="vi-card-grid" markdown="0">
   <a class="vi-card" href="#copilot-consumption-and-ways-of-working">
@@ -41,8 +41,10 @@ It is built around the volume-vs-mix distinction: total consumption differs from
 
 **Scope:** "consumption" here refers to **Copilot credit consumption** as captured by
 the Viva Insights Consumption Query. That query covers Microsoft 365 Copilot services
-and also emits GitHub AI credits, so both appear in this report. For GitHub Copilot
-*activity* — completions, chat, features, models and languages — see the
+and also emits GitHub AI credits, so both appear in this report. The report additionally
+reads the GitHub query's *activity* file to tell observed non-use apart from absent
+observation. For the GitHub Copilot feature, model and language **breakdowns** — which
+this report does not present — see the
 [Developer Experience and Copilot](#developer-experience-and-copilot) report below.
 
 **Real v1 capability:** the supplied runner builds a narrower **M365 credits-only**
@@ -63,7 +65,7 @@ reproduce the demo or build a scoped credits report with an agent and reusable R
 
 [![Consumption report overview]({{ site.baseurl }}/assets/images/reports/copilot-consumption-overview.png)]({{ site.baseurl }}/examples/utility-r/copilot-consumption-ways-of-working-simulation.html)
 
-**Demo inputs:** Synthetic Consumption query fixtures (`PeopleMetaData`, `PersonM365CreditsMetrics`, `PersonGitHubCreditsMetrics`) alongside a Person Query fixture. These carry simulated values in the real [public Consumption schema](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query), so credits, sessions, service grain and the `PeopleHistoricalId` join key all match a genuine export. Earlier versions of this demo carried token and task-type fields that exist in no export; those have been removed.
+**Demo inputs:** A Person Query fixture, the Consumption query fixtures (`PeopleMetaData`, `PersonM365CreditsMetrics`, `PersonGitHubCreditsMetrics`) and one GitHub query fixture (`PersonGitHubActivityMetrics`) — five files across three queries. The GitHub activity file is what separates "observed with no use" from "not observed" in the product usage mix; the four GitHub breakdown exports are **not** required by this report. These carry simulated values in the real [public Consumption schema](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query), so credits, sessions, service grain and the `PeopleHistoricalId` join key all match a genuine export. Earlier versions of this demo carried token and task-type fields that exist in no export; those have been removed.
 
 **Interpretation:** Associations only. Credit intensity is a cost measure, not a measure of value or quality. Concentration curves and banded percentiles help describe skewed consumption without relying on an average.
 
@@ -76,11 +78,13 @@ reproduce the demo or build a scoped credits report with an agent and reusable R
 
 ## Developer Experience and Copilot
 
-**Synthetic data · R template · Seven-page HTML report**
+**Synthetic data · R template · Four analytical pillars with supporting detail**
 
 **When to use it:** reach for this report when you need to answer questions such as —
 *Do developers who also use Microsoft 365 Copilot show different meeting load or
-uninterrupted-focus time than those who don't? How does GitHub Copilot use vary by
+uninterrupted-focus time than those who don't? Do developers with recorded GitHub
+Copilot use collaborate with broader or narrower internal networks? How does
+GitHub Copilot use vary by
 team, model, or language? Are developers using GitHub Copilot and Microsoft 365
 Copilot jointly, or are the two adopted independently? Is missing activity actually
 zero usage, or a coverage/eligibility gap?* It establishes a baseline of developer
@@ -102,7 +106,10 @@ needed — but column parity is not semantic parity. Confirm population scope, i
 date grains, licence history and expected coverage before adapting, and note that
 eligibility and coverage must be derived because no query emits them.
 
-Explore meeting and uninterrupted hours, team comparisons, joint product-use patterns, model and language mix, and trends.
+Start with Overview, then explore **Collaboration**, **Focus**, **After-hours** and
+**AI**. Collaboration covers both load and network breadth. The **More** menu
+contains GitHub breakdowns, working-pattern comparisons and methods. Detailed
+tables expand in place, and charts reflow for smaller screens.
 
 **[View demo]({{ site.baseurl }}/examples/utility-r/github-copilot-developer-productivity-simulation.html)** ·
 [Get source](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/github-copilot-developer-productivity-simulation.Rmd) ·
@@ -118,9 +125,9 @@ The developer demo uses **synthetic values in confirmed export headers**, not a 
 **Interpretation:** Associations only. Acceptance rate is not code quality, after-hours activity is not burnout, and calendar space does not establish coding time.
 
 <details markdown="1">
-<summary>See the joint AI-use preview</summary>
+<summary>See the recorded GitHub use and observation preview</summary>
 
-![Developer experience report joint AI use]({{ site.baseurl }}/assets/images/reports/github-copilot-devex-ai-use.png)
+![Developer experience report recorded GitHub use and observation]({{ site.baseurl }}/assets/images/reports/github-copilot-devex-ai-use.png)
 
 </details>
 

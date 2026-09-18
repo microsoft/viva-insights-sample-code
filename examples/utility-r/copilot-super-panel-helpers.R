@@ -43,7 +43,15 @@ safe_divide <- function(num, den) {
   out
 }
 
-build_copilot_super_panel <- function(data_dir = "_data") {
+build_copilot_super_panel <- function(data_dir = "_data",
+                                      include_github_breakdowns = TRUE) {
+  # The four GitHub breakdown exports only support feature, language and model
+  # drilldowns. A report that does not present those drilldowns should not
+  # require the files, so callers can opt out and read five exports instead of
+  # nine. Opting out never changes any measure that remains in the panel.
+  stopifnot(length(include_github_breakdowns) == 1L,
+            is.logical(include_github_breakdowns),
+            !is.na(include_github_breakdowns))
   pq <- read_demo_export(data_dir, "person-query", "PersonQuery.csv") |>
     mutate(MetricDate = as.Date(MetricDate),
            WeekStart = week_start_sunday(MetricDate))
@@ -65,6 +73,9 @@ build_copilot_super_panel <- function(data_dir = "_data") {
            `Agent adoption` = tolower(as.character(`Agent adoption`)) %in%
              c("true", "yes", "1"))
 
+  feature_daily <- language_feature_daily <- NULL
+  language_model_daily <- model_feature_daily <- NULL
+  if (include_github_breakdowns) {
   feature_daily <- read_demo_export(data_dir, "github-query",
                                     "GitHubActivityBreakdownByFeatureMetrics.csv") |>
     mutate(MetricDate = as.Date(MetricDate),
@@ -91,6 +102,7 @@ build_copilot_super_panel <- function(data_dir = "_data") {
            WeekStart = week_start_sunday(MetricDate),
            Model = clean_label(Model),
            Feature = clean_label(Feature))
+  }
 
   assert_unique_key(pq, c("PersonId", "MetricDate"), "Person query")
   assert_unique_key(people_meta, "PeopleHistoricalId", "People metadata")
@@ -98,6 +110,7 @@ build_copilot_super_panel <- function(data_dir = "_data") {
                     "GitHub credit consumption")
   assert_unique_key(github_activity_daily, c("PersonId", "MetricDate"),
                     "GitHub activity")
+  if (include_github_breakdowns) {
   assert_unique_key(feature_daily, c("PersonId", "MetricDate", "Feature"),
                     "GitHub feature breakdown")
   assert_unique_key(language_feature_daily,
@@ -109,6 +122,7 @@ build_copilot_super_panel <- function(data_dir = "_data") {
   assert_unique_key(model_feature_daily,
                     c("PersonId", "MetricDate", "Model", "Feature"),
                     "GitHub model-feature breakdown")
+  }
 
   person_keys <- bind_rows(
     select(m365_daily_raw, PersonId, PeopleHistoricalId),
@@ -201,6 +215,9 @@ build_copilot_super_panel <- function(data_dir = "_data") {
   assert_unique_key(github_activity_weekly, c("PersonId", "MetricDate"),
                     "GitHub activity aggregated to person-week")
 
+  github_feature_weekly <- github_language_feature_weekly <- NULL
+  github_language_model_weekly <- github_model_feature_weekly <- NULL
+  if (include_github_breakdowns) {
   github_feature_weekly <- feature_daily |>
     group_by(PersonId, MetricDate = WeekStart) |>
     summarise(
@@ -233,6 +250,7 @@ build_copilot_super_panel <- function(data_dir = "_data") {
       github_distinct_models_feature = n_distinct(Model),
       .groups = "drop"
     )
+  }
 
   panel <- pq |>
     select(-WeekStart) |>
@@ -241,15 +259,14 @@ build_copilot_super_panel <- function(data_dir = "_data") {
     left_join(github_credits_weekly, by = c("PersonId", "MetricDate"),
               relationship = "one-to-one") |>
     left_join(github_activity_weekly, by = c("PersonId", "MetricDate"),
-              relationship = "one-to-one") |>
-    left_join(github_feature_weekly, by = c("PersonId", "MetricDate"),
-              relationship = "one-to-one") |>
-    left_join(github_language_feature_weekly, by = c("PersonId", "MetricDate"),
-              relationship = "one-to-one") |>
-    left_join(github_language_model_weekly, by = c("PersonId", "MetricDate"),
-              relationship = "one-to-one") |>
-    left_join(github_model_feature_weekly, by = c("PersonId", "MetricDate"),
-              relationship = "one-to-one") |>
+              relationship = "one-to-one")
+  for (breakdown_weekly in Filter(Negate(is.null), list(
+    github_feature_weekly, github_language_feature_weekly,
+    github_language_model_weekly, github_model_feature_weekly))) {
+    panel <- left_join(panel, breakdown_weekly, by = c("PersonId", "MetricDate"),
+                       relationship = "one-to-one")
+  }
+  panel <- panel |>
     mutate(
       m365_observed_use = coalesce(m365_credits > 0 | m365_sessions > 0, FALSE),
       github_observed_use = case_when(

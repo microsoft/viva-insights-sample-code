@@ -27,6 +27,17 @@ source(super_panel_helper)
 
 MIN_GROUP_N <- 10L
 MIN_M365_SESSIONS <- 10L
+
+# Intensity thresholds are explicit parameters so that every published figure
+# can state the rule that produced it. CONCENTRATION_CUTS keeps the
+# conventional top-decile and top-quartile reporting cuts. HEAVY_USER_SHARE is
+# deliberately separate: the pattern split needs both patterns to clear the
+# publication floor, and a narrower cut is permitted but will be withheld
+# whenever it produces a cell that is too small to release.
+CONCENTRATION_CUTS <- c(0.10, 0.25)
+HEAVY_USER_SHARE <- 0.20
+HIGH_WEEK_PERCENTILE <- 0.90
+SUSTAINED_WEEK_SHARE <- 0.50
 PAL <- c("#1F4E79", "#2E75B6", "#7FA8D0", "#BDD3E8",
          "#C9C9C9", "#B03A2E", "#5B8C5A", "#7D5BA6")
 
@@ -72,6 +83,23 @@ publication_partition <- function(data, groups, contributors = character(),
   if (safe) data else data[0, , drop = FALSE]
 }
 
+# Share of a product's observed credits held by its highest-volume users. The
+# top group and its complement must both clear the floor, so a concentration
+# figure can never describe a group small enough to identify. Credits are only
+# ever concentrated within one product: M365 and GitHub units are not comparable
+# and are never pooled into a single denominator.
+concentration_share <- function(values, top_share, min_n = MIN_GROUP_N) {
+  stopifnot(length(top_share) == 1L, is.finite(top_share),
+            top_share > 0, top_share < 1, min_n >= 10L)
+  values <- values[is.finite(values) & values > 0]
+  n <- length(values)
+  if (n < min_n) return(NA_real_)
+  k <- ceiling(top_share * n)
+  total <- sum(values)
+  if (k < min_n || (n - k) < min_n || total <= 0) return(NA_real_)
+  sum(sort(values, decreasing = TRUE)[seq_len(k)]) / total
+}
+
 publication_count <- function(n, total, min_n = MIN_GROUP_N) {
   stopifnot(length(min_n) == 1L, is.finite(min_n), min_n >= 10L)
   ifelse(total >= min_n & (n == 0 | n >= min_n) &
@@ -94,7 +122,7 @@ consumption_profile <- function(credit_band, sessions, cost_profile) {
   )
 }
 
-super <- build_copilot_super_panel("_data")
+super <- build_copilot_super_panel("_data", include_github_breakdowns = FALSE)
 pq <- super$panel
 people_meta <- super$people_meta
 m365_daily_raw <- super$m365_daily_raw
@@ -161,11 +189,21 @@ person_week <- pq |>
          github_credits, github_credit_days, github_observed_days,
          github_active_days, github_code_suggestions, github_code_acceptances,
          github_chat_requests, github_agent_adoption_days,
-         github_feature_usage_count, github_distinct_features,
-         github_distinct_languages_feature, github_distinct_models_language,
          m365_observed_use, github_observed_use, any_observed_product_use,
          github_activity_observed, m365_credit_row_observed,
          credits_per_m365_session)
+
+# A high-credit week is defined once, across every active person-week in the
+# product window, so the same bar applies to everyone. Weeks without observed
+# M365 coverage stay out of both the threshold and the per-person counts: an
+# unobserved week is not evidence of a quiet week.
+m365_active_person_weeks <- person_week |>
+  filter(!is.na(m365_credits), m365_credits > 0)
+HIGH_WEEK_CUT <- if (nrow(m365_active_person_weeks) >= MIN_GROUP_N) {
+  unname(quantile(m365_active_person_weeks$m365_credits, HIGH_WEEK_PERCENTILE))
+} else {
+  NA_real_
+}
 
 WOW_METRICS <- c(
   "Collaboration_hours", "Active_connected_hours",
@@ -228,6 +266,8 @@ person_consumption <- person_week |>
       0
     ),
     active_weeks = sum(m365_credits > 0 | m365_sessions > 0, na.rm = TRUE),
+    m365_high_weeks = if (is.na(HIGH_WEEK_CUT)) NA_integer_ else
+      sum(!is.na(m365_credits) & m365_credits >= HIGH_WEEK_CUT),
     total_m365_credits = sum(m365_credits, na.rm = TRUE),
     total_github_credits = sum(github_credits, na.rm = TRUE),
     total_m365_sessions = sum(m365_sessions, na.rm = TRUE),
@@ -249,6 +289,7 @@ person_consumption <- person_week |>
       total_github_active_days > 0 | total_github_code_acceptances > 0 |
       total_github_chat_requests > 0,
     active_week_share = active_weeks / product_weeks,
+    m365_high_week_share = safe_divide(m365_high_weeks, m365_observed_weeks),
     positive_quartile = if_else(
       positive_consumer,
       ntile(if_else(positive_consumer, weekly_m365_credits, NA_real_), 4L),
@@ -271,6 +312,13 @@ high_cost_cut <- quantile(
     person_consumption$total_m365_sessions >= MIN_M365_SESSIONS
   ],
   0.75, na.rm = TRUE
+)
+
+# Heavy users are the highest-volume share of people with positive observed
+# M365 credits, ranked on their average weekly credits over observed weeks.
+heavy_user_cut <- quantile(
+  person_consumption$weekly_m365_credits[person_consumption$positive_consumer],
+  1 - HEAVY_USER_SHARE, na.rm = TRUE
 )
 
 person_attributes <- super$person_attributes
@@ -337,6 +385,23 @@ person_base <- person_attributes |>
                  "Low User", "No observed M365 credits"),
       ordered = TRUE
     ),
+    # Volume and consistency are separate questions. A heavy user who reaches
+    # the high-credit bar in most observed weeks is a sustained consumer; one
+    # who reaches it occasionally is spike-driven. Both remain observations
+    # about recorded credits, not judgements about value.
+    IntensityPattern = factor(
+      case_when(
+        !positive_consumer ~ "No observed M365 credits",
+        is.na(m365_high_week_share) ~ "Pattern unresolved",
+        weekly_m365_credits >= heavy_user_cut &
+          m365_high_week_share >= SUSTAINED_WEEK_SHARE ~ "Heavy, sustained",
+        weekly_m365_credits >= heavy_user_cut ~ "Heavy, intermittent",
+        TRUE ~ "Other active users"
+      ),
+      levels = c("Heavy, sustained", "Heavy, intermittent",
+                 "Other active users", "Pattern unresolved",
+                 "No observed M365 credits")
+    ),
     M365EnabledUser = replace_na(M365EnabledUser, FALSE),
     IsCopilotLicensed = if_else(M365EnabledUser, "true", "false")
   )
@@ -394,6 +459,62 @@ github_public <- publication_partition(
 overall_public <- publication_partition(
   person_base, character(), m365_contributors
 )
+intensity_public <- publication_partition(
+  person_base, "IntensityPattern", m365_contributors
+)
+
+concentration_summary <- bind_rows(lapply(
+  list(
+    list(product = "Microsoft 365 Copilot credits",
+         values = person_base$total_m365_credits),
+    list(product = "GitHub AI credits",
+         values = person_base$total_github_credits)
+  ),
+  function(spec) tibble(
+    Product = spec$product,
+    People = publication_count(sum(spec$values > 0), nrow(person_base)),
+    `Top decile` = concentration_share(spec$values, CONCENTRATION_CUTS[1]),
+    `Top quartile` = concentration_share(spec$values, CONCENTRATION_CUTS[2])
+  )
+))
+
+intensity_summary <- intensity_public |>
+  group_by(IntensityPattern) |>
+  summarise(
+    People = n(),
+    `Credits / person / week` = mean(weekly_m365_credits),
+    `High-credit weeks / person` = mean(m365_high_weeks),
+    .groups = "drop"
+  ) |>
+  mutate(`Share of population` = People / sum(People))
+
+# Built from the constants so a threshold change can never leave the published
+# rule describing the previous cut.
+INTENSITY_RULE <- sprintf(
+  paste("Heavy user: top %s of people with positive observed M365 credits, by",
+        "average weekly credits. High-credit week: a person-week at or above",
+        "the %s percentile of all active person-weeks. Sustained: at least %s",
+        "of a person's observed weeks are high-credit weeks."),
+  percent(HEAVY_USER_SHARE, accuracy = 1),
+  scales::ordinal(HIGH_WEEK_PERCENTILE * 100),
+  percent(SUSTAINED_WEEK_SHARE, accuracy = 1)
+)
+
+concentration_statement <- {
+  share <- concentration_summary$`Top decile`[
+    concentration_summary$Product == "Microsoft 365 Copilot credits"
+  ]
+  if (length(share) != 1L || is.na(share)) {
+    paste("the concentration of M365 credits is withheld because the highest-",
+          "volume group or its complement is below the publication floor",
+          sep = "")
+  } else {
+    sprintf(paste("the highest-volume %s of people with positive Microsoft 365",
+                  "credits account for %s of all observed M365 credits"),
+            percent(CONCENTRATION_CUTS[1], accuracy = 1),
+            percent(share, accuracy = 0.1))
+  }
+}
 
 function_summary <- function_public |>
   group_by(FunctionType) |>
@@ -741,6 +862,12 @@ Row {data-height=335}
 Copilot and GitHub Copilot activity before relating either product to working
 patterns. M365 credits, GitHub AI credits and GitHub activity remain separate
 measures; no common unit or conversion has been confirmed.
+
+**Consumption is concentrated.** Across the observed product window,
+`r concentration_statement`. Concentration is reported within each product
+separately: M365 credits and GitHub AI credits are different units and are
+never pooled into a shared denominator. See the consumption detail page for
+the concentration cuts and the heavy-user pattern split.
 
 **Enablement is a people measure.** M365 enablement is reported as the share of
 people with any observed enabled day, not as a percentage of possible enabled
@@ -1102,6 +1229,97 @@ profile_grid |>
 Appendix: consumption detail {data-icon="fa-bookmark"}
 =====================================
 
+Row {data-height=330}
+-------------------------------------
+
+### Credit concentration
+
+```{r concentration-table}
+if (!nrow(concentration_summary) ||
+    all(is.na(concentration_summary$`Top decile`) &
+        is.na(concentration_summary$`Top quartile`))) {
+  cat("Concentration withheld: for every product, the highest-volume group or its complement is below the publication floor. No partial share is shown.")
+} else {
+  withheld <- function(x, fmt) if_else(is.na(x), "Withheld", fmt(x))
+  concentration_summary |>
+    transmute(
+      Product,
+      `People with positive credits` =
+        withheld(People, \(x) comma(x)),
+      `Share used by top 10%` =
+        withheld(`Top decile`, \(x) percent(x, accuracy = 0.1)),
+      `Share used by top 25%` =
+        withheld(`Top quartile`, \(x) percent(x, accuracy = 0.1))
+    ) |>
+    kable(
+      caption = paste(
+        "Share of each product's observed credits used by its highest-volume",
+        "people, ranked within that product. Percentiles are taken among",
+        "people with positive observed credits. A share is withheld unless",
+        "both the top group and the remaining population meet the publication",
+        "floor. M365 and GitHub credits are separate units and are never added."
+      )
+    )
+}
+```
+
+### Heavy-user consumption pattern
+
+```{r intensity-pattern, fig.height=4.2, fig.alt="Horizontal bars showing how many people are heavy sustained users, heavy intermittent users, other active users, or have no observed M365 credits."}
+if (!nrow(intensity_summary)) {
+  cat("Pattern partition withheld: one or more pattern cells or complements are below the publication floor. Narrower heavy-user cuts withhold more often, because the highest-volume people are the fewest.")
+} else {
+ggplot(
+  intensity_summary,
+  aes(
+    x = People,
+    y = factor(IntensityPattern, levels = rev(levels(IntensityPattern)))
+  )
+) +
+  geom_col(fill = PAL[2], width = 0.64) +
+  geom_text(
+    aes(label = paste0(comma(People), " (",
+                       percent(`Share of population`, accuracy = 0.1), ")")),
+    hjust = -0.08, size = 3
+  ) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.3))) +
+  theme_t() +
+  labs(
+    title = "Sustained high volume versus occasional spikes",
+    subtitle = "Separates how much a person consumes from how consistently they consume it",
+    x = "People", y = NULL,
+    caption = paste(
+      strwrap(
+        paste("Heavy-user and high-credit-week thresholds are defined below.",
+              CHART_CAPTION),
+        width = 105
+      ),
+      collapse = "\n"
+    )
+  )
+}
+```
+
+Row {data-height=175}
+-------------------------------------
+
+### Reading the intensity measures
+
+**Volume and consistency answer different questions.** Concentration shows how
+much of the observed credit total sits with the highest-volume people. The
+pattern split shows whether those people consume at that level habitually or in
+occasional bursts. A group can be concentrated without being habitual.
+
+**The window is 13 product weeks.** Consistency is measured inside that window
+only. It is a lookback description, not a trend, and it cannot show whether a
+pattern is starting or fading. Unobserved weeks are excluded from both the
+threshold and the per-person counts, so a coverage gap is never counted as a
+quiet week.
+
+**Thresholds are parameters, not findings.** `r INTENSITY_RULE` Changing any
+threshold changes the groups; narrower heavy-user cuts are permitted and will
+be withheld whenever a resulting group falls below the publication floor.
+
 Row {data-height=455}
 -------------------------------------
 
@@ -1224,7 +1442,7 @@ if (!nrow(profile_summary)) {
 Methods and appendix {data-icon="fa-book"}
 =====================================
 
-Row {data-height=410}
+Row {data-height=330}
 -------------------------------------
 
 ### Join and aggregation workflow
@@ -1256,6 +1474,9 @@ ggplot(steps, aes(x, 1)) +
   labs(title = "Time-aligned person-week panel")
 ```
 
+Row {data-height=450}
+-------------------------------------
+
 ### Core rules
 
 | Question | Rule |
@@ -1270,6 +1491,9 @@ ggplot(steps, aes(x, 1)) +
 | Network measures | Use weekly person-query network metrics and average them across weeks; never sum them |
 | Privacy | At least 10 distinct people per published cell, contributing cohort and non-empty contributor complement. Pool unsafe function cells, then recheck; withhold an entire failing partition consistently across tables, charts, shares and ranks |
 
+Row {data-height=190}
+-------------------------------------
+
 ### Key crosswalk check
 
 ```{r}
@@ -1278,7 +1502,7 @@ unmatched_key_counts |>
   kable(caption = "Crosswalk diagnostics are qualitative: no small exception counts or reconstructible crosswalk totals are published.")
 ```
 
-Row {data-height=390}
+Row {data-height=430}
 -------------------------------------
 
 ### Simulation design
@@ -1308,6 +1532,9 @@ The following effects are deliberately modest:
   in some credit bands.
 - External network size is a null.
 
+Row {data-height=260}
+-------------------------------------
+
 ### Synthetic source assets
 
 The uncompressed source-shaped CSVs sit under:
@@ -1324,7 +1551,7 @@ They are intended for demonstrations, workshops and adaptation of the template.
 They contain no customer data or real identifiers. The GitHub-query files in the
 same folder are not required for this consumption report.
 
-Row {data-height=430}
+Row {data-height=520}
 -------------------------------------
 
 ### Definitions and limitations
@@ -1359,6 +1586,9 @@ caused a working pattern, and it does not observe output quality, task
 difficulty or business value. It also makes no wellbeing claims: uninterrupted,
 interrupted, available-to-focus, after-hours and weekend measures describe
 observed calendar and collaboration patterns only.
+
+Row {data-height=520}
+-------------------------------------
 
 ### Replacing the synthetic data
 
