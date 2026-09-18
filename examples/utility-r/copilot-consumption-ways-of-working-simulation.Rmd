@@ -1224,7 +1224,7 @@ if (!nrow(profile_summary)) {
 Methods and appendix {data-icon="fa-book"}
 =====================================
 
-Row {data-height=410}
+Row {data-height=330}
 -------------------------------------
 
 ### Join and aggregation workflow
@@ -1256,6 +1256,9 @@ ggplot(steps, aes(x, 1)) +
   labs(title = "Time-aligned person-week panel")
 ```
 
+Row {data-height=450}
+-------------------------------------
+
 ### Core rules
 
 | Question | Rule |
@@ -1270,6 +1273,9 @@ ggplot(steps, aes(x, 1)) +
 | Network measures | Use weekly person-query network metrics and average them across weeks; never sum them |
 | Privacy | At least 10 distinct people per published cell, contributing cohort and non-empty contributor complement. Pool unsafe function cells, then recheck; withhold an entire failing partition consistently across tables, charts, shares and ranks |
 
+Row {data-height=190}
+-------------------------------------
+
 ### Key crosswalk check
 
 ```{r}
@@ -1278,7 +1284,7 @@ unmatched_key_counts |>
   kable(caption = "Crosswalk diagnostics are qualitative: no small exception counts or reconstructible crosswalk totals are published.")
 ```
 
-Row {data-height=390}
+Row {data-height=430}
 -------------------------------------
 
 ### Simulation design
@@ -1308,6 +1314,9 @@ The following effects are deliberately modest:
   in some credit bands.
 - External network size is a null.
 
+Row {data-height=260}
+-------------------------------------
+
 ### Synthetic source assets
 
 The uncompressed source-shaped CSVs sit under:
@@ -1324,7 +1333,7 @@ They are intended for demonstrations, workshops and adaptation of the template.
 They contain no customer data or real identifiers. The GitHub-query files in the
 same folder are not required for this consumption report.
 
-Row {data-height=430}
+Row {data-height=520}
 -------------------------------------
 
 ### Definitions and limitations
@@ -1359,6 +1368,9 @@ caused a working pattern, and it does not observe output quality, task
 difficulty or business value. It also makes no wellbeing claims: uninterrupted,
 interrupted, available-to-focus, after-hours and weekend measures describe
 observed calendar and collaboration patterns only.
+
+Row {data-height=520}
+-------------------------------------
 
 ### Replacing the synthetic data
 
