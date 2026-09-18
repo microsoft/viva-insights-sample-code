@@ -14,8 +14,27 @@ for the official contracts.
 
 | Report | Source | Rendered report | Scope |
 |---|---|---|---|
-| Copilot Consumption and Ways of Working | [Rmd](copilot-consumption-ways-of-working-simulation.Rmd) | [HTML](copilot-consumption-ways-of-working-simulation.html) | Copilot credit consumption alongside collaboration patterns, by service, organisation and function. |
+| Copilot Consumption and Ways of Working | [Rmd](copilot-consumption-ways-of-working-simulation.Rmd) | [HTML](copilot-consumption-ways-of-working-simulation.html) | Copilot credit consumption alongside collaboration patterns, by service, organisation and function, including credit concentration and heavy-user consumption patterns. |
 | Developer Experience and Copilot | [Rmd](github-copilot-developer-productivity-simulation.Rmd) | [HTML](github-copilot-developer-productivity-simulation.html) | Baseline working conditions for the developer population, with GitHub Copilot activity, feature/model/language breakdowns, M365 Copilot credit consumption and an evaluation framework. |
+
+## Reading consumption intensity
+
+The Consumption report separates **how much** a person consumes from **how
+consistently** they consume it. Credit concentration reports the share of each
+product's observed credits used by its highest-volume people, ranked within
+that product; M365 and GitHub credits are never pooled into a shared
+denominator. The heavy-user pattern split then divides heavy users into
+sustained and intermittent consumers.
+
+Every threshold is a parameter declared in the report setup
+(`CONCENTRATION_CUTS`, `HEAVY_USER_SHARE`, `HIGH_WEEK_PERCENTILE`,
+`SUSTAINED_WEEK_SHARE`) and the published rule text is generated from those
+constants, so a threshold change cannot leave a stale rule on the page.
+Narrower heavy-user cuts are permitted and are withheld automatically whenever
+a resulting group falls below the publication floor — the highest-volume people
+are also the fewest. Consistency is measured inside the 13-week product window
+only: it is a lookback description, not a trend, and unobserved weeks are
+excluded from both the threshold and the per-person counts.
 
 ## Simulated values, real schema
 

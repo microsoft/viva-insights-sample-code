@@ -483,6 +483,61 @@ test("no published label asserts non-use from absent M365 data", {
   stopifnot(!grepl("non.?users?", page, ignore.case = TRUE),
             grepl(absent, page, fixed = TRUE))
 })
+test("credit concentration withholds unless the top group and its complement clear the floor", {
+  cs <- consumption$concentration_share
+  # A top decile of 4 people is below the floor even though the population is not.
+  stopifnot(is.na(cs(rep(1, 40), 0.10)))
+  # 100 equal contributors: the top decile holds exactly a tenth of the total.
+  stopifnot(abs(cs(rep(1, 100), 0.10) - 0.10) < 1e-9)
+  # The complement must clear the floor too, or the remainder is identifiable.
+  stopifnot(is.na(cs(rep(1, 100), 0.95)))
+  # Zero and non-finite values leave both the ranking and the denominator.
+  stopifnot(abs(cs(c(rep(0, 50), rep(1, 100)), 0.10) - 0.10) < 1e-9,
+            abs(cs(c(NA, NaN, rep(1, 100)), 0.10) - 0.10) < 1e-9)
+  # Concentration tracks skew rather than population size.
+  stopifnot(abs(cs(c(rep(100, 10), rep(1, 90)), 0.10) - 1000 / 1090) < 1e-9)
+  stopifnot(is.na(cs(rep(1, 9), 0.10)), is.na(cs(numeric(0), 0.10)),
+            is.na(cs(rep(0, 100), 0.10)))
+})
+test("heavy-user pattern reconciles to the population and never publishes a small band", {
+  env <- run_setup(stage_fixtures("consumption-intensity"))
+  summary <- env$intensity_summary
+  base <- env$person_base
+  stopifnot(nrow(summary) > 0,
+            sum(summary$People) == nrow(base),
+            all(summary$People >= env$MIN_GROUP_N),
+            all(c("Heavy, sustained", "Heavy, intermittent") %in%
+                  as.character(summary$IntensityPattern)))
+  heavy <- base[grepl("^Heavy", base$IntensityPattern), ]
+  sustained <- base[base$IntensityPattern == "Heavy, sustained", ]
+  intermittent <- base[base$IntensityPattern == "Heavy, intermittent", ]
+  absent <- base[base$IntensityPattern == "No observed M365 credits", ]
+  stopifnot(all(heavy$weekly_m365_credits >= env$heavy_user_cut),
+            all(sustained$m365_high_week_share >= env$SUSTAINED_WEEK_SHARE),
+            all(intermittent$m365_high_week_share < env$SUSTAINED_WEEK_SHARE),
+            all(absent$total_m365_credits == 0),
+            # An unobserved week is never counted as a high-credit week.
+            all(base$m365_high_weeks <= base$m365_observed_weeks))
+  # The published concentration equals an independent recomputation.
+  positive <- sort(base$total_m365_credits[base$total_m365_credits > 0],
+                   decreasing = TRUE)
+  expected <- sum(positive[seq_len(ceiling(0.10 * length(positive)))]) /
+    sum(positive)
+  reported <- env$concentration_summary$`Top decile`[
+    env$concentration_summary$Product == "Microsoft 365 Copilot credits"]
+  stopifnot(abs(reported - expected) < 1e-9,
+            env$concentration_summary$People[
+              env$concentration_summary$Product == "GitHub AI credits"] ==
+              sum(base$total_github_credits > 0))
+  # A narrower heavy-user cut that isolates a handful of people is withheld in
+  # full, including the complementary bands, rather than published in part.
+  narrowed <- base
+  narrowed$IntensityPattern <- as.character(narrowed$IntensityPattern)
+  narrowed$IntensityPattern[which(narrowed$IntensityPattern ==
+                                    "Heavy, sustained")[1:3]] <- "Heavy, rare"
+  stopifnot(nrow(env$publication_partition(narrowed, "IntensityPattern",
+    c("total_m365_credits", "total_m365_sessions"))) == 0)
+})
 test("crosswalk rejects a shared historical key and an unbacked historical key", {
   mpath_for <- function(directory) file.path(directory, "_data", "consumption-query",
                                              "PersonM365CreditsMetrics.csv")
