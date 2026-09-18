@@ -17,6 +17,32 @@ for the official contracts.
 | Copilot Consumption and Ways of Working | [Rmd](copilot-consumption-ways-of-working-simulation.Rmd) | [HTML](copilot-consumption-ways-of-working-simulation.html) | Copilot credit consumption alongside collaboration patterns, by service, organisation and function, including credit concentration and heavy-user consumption patterns. |
 | Developer Experience and Copilot | [Rmd](github-copilot-developer-productivity-simulation.Rmd) | [HTML](github-copilot-developer-productivity-simulation.html) | Baseline working conditions for the developer population, including collaboration network breadth, with GitHub Copilot activity, feature/model/language breakdowns, M365 Copilot credit consumption and an evaluation framework. |
 
+## Which queries each report needs
+
+Both reports draw on all three queries, but they do not need the same files.
+
+| Export | Query | Consumption | Developer Experience |
+|---|---|---|---|
+| `PersonQuery.csv` | Person | Required | Required |
+| `PeopleMetaData.csv` | Consumption | Required | Required |
+| `PersonM365CreditsMetrics.csv` | Consumption | Required | Required |
+| `PersonGitHubCreditsMetrics.csv` | Consumption | Required | Required |
+| `PersonGitHubActivityMetrics.csv` | GitHub | Required | Required |
+| `GitHubActivityBreakdownBy*Metrics.csv` (four files) | GitHub | Not used | Required |
+
+The Consumption report reads **five exports**; the Developer Experience report reads
+all **nine**. `build_copilot_super_panel()` takes `include_github_breakdowns = FALSE`
+for the five-export path, and the consumption report uses it. Opting out removes only
+the feature, language and model drilldown columns — every measure that remains in the
+panel is identical either way.
+
+The Consumption report needs the GitHub *activity* file even though it presents no
+feature or model drilldowns, because that file carries explicit weekday zero rows.
+Those zeros are what separate "observed with no GitHub use" from "not observed" in the
+product usage mix. The sparse GitHub credit file cannot make that distinction on its
+own: it records billable days only, so a developer who was observed but never
+generated billable usage has no credit row at all.
+
 ## Reading consumption intensity
 
 The Consumption report separates **how much** a person consumes from **how

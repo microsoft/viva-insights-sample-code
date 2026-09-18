@@ -307,11 +307,7 @@ test("demo source isolation preflight: tracked references and exact copy targets
       "_data/consumption-query/PeopleMetaData.csv",
       "_data/consumption-query/PersonM365CreditsMetrics.csv",
       "_data/consumption-query/PersonGitHubCreditsMetrics.csv",
-      "_data/github-query/PersonGitHubActivityMetrics.csv",
-      "_data/github-query/GitHubActivityBreakdownByFeatureMetrics.csv",
-      "_data/github-query/GitHubActivityBreakdownByLanguageFeatureMetrics.csv",
-      "_data/github-query/GitHubActivityBreakdownByLanguageModelMetrics.csv",
-      "_data/github-query/GitHubActivityBreakdownByModelFeatureMetrics.csv") else c(
+      "_data/github-query/PersonGitHubActivityMetrics.csv") else c(
         "github-copilot-developer-productivity-simulation.Rmd",
         "github-developer-experience-helpers.R",
         "copilot-super-panel-helpers.R",

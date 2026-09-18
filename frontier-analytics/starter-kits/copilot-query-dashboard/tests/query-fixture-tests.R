@@ -634,6 +634,42 @@ test("developer network measures are levels in distinct people, never weekly sum
             grepl("Network outside organisation", page, fixed = TRUE),
             grepl("trailing window", page, fixed = TRUE))
 })
+test("the consumption path reads five exports and the opt-out changes no retained measure", {
+  dir <- file.path(stage_fixtures("super-panel-lean"), "_data")
+  full <- super_helpers$build_copilot_super_panel(dir)
+  lean <- super_helpers$build_copilot_super_panel(dir, include_github_breakdowns = FALSE)
+  common <- intersect(names(full$panel), names(lean$panel))
+  breakdown_elements <- c("github_feature_weekly", "github_language_feature_weekly",
+                          "github_language_model_weekly", "github_model_feature_weekly")
+  stopifnot(nrow(full$panel) == nrow(lean$panel),
+            length(common) == ncol(lean$panel),
+            ncol(full$panel) > ncol(lean$panel),
+            isTRUE(all.equal(full$panel[common], lean$panel[common])),
+            all(vapply(breakdown_elements, function(n) is.null(lean[[n]]), logical(1))),
+            all(vapply(breakdown_elements, function(n) !is.null(full[[n]]), logical(1))),
+            !is.null(lean$github_activity_weekly), !is.null(lean$m365_weekly),
+            !is.null(lean$github_credits_weekly))
+  # With the four breakdown exports absent the consumption path still builds an
+  # identical panel, while the path that presents those drilldowns still fails.
+  for (f in c("GitHubActivityBreakdownByFeatureMetrics.csv",
+              "GitHubActivityBreakdownByLanguageFeatureMetrics.csv",
+              "GitHubActivityBreakdownByLanguageModelMetrics.csv",
+              "GitHubActivityBreakdownByModelFeatureMetrics.csv")) {
+    unlink(file.path(dir, "github-query", f))
+  }
+  five <- super_helpers$build_copilot_super_panel(dir, include_github_breakdowns = FALSE)
+  stopifnot(isTRUE(all.equal(five$panel, lean$panel)))
+  expect_error(super_helpers$build_copilot_super_panel(dir), "cannot open")
+  # The consumption report must actually take that path and stop carrying the
+  # breakdown-derived columns it never presented.
+  rmd <- paste(readLines(file.path(utility,
+    "copilot-consumption-ways-of-working-simulation.Rmd")), collapse = "\n")
+  stopifnot(grepl("include_github_breakdowns = FALSE", rmd, fixed = TRUE),
+            !grepl("github_feature_usage_count", rmd, fixed = TRUE),
+            !grepl("github_distinct_features", rmd, fixed = TRUE),
+            !grepl("github_distinct_languages_feature", rmd, fixed = TRUE),
+            !grepl("github_distinct_models_language", rmd, fixed = TRUE))
+})
 test("crosswalk rejects a shared historical key and an unbacked historical key", {
   mpath_for <- function(directory) file.path(directory, "_data", "consumption-query",
                                              "PersonM365CreditsMetrics.csv")

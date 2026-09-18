@@ -41,8 +41,10 @@ It is built around the volume-vs-mix distinction: total consumption differs from
 
 **Scope:** "consumption" here refers to **Copilot credit consumption** as captured by
 the Viva Insights Consumption Query. That query covers Microsoft 365 Copilot services
-and also emits GitHub AI credits, so both appear in this report. For GitHub Copilot
-*activity* — completions, chat, features, models and languages — see the
+and also emits GitHub AI credits, so both appear in this report. The report additionally
+reads the GitHub query's *activity* file to tell observed non-use apart from absent
+observation. For the GitHub Copilot feature, model and language **breakdowns** — which
+this report does not present — see the
 [Developer Experience and Copilot](#developer-experience-and-copilot) report below.
 
 **Real v1 capability:** the supplied runner builds a narrower **M365 credits-only**
@@ -63,7 +65,7 @@ reproduce the demo or build a scoped credits report with an agent and reusable R
 
 [![Consumption report overview]({{ site.baseurl }}/assets/images/reports/copilot-consumption-overview.png)]({{ site.baseurl }}/examples/utility-r/copilot-consumption-ways-of-working-simulation.html)
 
-**Demo inputs:** Synthetic Consumption query fixtures (`PeopleMetaData`, `PersonM365CreditsMetrics`, `PersonGitHubCreditsMetrics`) alongside a Person Query fixture. These carry simulated values in the real [public Consumption schema](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query), so credits, sessions, service grain and the `PeopleHistoricalId` join key all match a genuine export. Earlier versions of this demo carried token and task-type fields that exist in no export; those have been removed.
+**Demo inputs:** A Person Query fixture, the Consumption query fixtures (`PeopleMetaData`, `PersonM365CreditsMetrics`, `PersonGitHubCreditsMetrics`) and one GitHub query fixture (`PersonGitHubActivityMetrics`) — five files across three queries. The GitHub activity file is what separates "observed with no use" from "not observed" in the product usage mix; the four GitHub breakdown exports are **not** required by this report. These carry simulated values in the real [public Consumption schema](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query), so credits, sessions, service grain and the `PeopleHistoricalId` join key all match a genuine export. Earlier versions of this demo carried token and task-type fields that exist in no export; those have been removed.
 
 **Interpretation:** Associations only. Credit intensity is a cost measure, not a measure of value or quality. Concentration curves and banded percentiles help describe skewed consumption without relying on an average.
 

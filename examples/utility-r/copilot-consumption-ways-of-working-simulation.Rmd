@@ -122,7 +122,7 @@ consumption_profile <- function(credit_band, sessions, cost_profile) {
   )
 }
 
-super <- build_copilot_super_panel("_data")
+super <- build_copilot_super_panel("_data", include_github_breakdowns = FALSE)
 pq <- super$panel
 people_meta <- super$people_meta
 m365_daily_raw <- super$m365_daily_raw
@@ -189,8 +189,6 @@ person_week <- pq |>
          github_credits, github_credit_days, github_observed_days,
          github_active_days, github_code_suggestions, github_code_acceptances,
          github_chat_requests, github_agent_adoption_days,
-         github_feature_usage_count, github_distinct_features,
-         github_distinct_languages_feature, github_distinct_models_language,
          m365_observed_use, github_observed_use, any_observed_product_use,
          github_activity_observed, m365_credit_row_observed,
          credits_per_m365_session)

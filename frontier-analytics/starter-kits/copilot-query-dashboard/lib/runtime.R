@@ -271,11 +271,7 @@ reference_files <- function(cfg) {
                     "consumption-query/PeopleMetaData.csv",
                     "consumption-query/PersonM365CreditsMetrics.csv",
                     "consumption-query/PersonGitHubCreditsMetrics.csv",
-                    "github-query/PersonGitHubActivityMetrics.csv",
-                    "github-query/GitHubActivityBreakdownByFeatureMetrics.csv",
-                    "github-query/GitHubActivityBreakdownByLanguageFeatureMetrics.csv",
-                    "github-query/GitHubActivityBreakdownByLanguageModelMetrics.csv",
-                    "github-query/GitHubActivityBreakdownByModelFeatureMetrics.csv")))
+                    "github-query/PersonGitHubActivityMetrics.csv")))
   }
   paths <- file.path(utility, relative)
   if (!all(file.exists(paths))) fail("Reference report or supplied synthetic fixtures are missing.")
