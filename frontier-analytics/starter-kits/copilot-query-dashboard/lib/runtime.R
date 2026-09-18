@@ -252,6 +252,7 @@ reference_files <- function(cfg) {
   if (cfg$report == "github") {
     relative <- c("github-copilot-developer-productivity-simulation.Rmd",
                   "github-developer-experience-helpers.R",
+                  "copilot-super-panel-helpers.R",
                   file.path("_data", c(
                     "person-query/PersonQuery.csv",
                     "consumption-query/PeopleMetaData.csv",

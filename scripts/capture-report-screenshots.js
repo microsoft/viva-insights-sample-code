@@ -28,7 +28,7 @@ const SHOTS = [
   },
   {
     html: 'copilot-consumption-ways-of-working-simulation.html',
-    page: 'credit-distribution',
+    page: 'product-usage-mix',
     file: 'copilot-consumption-credit-distribution.png',
   },
   {
@@ -38,7 +38,7 @@ const SHOTS = [
   },
   {
     html: 'github-copilot-developer-productivity-simulation.html',
-    page: 'focus-and-coordination',
+    page: 'focus',
     file: 'github-copilot-devex-focus.png',
   },
 ];

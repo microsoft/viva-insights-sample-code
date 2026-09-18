@@ -51,12 +51,16 @@ th,td { padding:9px 12px !important; border-bottom:1px solid #e5e7eb; vertical-a
 caption { text-align:left; color:#526079; font-size:12px; padding:8px 0; }
 .framework { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
 .framework>div { background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:14px; line-height:1.5; }
+.pillar-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin:14px 0; }
+.pillar-grid>div { background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:14px 16px; line-height:1.5; }
+.pillar-grid strong { display:block; color:#242742; margin-bottom:4px; }
+.pillar-grid small { color:#526079; }
 a { color:#4338ca; }
 @media(min-width:1200px) { .dashboard-page-wrapper { max-width:1440px; margin:0 auto; } }
 @media(max-width:767px) {
   body { padding-top:59px !important; }
   .kpis { grid-template-columns:repeat(2,minmax(0,1fr)); }
-  .framework { grid-template-columns:1fr; }
+  .framework, .pillar-grid { grid-template-columns:1fr; }
   .chart-stage { padding:12px !important; }
   .chart-stage img { min-width:700px; }
 }
@@ -70,47 +74,106 @@ document.addEventListener('click', function(event) {
 });
 </script>
 
-1 Landscape
+1 Overview
 =====================================
 
 Row
 -------------------------------------
 
-### Who is represented, and what does their working week look like?
+### Who is represented, and what should we inspect?
 
 <span class="pill">Synthetic demo · Real export schema</span>
 <span class="context">Baseline: `r period_label` · `r BASELINE_WEEKS` complete Person Query weeks · Product feeds observed on weekdays in `r product_label`</span>
 
-<p class="leadline">The baseline covers <strong>`r num(nrow(baseline))` developers across `r n_distinct(baseline$Team)` teams</strong>, with all eight Person Query weeks recorded for every developer. The median developer averaged <strong>`r f1(median(baseline$Collaboration_hours))` collaboration hours</strong>, including <strong>`r f1(median(baseline$Meeting_hours))` meeting hours</strong>, <strong>`r f1(median(baseline$Available_to_focus_hours))` available-to-focus hours</strong>, <strong>`r f1(median(baseline$Uninterrupted_hours))` uninterrupted hours</strong>, and <strong>`r f1(median(baseline$Interrupted_hours))` interrupted hours</strong> per week.</p>
+<p class="leadline">The baseline covers <strong>`r num(nrow(baseline))` developers across `r n_distinct(baseline$Team)` teams</strong>, with all eight Person Query weeks recorded for every developer. The report is now organised around four pillars: collaboration load, focus, after-hours working, and observed AI use.</p>
 
 ```{r landscape-kpis, results='asis'}
 cat('<div class="kpis">')
 card('Developer roster', num(nrow(baseline)), paste(num(sum(people$IsDeveloper)), 'developers;', num(nrow(people)), 'people in source population'))
 card('Collaboration hours / week', f1(median(baseline$Collaboration_hours)), 'Median of person-level eight-week averages')
-card('Meeting hours / week', f1(median(baseline$Meeting_hours)), 'Median of person-level eight-week averages')
 card('Available-to-focus hours / week', f1(median(baseline$Available_to_focus_hours)), 'Calendar availability; tenant working-hours rules apply')
-card('Uninterrupted hours / week', f1(median(baseline$Uninterrupted_hours)), 'Partitioned with interrupted hours')
+card('After-hours hours / week', f1(median(baseline$After_hours_collaboration_hours)), 'Observed collaboration outside configured working hours')
+card('GitHub observed developers', num(sum(gh_observed$GH_use == 'GitHub use recorded')), 'Complete GitHub activity coverage in the baseline window')
 cat('</div>')
 ```
 
 This is a manager view of working conditions and recorded Copilot use from committed synthetic CSVs whose column names match Viva Insights query exports. The roster contains `r num(nrow(people))` synthetic people, of whom `r num(sum(people$IsDeveloper))` are developers. Other job-family records are excluded by the `IsDeveloper` attribute, not by product activity. The helper does not generate or overwrite data. Microsoft 365 collection completeness is unknown by default: its complete-window rates and common-product comparisons are unavailable, not zero. Matching a fixture filename or schema never certifies coverage.
 
-<div class="definitions">
-<strong>Reading the working week.</strong> Collaboration hours include meeting hours, scheduled calls, email and chat activity, so they must not be added to meeting hours. Available-to-focus hours are the hours remaining during working hours after excluding meetings and scheduled Teams calls. Uninterrupted hours and interrupted hours partition available-to-focus hours. The working-hours basis is configurable per tenant through metric rules, so the 40-hour basis in this synthetic file is not universal. Available-to-focus hours are calendar availability; they do not measure coding time or psychological flow.
+<div class="pillar-grid">
+<div><strong>Collaboration</strong><small>Collaboration, meeting, email, chat and call hours. These measures describe coordination load and communication mode, not output.</small></div>
+<div><strong>Focus</strong><small>Available-to-focus, uninterrupted and interrupted hours. These are calendar-derived conditions, not psychological flow.</small></div>
+<div><strong>After-hours</strong><small>Collaboration outside configured working hours and persistence across weeks. This is not total work time or a wellbeing diagnosis.</small></div>
+<div><strong>AI</strong><small>Observed GitHub activity, sparse GitHub credits, and M365 availability boundaries. Product rows establish observation, not full entitlement.</small></div>
 </div>
 
 Row
 -------------------------------------
 
-### Team and role composition
+### Pillar baseline table
+
+```{r landscape-tables, results='asis'}
+html_table(work_summary, paste('Population percentiles across', num(nrow(baseline)), 'developers’ eight-week averages | Hours/person/week |', period_label))
+```
+
+<div class="definitions">
+<strong>Reading the working week.</strong> Collaboration hours include meeting hours, scheduled calls, email and chat activity, so they must not be added to meeting hours. Available-to-focus hours are the hours remaining during working hours after excluding meetings and scheduled Teams calls. Uninterrupted hours and interrupted hours partition available-to-focus hours. The working-hours basis is configurable per tenant through metric rules, so the 40-hour basis in this synthetic file is not universal. Available-to-focus hours are calendar availability; they do not measure coding time or psychological flow.
+</div>
+
+2 Collaboration
+=====================================
+
+Row
+-------------------------------------
+
+### How is collaboration load distributed across teams?
+
+<span class="pill">Collaboration pillar</span>
+<span class="context">`r period_label` · Person-level eight-week averages · no individual points shown</span>
+
+<p class="leadline">Sorted by collaboration hours, <strong>`r team_league$Team[1]`</strong> has the highest median collaboration at <strong>`r f1(team_league$Collaboration_hours[1])` hours/person/week</strong>. This page separates total collaboration from meeting, email, chat and call components so the first-page landscape no longer mixes every behavioural metric in one view.</p>
+
+<div class="definitions">
+<strong>Collaboration hours are not additive with every component shown here.</strong> Use these charts to compare patterns and mode mix, not to sum a workload total. Meeting hours and scheduled calls are also part of the focus-time identity used on the next page.
+</div>
+
+Row
+-------------------------------------
+
+### Collaboration, meetings, email, chat and calls
+
+```{r collaboration-intervals, fig.height=7.2, fig.alt='Team percentile intervals compare collaboration hours, meeting hours, email hours, chat hours, scheduled call hours and unscheduled call hours.'}
+interval_plot(baseline,
+  c('Collaboration_hours','Meeting_hours','Email_hours','Chat_hours',
+    'Scheduled_call_hours','Unscheduled_call_hours'),
+  title='Collaboration load and communication modes by team',
+  subtitle='Dot: median. Line: 25th to 75th percentile of person-level eight-week averages. Separate horizontal scales.')
+```
+
+Row
+-------------------------------------
+
+### Team collaboration table
+
+```{r collaboration-table, results='asis'}
+html_table(team_league |>
+  transmute(Rank, Team, `Developers (count)`=Developers,
+    `Collaboration hours`=f1(Collaboration_hours),
+    `Meeting hours`=f1(Meeting_hours),
+    `Email hours`=f1(Email_hours),
+    `Chat hours`=f1(Chat_hours),
+    `Scheduled call hours`=f1(Scheduled_call_hours),
+    `Unscheduled call hours`=f1(Unscheduled_call_hours)),
+  paste('Sorted by collaboration hours descending | Hours/person/week |', period_label,
+        '| These are descriptive working-condition metrics, not delivery-quality measures.'))
+```
+
+<details><summary>Team and role composition context</summary>
 
 ```{r roster-composition, fig.height=4.4, fig.alt='Six team bars showing role composition. Every team contains 60 developers. Percentage labels and an exact table accompany the chart.'}
 stack_plot(team_context, 'Roles represented in each team',
   'Roster composition provides context for coordination needs.',
   base_caption(unit='share of each team, 60 developers per team'))
 ```
-
-<details><summary>Exact role mix, seniority and tenure</summary>
 
 ```{r composition-details, results='asis'}
 html_table(composition_table(team_context), 'Role shares use the 60 developers in each team as denominator.')
@@ -120,58 +183,9 @@ html_table(composition_counts |> transmute(Attribute, Category, `Developers (cou
 
 </details>
 
-Row
--------------------------------------
+**Manager next step.** Use the collaboration breakdown to pick a specific coordination question before setting a target. For example: are meetings the main load, or is the issue fragmented chat/call activity?
 
-### Team league table for workload and recorded Copilot use
-
-<p class="leadline">Sorted by collaboration hours, <strong>`r team_league$Team[1]`</strong> has the highest median collaboration at <strong>`r f1(team_league$Collaboration_hours[1])` hours/person/week</strong>. Highest reportable GitHub recorded-active share: <strong>`r leader_label(team_league$Team, team_league$GH_active_share)`</strong>, <strong>`r pct(suppressWarnings(max(team_league$GH_active_share, na.rm=TRUE)))`</strong>. `r if (all(is.na(team_league$M365_active_share))) 'Microsoft 365 recorded-active share is unavailable for every team: Microsoft 365 collection completeness is not independently established by these exports, so the value is unresolved measurement, not zero use.' else paste0('Highest reportable Microsoft 365 recorded-active share: <strong>', leader_label(team_league$Team, team_league$M365_active_share), '</strong>, <strong>', pct(suppressWarnings(max(team_league$M365_active_share, na.rm=TRUE))), '</strong>.')` Unavailable means missing coverage evidence or privacy suppression, not inactivity.</p>
-
-```{r landscape-tables, results='asis'}
-html_table(team_league |>
-  transmute(Rank, Team, `Developers (count)`=Developers,
-    `Collaboration hours`=f1(Collaboration_hours), `Meeting hours`=f1(Meeting_hours),
-    `Available-to-focus hours`=f1(Available_to_focus_hours),
-    `Uninterrupted hours`=f1(Uninterrupted_hours), `Interrupted hours`=f1(Interrupted_hours),
-    `After-hours collaboration`=f1(After_hours_collaboration_hours),
-    `GitHub valid developers`=num(GH_valid_n), `GitHub active (%)`=pct_or_reason(GH_active_share, GH_valid_n),
-    `GitHub credits / person / week`=f1(GH_intensity),
-    `M365 valid developers`=num(M365_valid_n), `M365 active (%)`=pct_or_reason(M365_active_share, M365_valid_n),
-    `M365 credits / person / week`=f1(M365_intensity)),
-  paste('Sorted by collaboration hours descending | Hours/person/week and credits/person/week |', period_label,
-        '| Microsoft 365 columns read 0 valid developers and an unavailable credit rate because no developer has independently established Microsoft 365 coverage in this window: that is unresolved measurement, not zero use.'))
-html_table(work_summary, paste('Population percentiles across', num(nrow(baseline)), 'developers’ eight-week averages | Hours/person/week |', period_label))
-```
-
-Row
--------------------------------------
-
-### Ranked team view of headline metrics
-
-```{r team-league-visual, fig.height=12.2, fig.alt='Small-multiple ranked bars compare six teams on workload, available-to-focus time, uninterrupted time, interrupted time, after-hours collaboration and product-specific recorded use.'}
-plot_league <- team_league_plot |>
-  group_by(Metric) |>
-  arrange(Value, .by_group=TRUE) |>
-  mutate(Team_metric=factor(paste(Team, Metric, sep=' | '), levels=paste(Team, Metric, sep=' | '))) |>
-  ungroup()
-ggplot(plot_league, aes(x=Value, y=Team_metric)) +
-  geom_col(data=filter(plot_league, is.finite(Value)), fill='#2563eb', width=.62) +
-  geom_text(data=filter(plot_league, is.finite(Value)),
-    aes(label=Label), hjust=-.10, size=3.1, colour='#253047') +
-  geom_text(data=filter(plot_league, !is.finite(Value)),
-    aes(x=0, label='Unavailable / withheld'), hjust=0, size=3.1, colour='#526079') +
-  facet_wrap(~Metric, scales='free', ncol=2, labeller=label_wrap_gen(26)) +
-  scale_y_discrete(labels=function(x) sub(' \\| .*', '', x)) +
-  scale_x_continuous(expand=expansion(mult=c(0,.25))) + theme_report() +
-  chart_labs('Ranked team metrics for the baseline window',
-    'Each panel is ranked independently. Product denominators use developers with valid observation across the full baseline window.',
-    paste(period_label, '| 60 developers per team | Product intensity uses credits, not fabricated action counts.'),
-    x=NULL, y=NULL)
-```
-
-**Manager next step.** Use the team and role composition when discussing the distribution of working hours. Agree which coordination or tooling question needs investigation before setting a target. No performance judgement or individual action is supported by these data.
-
-2 Focus and coordination
+3 Focus
 =====================================
 
 Row
@@ -217,7 +231,7 @@ html_table(characteristics, paste('Hours/person/week |', period_label, '| 60 dev
 
 **Manager next step.** Use these distributions to ask which meetings unblock work and which interrupt it. Combine the answer with feedback on review wait times and cognitive load before testing a calendar change.
 
-3 Sustainable workload
+4 After-hours
 =====================================
 
 Row
@@ -269,7 +283,7 @@ ggplot(persistence, aes(x=People, y=factor(Band, levels=rev(c('0 weeks', paste('
 
 **Manager next step.** Before drawing a workload conclusion, validate work-schedule settings and seek anonymous feedback on sustainability and disconnection. Do not target individual developers from these aggregates.
 
-4 AI use and query coverage
+5 AI use and query coverage
 =====================================
 
 Row
@@ -346,7 +360,7 @@ html_table(m365_service_mix |> transmute(Service=ServiceName, `People (count)`=P
 
 The concentration row is the share of GitHub credits or Microsoft 365 credits attributable to the highest-volume 10% of active developers for that product. Identities and individual rankings are never displayed. Credits, sessions, completion suggestions and chat requests are different units and are not added together.
 
-5 GitHub Copilot breakdowns
+6 GitHub Copilot breakdowns
 =====================================
 
 Row
@@ -423,7 +437,7 @@ html_table(language_feature_mix |>
 
 **Manager next step.** Use these breakdowns to ask which workflows each feature supports. Do not treat agent-type features or model choice as maturity, quality, productivity or time-saved measures.
 
-6 Working patterns and evaluation
+7 Working patterns and evaluation
 =====================================
 
 Row

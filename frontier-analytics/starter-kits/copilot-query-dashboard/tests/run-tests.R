@@ -314,6 +314,7 @@ test("demo source isolation preflight: tracked references and exact copy targets
       "_data/github-query/GitHubActivityBreakdownByModelFeatureMetrics.csv") else c(
         "github-copilot-developer-productivity-simulation.Rmd",
         "github-developer-experience-helpers.R",
+        "copilot-super-panel-helpers.R",
         paste0("_data/", names(query_export_headers)))
     utility <- file.path(repo, "examples", "utility-r")
     stopifnot(setequal(gsub("\\\\", "/", unname(refs)), file.path(utility, expected)),

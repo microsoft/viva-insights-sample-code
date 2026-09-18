@@ -13,6 +13,19 @@ stopifnot(AFTER_HOURS_CONVENTION >= 0, PERSISTENCE_WEEKS >= 2,
           PERSISTENCE_WEEKS <= BASELINE_WEEKS)
 options(OutDec = '.')
 
+super_panel_helper <- 'copilot-super-panel-helpers.R'
+if (!file.exists(super_panel_helper) && exists('utility')) {
+  super_panel_helper <- file.path(utility, 'copilot-super-panel-helpers.R')
+}
+if (!file.exists(super_panel_helper)) {
+  source_file <- tryCatch(sys.frame(1)$ofile, error = function(e) NULL)
+  if (!is.null(source_file)) {
+    super_panel_helper <- file.path(dirname(source_file),
+                                    'copilot-super-panel-helpers.R')
+  }
+}
+source(super_panel_helper)
+
 read_export <- function(...) {
   read.csv(file.path(DATA_DIR, ...), check.names = FALSE,
            stringsAsFactors = FALSE, na.strings = c('', 'NA'))
@@ -127,26 +140,28 @@ support_release_safe <- function(data, groups, metrics, parent_ids) {
   all(table(memberships) >= MIN_GROUP_N)
 }
 
-pq <- read_export('person-query', 'PersonQuery.csv') |>
+super_panel_inputs <- build_copilot_super_panel(DATA_DIR)
+
+pq <- super_panel_inputs$panel |>
   mutate(MetricDate = as.Date(MetricDate),
          Week = MetricDate,
          IsDeveloper = as_bool(IsDeveloper),
          IsManager = as_bool(IsManager),
          across(any_of(c('Team', 'Role', 'Seniority', 'Tenure')), missing_label))
-people_meta <- read_export('consumption-query', 'PeopleMetaData.csv') |>
+people_meta <- super_panel_inputs$people_meta |>
   mutate(IsCopilotLicensed = as_bool(IsCopilotLicensed),
          IsDeveloper = as_bool(IsDeveloper),
          IsManager = as_bool(IsManager))
-gh_daily <- read_export('github-query', 'PersonGitHubActivityMetrics.csv') |>
+gh_daily <- super_panel_inputs$github_activity_daily |>
   mutate(MetricDate = as.Date(MetricDate),
-         Week = week_start(MetricDate),
+         Week = WeekStart,
          `Agent adoption` = as_bool(`Agent adoption`))
-m365_raw <- read_export('consumption-query', 'PersonM365CreditsMetrics.csv') |>
+m365_raw <- super_panel_inputs$m365_daily_raw |>
   mutate(MetricDate = as.Date(MetricDate),
-         Week = week_start(MetricDate))
-github_credits_daily <- read_export('consumption-query', 'PersonGitHubCreditsMetrics.csv') |>
+         Week = WeekStart)
+github_credits_daily <- super_panel_inputs$github_credits_daily |>
   mutate(MetricDate = as.Date(MetricDate),
-         Week = week_start(MetricDate))
+         Week = WeekStart)
 feature_daily <- read_export('github-query', 'GitHubActivityBreakdownByFeatureMetrics.csv') |>
   mutate(MetricDate = as.Date(MetricDate), Week = week_start(MetricDate),
          Feature = missing_label(Feature))
@@ -390,6 +405,10 @@ panel <- coverage |>
 assert_key(panel, c('PersonId', 'Week'))
 
 metric_labels <- c(Meeting_hours = 'Meetings',
+                   Email_hours = 'Email',
+                   Chat_hours = 'Chat',
+                   Scheduled_call_hours = 'Scheduled calls',
+                   Unscheduled_call_hours = 'Unscheduled calls',
                    Available_to_focus_hours = 'Available-to-focus hours',
                    Uninterrupted_hours = 'Uninterrupted time',
                    Interrupted_hours = 'Interrupted time',
@@ -454,7 +473,10 @@ baseline <- baseline |>
 gh_observed <- baseline |> filter(GH_all_valid)
 
 measure_values <- c(
-  unlist(pq |> select(where(is.numeric), -Total_Copilot_enabled_days), use.names = FALSE),
+  unlist(pq |> select(where(is.numeric), -Total_Copilot_enabled_days,
+                      -starts_with('m365_'), -starts_with('github_'),
+                      -credits_per_m365_session),
+         use.names = FALSE),
   gh_daily$`Code completions accepted`,
   gh_daily$`Code completions suggested`,
   gh_daily$`User-initiated chat requests`,
@@ -711,7 +733,8 @@ if (!hr_release_safe) {
   team_joint_context <- team_joint_context[0, ]
   composition_counts <- composition_counts[0, ]
 }
-work_summary <- bind_rows(lapply(c('Collaboration_hours', 'Meeting_hours', 'Available_to_focus_hours',
+work_summary <- bind_rows(lapply(c('Collaboration_hours', 'Meeting_hours', 'Email_hours',
+                                   'Chat_hours', 'Available_to_focus_hours',
                                    'Uninterrupted_hours', 'Interrupted_hours',
                                    'After_hours_collaboration_hours'), function(m) tibble(
   Metric = metric_labels[[m]], `25th percentile` = f1(quantile(baseline[[m]], .25)),
@@ -761,6 +784,10 @@ team_league <- baseline |>
   summarise(Developers = n(),
             Collaboration_hours = median(Collaboration_hours),
             Meeting_hours = median(Meeting_hours),
+            Email_hours = median(Email_hours),
+            Chat_hours = median(Chat_hours),
+            Scheduled_call_hours = median(Scheduled_call_hours),
+            Unscheduled_call_hours = median(Unscheduled_call_hours),
             Available_to_focus_hours = median(Available_to_focus_hours),
             Uninterrupted_hours = median(Uninterrupted_hours),
             Interrupted_hours = median(Interrupted_hours),
@@ -802,13 +829,18 @@ for (product in c('GH', 'M365')) {
   }
 }
 
-league_metric_levels <- c('Collaboration hours', 'Meeting hours', 'Available-to-focus hours',
+league_metric_levels <- c('Collaboration hours', 'Meeting hours', 'Email', 'Chat',
+  'Scheduled calls', 'Unscheduled calls', 'Available-to-focus hours',
   'Uninterrupted hours', 'Interrupted time', 'After-hours collaboration',
   'GitHub recorded-active share (%)', 'GitHub credits',
   'Microsoft 365 recorded-active share (%)', 'Microsoft 365 credits')
 team_league_plot <- bind_rows(
   team_league |> transmute(Team, Metric = 'Collaboration hours', Value = Collaboration_hours, Label = f1(Value)),
   team_league |> transmute(Team, Metric = 'Meeting hours', Value = Meeting_hours, Label = f1(Value)),
+  team_league |> transmute(Team, Metric = 'Email', Value = Email_hours, Label = f1(Value)),
+  team_league |> transmute(Team, Metric = 'Chat', Value = Chat_hours, Label = f1(Value)),
+  team_league |> transmute(Team, Metric = 'Scheduled calls', Value = Scheduled_call_hours, Label = f1(Value)),
+  team_league |> transmute(Team, Metric = 'Unscheduled calls', Value = Unscheduled_call_hours, Label = f1(Value)),
   team_league |> transmute(Team, Metric = 'Available-to-focus hours', Value = Available_to_focus_hours, Label = f1(Value)),
   team_league |> transmute(Team, Metric = 'Uninterrupted hours', Value = Uninterrupted_hours, Label = f1(Value)),
   team_league |> transmute(Team, Metric = 'Interrupted time', Value = Interrupted_hours, Label = f1(Value)),

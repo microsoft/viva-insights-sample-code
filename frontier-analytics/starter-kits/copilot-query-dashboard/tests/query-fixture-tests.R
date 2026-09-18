@@ -134,7 +134,7 @@ test("zero through nine sessions remain limited rather than standard cost", {
 })
 github <- new.env()
 helper <- readLines(file.path(utility, "github-developer-experience-helpers.R"))
-eval(parse(text = helper[1:(grep("^pq <-", helper)[1] - 1L)]), github)
+eval(parse(text = helper[1:(grep("^super_panel_inputs <-", helper)[1] - 1L)]), github)
 test("weekly enabled days override metadata and completeness defaults unknown", {
   p <- data.frame(PersonId = c("synthetic-a", "synthetic-b", "synthetic-c"),
                   Week = as.Date("2026-06-07"), Total_Copilot_enabled_days = c(7, 0, NA),
