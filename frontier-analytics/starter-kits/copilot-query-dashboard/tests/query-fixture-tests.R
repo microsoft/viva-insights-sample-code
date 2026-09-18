@@ -368,6 +368,62 @@ test("breakdown margins and cross-tabs are released for the committed fixtures",
             length(unique(shown)) >= 6L,
             all(vapply(unique(shown), function(x) grepl(x, page, fixed = TRUE), logical(1))))
 })
+test("developer presentation distinguishes recorded use from complete observation", {
+  stopifnot(released$github_active_n == 184L,
+            released$github_observed_n == 268L,
+            sum(released$github_use_counts$People) == nrow(released$baseline),
+            all(released$github_use_counts$People >= released$MIN_GROUP_N),
+            all(released$github_use_counts$Share ==
+                  released$github_use_counts$People / nrow(released$baseline)))
+  rmd <- paste(readLines(file.path(utility,
+    "github-copilot-developer-productivity-simulation.Rmd")), collapse = "\n")
+  stopifnot(!grepl("GitHub observed developers", rmd, fixed = TRUE),
+            grepl('AI {#ai-use-and-query-coverage}', rmd, fixed = TRUE),
+            grepl('data-navmenu="More"', rmd, fixed = TRUE),
+            !grepl("min-width:700px", rmd, fixed = TRUE))
+})
+test("responsive tables retain every row and escape labels and cell contents", {
+  rows <- data.frame(Label = sprintf("ui-row-%02d", 1:12), Value = seq_len(12),
+                     check.names = FALSE)
+  names(rows)[1] <- "<unsafe-header>"
+  rows[1, 1] <- '<img src=x onerror="alert(1)">'
+  output <- paste(capture.output(released$html_table(rows, "<unsafe-caption>")), collapse = "\n")
+  stopifnot(grepl('scope="col"', output, fixed = TRUE),
+            grepl('class="mobile-label"', output, fixed = TRUE),
+            grepl("Show remaining 2 rows (12 total)", output, fixed = TRUE),
+            grepl("&lt;unsafe-header&gt;", output, fixed = TRUE),
+            grepl("&lt;unsafe-caption&gt;", output, fixed = TRUE),
+            grepl("&lt;img", output, fixed = TRUE),
+            !grepl("<img src=x", output, fixed = TRUE),
+            all(vapply(rows[2:12, 1], function(value) grepl(value, output, fixed = TRUE), logical(1))))
+  withheld <- paste(capture.output(released$html_table(rows[0, ])), collapse = "\n")
+  stopifnot(grepl("Unavailable: independent coverage", withheld, fixed = TRUE),
+            !grepl("<table", withheld, fixed = TRUE))
+})
+test("responsive vector charts keep aggregate values and close graphics devices on failure", {
+  before <- released$baseline
+  devices <- grDevices::dev.list()
+  output <- paste(capture.output(released$interval_cards(before,
+    c("Collaboration_hours", "Meeting_hours"))), collapse = "\n")
+  stopifnot(grepl('class="chart-grid"', output, fixed = TRUE),
+            grepl("data:image/svg+xml;base64,", output, fixed = TRUE),
+            !grepl("PersonId", output, fixed = TRUE),
+            identical(before, released$baseline),
+            identical(devices, grDevices::dev.list()))
+  plot <- released$interval_plot(before, "Collaboration_hours",
+    title = "<untrusted-title>", subtitle = "Median and middle half")
+  responsive <- paste(capture.output(released$render_chart(plot)), collapse = "\n")
+  stopifnot(grepl('media="(max-width: 767px)"', responsive, fixed = TRUE),
+            grepl('media="(max-width: 1199px)"', responsive, fixed = TRUE),
+            grepl("&lt;untrusted-title&gt;", responsive, fixed = TRUE),
+            identical(devices, grDevices::dev.list()))
+  files <- list.files(tempdir(), pattern = "\\.svg$")
+  invalid <- ggplot2::ggplot(data.frame(x = 1), ggplot2::aes(x = x, y = absent_ui_field)) +
+    ggplot2::geom_point()
+  expect_error(released$chart_image_uri(invalid, 4, 3), "absent_ui_field")
+  stopifnot(identical(devices, grDevices::dev.list()),
+            identical(files, list.files(tempdir(), pattern = "\\.svg$")))
+})
 test("per-person-day category redraws lose the shared support and stay withheld", {
   redrawn <- stage_fixtures("breakdown-redrawn")
   set.seed(20260917L)
@@ -537,6 +593,46 @@ test("heavy-user pattern reconciles to the population and never publishes a smal
                                     "Heavy, sustained")[1:3]] <- "Heavy, rare"
   stopifnot(nrow(env$publication_partition(narrowed, "IntensityPattern",
     c("total_m365_credits", "total_m365_sessions"))) == 0)
+})
+test("developer network measures are levels in distinct people, never weekly sums", {
+  env <- load_github(stage_fixtures("developer-network"))
+  stopifnot(setequal(env$NETWORK_METRICS,
+              c("Internal_network_size", "External_network_size", "Strong_ties",
+                "Diverse_ties", "Network_outside_organization")),
+            all(env$NETWORK_METRICS %in% names(env$baseline)),
+            all(env$NETWORK_METRICS %in% env$work_metrics))
+  # Units are declared per measure, and a mixed request never claims one unit.
+  stopifnot(env$metric_unit("Internal_network_size") == env$PEOPLE_UNIT,
+            env$metric_unit("Collaboration_hours") == env$HOURS_UNIT,
+            env$metric_unit(env$NETWORK_METRICS) == env$PEOPLE_UNIT,
+            env$metric_unit(c("Collaboration_hours", "Strong_ties")) ==
+              "See each panel for its unit",
+            all(env$work_summary$Unit[env$work_summary$Metric %in%
+                  unname(env$metric_labels[env$NETWORK_METRICS])] ==
+                  env$PEOPLE_UNIT))
+  # A network baseline is the mean of that person's weekly trailing-window
+  # levels, so it must fall inside their observed weekly range. Summing the
+  # weeks instead would push the value above the maximum.
+  weekly <- env$baseline_panel
+  for (m in env$NETWORK_METRICS) {
+    lo <- tapply(weekly[[m]], weekly$PersonId, min)
+    hi <- tapply(weekly[[m]], weekly$PersonId, max)
+    value <- setNames(env$baseline[[m]], env$baseline$PersonId)
+    ids <- names(value)
+    stopifnot(!anyNA(value), all(value >= lo[ids] - 1e-9),
+              all(value <= hi[ids] + 1e-9), all(value >= 0))
+  }
+  # Team medians follow the same team-size rule as the other team output.
+  stopifnot(nrow(env$team_network) > 0,
+            all(env$team_network$Developers >= env$MIN_GROUP_N),
+            env$network_lead_team %in% as.character(env$team_network$Team),
+            env$network_lead_value == max(env$team_network$Internal_network_size))
+  page <- paste(readLines(file.path(utility,
+    "github-copilot-developer-productivity-simulation.html"), warn = FALSE),
+    collapse = "")
+  stopifnot(grepl("Internal network size", page, fixed = TRUE),
+            grepl("Network outside organisation", page, fixed = TRUE),
+            grepl("trailing window", page, fixed = TRUE))
 })
 test("crosswalk rejects a shared historical key and an unbacked historical key", {
   mpath_for <- function(directory) file.path(directory, "_data", "consumption-query",

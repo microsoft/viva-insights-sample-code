@@ -416,7 +416,26 @@ metric_labels <- c(Meeting_hours = 'Meetings',
                    After_hours_collaboration_hours = 'After-hours collaboration',
                    Recurring_meeting_hours = 'Recurring meetings',
                    Conflicting_meeting_hours = 'Conflicting meetings',
-                   Meeting_hours_with_six_or_fewer_hours_of_advanced_notice = 'Short-notice meetings')
+                   Meeting_hours_with_six_or_fewer_hours_of_advanced_notice = 'Short-notice meetings',
+                   Internal_network_size = 'Internal network size',
+                   External_network_size = 'External network size',
+                   Strong_ties = 'Strong ties',
+                   Diverse_ties = 'Diverse ties',
+                   Network_outside_organization = 'Network outside organisation')
+# Network measures count distinct people rather than hours, and Viva Insights
+# derives them over a trailing window rather than inside the single reporting
+# week. They are levels, not weekly flows, and must never be summed across
+# weeks or read as week-on-week movement.
+NETWORK_METRICS <- c('Internal_network_size', 'External_network_size',
+                    'Strong_ties', 'Diverse_ties',
+                    'Network_outside_organization')
+HOURS_UNIT <- 'Hours / person / week'
+PEOPLE_UNIT <- 'People (distinct)'
+metric_unit <- function(metrics) {
+  if (all(metrics %in% NETWORK_METRICS)) PEOPLE_UNIT
+  else if (any(metrics %in% NETWORK_METRICS)) 'See each panel for its unit'
+  else HOURS_UNIT
+}
 work_metrics <- names(metric_labels)
 baseline_panel <- panel |>
   filter(IsDeveloper, PQ_eligible, PQ_complete, Week >= baseline_start)
@@ -603,19 +622,60 @@ leader_label <- function(labels, values) {
 }
 PAL <- c('#2563eb', '#0f766e', '#7c3aed', '#db2777', '#f97316', '#64748b', '#0891b2', '#ca8a04')
 joint_pal <- setNames(PAL, joint_levels)
-theme_report <- function() theme_minimal(base_size = 12) + theme(
+theme_report <- function() theme_minimal(base_size = 11, base_family = 'sans') + theme(
   panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
-  plot.title.position = 'plot', plot.title = element_text(face = 'bold', colour = '#20243b', size = 15),
+  text = element_text(colour = '#374151'),
+  axis.text = element_text(colour = '#475569'),
+  panel.grid.major.x = element_line(colour = '#e5e7eb', linewidth = .3),
+  plot.title.position = 'plot', plot.title = element_text(face = 'bold', colour = '#111827', size = 15),
   plot.subtitle = element_text(colour = '#475569', size = 11, margin = margin(b = 12)),
   plot.caption = element_text(hjust = 0, colour = '#475569', size = 9, margin = margin(t = 14)),
-  plot.margin = margin(14, 24, 14, 16), legend.position = 'bottom', legend.title = element_blank(),
+  plot.margin = margin(8, 16, 8, 4), legend.position = 'bottom', legend.title = element_blank(),
   strip.text = element_text(face = 'bold', size = 11), axis.title = element_text(size = 11),
   legend.text = element_text(size = 10))
 chart_labs <- function(title, subtitle, caption, x = NULL, y = NULL) labs(
-  title = wrap(title, 88), subtitle = wrap(subtitle, 110), caption = wrap(caption, 115), x = x, y = y)
+  title = title, subtitle = subtitle, caption = caption, x = x, y = y)
 base_caption <- function(n = nrow(baseline), unit = 'hours/person/week') paste0(
   period_label, ' | ', num(n), ' distinct developers | ', BASELINE_WEEKS,
   ' complete Person Query weeks | ', unit, '. Dates use UTC convention.')
+
+# Render vector sizes for wide charts; small panels reflow in the HTML grid.
+# Text outside the image stays readable without shrinking a desktop title on phones.
+chart_image_uri <- function(plot, width, height) {
+  path <- tempfile(fileext = '.svg')
+  on.exit(unlink(path), add = TRUE)
+  grDevices::svg(path, width = width, height = height, family = 'sans')
+  device <- grDevices::dev.cur()
+  tryCatch(print(plot), finally = grDevices::dev.off(device))
+  knitr::image_uri(path)
+}
+render_chart <- function(plot, heading = NULL, layout = c('standard', 'panel', 'list')) {
+  layout <- match.arg(layout)
+  tags <- htmltools::tags
+  labels <- plot$labels
+  image <- plot + labs(title = NULL, subtitle = NULL, caption = NULL)
+  width <- if (layout == 'standard') 12.8 else 4.2
+  height <- if (layout == 'list') 4.8 else 3.4
+  desktop <- chart_image_uri(image, width, height)
+  sources <- NULL
+  if (layout == 'standard') {
+    mobile <- image + guides(fill = guide_legend(ncol = 1), colour = guide_legend(ncol = 1)) +
+      theme(legend.text = element_text(size = 9))
+    sources <- list(tags$source(media = '(max-width: 767px)',
+      srcset = chart_image_uri(mobile, 3.75, 3.8)),
+      tags$source(media = '(max-width: 1199px)',
+        srcset = chart_image_uri(image, 9.5, height)))
+  }
+  alt <- paste(c(heading, labels$title, labels$subtitle), collapse = '. ')
+  figure <- tags$figure(class = paste('report-chart', paste0('chart-', layout)),
+    if (!is.null(heading)) tags$h4(heading),
+    if (!is.null(labels$subtitle)) tags$p(class = 'chart-description', labels$subtitle),
+    tags$picture(sources, tags$img(src = desktop, alt = alt,
+      width = round(width * 96), height = round(height * 96))),
+    if (!is.null(labels$caption)) tags$figcaption(class = 'chart-note', labels$caption))
+  cat(as.character(figure), '\n')
+  invisible(NULL)
+}
 
 interval_data <- function(data, metrics, group = 'Team') {
   sizes <- data |> count(.data[[group]], name = 'People', .drop = TRUE)
@@ -644,9 +704,33 @@ interval_plot <- function(data, metrics, group = 'Team', title, subtitle, captio
   ggplot(d, aes(x = p50, y = Group)) +
     geom_linerange(aes(xmin = p25, xmax = p75), linewidth = 2.4, colour = '#bfdbfe') +
     geom_point(size = 2.6, colour = '#2563eb') +
-    facet_wrap(~Metric, nrow = 1, scales = 'free_x', labeller = label_wrap_gen(22)) +
+    facet_wrap(~Metric, ncol = 3, scales = 'free_x', labeller = label_wrap_gen(22)) +
+    scale_y_discrete(labels = function(x) wrap(x, 18)) +
     scale_x_continuous(expand = expansion(mult = c(.12, .14))) + theme_report() +
-    chart_labs(title, subtitle, caption, x = 'Hours per person per week')
+    chart_labs(title, subtitle, caption, x = metric_unit(metrics))
+}
+interval_cards <- function(data, metrics, group = 'Team',
+                           caption = base_caption(nrow(data))) {
+  plot <- interval_plot(data, metrics, group,
+    title = 'Working-condition distributions',
+    subtitle = 'Dot: median. Line: middle 50% of person-level averages.',
+    caption = caption)
+  if (!is.data.frame(plot$data) || !nrow(plot$data)) {
+    render_chart(plot)
+    return(invisible(NULL))
+  }
+  cat('<p class="chart-description">Dot: median. Line: middle 50% of person-level averages. ',
+      'Each panel has its own horizontal scale; group order is shared.</p>\n',
+      '<div class="chart-grid">\n', sep = '')
+  for (m in metrics) {
+    label <- unname(metric_labels[[m]])
+    panel <- (plot + filter(plot$data, as.character(Metric) == label)) +
+      facet_null() + labs(title = label, subtitle = NULL, caption = NULL,
+                          x = metric_unit(m), y = NULL)
+    render_chart(panel, heading = label, layout = 'panel')
+  }
+  cat('</div>\n', as.character(htmltools::tags$p(class = 'chart-note', caption)), '\n')
+  invisible(NULL)
 }
 composition <- function(data, group, category) {
   counts <- data |> count(Group = missing_label(.data[[group]]),
@@ -656,7 +740,8 @@ composition <- function(data, group, category) {
 }
 unavailable_plot <- function(title = NULL) {
   ggplot() + annotate('text', x = 0, y = 0,
-                      label = 'Unavailable: independent coverage missing or privacy threshold not met.') +
+                      label = 'Unavailable: independent coverage\nmissing or privacy threshold not met.',
+                      size = 3.5, colour = '#475569') +
     theme_void() + labs(title = title)
 }
 stack_plot <- function(d, title, subtitle, caption, palette = PAL, sort_category = NULL, group_order = NULL) {
@@ -680,18 +765,38 @@ stack_plot <- function(d, title, subtitle, caption, palette = PAL, sort_category
     geom_text(aes(label = ifelse(Share >= .06, pct(Share), ''), colour = TextColour),
               position = position_stack(vjust = .5), size = 3.2) +
     scale_colour_identity() + scale_fill_manual(values = colours, labels = function(x) wrap(x, 25)) +
+    scale_y_discrete(labels = function(x) wrap(x, 18)) +
     scale_x_continuous(labels = label_percent(), expand = expansion(mult = c(0, .01))) +
     guides(fill = guide_legend(nrow = 2, byrow = TRUE)) + theme_report() +
     chart_labs(title, subtitle, caption, x = 'Share of developers')
 }
-html_table <- function(data, caption = NULL, escape = TRUE) {
+html_table <- function(data, caption = NULL, escape = TRUE, page_size = 10L) {
   if (is.null(data) || !nrow(data)) {
     cat('<p>Unavailable: independent coverage missing or privacy threshold not met.</p>')
     return(invisible(NULL))
   }
-  cat('<div class="table-scroll">')
-  print(knitr::kable(data, format = 'html', row.names = FALSE, escape = escape, caption = caption))
-  cat('</div>')
+  stopifnot(length(page_size) == 1L, is.finite(page_size), page_size >= 1L)
+  tags <- htmltools::tags
+  table_part <- function(rows, title) {
+    tags$table(class = 'data-table',
+      if (!is.null(title)) tags$caption(title),
+      tags$thead(tags$tr(lapply(names(data), function(name) tags$th(scope = 'col', name)))),
+      tags$tbody(lapply(rows, function(i) tags$tr(lapply(seq_along(data), function(j) {
+        value <- as.character(data[[j]][i])
+        if (is.na(value)) value <- 'Unavailable'
+        tags$td(class = if (is.numeric(data[[j]])) 'num' else NULL,
+          tags$span(class = 'mobile-label', `aria-hidden` = 'true', names(data)[j]),
+          tags$span(class = 'cell-value', if (escape) value else htmltools::HTML(value)))
+      })))))
+  }
+  shown <- min(nrow(data), as.integer(page_size))
+  cat(as.character(table_part(seq_len(shown), caption)), '\n')
+  if (shown < nrow(data)) {
+    cat(as.character(tags$details(class = 'table-remainder',
+      tags$summary(sprintf('Show remaining %s rows (%s total)', nrow(data) - shown, nrow(data))),
+      table_part(seq.int(shown + 1L, nrow(data)), 'Continued'))), '\n')
+  }
+  invisible(NULL)
 }
 composition_table <- function(d) d |> transmute(Group, Category, `Developers (count)` = People, `Share (%)` = pct(Share))
 metric_count <- function(x, unit) {
@@ -707,6 +812,12 @@ joint_counts_public <- joint_counts |>
   disclose_partition() |>
   mutate(Display = Joint) |>
   arrange(Display)
+github_use_counts <- baseline |> count(GH_use, name = 'People', .drop = TRUE) |>
+  disclose_partition() |> mutate(Share = People / nrow(baseline))
+github_active_n <- if (nrow(github_use_counts))
+  sum(github_use_counts$People[github_use_counts$GH_use == 'GitHub use recorded']) else NA_real_
+github_observed_n <- if (nrow(github_use_counts))
+  sum(github_use_counts$People[github_use_counts$GH_use != 'GitHub observation unresolved']) else NA_real_
 team_context <- composition(baseline, 'Team', 'Role')
 role_context <- composition(gh_observed, 'GH_use', 'Role')
 team_joint_context <- composition(gh_observed, 'GH_use', 'Team')
@@ -736,9 +847,30 @@ if (!hr_release_safe) {
 work_summary <- bind_rows(lapply(c('Collaboration_hours', 'Meeting_hours', 'Email_hours',
                                    'Chat_hours', 'Available_to_focus_hours',
                                    'Uninterrupted_hours', 'Interrupted_hours',
-                                   'After_hours_collaboration_hours'), function(m) tibble(
-  Metric = metric_labels[[m]], `25th percentile` = f1(quantile(baseline[[m]], .25)),
+                                   'After_hours_collaboration_hours',
+                                   'Internal_network_size', 'External_network_size',
+                                   'Strong_ties', 'Diverse_ties',
+                                   'Network_outside_organization'), function(m) tibble(
+  Metric = metric_labels[[m]], Unit = metric_unit(m),
+  `25th percentile` = f1(quantile(baseline[[m]], .25)),
   Median = f1(median(baseline[[m]])), `75th percentile` = f1(quantile(baseline[[m]], .75)))))
+network_summary <- bind_rows(lapply(NETWORK_METRICS, function(m) tibble(
+  Metric = metric_labels[[m]],
+  `25th percentile` = f1(quantile(baseline[[m]], .25)),
+  Median = f1(median(baseline[[m]])),
+  `75th percentile` = f1(quantile(baseline[[m]], .75)))))
+# Team medians of a trailing-window level, released on the same team-size rule
+# as the collaboration league table. A larger network is not a better one.
+team_network <- baseline |>
+  group_by(Team) |>
+  summarise(Developers = n(),
+            across(all_of(NETWORK_METRICS), median), .groups = 'drop') |>
+  filter(Developers >= MIN_GROUP_N) |>
+  arrange(desc(Internal_network_size))
+network_lead_team <- if (nrow(team_network)) as.character(team_network$Team[1]) else
+  'Unavailable'
+network_lead_value <- if (nrow(team_network)) team_network$Internal_network_size[1] else
+  NA_real_
 
 credit_release_safe <- setNames(vapply(c('GH', 'M365'), function(product) {
   flag <- if (product == 'GH') 'GH_credits_all_valid' else 'M365_all_valid'

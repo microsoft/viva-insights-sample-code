@@ -8,6 +8,7 @@
 //
 // Usage, from the repository root:
 //   node scripts/capture-report-screenshots.js
+//   node scripts/capture-report-screenshots.js --github-only
 //
 // Render both reports first, otherwise the screenshots capture stale charts:
 //   cd examples/utility-r
@@ -45,45 +46,49 @@ const SHOTS = [
 
 (async () => {
   const browser = await chromium.launch({ channel: 'msedge' });
-  const context = await browser.newContext({
-    viewport: { width: 1440, height: 900 },
-    deviceScaleFactor: 1,
-  });
-  const page = await context.newPage();
-
-  for (const shot of SHOTS) {
-    const url = 'file:///' + path.join(UTILITY, shot.html).replace(/\\/g, '/');
-    await page.goto(url, { waitUntil: 'load' });
-    await page.waitForSelector('.navbar-nav a', { timeout: 60000 });
-
-    const clicked = await page.evaluate((id) => {
-      const links = Array.from(document.querySelectorAll('.navbar-nav a'));
-      const target = links.find((a) => (a.getAttribute('href') || '').replace('#', '') === id);
-      if (!target) return false;
-      target.click();
-      return true;
-    }, shot.page);
-
-    if (!clicked) {
-      const available = await page.evaluate(() =>
-        Array.from(document.querySelectorAll('.navbar-nav a')).map((a) => a.getAttribute('href'))
-      );
-      throw new Error(`Page "${shot.page}" not found in ${shot.html}. Available: ${available.join(', ')}`);
-    }
-
-    // Let the tab switch settle and any chart images paint.
-    await page.waitForTimeout(2500);
-    // flexdashboard can retain scroll position across tab switches, which
-    // clips the first card's heading. Reset before capturing.
-    await page.evaluate(() => {
-      window.scrollTo(0, 0);
-      document.querySelectorAll('.section.level1').forEach((s) => { s.scrollTop = 0; });
-      document.querySelectorAll('.dashboard-column, .chart-wrapper, .chart-stage').forEach((s) => { s.scrollTop = 0; });
+  try {
+    const context = await browser.newContext({
+      viewport: { width: 1440, height: 900 },
+      deviceScaleFactor: 1,
     });
-    await page.waitForTimeout(600);
-    await page.screenshot({ path: path.join(OUT, shot.file) });
-    console.log(`captured ${shot.file}`);
-  }
+    const page = await context.newPage();
 
-  await browser.close();
-})();
+    const shots = process.argv.includes('--github-only')
+      ? SHOTS.filter((shot) => shot.html.startsWith('github-')) : SHOTS;
+    for (const shot of shots) {
+      const url = 'file:///' + path.join(UTILITY, shot.html).replace(/\\/g, '/');
+      await page.goto(url, { waitUntil: 'load' });
+      await page.waitForSelector('.navbar-nav a', { timeout: 60000 });
+
+      const clicked = await page.evaluate((id) => {
+        const links = Array.from(document.querySelectorAll('.navbar-nav a'));
+        const target = links.find((a) => (a.getAttribute('href') || '').replace('#', '') === id);
+        if (!target) return false;
+        target.click();
+        return true;
+      }, shot.page);
+
+      if (!clicked) {
+        const available = await page.evaluate(() =>
+          Array.from(document.querySelectorAll('.navbar-nav a')).map((a) => a.getAttribute('href'))
+        );
+        throw new Error(`Page "${shot.page}" not found in ${shot.html}. Available: ${available.join(', ')}`);
+      }
+
+      // Let the tab switch settle and any chart images paint.
+      await page.waitForTimeout(2500);
+      // flexdashboard can retain scroll position across tab switches, which
+      // clips the first card's heading. Reset before capturing.
+      await page.evaluate(() => {
+        window.scrollTo(0, 0);
+        document.querySelectorAll('.section.level1').forEach((s) => { s.scrollTop = 0; });
+        document.querySelectorAll('.dashboard-column, .chart-wrapper, .chart-stage').forEach((s) => { s.scrollTop = 0; });
+      });
+      await page.waitForTimeout(600);
+      await page.screenshot({ path: path.join(OUT, shot.file) });
+      console.log(`captured ${shot.file}`);
+    }
+  } finally {
+    await browser.close();
+  }
+})().catch((error) => { console.error(error); process.exitCode = 1; });

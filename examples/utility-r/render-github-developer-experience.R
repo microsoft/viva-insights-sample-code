@@ -4,9 +4,10 @@ args <- commandArgs(trailingOnly=FALSE)
 script <- sub('^--file=', '', args[grepl('^--file=',args)])
 if(length(script)) setwd(dirname(normalizePath(script)))
 required <- c('rmarkdown','flexdashboard','dplyr','tidyr','ggplot2','scales',
-              'knitr','stringr','vivainsights')
+              'knitr','stringr','vivainsights','htmltools')
 missing <- required[!vapply(required,requireNamespace,logical(1),quietly=TRUE)]
 if(length(missing)) stop('Missing packages: ',paste(missing,collapse=', '))
+if(!capabilities('cairo')) stop('Cairo graphics support is required to render the embedded SVG charts.')
 if(!rmarkdown::pandoc_available()) stop('Pandoc is required. Set RSTUDIO_PANDOC to its folder.')
 env <- new.env(parent=globalenv())
 rmarkdown::render('github-copilot-developer-productivity-simulation.Rmd', envir=env)

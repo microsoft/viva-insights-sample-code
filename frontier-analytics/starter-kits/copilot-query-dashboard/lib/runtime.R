@@ -443,7 +443,7 @@ reproduce_dashboard <- function(cfg, kit) {
   if (cfg$mode != "demo") fail("reproduce is demo-only and never accepts real inputs.")
   required <- c("rmarkdown", "flexdashboard", "dplyr", "tidyr", "ggplot2",
                 "scales", "knitr", "stringr", "vivainsights",
-                if (cfg$report == "consumption") "ggrepel")
+                if (cfg$report == "consumption") "ggrepel" else "htmltools")
   need(required)
   if (!rmarkdown::pandoc_available()) fail("Pandoc is missing. Set RSTUDIO_PANDOC to an existing Pandoc folder.")
   inputs <- reference_files(cfg)

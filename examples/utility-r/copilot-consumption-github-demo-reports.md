@@ -15,7 +15,7 @@ for the official contracts.
 | Report | Source | Rendered report | Scope |
 |---|---|---|---|
 | Copilot Consumption and Ways of Working | [Rmd](copilot-consumption-ways-of-working-simulation.Rmd) | [HTML](copilot-consumption-ways-of-working-simulation.html) | Copilot credit consumption alongside collaboration patterns, by service, organisation and function, including credit concentration and heavy-user consumption patterns. |
-| Developer Experience and Copilot | [Rmd](github-copilot-developer-productivity-simulation.Rmd) | [HTML](github-copilot-developer-productivity-simulation.html) | Baseline working conditions for the developer population, with GitHub Copilot activity, feature/model/language breakdowns, M365 Copilot credit consumption and an evaluation framework. |
+| Developer Experience and Copilot | [Rmd](github-copilot-developer-productivity-simulation.Rmd) | [HTML](github-copilot-developer-productivity-simulation.html) | Baseline working conditions for the developer population, including collaboration network breadth, with GitHub Copilot activity, feature/model/language breakdowns, M365 Copilot credit consumption and an evaluation framework. |
 
 ## Reading consumption intensity
 
@@ -35,6 +35,30 @@ a resulting group falls below the publication floor — the highest-volume peopl
 are also the fewest. Consistency is measured inside the 13-week product window
 only: it is a lookback description, not a trend, and unobserved weeks are
 excluded from both the threshold and the per-person counts.
+
+## Navigating Developer Experience
+Start with **Overview**, then explore **Collaboration**, **Focus**, **After-hours**
+and **AI**. The **More** menu holds GitHub feature/model/language breakdowns,
+working-pattern comparisons and methods. The overview's pillar cards are links;
+exact values, composition and longer definitions expand in place.
+
+**Collaboration covers both load and breadth.** Collaboration, meeting, email,
+chat and call hours describe how much coordination happens and through which
+channels. Network measures — internal and external network size, strong ties,
+diverse ties and network outside the organisation — describe how many distinct
+people that coordination reaches. These count people rather than hours, and
+Viva Insights derives them over a trailing window, so they are standing levels
+rather than weekly flows: they are never summed across weeks and should not be
+read as week-on-week movement. A larger network is not inherently better. The
+working-patterns page repeats the network comparison across recorded-GitHub-use
+groups, where the differences remain unadjusted and descriptive.
+
+The report uses embedded SVG charts, a reflowing small-multiple grid and separate
+wide-chart renders for desktop, tablet and mobile. Long tables show ten rows first
+with an expandable remainder; on phones, column labels stay beside each value.
+These presentation changes do not equate missing observation with zero or weaken
+the privacy floor. "Recorded GitHub use" is a subset of developers with complete
+GitHub activity observation, not another name for that observed population.
 
 ## Simulated values, real schema
 
@@ -190,8 +214,21 @@ the committed CSVs and performs derivation, validation, aggregation and presenta
 longer generates data; that responsibility belongs to `simulate-query-exports.R`.
 
 Dependencies: R, Pandoc, `rmarkdown`, `flexdashboard`, `knitr`, `dplyr`, `tidyr`,
-`ggplot2`, `scales`, `stringr` and `vivainsights`. Runtime package versions appear in each
-report's appendix.
+`ggplot2`, `scales`, `stringr`, `htmltools` and `vivainsights`. The developer report's
+SVG device also needs Cairo graphics support (`capabilities("cairo")` in R).
+Runtime package versions appear in each report's methods.
+
+After rendering Developer Experience, its responsive layout and navigation can be
+checked with the same Playwright and system Edge setup used for report screenshots:
+
+```powershell
+node scripts\check-developer-report-layout.js
+node scripts\capture-report-screenshots.js --github-only
+```
+
+Run these from the repository root. The layout check covers all eight pages at
+desktop, tablet and phone widths, including expanded content and keyboard controls.
+Pass an output directory to the layout script to retain screenshots.
 
 ## Adapting to real data
 
