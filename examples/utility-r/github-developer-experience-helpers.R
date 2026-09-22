@@ -896,21 +896,6 @@ heavy_concentration <- function(attribute) {
 }
 heavy_team_concentration <- heavy_concentration('Team')
 heavy_role_concentration <- heavy_concentration('Role')
-# Data-derived confounding statement so the caveat text stays true if the
-# fixtures change. Heavy use is unevenly spread across teams, so group
-# differences may reflect team composition rather than tool use.
-heavy_confound_note <- if (!nrow(heavy_team_concentration)) {
-  paste('Heavy GitHub use is unevenly distributed across teams, so differences',
-        'between these groups may reflect team composition rather than tool use.')
-} else {
-  named <- heavy_team_concentration[heavy_team_concentration$Group != 'Other (pooled)', ]
-  top <- named[which.max(named$`Heavy GitHub users`), ]
-  sprintf(paste('Heavy GitHub use is unevenly distributed across teams: %s alone',
-                'accounts for %s of the %s heavy users, and some teams contribute',
-                'none. Differences between these groups may reflect team composition',
-                'rather than tool use, not an effect of the tool.'),
-          top$Group, num(top$`Heavy GitHub users`), num(heavy_github_n))
-}
 
 team_context <- composition(baseline, 'Team', 'Role')
 role_context <- composition(gh_observed, 'GH_use', 'Role')
@@ -923,6 +908,10 @@ composition_counts <- bind_rows(lapply(c('Role','Seniority','Tenure'), function(
 # sub-floor group. Gating instead on the full Team x Role x Seniority x Tenure
 # intersection withheld the whole family unconditionally: at this population
 # size that intersection can never reach ten people, and it is never published.
+# The heavy-use margins are subordinate to this gate rather than inputs to it:
+# heavy_concentration() already pools its own sub-floor cells, but releasing a
+# pooled margin while the rest of the family is withheld would still let a
+# reader difference it against the suppressed margins.
 hr_published <- list(
   baseline |> count(Team, Role, name = 'People'),
   baseline |> count(Role, name = 'People'),
@@ -937,7 +926,26 @@ if (!hr_release_safe) {
   role_context <- role_context[0, ]
   team_joint_context <- team_joint_context[0, ]
   composition_counts <- composition_counts[0, ]
+  heavy_team_concentration <- heavy_team_concentration[0, ]
+  heavy_role_concentration <- heavy_role_concentration[0, ]
 }
+# Data-derived confounding statement so the caveat text stays true if the
+# fixtures change. Heavy use is unevenly spread across teams, so group
+# differences may reflect team composition rather than tool use. Computed after
+# the release gate so a withheld concentration cannot leak a team name here.
+heavy_confound_note <- if (!nrow(heavy_team_concentration)) {
+  paste('Heavy GitHub use is unevenly distributed across teams, so differences',
+        'between these groups may reflect team composition rather than tool use.')
+} else {
+  named <- heavy_team_concentration[heavy_team_concentration$Group != 'Other (pooled)', ]
+  top <- named[which.max(named$`Heavy GitHub users`), ]
+  sprintf(paste('Heavy GitHub use is unevenly distributed across teams: %s alone',
+                'accounts for %s of the %s heavy users, and some teams contribute',
+                'none. Differences between these groups may reflect team composition',
+                'rather than tool use, not an effect of the tool.'),
+          top$Group, num(top$`Heavy GitHub users`), num(heavy_github_n))
+}
+
 work_summary <- bind_rows(lapply(c('Collaboration_hours', 'Meeting_hours', 'Email_hours',
                                    'Chat_hours', 'Available_to_focus_hours',
                                    'Uninterrupted_hours', 'Interrupted_hours',

@@ -273,6 +273,13 @@ test("all linked HR margins and one-contributor service totals are withheld", {
             nrow(adversarial$team_context) == 0,
             nrow(adversarial$composition_counts) == 0,
             nrow(adversarial$role_context) == 0,
+            # The heavy-use team and role margins are HR margins over the same
+            # people, so they join the shared release family. Publishing them
+            # while the family is withheld would expose a suppressed group by
+            # differencing. This ran green before they joined the gate.
+            nrow(adversarial$heavy_team_concentration) == 0,
+            nrow(adversarial$heavy_role_concentration) == 0,
+            !grepl("PrivacyRole", adversarial$heavy_confound_note),
             nrow(adversarial$m365_service_mix) == 0,
             !adversarial$credit_release_safe[["GH"]],
             all(is.na(adversarial$team_league$GH_intensity)),
