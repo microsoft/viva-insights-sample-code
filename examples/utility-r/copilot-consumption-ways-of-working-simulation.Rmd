@@ -368,23 +368,6 @@ person_base <- person_attributes |>
     ConsumptionProfile = consumption_profile(
       CreditBand, total_m365_sessions, CostPerSessionProfile
     ),
-    # The same condition that labels CostPerSessionProfile. Absent credit rows
-    # are unresolved coverage, not established non-use, so the segment records
-    # what was observed rather than asserting that the person used nothing.
-    CreditActivitySegment = case_when(
-      !positive_consumer ~ "No observed M365 credits",
-      active_weeks >= 10 & CreditBand == "High credit" ~
-        "Power User",
-      active_weeks >= 8 ~ "Habitual User",
-      active_weeks >= 3 ~ "Novice User",
-      TRUE ~ "Low User"
-    ),
-    CreditActivitySegment = factor(
-      CreditActivitySegment,
-      levels = c("Power User", "Habitual User", "Novice User",
-                 "Low User", "No observed M365 credits"),
-      ordered = TRUE
-    ),
     # Volume and consistency are separate questions. A heavy user who reaches
     # the high-credit bar in most observed weeks is a sustained consumer; one
     # who reaches it occasionally is spike-driven. Both remain observations
@@ -439,12 +422,6 @@ function_public <- publication_partition(
 # a still-small pooled remainder withholds every function output.
 credit_public <- publication_partition(
   person_wow, "CreditQuartile", m365_contributors
-)
-# Both segment outputs use the same joint gate; a baseline must not restore
-# the denominator of a suppressed segment-by-quartile composition.
-segment_public <- publication_partition(
-  person_wow, c("CreditActivitySegment", "CreditQuartile"),
-  m365_contributors
 )
 profile_public <- publication_partition(
   person_wow, c("ConsumptionProfile", "CreditQuartile"), m365_contributors

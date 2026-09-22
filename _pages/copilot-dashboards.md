@@ -35,7 +35,7 @@ Both reports use **synthetic data**. They illustrate analysis approaches, not ev
 *Are a small number of users or groups driving most of our credit spend?
 Do certain user groups consume disproportionately more credits, not just more sessions?
 How does cost per session vary by service, organisation or function?
-Which Copilot services account for the most consumption across usage segments?*
+Are our heaviest consumers consistently heavy, or do they spike occasionally?*
 It is built around the volume-vs-mix distinction: total consumption differs from
 *how expensive* each session of that consumption is.
 
@@ -54,7 +54,7 @@ implemented by that real adapter. Reproducing the full synthetic demonstration o
 governed inputs requires separately implemented and verified support; matching headers
 alone does not make it a like-for-like substitution.
 
-Separate consumption volume from consumption cost: credit concentration and percentile bands, cost per session, service mix, usage segments, and function drill-downs.
+Separate consumption volume from consumption cost: credit concentration and percentile bands, heavy-user consumption patterns, cost per session, service mix, and function drill-downs. For the [Copilot Usage Segments]({{ site.baseurl }}/copilot-usage-segments/) ladder — Power, Habitual, Novice, Low and Non-users — use `identify_usage_segments()`, which needs a longer rolling window than this report's product feed provides.
 
 **[View demo]({{ site.baseurl }}/examples/utility-r/copilot-consumption-ways-of-working-simulation.html)** ·
 [Get source](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-ways-of-working-simulation.Rmd) ·
@@ -70,9 +70,9 @@ reproduce the demo or build a scoped credits report with an agent and reusable R
 **Interpretation:** Associations only. Credit intensity is a cost measure, not a measure of value or quality. Concentration curves and banded percentiles help describe skewed consumption without relying on an average.
 
 <details markdown="1">
-<summary>See the consumption distribution preview</summary>
+<summary>See the product usage mix preview</summary>
 
-![Consumption report credit distribution]({{ site.baseurl }}/assets/images/reports/copilot-consumption-credit-distribution.png)
+![Consumption report product usage mix]({{ site.baseurl }}/assets/images/reports/copilot-consumption-product-usage-mix.png)
 
 </details>
 

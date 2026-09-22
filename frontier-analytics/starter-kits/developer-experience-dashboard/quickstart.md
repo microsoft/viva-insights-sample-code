@@ -7,10 +7,10 @@
 3. Have the agent follow the [runner README](../copilot-query-dashboard/README.md),
    create a demo config and run `dashboard.R reproduce <config.json>` using
    Rscript. The helper generates synthetic files in an isolated copied workspace.
-4. Open the seven-page HTML. Confirm the whole developer baseline, separate
+4. Open the eight-page HTML. Confirm the whole developer baseline, separate
    eligibility/coverage categories and synthetic labels are retained.
 5. Customise the copied source, not generated HTML: for example, "lead with
-   focus and coordination, retaining the methodology and all privacy rules."
+   after-hours working, retaining the methodology and all privacy rules."
 
 For real files, use a separate **real** config with
 `dashboard.R inspect <config.json>`. Commands are run from the shared runner

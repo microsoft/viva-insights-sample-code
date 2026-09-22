@@ -30,7 +30,7 @@ const SHOTS = [
   {
     html: 'copilot-consumption-ways-of-working-simulation.html',
     page: 'product-usage-mix',
-    file: 'copilot-consumption-credit-distribution.png',
+    file: 'copilot-consumption-product-usage-mix.png',
   },
   {
     html: 'github-copilot-developer-productivity-simulation.html',

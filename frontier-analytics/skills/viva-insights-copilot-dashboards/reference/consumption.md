@@ -7,6 +7,7 @@ Paths below are relative to `repo_root`. Read only the needed sections.
 | `examples/utility-r/copilot-consumption-ways-of-working-simulation.Rmd` | Canonical seven-page demo; reads supplied fixture CSVs |
 | `examples/utility-r/_data/consumption-query/` | Consumption query fixtures: `PeopleMetaData`, `PersonM365CreditsMetrics`, `PersonGitHubCreditsMetrics` |
 | `examples/utility-r/_data/person-query/PersonQuery.csv` | Person query fixture supplying collaboration metrics and HR attributes |
+| `examples/utility-r/_data/github-query/PersonGitHubActivityMetrics.csv` | GitHub activity fixture; its explicit weekday zero rows separate observed non-use from absent observation in the product usage mix. The four GitHub breakdown exports are **not** read by this report |
 | `examples/utility-r/_data/README.md` | Authoritative schema manifest: keys, grains, units and join rules |
 | `examples/utility-r/copilot-consumption-github-demo-reports.md` | Background documentation; actual source and fixture manifest determine runtime inputs |
 | `frontier-analytics/starter-kits/copilot-query-dashboard/README.md` | Runner configuration, dependencies and output contracts |

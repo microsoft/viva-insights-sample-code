@@ -520,24 +520,41 @@ test("sparse GitHub credit rows never void observed activity", {
 
 test("no published label asserts non-use from absent M365 data", {
   env <- run_setup(stage_fixtures("consumption-honest-label"))
-  segments <- levels(env$person_base$CreditActivitySegment)
   absent <- "No observed M365 credits"
-  # The segment and the cost profile share the condition !positive_consumer, so
-  # they must share the honest label. "Non-user" would assert non-use from data
-  # this report states is not established as complete.
-  stopifnot(absent %in% segments,
-            !any(grepl("non.?users?", segments, ignore.case = TRUE)),
-            sum(env$person_base$CreditActivitySegment == absent) > 0L,
-            all(env$person_base$CostPerSessionProfile[
-              env$person_base$CreditActivitySegment == absent] %in%
-                c(absent, "Limited M365 sessions")),
-            !any(grepl("non.?users?", levels(env$person_base$CreditQuartile),
-                       ignore.case = TRUE)))
+  base <- env$person_base
+  # Every label a person can carry when M365 credits are absent must say that
+  # nothing was observed. "Non-user" would assert non-use from data this report
+  # states is not established as complete. The cost profile, credit band, credit
+  # quartile and intensity pattern all share the !positive_consumer condition,
+  # so they must share the honest label rather than inventing a usage claim.
+  label_columns <- c("CreditQuartile", "CreditBand", "CostPerSessionProfile",
+                     "ConsumptionProfile", "IntensityPattern")
+  for (column in label_columns) {
+    values <- as.character(base[[column]])
+    levels_present <- unique(c(values, levels(base[[column]])))
+    stopifnot(!any(grepl("non.?users?", levels_present, ignore.case = TRUE)),
+              all(values[!base$positive_consumer] %in%
+                    c(absent, "Limited M365 sessions")))
+  }
+  stopifnot(sum(base$CreditQuartile == absent) > 0L,
+            any(base$IntensityPattern == absent))
+  # The retired CreditActivitySegment reused the canonical Power / Habitual /
+  # Novice / Low ladder with report-local thresholds, which collided with the
+  # vivainsights definition documented elsewhere in this repository.
+  stopifnot(!"CreditActivitySegment" %in% names(base))
+  rmd <- paste(readLines(file.path(utility,
+    "copilot-consumption-ways-of-working-simulation.Rmd")), collapse = "\n")
+  stopifnot(!grepl("CreditActivitySegment", rmd, fixed = TRUE),
+            !grepl("segment_public", rmd, fixed = TRUE))
   page <- paste(readLines(file.path(utility,
     "copilot-consumption-ways-of-working-simulation.html"), warn = FALSE),
     collapse = "")
   stopifnot(!grepl("non.?users?", page, ignore.case = TRUE),
-            grepl(absent, page, fixed = TRUE))
+            grepl(absent, page, fixed = TRUE),
+            # The report must not advertise a usage-segment ladder it does not
+            # present. These labels belong to identify_usage_segments().
+            !grepl("Habitual User", page, fixed = TRUE),
+            !grepl("Novice User", page, fixed = TRUE))
 })
 test("credit concentration withholds unless the top group and its complement clear the floor", {
   cs <- consumption$concentration_share
