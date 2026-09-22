@@ -252,6 +252,7 @@ reference_files <- function(cfg) {
   if (cfg$report == "github") {
     relative <- c("github-copilot-developer-productivity-simulation.Rmd",
                   "github-developer-experience-helpers.R",
+                  "copilot-super-panel-helpers.R",
                   file.path("_data", c(
                     "person-query/PersonQuery.csv",
                     "consumption-query/PeopleMetaData.csv",
@@ -270,11 +271,7 @@ reference_files <- function(cfg) {
                     "consumption-query/PeopleMetaData.csv",
                     "consumption-query/PersonM365CreditsMetrics.csv",
                     "consumption-query/PersonGitHubCreditsMetrics.csv",
-                    "github-query/PersonGitHubActivityMetrics.csv",
-                    "github-query/GitHubActivityBreakdownByFeatureMetrics.csv",
-                    "github-query/GitHubActivityBreakdownByLanguageFeatureMetrics.csv",
-                    "github-query/GitHubActivityBreakdownByLanguageModelMetrics.csv",
-                    "github-query/GitHubActivityBreakdownByModelFeatureMetrics.csv")))
+                    "github-query/PersonGitHubActivityMetrics.csv")))
   }
   paths <- file.path(utility, relative)
   if (!all(file.exists(paths))) fail("Reference report or supplied synthetic fixtures are missing.")
@@ -442,7 +439,7 @@ reproduce_dashboard <- function(cfg, kit) {
   if (cfg$mode != "demo") fail("reproduce is demo-only and never accepts real inputs.")
   required <- c("rmarkdown", "flexdashboard", "dplyr", "tidyr", "ggplot2",
                 "scales", "knitr", "stringr", "vivainsights",
-                if (cfg$report == "consumption") "ggrepel")
+                if (cfg$report == "consumption") "ggrepel" else "htmltools")
   need(required)
   if (!rmarkdown::pandoc_available()) fail("Pandoc is missing. Set RSTUDIO_PANDOC to an existing Pandoc folder.")
   inputs <- reference_files(cfg)

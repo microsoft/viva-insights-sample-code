@@ -4,7 +4,7 @@ Paths below are relative to `repo_root`.
 
 | Asset | Role |
 |---|---|
-| `examples/utility-r/github-copilot-developer-productivity-simulation.Rmd` | Canonical seven-page demo; historical filename retained |
+| `examples/utility-r/github-copilot-developer-productivity-simulation.Rmd` | Canonical nine-page demo; historical filename retained |
 | `examples/utility-r/github-developer-experience-helpers.R` | Fixture loading, coverage derivation, aggregation, assertions and plot helpers |
 | `examples/utility-r/render-github-developer-experience.R` | Existing rendering entry point |
 | `examples/utility-r/simulate-query-exports.R` | Single deterministic generator for every fixture under `_data` |

@@ -134,7 +134,7 @@ test("zero through nine sessions remain limited rather than standard cost", {
 })
 github <- new.env()
 helper <- readLines(file.path(utility, "github-developer-experience-helpers.R"))
-eval(parse(text = helper[1:(grep("^pq <-", helper)[1] - 1L)]), github)
+eval(parse(text = helper[1:(grep("^super_panel_inputs <-", helper)[1] - 1L)]), github)
 test("weekly enabled days override metadata and completeness defaults unknown", {
   p <- data.frame(PersonId = c("synthetic-a", "synthetic-b", "synthetic-c"),
                   Week = as.Date("2026-06-07"), Total_Copilot_enabled_days = c(7, 0, NA),
@@ -273,6 +273,13 @@ test("all linked HR margins and one-contributor service totals are withheld", {
             nrow(adversarial$team_context) == 0,
             nrow(adversarial$composition_counts) == 0,
             nrow(adversarial$role_context) == 0,
+            # The heavy-use team and role margins are HR margins over the same
+            # people, so they join the shared release family. Publishing them
+            # while the family is withheld would expose a suppressed group by
+            # differencing. This ran green before they joined the gate.
+            nrow(adversarial$heavy_team_concentration) == 0,
+            nrow(adversarial$heavy_role_concentration) == 0,
+            !grepl("PrivacyRole", adversarial$heavy_confound_note),
             nrow(adversarial$m365_service_mix) == 0,
             !adversarial$credit_release_safe[["GH"]],
             all(is.na(adversarial$team_league$GH_intensity)),
@@ -367,6 +374,234 @@ test("breakdown margins and cross-tabs are released for the committed fixtures",
             grepl("Largest reportable Language x Feature cells", page, fixed = TRUE),
             length(unique(shown)) >= 6L,
             all(vapply(unique(shown), function(x) grepl(x, page, fixed = TRUE), logical(1))))
+})
+test("developer presentation distinguishes recorded use from complete observation", {
+  stopifnot(released$github_active_n == 184L,
+            released$github_observed_n == 268L,
+            sum(released$github_use_counts$People) == nrow(released$baseline),
+            all(released$github_use_counts$People >= released$MIN_GROUP_N),
+            all(released$github_use_counts$Share ==
+                  released$github_use_counts$People / nrow(released$baseline)))
+  rmd <- paste(readLines(file.path(utility,
+    "github-copilot-developer-productivity-simulation.Rmd")), collapse = "\n")
+  stopifnot(!grepl("GitHub observed developers", rmd, fixed = TRUE),
+            # The standalone AI page is dissolved; coverage detail moves to a
+            # More dropdown page and network breadth becomes its own top page.
+            !grepl('AI {#ai-use-and-query-coverage}', rmd, fixed = TRUE),
+            grepl('GitHub coverage {#github-coverage data-navmenu="More"}', rmd, fixed = TRUE),
+            grepl('href="#network"', rmd, fixed = TRUE),
+            grepl('data-navmenu="More"', rmd, fixed = TRUE),
+            !grepl("min-width:700px", rmd, fixed = TRUE))
+})
+test("heavy GitHub group reconciles to the observed population and reports the observed-denominator share", {
+  env <- load_github(stage_fixtures("heavy-github-group"))
+  # The three groups partition exactly the GitHub-observed population (GH_all_valid),
+  # never the full roster and never the recorded-use subset alone.
+  stopifnot(env$HEAVY_GITHUB_SHARE == 0.20,
+            setequal(levels(env$gh_observed$GH_intensity),
+                     c("Heavy GitHub use", "Other recorded use", "No recorded use")),
+            nrow(env$gh_observed) == env$github_observed_n,
+            env$github_observed_n == 268L,
+            env$github_recorded_n == 184L,
+            env$heavy_github_n == 37L,
+            sum(env$gh_intensity_counts$People) == nrow(env$gh_observed),
+            # No group falls below the floor for the committed fixtures.
+            all(env$gh_intensity_counts$People >= env$MIN_GROUP_N))
+  counts <- table(env$gh_observed$GH_intensity)
+  stopifnot(counts[["Heavy GitHub use"]] == 37L,
+            counts[["Other recorded use"]] == 147L,
+            counts[["No recorded use"]] == 84L,
+            sum(counts) == 268L)
+  # Developers with no recorded use are their own group, never recoded as heavy
+  # or light; the recorded-use subset equals heavy + other recorded.
+  stopifnot(sum(env$gh_observed$GH_active_days > 0) == env$github_recorded_n,
+            counts[["Heavy GitHub use"]] + counts[["Other recorded use"]] ==
+              env$github_recorded_n)
+  # Headline share uses the observed denominator (13.8% of 268), NOT the
+  # recorded-use denominator (the population used to set the threshold).
+  stopifnot(abs(env$heavy_github_share - 37 / 268) < 1e-9,
+            abs(env$heavy_github_share - 0.138) < 5e-4,
+            abs(env$heavy_github_n / env$github_recorded_n - 0.20) < 0.03)
+  stopifnot(env$heavy_github_share != env$heavy_github_n / env$github_recorded_n)
+  stopifnot(grepl("80 percentile", env$HEAVY_GITHUB_RULE, fixed = TRUE),
+            grepl("All ties", env$HEAVY_GITHUB_RULE, fixed = TRUE),
+            !grepl("268|184", env$HEAVY_GITHUB_RULE),
+            grepl("withheld", env$heavy_confound_note, fixed = TRUE))
+})
+test("heavy-group concentration withholds linked sub-floor intersections even after pooling", {
+  env <- load_github(stage_fixtures("heavy-github-concentration"))
+  # Local pooling clears the margin floor, but the joint release must still
+  # reject small heavy Team x Role cells and their unresolved complements.
+  tc <- env$heavy_concentration("Team")
+  stopifnot(nrow(tc) > 0,
+            sum(tc$`Heavy GitHub users`) == env$heavy_github_n,
+            all(mapply(env$disclosable_split, tc$`Recorded-use developers`,
+                       tc$`Heavy GitHub users`)),
+            "Developer Experience" %in% tc$Group,
+            "Other (pooled)" %in% tc$Group)
+  rc <- env$heavy_concentration("Role")
+  stopifnot(nrow(rc) > 0, sum(rc$`Heavy GitHub users`) == env$heavy_github_n,
+            !env$heavy_composition_safe,
+            nrow(env$heavy_team_concentration) == 0L,
+            nrow(env$heavy_role_concentration) == 0L)
+  # If a whole intensity group is forced below the floor, the partition is
+  # withheld entirely rather than published in part.
+  forced <- env$gh_observed
+  forced$GH_intensity <- as.character(forced$GH_intensity)
+  heavy_ids <- which(forced$GH_intensity == "Heavy GitHub use")
+  forced$GH_intensity[heavy_ids[-(1:5)]] <- "Other recorded use"
+  withheld <- env$disclose_partition(
+    as.data.frame(table(forced$GH_intensity), responseName = "People") |>
+      subset(People > 0))
+  stopifnot(nrow(withheld) == 0L)
+})
+test("heavy threshold includes boundary ties and handles equal or empty recorded cohorts", {
+  d <- data.frame(GH_active_days = rep(1, 20), GH_accepted = 1:20, GH_chats = 0)
+  stopifnot(sum(github$github_intensity(d) == "Heavy GitHub use") == 4L)
+  d$GH_accepted <- c(1:14, rep(20, 6))
+  stopifnot(sum(github$github_intensity(d) == "Heavy GitHub use") == 6L)
+  d$GH_accepted <- 1
+  stopifnot(all(github$github_intensity(d) == "Heavy GitHub use"))
+  d$GH_active_days <- 0
+  stopifnot(all(github$github_intensity(d) == "No recorded use"),
+            length(github$github_intensity(d[0, ])) == 0L)
+})
+test("joint heavy margins cannot reveal one person by subtracting team from role", {
+  cells <- data.frame(
+    Team = c("A", "A", "B", "B", "B", "B", "C", "C"),
+    Role = c("X", "X", "X", "X", "Y", "Y", "X", "Y"),
+    GH_intensity = c("Heavy GitHub use", "Other recorded use",
+                     "Heavy GitHub use", "Other recorded use",
+                     "Heavy GitHub use", "Other recorded use",
+                     "Other recorded use", "Other recorded use"),
+    People = c(10, 60, 1, 29, 19, 21, 30, 40))
+  d <- cells[rep(seq_len(nrow(cells)), cells$People), ]
+  d$PersonId <- paste0("synthetic-joint-", seq_len(nrow(d)))
+  margins <- lapply(c("Team", "Role"), function(a)
+    d |> dplyr::count(.data[[a]], GH_intensity, name = "People"))
+  stopifnot(all(vapply(margins, function(m)
+    nrow(github$disclose_partition(m)) > 0L, logical(1))),
+    !github$heavy_hr_release_safe(d, d))
+  # A safe fixture must remain publishable; the fix is not unconditional hiding.
+  cells$People <- c(10, 60, 10, 20, 20, 20, 30, 40)
+  safe <- cells[rep(seq_len(nrow(cells)), cells$People), ]
+  safe$PersonId <- paste0("synthetic-safe-", seq_len(nrow(safe)))
+  stopifnot(github$heavy_hr_release_safe(safe, safe),
+            !github$heavy_hr_release_safe(safe, safe[-1, ]))
+})
+test("withheld intensity counts never reappear in rendered overview or pillar prose", {
+  env <- load_github(stage_fixtures("heavy-publication-text"))
+  rmd <- readLines(file.path(utility, "github-copilot-developer-productivity-simulation.Rmd"))
+  overview <- rmd[grep("^Overview$", rmd):(
+    grep("^### Where should we look", rmd) - 1L)]
+  contexts <- rmd[grep("^### Role and team context", rmd):(
+    grep("^### Weekly trends and valid", rmd) - 1L)]
+  inline <- regmatches(rmd, gregexpr("`r [^`]+`", rmd))
+  inline <- unlist(inline, use.names = FALSE)
+  affected <- inline[grepl("heavy_github|github_recorded|github_observed|HEAVY_GITHUB|heavy_confound", inline)]
+  refresh <- function() eval(parse(text = helper[
+    grep("^joint_counts <-", helper):(grep("^work_summary <-", helper) - 1L)]), env)
+  render_public <- function() {
+    old_options <- knitr::opts_chunk$get()
+    on.exit(knitr::opts_chunk$set(old_options), add = TRUE)
+    knitr::opts_chunk$set(echo = FALSE)
+    text <- paste(knitr::knit(text = c(overview, contexts, affected),
+                              envir = env, quiet = TRUE), collapse = "\n")
+    # Random base64 digits are not displayed counts; keep captions and prose.
+    gsub('data:image/[^"[:space:]]+', '<embedded-chart>', text)
+  }
+  forced <- which(env$gh_observed$GH_intensity == "Heavy GitHub use")
+  env$gh_observed$GH_intensity[forced[-seq_len(5)]] <- "Other recorded use"
+  refresh()
+  text <- render_public()
+  stopifnot(!env$gh_intensity_release$safe,
+            is.na(env$heavy_github_n), is.na(env$github_recorded_n),
+            is.na(env$heavy_github_share),
+            nrow(env$interval_data(env$gh_observed, "Collaboration_hours", "GH_intensity")) == 0L,
+            !grepl("(?<![[:digit:].])5(?![[:digit:].])", text, perl = TRUE),
+            grepl("withheld", text))
+  # Observe all but five developers: neither 355 nor its five-person complement
+  # may return through definitions, captions, KPI details or comparison charts.
+  original <- load_github(stage_fixtures("heavy-coverage-text"))
+  env$gh_observed <- original$gh_observed
+  ids <- setdiff(env$baseline$PersonId, env$gh_observed$PersonId)[seq_len(87)]
+  extra <- env$gh_observed[rep(which(env$gh_observed$GH_active_days == 0)[1], 87), ]
+  extra$PersonId <- ids
+  for (attribute in c("Team", "Role")) {
+    extra[[attribute]] <- env$baseline[[attribute]][match(ids, env$baseline$PersonId)]
+  }
+  env$gh_observed <- dplyr::bind_rows(env$gh_observed, extra)
+  env$baseline$GH_use[env$baseline$PersonId %in% ids] <- "No GitHub use recorded"
+  refresh()
+  text <- render_public()
+  stopifnot(nrow(env$gh_observed) == 355L,
+            !env$gh_intensity_release$safe, is.na(env$github_observed_n),
+            !env$hr_release_safe, nrow(env$role_context) == 0L,
+            nrow(env$team_joint_context) == 0L,
+            nrow(env$interval_data(env$gh_observed, "Collaboration_hours", "GH_intensity")) == 0L,
+            !grepl("(?<![[:digit:].])(5|355)(?![[:digit:].])", text, perl = TRUE),
+            grepl("withheld", text))
+})
+test("the developer report never reuses the canonical usage-segment names", {
+  rmd <- paste(readLines(file.path(utility,
+    "github-copilot-developer-productivity-simulation.Rmd")), collapse = "\n")
+  page <- paste(readLines(file.path(utility,
+    "github-copilot-developer-productivity-simulation.html"), warn = FALSE),
+    collapse = "")
+  env <- load_github(stage_fixtures("heavy-github-names"))
+  # These labels belong to vivainsights::identify_usage_segments(); reusing them
+  # for the GitHub-intensity grouping was deliberately avoided.
+  canonical <- c("Power User", "Habitual User", "Novice User", "Low User")
+  for (name in canonical) {
+    stopifnot(!grepl(name, rmd, fixed = TRUE),
+              !grepl(name, page, fixed = TRUE))
+  }
+  stopifnot(!any(canonical %in% levels(env$gh_observed$GH_intensity)),
+            all(levels(env$gh_observed$GH_intensity) %in%
+                  c("Heavy GitHub use", "Other recorded use", "No recorded use")),
+            grepl("Heavy GitHub use", page, fixed = TRUE))
+})
+test("responsive tables retain every row and escape labels and cell contents", {
+  rows <- data.frame(Label = sprintf("ui-row-%02d", 1:12), Value = seq_len(12),
+                     check.names = FALSE)
+  names(rows)[1] <- "<unsafe-header>"
+  rows[1, 1] <- '<img src=x onerror="alert(1)">'
+  output <- paste(capture.output(released$html_table(rows, "<unsafe-caption>")), collapse = "\n")
+  stopifnot(grepl('scope="col"', output, fixed = TRUE),
+            grepl('class="mobile-label"', output, fixed = TRUE),
+            grepl("Show remaining 2 rows (12 total)", output, fixed = TRUE),
+            grepl("&lt;unsafe-header&gt;", output, fixed = TRUE),
+            grepl("&lt;unsafe-caption&gt;", output, fixed = TRUE),
+            grepl("&lt;img", output, fixed = TRUE),
+            !grepl("<img src=x", output, fixed = TRUE),
+            all(vapply(rows[2:12, 1], function(value) grepl(value, output, fixed = TRUE), logical(1))))
+  withheld <- paste(capture.output(released$html_table(rows[0, ])), collapse = "\n")
+  stopifnot(grepl("Unavailable: independent coverage", withheld, fixed = TRUE),
+            !grepl("<table", withheld, fixed = TRUE))
+})
+test("responsive vector charts keep aggregate values and close graphics devices on failure", {
+  before <- released$baseline
+  devices <- grDevices::dev.list()
+  output <- paste(capture.output(released$interval_cards(before,
+    c("Collaboration_hours", "Meeting_hours"))), collapse = "\n")
+  stopifnot(grepl('class="chart-grid"', output, fixed = TRUE),
+            grepl("data:image/svg+xml;base64,", output, fixed = TRUE),
+            !grepl("PersonId", output, fixed = TRUE),
+            identical(before, released$baseline),
+            identical(devices, grDevices::dev.list()))
+  plot <- released$interval_plot(before, "Collaboration_hours",
+    title = "<untrusted-title>", subtitle = "Median and middle half")
+  responsive <- paste(capture.output(released$render_chart(plot)), collapse = "\n")
+  stopifnot(grepl('media="(max-width: 767px)"', responsive, fixed = TRUE),
+            grepl('media="(max-width: 1199px)"', responsive, fixed = TRUE),
+            grepl("&lt;untrusted-title&gt;", responsive, fixed = TRUE),
+            identical(devices, grDevices::dev.list()))
+  files <- list.files(tempdir(), pattern = "\\.svg$")
+  invalid <- ggplot2::ggplot(data.frame(x = 1), ggplot2::aes(x = x, y = absent_ui_field)) +
+    ggplot2::geom_point()
+  expect_error(released$chart_image_uri(invalid, 4, 3), "absent_ui_field")
+  stopifnot(identical(devices, grDevices::dev.list()),
+            identical(files, list.files(tempdir(), pattern = "\\.svg$")))
 })
 test("per-person-day category redraws lose the shared support and stay withheld", {
   redrawn <- stage_fixtures("breakdown-redrawn")
@@ -464,24 +699,172 @@ test("sparse GitHub credit rows never void observed activity", {
 
 test("no published label asserts non-use from absent M365 data", {
   env <- run_setup(stage_fixtures("consumption-honest-label"))
-  segments <- levels(env$person_base$CreditActivitySegment)
   absent <- "No observed M365 credits"
-  # The segment and the cost profile share the condition !positive_consumer, so
-  # they must share the honest label. "Non-user" would assert non-use from data
-  # this report states is not established as complete.
-  stopifnot(absent %in% segments,
-            !any(grepl("non.?users?", segments, ignore.case = TRUE)),
-            sum(env$person_base$CreditActivitySegment == absent) > 0L,
-            all(env$person_base$CostPerSessionProfile[
-              env$person_base$CreditActivitySegment == absent] %in%
-                c(absent, "Limited M365 sessions")),
-            !any(grepl("non.?users?", levels(env$person_base$CreditQuartile),
-                       ignore.case = TRUE)))
+  base <- env$person_base
+  # Every label a person can carry when M365 credits are absent must say that
+  # nothing was observed. "Non-user" would assert non-use from data this report
+  # states is not established as complete. The cost profile, credit band, credit
+  # quartile and intensity pattern all share the !positive_consumer condition,
+  # so they must share the honest label rather than inventing a usage claim.
+  label_columns <- c("CreditQuartile", "CreditBand", "CostPerSessionProfile",
+                     "ConsumptionProfile", "IntensityPattern")
+  for (column in label_columns) {
+    values <- as.character(base[[column]])
+    levels_present <- unique(c(values, levels(base[[column]])))
+    stopifnot(!any(grepl("non.?users?", levels_present, ignore.case = TRUE)),
+              all(values[!base$positive_consumer] %in%
+                    c(absent, "Limited M365 sessions")))
+  }
+  stopifnot(sum(base$CreditQuartile == absent) > 0L,
+            any(base$IntensityPattern == absent))
+  # The retired CreditActivitySegment reused the canonical Power / Habitual /
+  # Novice / Low ladder with report-local thresholds, which collided with the
+  # vivainsights definition documented elsewhere in this repository.
+  stopifnot(!"CreditActivitySegment" %in% names(base))
+  rmd <- paste(readLines(file.path(utility,
+    "copilot-consumption-ways-of-working-simulation.Rmd")), collapse = "\n")
+  stopifnot(!grepl("CreditActivitySegment", rmd, fixed = TRUE),
+            !grepl("segment_public", rmd, fixed = TRUE))
   page <- paste(readLines(file.path(utility,
     "copilot-consumption-ways-of-working-simulation.html"), warn = FALSE),
     collapse = "")
   stopifnot(!grepl("non.?users?", page, ignore.case = TRUE),
-            grepl(absent, page, fixed = TRUE))
+            grepl(absent, page, fixed = TRUE),
+            # The report must not advertise a usage-segment ladder it does not
+            # present. These labels belong to identify_usage_segments().
+            !grepl("Habitual User", page, fixed = TRUE),
+            !grepl("Novice User", page, fixed = TRUE))
+})
+test("credit concentration withholds unless the top group and its complement clear the floor", {
+  cs <- consumption$concentration_share
+  # A top decile of 4 people is below the floor even though the population is not.
+  stopifnot(is.na(cs(rep(1, 40), 0.10)))
+  # 100 equal contributors: the top decile holds exactly a tenth of the total.
+  stopifnot(abs(cs(rep(1, 100), 0.10) - 0.10) < 1e-9)
+  # The complement must clear the floor too, or the remainder is identifiable.
+  stopifnot(is.na(cs(rep(1, 100), 0.95)))
+  # Zero and non-finite values leave both the ranking and the denominator.
+  stopifnot(abs(cs(c(rep(0, 50), rep(1, 100)), 0.10) - 0.10) < 1e-9,
+            abs(cs(c(NA, NaN, rep(1, 100)), 0.10) - 0.10) < 1e-9)
+  # Concentration tracks skew rather than population size.
+  stopifnot(abs(cs(c(rep(100, 10), rep(1, 90)), 0.10) - 1000 / 1090) < 1e-9)
+  stopifnot(is.na(cs(rep(1, 9), 0.10)), is.na(cs(numeric(0), 0.10)),
+            is.na(cs(rep(0, 100), 0.10)))
+})
+test("heavy-user pattern reconciles to the population and never publishes a small band", {
+  env <- run_setup(stage_fixtures("consumption-intensity"))
+  summary <- env$intensity_summary
+  base <- env$person_base
+  stopifnot(nrow(summary) > 0,
+            sum(summary$People) == nrow(base),
+            all(summary$People >= env$MIN_GROUP_N),
+            all(c("Heavy, sustained", "Heavy, intermittent") %in%
+                  as.character(summary$IntensityPattern)))
+  heavy <- base[grepl("^Heavy", base$IntensityPattern), ]
+  sustained <- base[base$IntensityPattern == "Heavy, sustained", ]
+  intermittent <- base[base$IntensityPattern == "Heavy, intermittent", ]
+  absent <- base[base$IntensityPattern == "No observed M365 credits", ]
+  stopifnot(all(heavy$weekly_m365_credits >= env$heavy_user_cut),
+            all(sustained$m365_high_week_share >= env$SUSTAINED_WEEK_SHARE),
+            all(intermittent$m365_high_week_share < env$SUSTAINED_WEEK_SHARE),
+            all(absent$total_m365_credits == 0),
+            # An unobserved week is never counted as a high-credit week.
+            all(base$m365_high_weeks <= base$m365_observed_weeks))
+  # The published concentration equals an independent recomputation.
+  positive <- sort(base$total_m365_credits[base$total_m365_credits > 0],
+                   decreasing = TRUE)
+  expected <- sum(positive[seq_len(ceiling(0.10 * length(positive)))]) /
+    sum(positive)
+  reported <- env$concentration_summary$`Top decile`[
+    env$concentration_summary$Product == "Microsoft 365 Copilot credits"]
+  stopifnot(abs(reported - expected) < 1e-9,
+            env$concentration_summary$People[
+              env$concentration_summary$Product == "GitHub AI credits"] ==
+              sum(base$total_github_credits > 0))
+  # A narrower heavy-user cut that isolates a handful of people is withheld in
+  # full, including the complementary bands, rather than published in part.
+  narrowed <- base
+  narrowed$IntensityPattern <- as.character(narrowed$IntensityPattern)
+  narrowed$IntensityPattern[which(narrowed$IntensityPattern ==
+                                    "Heavy, sustained")[1:3]] <- "Heavy, rare"
+  stopifnot(nrow(env$publication_partition(narrowed, "IntensityPattern",
+    c("total_m365_credits", "total_m365_sessions"))) == 0)
+})
+test("developer network measures are levels in distinct people, never weekly sums", {
+  env <- load_github(stage_fixtures("developer-network"))
+  stopifnot(setequal(env$NETWORK_METRICS,
+              c("Internal_network_size", "External_network_size", "Strong_ties",
+                "Diverse_ties", "Network_outside_organization")),
+            all(env$NETWORK_METRICS %in% names(env$baseline)),
+            all(env$NETWORK_METRICS %in% env$work_metrics))
+  # Units are declared per measure, and a mixed request never claims one unit.
+  stopifnot(env$metric_unit("Internal_network_size") == env$PEOPLE_UNIT,
+            env$metric_unit("Collaboration_hours") == env$HOURS_UNIT,
+            env$metric_unit(env$NETWORK_METRICS) == env$PEOPLE_UNIT,
+            env$metric_unit(c("Collaboration_hours", "Strong_ties")) ==
+              "See each panel for its unit",
+            all(env$work_summary$Unit[env$work_summary$Metric %in%
+                  unname(env$metric_labels[env$NETWORK_METRICS])] ==
+                  env$PEOPLE_UNIT))
+  # A network baseline is the mean of that person's weekly trailing-window
+  # levels, so it must fall inside their observed weekly range. Summing the
+  # weeks instead would push the value above the maximum.
+  weekly <- env$baseline_panel
+  for (m in env$NETWORK_METRICS) {
+    lo <- tapply(weekly[[m]], weekly$PersonId, min)
+    hi <- tapply(weekly[[m]], weekly$PersonId, max)
+    value <- setNames(env$baseline[[m]], env$baseline$PersonId)
+    ids <- names(value)
+    stopifnot(!anyNA(value), all(value >= lo[ids] - 1e-9),
+              all(value <= hi[ids] + 1e-9), all(value >= 0))
+  }
+  # Team medians follow the same team-size rule as the other team output.
+  stopifnot(nrow(env$team_network) > 0,
+            all(env$team_network$Developers >= env$MIN_GROUP_N),
+            env$network_lead_team %in% as.character(env$team_network$Team),
+            env$network_lead_value == max(env$team_network$Internal_network_size))
+  page <- paste(readLines(file.path(utility,
+    "github-copilot-developer-productivity-simulation.html"), warn = FALSE),
+    collapse = "")
+  stopifnot(grepl("Internal network size", page, fixed = TRUE),
+            grepl("Network outside organisation", page, fixed = TRUE),
+            grepl("trailing window", page, fixed = TRUE))
+})
+test("the consumption path reads five exports and the opt-out changes no retained measure", {
+  dir <- file.path(stage_fixtures("super-panel-lean"), "_data")
+  full <- super_helpers$build_copilot_super_panel(dir)
+  lean <- super_helpers$build_copilot_super_panel(dir, include_github_breakdowns = FALSE)
+  common <- intersect(names(full$panel), names(lean$panel))
+  breakdown_elements <- c("github_feature_weekly", "github_language_feature_weekly",
+                          "github_language_model_weekly", "github_model_feature_weekly")
+  stopifnot(nrow(full$panel) == nrow(lean$panel),
+            length(common) == ncol(lean$panel),
+            ncol(full$panel) > ncol(lean$panel),
+            isTRUE(all.equal(full$panel[common], lean$panel[common])),
+            all(vapply(breakdown_elements, function(n) is.null(lean[[n]]), logical(1))),
+            all(vapply(breakdown_elements, function(n) !is.null(full[[n]]), logical(1))),
+            !is.null(lean$github_activity_weekly), !is.null(lean$m365_weekly),
+            !is.null(lean$github_credits_weekly))
+  # With the four breakdown exports absent the consumption path still builds an
+  # identical panel, while the path that presents those drilldowns still fails.
+  for (f in c("GitHubActivityBreakdownByFeatureMetrics.csv",
+              "GitHubActivityBreakdownByLanguageFeatureMetrics.csv",
+              "GitHubActivityBreakdownByLanguageModelMetrics.csv",
+              "GitHubActivityBreakdownByModelFeatureMetrics.csv")) {
+    unlink(file.path(dir, "github-query", f))
+  }
+  five <- super_helpers$build_copilot_super_panel(dir, include_github_breakdowns = FALSE)
+  stopifnot(isTRUE(all.equal(five$panel, lean$panel)))
+  expect_error(super_helpers$build_copilot_super_panel(dir), "cannot open")
+  # The consumption report must actually take that path and stop carrying the
+  # breakdown-derived columns it never presented.
+  rmd <- paste(readLines(file.path(utility,
+    "copilot-consumption-ways-of-working-simulation.Rmd")), collapse = "\n")
+  stopifnot(grepl("include_github_breakdowns = FALSE", rmd, fixed = TRUE),
+            !grepl("github_feature_usage_count", rmd, fixed = TRUE),
+            !grepl("github_distinct_features", rmd, fixed = TRUE),
+            !grepl("github_distinct_languages_feature", rmd, fixed = TRUE),
+            !grepl("github_distinct_models_language", rmd, fixed = TRUE))
 })
 test("crosswalk rejects a shared historical key and an unbacked historical key", {
   mpath_for <- function(directory) file.path(directory, "_data", "consumption-query",

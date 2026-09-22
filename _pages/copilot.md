@@ -61,7 +61,7 @@ Open a demo in your browser without installing anything. Both reports use **synt
     <span class="vi-card-more">View demo →</span>
   </a>
   <a class="vi-card" id="developer-experience-and-copilot" href="{{ site.baseurl }}/examples/utility-r/github-copilot-developer-productivity-simulation.html">
-    <img src="{{ site.baseurl }}/assets/images/reports/github-copilot-devex-focus.png" alt="Developer experience report focus and coordination preview" loading="lazy">
+    <img src="{{ site.baseurl }}/assets/images/reports/github-copilot-devex-overview.png" alt="Developer experience report heavy GitHub Copilot user overview preview" loading="lazy">
     <span class="vi-card-title">Developer Experience and Copilot</span>
     <span class="vi-card-desc">Explore developer working conditions alongside GitHub and Microsoft 365 Copilot use.</span>
     <span class="vi-card-more">View demo →</span>
