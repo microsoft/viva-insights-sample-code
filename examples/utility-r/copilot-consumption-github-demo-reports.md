@@ -15,7 +15,7 @@ for the official contracts.
 | Report | Source | Rendered report | Scope |
 |---|---|---|---|
 | Copilot Consumption and Ways of Working | [Rmd](copilot-consumption-ways-of-working-simulation.Rmd) | [HTML](copilot-consumption-ways-of-working-simulation.html) | Copilot credit consumption alongside collaboration patterns, by service, organisation and function, including credit concentration and heavy-user consumption patterns. |
-| Developer Experience and Copilot | [Rmd](github-copilot-developer-productivity-simulation.Rmd) | [HTML](github-copilot-developer-productivity-simulation.html) | Baseline working conditions for the developer population, including collaboration network breadth, with GitHub Copilot activity, feature/model/language breakdowns, M365 Copilot credit consumption and an evaluation framework. |
+| Developer Experience and Copilot | [Rmd](github-copilot-developer-productivity-simulation.Rmd) | [HTML](github-copilot-developer-productivity-simulation.html) | Baseline working conditions for the developer population organised around GitHub Copilot usage: a heavy GitHub-use group defined and profiled on the Overview, collaboration, focus, after-hours and network breadth each compared across the three GitHub-intensity groups, plus feature/model/language breakdowns, GitHub coverage, M365 Copilot credit consumption and an evaluation framework. |
 
 ## Which queries each report needs
 
@@ -63,21 +63,44 @@ only: it is a lookback description, not a trend, and unobserved weeks are
 excluded from both the threshold and the per-person counts.
 
 ## Navigating Developer Experience
-Start with **Overview**, then explore **Collaboration**, **Focus**, **After-hours**
-and **AI**. The **More** menu holds GitHub feature/model/language breakdowns,
-working-pattern comparisons and methods. The overview's pillar cards are links;
-exact values, composition and longer definitions expand in place.
+GitHub Copilot usage is the organising lens of the whole report. Start with
+**Overview**, which defines the **heavy GitHub-use** group and shows where it
+concentrates by team and role, then explore **Collaboration**, **Focus**,
+**After-hours** and **Network**. The **More** menu holds GitHub
+feature/model/language breakdowns, GitHub coverage, working-pattern comparisons
+and methods. The overview's pillar cards are links; exact values, composition
+and longer definitions expand in place.
 
-**Collaboration covers both load and breadth.** Collaboration, meeting, email,
-chat and call hours describe how much coordination happens and through which
-channels. Network measures — internal and external network size, strong ties,
-diverse ties and network outside the organisation — describe how many distinct
-people that coordination reaches. These count people rather than hours, and
-Viva Insights derives them over a trailing window, so they are standing levels
-rather than weekly flows: they are never summed across weeks and should not be
-read as week-on-week movement. A larger network is not inherently better. The
-working-patterns page repeats the network comparison across recorded-GitHub-use
-groups, where the differences remain unadjusted and descriptive.
+**Heavy GitHub use is defined on the GitHub-observed population.** Heavy users
+are the top `HEAVY_GITHUB_SHARE` (20%) of GitHub-observed developers with
+recorded use, ranked by accepted code completions plus user-initiated chat
+requests over the baseline. The published rule text is generated from the
+`HEAVY_GITHUB_SHARE` constant, so a threshold change cannot leave a stale rule
+on the page. The headline share is always reported against the GitHub-observed
+denominator — heavy users are 13.8% of the 268 observed developers, not 20% of
+the 184 with recorded use, which would be true by construction. The three groups
+(**Heavy GitHub use**, **Other recorded use**, **No recorded use**) partition the
+observed population and are gated by the same disclosure helpers as every other
+split: if any group falls below the floor the whole partition is withheld.
+Heavy use is unevenly distributed across teams, so each pillar page carries a
+specific confounding note that comparisons may reflect team composition rather
+than an effect of the tool.
+
+**Each pillar leads with the three-group GitHub-intensity comparison** and keeps
+the team view where it still adds value. The comparisons are unadjusted and
+descriptive; no causal or productivity claim is implied.
+
+**Collaboration and Network cover both load and breadth.** Collaboration,
+meeting, email, chat and call hours describe how much coordination happens and
+through which channels. Network measures — internal and external network size,
+strong ties, diverse ties and network outside the organisation — describe how
+many distinct people that coordination reaches, and have their own top-level
+page. These count people rather than hours, and Viva Insights derives them over
+a trailing window, so they are standing levels rather than weekly flows: they
+are never summed across weeks and should not be read as week-on-week movement.
+A larger network is not inherently better. The Network page and the
+working-patterns page repeat the comparison across GitHub-intensity groups,
+where the differences remain unadjusted and descriptive.
 
 The report uses embedded SVG charts, a reflowing small-multiple grid and separate
 wide-chart renders for desktop, tablet and mobile. Long tables show ten rows first
@@ -252,7 +275,7 @@ node scripts\check-developer-report-layout.js
 node scripts\capture-report-screenshots.js --github-only
 ```
 
-Run these from the repository root. The layout check covers all eight pages at
+Run these from the repository root. The layout check covers all nine pages at
 desktop, tablet and phone widths, including expanded content and keyboard controls.
 Pass an output directory to the layout script to retain screenshots.
 

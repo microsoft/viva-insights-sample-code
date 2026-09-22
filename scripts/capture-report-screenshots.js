@@ -34,13 +34,13 @@ const SHOTS = [
   },
   {
     html: 'github-copilot-developer-productivity-simulation.html',
-    page: 'ai-use-and-query-coverage',
-    file: 'github-copilot-devex-ai-use.png',
+    page: 'overview',
+    file: 'github-copilot-devex-overview.png',
   },
   {
     html: 'github-copilot-developer-productivity-simulation.html',
-    page: 'focus',
-    file: 'github-copilot-devex-focus.png',
+    page: 'network',
+    file: 'github-copilot-devex-network.png',
   },
 ];
 

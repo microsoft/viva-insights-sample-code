@@ -78,18 +78,19 @@ reproduce the demo or build a scoped credits report with an agent and reusable R
 
 ## Developer Experience and Copilot
 
-**Synthetic data · R template · Four analytical pillars with supporting detail**
+**Synthetic data · R template · GitHub Copilot usage as the organising lens**
 
 **When to use it:** reach for this report when you need to answer questions such as —
-*Do developers who also use Microsoft 365 Copilot show different meeting load or
-uninterrupted-focus time than those who don't? Do developers with recorded GitHub
-Copilot use collaborate with broader or narrower internal networks? How does
-GitHub Copilot use vary by
+*Which developers are the heaviest GitHub Copilot users, and where are they
+concentrated? Do heavy GitHub users show different meeting load or
+uninterrupted-focus time than other observed developers? Do they collaborate with
+broader or narrower internal networks? How does GitHub Copilot use vary by
 team, model, or language? Are developers using GitHub Copilot and Microsoft 365
 Copilot jointly, or are the two adopted independently? Is missing activity actually
-zero usage, or a coverage/eligibility gap?* It establishes a baseline of developer
-working conditions alongside GitHub **and** Microsoft 365 Copilot use, and keeps
-eligibility and coverage visible rather than treating missing activity as zero.
+zero usage, or a coverage/eligibility gap?* It defines a **heavy GitHub-use** group
+on the GitHub-observed population, then compares developer working conditions across
+the three GitHub-intensity groups, and keeps eligibility and coverage visible rather
+than treating missing activity as zero.
 
 **Scope:** this report adds **GitHub Copilot activity** and feature, model and language
 breakdowns to a developer working-conditions baseline, alongside **Microsoft 365
@@ -106,10 +107,12 @@ needed — but column parity is not semantic parity. Confirm population scope, i
 date grains, licence history and expected coverage before adapting, and note that
 eligibility and coverage must be derived because no query emits them.
 
-Start with Overview, then explore **Collaboration**, **Focus**, **After-hours** and
-**AI**. Collaboration covers both load and network breadth. The **More** menu
-contains GitHub breakdowns, working-pattern comparisons and methods. Detailed
-tables expand in place, and charts reflow for smaller screens.
+Start with Overview, which defines the **heavy GitHub-use** group and shows where
+it concentrates by team and role, then explore **Collaboration**, **Focus**,
+**After-hours** and **Network** — each leads with the three-group GitHub-intensity
+comparison. The **More** menu contains GitHub breakdowns, GitHub coverage,
+working-pattern comparisons and methods. Detailed tables expand in place, and
+charts reflow for smaller screens.
 
 **[View demo]({{ site.baseurl }}/examples/utility-r/github-copilot-developer-productivity-simulation.html)** ·
 [Get source](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/github-copilot-developer-productivity-simulation.Rmd) ·
@@ -118,7 +121,7 @@ tables expand in place, and charts reflow for smaller screens.
 **[Build or customise with AI]({{ site.baseurl }}/frontier-analytics-prompt-developer-experience-dashboard/)**:
 reproduce the synthetic reference or assess real inputs. No verified real GitHub adapter is supplied yet.
 
-[![Developer experience report focus and coordination]({{ site.baseurl }}/assets/images/reports/github-copilot-devex-focus.png)]({{ site.baseurl }}/examples/utility-r/github-copilot-developer-productivity-simulation.html)
+[![Developer experience report heavy GitHub Copilot user overview]({{ site.baseurl }}/assets/images/reports/github-copilot-devex-overview.png)]({{ site.baseurl }}/examples/utility-r/github-copilot-developer-productivity-simulation.html)
 
 The developer demo uses **synthetic values in confirmed export headers**, not a certified real-data adapter. Weekly M365 eligibility uses enabled days; ingestion completeness remains unknown without independent evidence. GitHub row presence is observation, not provisioning. Breakdown/model allocations are illustrative synthetic invariants, not verified real-export semantics. M365 Copilot credits and GitHub AI credits remain separately named units; no cross-product total or share is supported.
 
@@ -127,7 +130,7 @@ The developer demo uses **synthetic values in confirmed export headers**, not a 
 <details markdown="1">
 <summary>See the recorded GitHub use and observation preview</summary>
 
-![Developer experience report recorded GitHub use and observation]({{ site.baseurl }}/assets/images/reports/github-copilot-devex-ai-use.png)
+![Developer experience report network breadth by GitHub intensity]({{ site.baseurl }}/assets/images/reports/github-copilot-devex-network.png)
 
 </details>
 

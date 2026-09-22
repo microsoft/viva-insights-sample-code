@@ -489,7 +489,29 @@ baseline <- baseline |>
     !GH_all_valid ~ 'GitHub observation unresolved',
     GH_active_days > 0 ~ 'GitHub use recorded',
     TRUE ~ 'No GitHub use recorded'), levels = gh_use_levels))
+
 gh_observed <- baseline |> filter(GH_all_valid)
+
+# GitHub-intensity grouping over the GitHub-observed population (GH_all_valid).
+# The volume measure is accepted code completions plus user-initiated chat
+# requests, summed over the baseline, among developers with recorded use
+# (GH_active_days > 0). Heavy GitHub use is the top HEAVY_GITHUB_SHARE quintile
+# of that volume. The share is an explicit parameter so the published rule text
+# is generated from it, mirroring INTENSITY_RULE in the consumption report.
+# Developers with no recorded use are their own group and are never recoded as
+# heavy or light; developers with unresolved GitHub observation are excluded
+# from gh_observed entirely and never appear here.
+HEAVY_GITHUB_SHARE <- 0.20
+gh_intensity_levels <- c('Heavy GitHub use', 'Other recorded use', 'No recorded use')
+gh_recorded <- gh_observed |> filter(GH_active_days > 0)
+gh_volume <- gh_recorded$GH_accepted + gh_recorded$GH_chats
+heavy_github_cut <- if (nrow(gh_recorded))
+  as.numeric(quantile(gh_volume, 1 - HEAVY_GITHUB_SHARE, na.rm = TRUE)) else NA_real_
+gh_observed <- gh_observed |>
+  mutate(GH_intensity = factor(case_when(
+    GH_active_days > 0 & (GH_accepted + GH_chats) >= heavy_github_cut ~ 'Heavy GitHub use',
+    GH_active_days > 0 ~ 'Other recorded use',
+    TRUE ~ 'No recorded use'), levels = gh_intensity_levels))
 
 measure_values <- c(
   unlist(pq |> select(where(is.numeric), -Total_Copilot_enabled_days,
@@ -697,6 +719,7 @@ interval_plot <- function(data, metrics, group = 'Team', title, subtitle, captio
   first_metric <- unname(metric_labels[metrics[1]])
   group_order <- if (group == 'Joint') joint_levels[1:4]
     else if (group == 'GH_use') gh_use_levels[1:2]
+    else if (group == 'GH_intensity') gh_intensity_levels
     else d |>
     filter(Metric == first_metric) |> arrange(desc(p50)) |> pull(Group)
   d$Group <- factor(d$Group, levels = rev(group_order))
@@ -818,6 +841,77 @@ github_active_n <- if (nrow(github_use_counts))
   sum(github_use_counts$People[github_use_counts$GH_use == 'GitHub use recorded']) else NA_real_
 github_observed_n <- if (nrow(github_use_counts))
   sum(github_use_counts$People[github_use_counts$GH_use != 'GitHub observation unresolved']) else NA_real_
+
+# The three-group GitHub-intensity partition over the GitHub-observed
+# population. Gated like every other partition: if any of the three groups
+# falls below the floor the whole split is withheld rather than published in
+# part. The headline share is always heavy users as a fraction of the
+# GitHub-observed population, never of the recorded-use subset (which is 20% by
+# construction and therefore tautological).
+gh_intensity_counts <- gh_observed |>
+  count(GH_intensity, name = 'People', .drop = FALSE) |>
+  disclose_partition() |>
+  mutate(Share = People / nrow(gh_observed))
+heavy_github_n <- sum(gh_observed$GH_intensity == 'Heavy GitHub use')
+github_recorded_n <- nrow(gh_recorded)
+heavy_github_share <- if (nrow(gh_intensity_counts))
+  heavy_github_n / nrow(gh_observed) else NA_real_
+# Built from the constant so a threshold change can never leave the published
+# rule describing the previous cut.
+HEAVY_GITHUB_RULE <- sprintf(
+  paste('Heavy GitHub use: the top %s of GitHub-observed developers with',
+        'recorded use, ranked by accepted code completions plus user-initiated',
+        'chat requests over the %s-week baseline. Reported as a share of all %s',
+        'GitHub-observed developers, not of the %s with recorded use.'),
+  scales::percent(HEAVY_GITHUB_SHARE, accuracy = 1), BASELINE_WEEKS,
+  num(nrow(gh_observed)), num(github_recorded_n))
+
+# Team concentration of the heavy group, reported as heavy users within each
+# team's recorded-use population -- the denominator the confounding note refers
+# to. Teams whose heavy count is a positive sub-floor value are pooled so the
+# partition can publish without exposing a cell below MIN_GROUP_N; the whole
+# table is withheld if any published count or its complement still fails the
+# split gate. Role concentration uses the same construction without pooling.
+heavy_concentration <- function(attribute) {
+  source <- gh_observed |>
+    filter(GH_active_days > 0) |>
+    mutate(Heavy = GH_intensity == 'Heavy GitHub use',
+           Group = missing_label(.data[[attribute]]))
+  raw <- source |>
+    group_by(Group) |>
+    summarise(`Recorded-use developers` = n(),
+              `Heavy GitHub users` = sum(Heavy), .groups = 'drop')
+  pooled <- raw$Group[raw$`Heavy GitHub users` > 0 &
+                        raw$`Heavy GitHub users` < MIN_GROUP_N]
+  out <- source |>
+    mutate(Group = if_else(Group %in% pooled, 'Other (pooled)', Group)) |>
+    group_by(Group) |>
+    summarise(`Recorded-use developers` = n(),
+              `Heavy GitHub users` = sum(Heavy), .groups = 'drop') |>
+    arrange(desc(`Heavy GitHub users`), Group)
+  safe <- nrow(out) > 0 &&
+    all(mapply(disclosable_split, out$`Recorded-use developers`,
+               out$`Heavy GitHub users`))
+  if (!safe) out[0, ] else out
+}
+heavy_team_concentration <- heavy_concentration('Team')
+heavy_role_concentration <- heavy_concentration('Role')
+# Data-derived confounding statement so the caveat text stays true if the
+# fixtures change. Heavy use is unevenly spread across teams, so group
+# differences may reflect team composition rather than tool use.
+heavy_confound_note <- if (!nrow(heavy_team_concentration)) {
+  paste('Heavy GitHub use is unevenly distributed across teams, so differences',
+        'between these groups may reflect team composition rather than tool use.')
+} else {
+  named <- heavy_team_concentration[heavy_team_concentration$Group != 'Other (pooled)', ]
+  top <- named[which.max(named$`Heavy GitHub users`), ]
+  sprintf(paste('Heavy GitHub use is unevenly distributed across teams: %s alone',
+                'accounts for %s of the %s heavy users, and some teams contribute',
+                'none. Differences between these groups may reflect team composition',
+                'rather than tool use, not an effect of the tool.'),
+          top$Group, num(top$`Heavy GitHub users`), num(heavy_github_n))
+}
+
 team_context <- composition(baseline, 'Team', 'Role')
 role_context <- composition(gh_observed, 'GH_use', 'Role')
 team_joint_context <- composition(gh_observed, 'GH_use', 'Team')

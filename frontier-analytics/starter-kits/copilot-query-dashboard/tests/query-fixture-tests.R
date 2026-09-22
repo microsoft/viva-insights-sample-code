@@ -378,9 +378,96 @@ test("developer presentation distinguishes recorded use from complete observatio
   rmd <- paste(readLines(file.path(utility,
     "github-copilot-developer-productivity-simulation.Rmd")), collapse = "\n")
   stopifnot(!grepl("GitHub observed developers", rmd, fixed = TRUE),
-            grepl('AI {#ai-use-and-query-coverage}', rmd, fixed = TRUE),
+            # The standalone AI page is dissolved; coverage detail moves to a
+            # More dropdown page and network breadth becomes its own top page.
+            !grepl('AI {#ai-use-and-query-coverage}', rmd, fixed = TRUE),
+            grepl('GitHub coverage {#github-coverage data-navmenu="More"}', rmd, fixed = TRUE),
+            grepl('href="#network"', rmd, fixed = TRUE),
             grepl('data-navmenu="More"', rmd, fixed = TRUE),
             !grepl("min-width:700px", rmd, fixed = TRUE))
+})
+test("heavy GitHub group reconciles to the observed population and reports the observed-denominator share", {
+  env <- load_github(stage_fixtures("heavy-github-group"))
+  # The three groups partition exactly the GitHub-observed population (GH_all_valid),
+  # never the full roster and never the recorded-use subset alone.
+  stopifnot(env$HEAVY_GITHUB_SHARE == 0.20,
+            setequal(levels(env$gh_observed$GH_intensity),
+                     c("Heavy GitHub use", "Other recorded use", "No recorded use")),
+            nrow(env$gh_observed) == env$github_observed_n,
+            env$github_observed_n == 268L,
+            env$github_recorded_n == 184L,
+            env$heavy_github_n == 37L,
+            sum(env$gh_intensity_counts$People) == nrow(env$gh_observed),
+            # No group falls below the floor for the committed fixtures.
+            all(env$gh_intensity_counts$People >= env$MIN_GROUP_N))
+  counts <- table(env$gh_observed$GH_intensity)
+  stopifnot(counts[["Heavy GitHub use"]] == 37L,
+            counts[["Other recorded use"]] == 147L,
+            counts[["No recorded use"]] == 84L,
+            sum(counts) == 268L)
+  # Developers with no recorded use are their own group, never recoded as heavy
+  # or light; the recorded-use subset equals heavy + other recorded.
+  stopifnot(sum(env$gh_observed$GH_active_days > 0) == env$github_recorded_n,
+            counts[["Heavy GitHub use"]] + counts[["Other recorded use"]] ==
+              env$github_recorded_n)
+  # Headline share uses the observed denominator (13.8% of 268), NOT the
+  # recorded-use denominator (which is 20% by construction and tautological).
+  stopifnot(abs(env$heavy_github_share - 37 / 268) < 1e-9,
+            abs(env$heavy_github_share - 0.138) < 5e-4,
+            abs(env$heavy_github_n / env$github_recorded_n - 0.20) < 0.03)
+  stopifnot(env$heavy_github_share != env$heavy_github_n / env$github_recorded_n)
+  # The generated rule text names the observed denominator, mirroring INTENSITY_RULE.
+  stopifnot(grepl("top 20%", env$HEAVY_GITHUB_RULE, fixed = TRUE),
+            grepl("268", env$HEAVY_GITHUB_RULE, fixed = TRUE),
+            grepl("not of the 184", env$HEAVY_GITHUB_RULE, fixed = TRUE))
+  # The confounding note is specific about team concentration, not generic.
+  stopifnot(grepl("unevenly distributed across teams", env$heavy_confound_note, fixed = TRUE),
+            grepl("Developer Experience", env$heavy_confound_note, fixed = TRUE))
+})
+test("heavy-group concentration pools sub-floor cells and withholds when a group is below the floor", {
+  env <- load_github(stage_fixtures("heavy-github-concentration"))
+  # Team concentration publishes with sub-floor teams pooled: every published
+  # heavy count and its complement clears the floor, and the counts reconcile
+  # to the 37 heavy users.
+  tc <- env$heavy_team_concentration
+  stopifnot(nrow(tc) > 0,
+            sum(tc$`Heavy GitHub users`) == env$heavy_github_n,
+            all(mapply(env$disclosable_split, tc$`Recorded-use developers`,
+                       tc$`Heavy GitHub users`)),
+            "Developer Experience" %in% tc$Group,
+            "Other (pooled)" %in% tc$Group)
+  # Role concentration clears the floor without pooling for these fixtures.
+  rc <- env$heavy_role_concentration
+  stopifnot(nrow(rc) > 0, sum(rc$`Heavy GitHub users`) == env$heavy_github_n)
+  # If a whole intensity group is forced below the floor, the partition is
+  # withheld entirely rather than published in part.
+  forced <- env$gh_observed
+  forced$GH_intensity <- as.character(forced$GH_intensity)
+  heavy_ids <- which(forced$GH_intensity == "Heavy GitHub use")
+  forced$GH_intensity[heavy_ids[-(1:5)]] <- "Other recorded use"
+  withheld <- env$disclose_partition(
+    as.data.frame(table(forced$GH_intensity), responseName = "People") |>
+      subset(People > 0))
+  stopifnot(nrow(withheld) == 0L)
+})
+test("the developer report never reuses the canonical usage-segment names", {
+  rmd <- paste(readLines(file.path(utility,
+    "github-copilot-developer-productivity-simulation.Rmd")), collapse = "\n")
+  page <- paste(readLines(file.path(utility,
+    "github-copilot-developer-productivity-simulation.html"), warn = FALSE),
+    collapse = "")
+  env <- load_github(stage_fixtures("heavy-github-names"))
+  # These labels belong to vivainsights::identify_usage_segments(); reusing them
+  # for the GitHub-intensity grouping was deliberately avoided.
+  canonical <- c("Power User", "Habitual User", "Novice User", "Low User")
+  for (name in canonical) {
+    stopifnot(!grepl(name, rmd, fixed = TRUE),
+              !grepl(name, page, fixed = TRUE))
+  }
+  stopifnot(!any(canonical %in% levels(env$gh_observed$GH_intensity)),
+            all(levels(env$gh_observed$GH_intensity) %in%
+                  c("Heavy GitHub use", "Other recorded use", "No recorded use")),
+            grepl("Heavy GitHub use", page, fixed = TRUE))
 })
 test("responsive tables retain every row and escape labels and cell contents", {
   rows <- data.frame(Label = sprintf("ui-row-%02d", 1:12), Value = seq_len(12),

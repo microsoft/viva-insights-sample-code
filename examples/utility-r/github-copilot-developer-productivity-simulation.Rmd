@@ -130,31 +130,86 @@ Overview
 Row
 -------------------------------------
 
-### Where should we look more closely at developer working conditions?
+### Who are the heavy GitHub Copilot users, and where are they?
 
 <span class="pill">Synthetic demo · Real export schema</span>
 <span class="context">`r period_label` · `r num(nrow(baseline))` developers · `r n_distinct(baseline$Team)` teams · `r BASELINE_WEEKS` complete Person Query weeks</span>
 
-<p class="leadline">The median developer records <strong>`r f1(median(baseline$Collaboration_hours))` collaboration hours per week</strong>; use the four pillars to explore team differences, calendar availability and recorded Copilot use.</p>
+<p class="leadline"><strong>`r num(heavy_github_n)` developers (`r pct(heavy_github_share)` of the `r num(github_observed_n)` with complete GitHub observation)</strong> are heavy GitHub Copilot users. Use this lens, then the four pillars, to explore how their working conditions compare.</p>
 
 ```{r landscape-kpis, results='asis'}
 cat('<div class="kpis">')
-card('Collaboration hours / week', f1(median(baseline$Collaboration_hours)), 'Median of person-level eight-week averages')
-card('Available-to-focus hours / week', f1(median(baseline$Available_to_focus_hours)), 'Calendar availability; tenant working-hours rules apply')
-card('After-hours collaboration / week', f1(median(baseline$After_hours_collaboration_hours)), 'Median hours outside configured working hours')
+card('Heavy GitHub users', pct(heavy_github_share),
+  paste(num(heavy_github_n), 'of', num(github_observed_n), 'GitHub-observed developers; top', scales::percent(HEAVY_GITHUB_SHARE, accuracy=1), 'by accepted completions plus chats among the', num(github_recorded_n), 'with recorded use'))
 card('Developers with recorded GitHub use', num(github_active_n),
   paste('Among', num(github_observed_n), 'developers with complete activity coverage'))
+card('Collaboration hours / week', f1(median(baseline$Collaboration_hours)), 'Median of person-level eight-week averages')
+card('Available-to-focus hours / week', f1(median(baseline$Available_to_focus_hours)), 'Calendar availability; tenant working-hours rules apply')
 cat('</div>')
 ```
 
-<p class="chart-note">Synthetic examples, not productivity scores or intervention effects. Microsoft 365 complete-window rates are unavailable without independent collection evidence; missing observation is not non-use.</p>
+<p class="chart-note">Synthetic examples, not productivity scores or intervention effects. The heavy-user share uses the `r num(github_observed_n)` GitHub-observed developers as its denominator, never the `r num(github_recorded_n)` with recorded use (which would be `r scales::percent(HEAVY_GITHUB_SHARE, accuracy=1)` by construction). Microsoft 365 complete-window rates are unavailable without independent collection evidence; missing observation is not non-use.</p>
+
+Row
+-------------------------------------
+
+### How the heavy GitHub-use group is defined, and where it concentrates
+
+<div class="definitions">
+<strong>Definition.</strong> `r HEAVY_GITHUB_RULE` The `r num(github_observed_n)` GitHub-observed developers split into three groups: <strong>Heavy GitHub use</strong> (`r num(heavy_github_n)`), <strong>Other recorded use</strong> (`r num(github_recorded_n - heavy_github_n)`) and <strong>No recorded use</strong> (`r num(github_observed_n - github_recorded_n)`). Developers with unresolved GitHub observation are excluded, never recoded as non-users. These labels are deliberately distinct from the canonical `vivainsights::identify_usage_segments()` names.
+</div>
+
+<p class="chart-note">`r heavy_confound_note`</p>
+
+```{r overview-heavy-concentration, results='asis'}
+if (!nrow(heavy_team_concentration)) {
+  cat('<p>Team concentration withheld: a published cell or its complement falls below the privacy floor.</p>')
+} else {
+  render_chart(
+    ggplot(heavy_team_concentration,
+           aes(x = `Heavy GitHub users`,
+               y = factor(Group, levels = rev(Group)))) +
+      geom_col(fill = '#4338ca', width = .6) +
+      geom_text(aes(label = paste0(num(`Heavy GitHub users`), ' of ',
+                                   num(`Recorded-use developers`))),
+                hjust = -.1, size = 3.3) +
+      scale_x_continuous(expand = expansion(mult = c(0, .35))) +
+      scale_y_discrete(labels = function(x) wrap(x, 18)) + theme_report() +
+      chart_labs('Heavy GitHub users by team',
+        paste('Heavy users within each team’s recorded-use population. Teams with a sub-floor heavy count are pooled.'),
+        base_caption(github_recorded_n, unit = paste('heavy users among', num(github_recorded_n), 'developers with recorded GitHub use')),
+        x = 'Heavy GitHub users (count)', y = NULL))
+}
+```
+
+<details><summary>Heavy-group composition by team and role</summary>
+
+```{r overview-concentration-tables, results='asis'}
+html_table(heavy_team_concentration |>
+  transmute(Team = Group, `Recorded-use developers`, `Heavy GitHub users`,
+            `Heavy share (%)` = pct(`Heavy GitHub users` / `Recorded-use developers`)),
+  'Heavy GitHub users within each team’s recorded-use population. Teams with a positive sub-floor heavy count are pooled; the whole table is withheld if any published count or its complement is below 10.')
+html_table(heavy_role_concentration |>
+  transmute(Role = Group, `Recorded-use developers`, `Heavy GitHub users`,
+            `Heavy share (%)` = pct(`Heavy GitHub users` / `Recorded-use developers`)),
+  'Heavy GitHub users within each role’s recorded-use population, released on the same floor and complement rules.')
+```
+
+Heavy GitHub use concentrates in a small number of teams and roles. Because the groups differ in team and role mix, comparisons on the pillar pages are descriptive and unadjusted; they may reflect that composition rather than an effect of the tool.
+
+</details>
+
+Row
+-------------------------------------
+
+### Where should we look more closely at developer working conditions?
 
 ```{=html}
 <nav class="pillar-grid" aria-label="Explore report pillars">
 <a href="#collaboration" data-report-page><strong>Collaboration &rarr;</strong><small>Where is coordination load concentrated, and which communication modes contribute?</small></a>
 <a href="#focus" data-report-page><strong>Focus &rarr;</strong><small>How much calendar time is available, uninterrupted or fragmented?</small></a>
 <a href="#after-hours" data-report-page><strong>After-hours &rarr;</strong><small>How much collaboration falls outside working hours, and how often?</small></a>
-<a href="#ai-use-and-query-coverage" data-report-page><strong>AI &rarr;</strong><small>What GitHub use is recorded, and what can each product feed support?</small></a>
+<a href="#network" data-report-page><strong>Network &rarr;</strong><small>How broad are collaboration networks, and do they differ by GitHub intensity?</small></a>
 </nav>
 ```
 
@@ -178,11 +233,41 @@ Collaboration
 Row
 -------------------------------------
 
+### How does collaboration load differ by GitHub intensity?
+
+<p class="context">Synthetic demo · `r period_label` · `r num(github_observed_n)` GitHub-observed developers · Person-level eight-week averages</p>
+
+<p class="leadline">Collaboration load compared across <strong>Heavy GitHub use</strong> (`r num(heavy_github_n)`), <strong>Other recorded use</strong> (`r num(github_recorded_n - heavy_github_n)`) and <strong>No recorded use</strong> (`r num(github_observed_n - github_recorded_n)`).</p>
+
+<p class="chart-note">`r heavy_confound_note` Total collaboration overlaps its components: compare the panels, do not add them. These are descriptive, unadjusted comparisons, not delivery-quality measures or an effect of tool use.</p>
+
+```{r collaboration-intensity, results='asis'}
+interval_cards(gh_observed,
+  c('Collaboration_hours','Meeting_hours','Email_hours','Chat_hours',
+    'Scheduled_call_hours','Unscheduled_call_hours'), group='GH_intensity')
+```
+
+<details><summary>Exact GitHub-intensity group sizes and percentiles</summary>
+
+```{r collaboration-intensity-table, results='asis'}
+intensity_sizes <- gh_observed |> count(GH_intensity, name='People', .drop=TRUE) |> filter(People >= MIN_GROUP_N)
+html_table(interval_data(gh_observed, c('Collaboration_hours','Meeting_hours','Email_hours','Chat_hours','Scheduled_call_hours','Unscheduled_call_hours'), 'GH_intensity') |>
+  left_join(intensity_sizes, by=c('Group'='GH_intensity'), relationship='many-to-one') |>
+  filter(!is.na(People)) |>
+  transmute(Group, Metric, `Developers (count)`=People, `25th percentile`=f1(p25), Median=f1(p50), `75th percentile`=f1(p75)),
+  paste('Hours/person/week |', period_label, '| Each person contributes one eight-week average. Any sub-10 group is withheld.'))
+```
+
+</details>
+
+<p class="next-step"><strong>Question to take to the team:</strong> which coordination activities unblock work, and which fragment it? Agree the workflow problem before setting a target.</p>
+
+Row
+-------------------------------------
+
 ### How is collaboration load distributed across teams?
 
-<p class="context">Synthetic demo · `r period_label` · Person-level eight-week averages</p>
-
-<p class="leadline"><strong>`r team_league$Team[1]`</strong> has the highest median collaboration load at <strong>`r f1(team_league$Collaboration_hours[1])` hours/person/week</strong>.</p>
+<p class="leadline"><strong>`r team_league$Team[1]`</strong> has the highest median collaboration load at <strong>`r f1(team_league$Collaboration_hours[1])` hours/person/week</strong>. The team view remains because coordination load is a team-level property that the GitHub split does not replace.</p>
 
 <p class="chart-note">Total collaboration overlaps its components: compare the panels, do not add them. These are working conditions, not delivery-quality measures.</p>
 
@@ -237,48 +322,42 @@ Recurring meeting hours cover meetings set to recur. Conflicting hours count onl
 
 </details>
 
-<p class="next-step"><strong>Question to take to the team:</strong> which coordination activities unblock work, and which fragment it? Agree the workflow problem before setting a target.</p>
-
-Row
--------------------------------------
-
-### How broad is each team's collaboration network?
-
-<p class="leadline"><strong>`r network_lead_team`</strong> has the largest median internal network at <strong>`r f1(network_lead_value)` people</strong>, against a population median of <strong>`r f1(median(baseline$Internal_network_size))`</strong>.</p>
-
-<p class="chart-note">Network measures count distinct people, not hours. Viva Insights derives them over a trailing window, so they describe a standing level of connection rather than activity inside a single week. A larger network is not inherently better; it reflects role and coordination requirements.</p>
-
-```{r network-intervals, results='asis'}
-interval_cards(baseline, NETWORK_METRICS,
-  caption=base_caption(unit='distinct people per person. Network measures use a trailing window and are never summed across weeks'))
-```
-
-<details><summary>Population network baseline and exact team percentiles</summary>
-
-```{r network-tables, results='asis'}
-html_table(network_summary, paste('Population percentiles across', num(nrow(baseline)),
-  'developers | Distinct people |', period_label,
-  '| Each developer contributes one eight-week average of a trailing-window measure.'))
-html_table(interval_data(baseline, NETWORK_METRICS) |>
-  transmute(Team=Group, Metric, `25th percentile`=f1(p25), Median=f1(p50), `75th percentile`=f1(p75)),
-  paste('Distinct people |', period_label, '| 60 developers per team.'))
-```
-
-**Internal network size** counts distinct internal people collaborated with. **Strong ties** and **diverse ties** describe the depth and spread of those connections. **Network outside organisation** counts connections beyond the person's own organisational unit, and **external network size** counts connections outside the company. These overlap and must not be added.
-
-</details>
-
 Focus
 =====================================
 
 Row
 -------------------------------------
 
+### How does focus time differ by GitHub intensity?
+
+<p class="context">Synthetic demo · `r period_label` · `r num(github_observed_n)` GitHub-observed developers · `r BASELINE_WEEKS` complete Person Query weeks each</p>
+
+<p class="leadline">Calendar availability compared across <strong>Heavy GitHub use</strong> (`r num(heavy_github_n)`), <strong>Other recorded use</strong> (`r num(github_recorded_n - heavy_github_n)`) and <strong>No recorded use</strong> (`r num(github_observed_n - github_recorded_n)`).</p>
+
+<p class="chart-note">`r heavy_confound_note` Calendar availability does not establish coding time or psychological flow. These are descriptive, unadjusted comparisons, not an effect of tool use.</p>
+
+```{r focus-intensity, results='asis'}
+interval_cards(gh_observed, c('Available_to_focus_hours','Uninterrupted_hours','Interrupted_hours'), group='GH_intensity')
+```
+
+<details><summary>Exact GitHub-intensity group percentiles</summary>
+
+```{r focus-intensity-table, results='asis'}
+html_table(interval_data(gh_observed, c('Available_to_focus_hours','Uninterrupted_hours','Interrupted_hours'), 'GH_intensity') |>
+  left_join(gh_observed |> count(GH_intensity, name='People', .drop=TRUE) |> filter(People >= MIN_GROUP_N), by=c('Group'='GH_intensity'), relationship='many-to-one') |>
+  filter(!is.na(People)) |>
+  transmute(Group, Metric, `Developers (count)`=People, `25th percentile`=f1(p25), Median=f1(p50), `75th percentile`=f1(p75)),
+  paste('Hours/person/week |', period_label, '| Each person contributes one eight-week average. Any sub-10 group is withheld.'))
+```
+
+</details>
+
+Row
+-------------------------------------
+
 ### How much calendar time is available for focus?
 
-<p class="context">Synthetic demo · `r period_label` · `r num(nrow(baseline))` developers · `r BASELINE_WEEKS` complete Person Query weeks each</p>
-
-<p class="leadline"><strong>`r team_league$Team[which.max(team_league$Uninterrupted_hours)]`</strong> has the most uninterrupted time at <strong>`r f1(max(team_league$Uninterrupted_hours))` hours/person/week</strong>.</p>
+<p class="leadline"><strong>`r team_league$Team[which.max(team_league$Uninterrupted_hours)]`</strong> has the most uninterrupted time at <strong>`r f1(max(team_league$Uninterrupted_hours))` hours/person/week</strong>. The team view remains because working-hour rules and calendar load are team-level properties.</p>
 
 <p class="chart-note">Calendar availability does not establish coding time or psychological flow. Working-hour rules vary by tenant; the synthetic 40-hour basis is not universal.</p>
 
@@ -302,6 +381,36 @@ html_table(interval_data(baseline, c('Available_to_focus_hours','Uninterrupted_h
 
 After-hours
 =====================================
+
+Row
+-------------------------------------
+
+### How does after-hours collaboration differ by GitHub intensity?
+
+<p class="context">Synthetic demo · `r period_label` · `r num(github_observed_n)` GitHub-observed developers · `r BASELINE_WEEKS` observed weeks each</p>
+
+<p class="leadline">After-hours collaboration compared across <strong>Heavy GitHub use</strong> (`r num(heavy_github_n)`), <strong>Other recorded use</strong> (`r num(github_recorded_n - heavy_github_n)`) and <strong>No recorded use</strong> (`r num(github_observed_n - github_recorded_n)`).</p>
+
+<p class="chart-note">`r heavy_confound_note` Recorded collaboration outside configured working hours is not total work time or a wellbeing diagnosis. These are descriptive, unadjusted comparisons, not an effect of tool use.</p>
+
+```{r afterhours-intensity, results='asis'}
+render_chart(interval_plot(gh_observed, 'After_hours_collaboration_hours', group='GH_intensity',
+  title='After-hours collaboration by GitHub intensity',
+  subtitle='Dot: median. Line: middle 50% of person-level eight-week averages. No health bands are assigned.') +
+  facet_null())
+```
+
+<details><summary>Exact GitHub-intensity group percentiles</summary>
+
+```{r afterhours-intensity-table, results='asis'}
+html_table(interval_data(gh_observed, 'After_hours_collaboration_hours', 'GH_intensity') |>
+  left_join(gh_observed |> count(GH_intensity, name='People', .drop=TRUE) |> filter(People >= MIN_GROUP_N), by=c('Group'='GH_intensity'), relationship='many-to-one') |>
+  filter(!is.na(People)) |>
+  transmute(Group, Metric, `Developers (count)`=People, `25th percentile`=f1(p25), Median=f1(p50), `75th percentile`=f1(p75)),
+  paste('Hours/person/week |', period_label, '| Each person contributes one eight-week average. Any sub-10 group is withheld.'))
+```
+
+</details>
 
 Row
 -------------------------------------
@@ -351,104 +460,66 @@ ggplot(persistence, aes(x=People, y=factor(Band, levels=rev(c('0 weeks', paste('
 
 <p class="next-step"><strong>Question to take to the team:</strong> do the patterns reflect schedules, on-call duties or difficulty disconnecting? Validate work-hour settings and seek anonymous feedback; do not target individuals from these aggregates.</p>
 
-AI {#ai-use-and-query-coverage}
+Network
 =====================================
 
 Row
 -------------------------------------
 
-### What GitHub Copilot use is recorded?
+### How does network breadth differ by GitHub intensity?
 
-<p class="context">Synthetic demo · `r period_label` · `r num(nrow(baseline))`-developer roster</p>
+<p class="context">Synthetic demo · `r period_label` · `r num(github_observed_n)` GitHub-observed developers · Trailing-window levels in distinct people</p>
 
-<p class="leadline"><strong>`r num(github_active_n)` developers have recorded GitHub use</strong> among <strong>`r num(github_observed_n)` with complete activity observation</strong> in the baseline.</p>
+<p class="leadline">Collaboration-network breadth compared across <strong>Heavy GitHub use</strong> (`r num(heavy_github_n)`), <strong>Other recorded use</strong> (`r num(github_recorded_n - heavy_github_n)`) and <strong>No recorded use</strong> (`r num(github_observed_n - github_recorded_n)`).</p>
 
-<p class="chart-note">Observed means complete activity-row coverage, not licensing. Microsoft 365 complete-window rates and two-product comparisons remain unavailable without independent completeness evidence.</p>
+<p class="chart-note">`r heavy_confound_note` Network measures count distinct people over a trailing window, not hours; they are standing levels and are never summed across weeks. Differences are unadjusted and descriptive; neither direction implies an effect of tool use.</p>
 
-```{r github-observation, results='asis'}
-render_chart(if (!nrow(github_use_counts)) unavailable_plot('GitHub observation partition withheld') else
-  ggplot(github_use_counts, aes(x=People, y=factor(GH_use, levels=rev(gh_use_levels)))) +
-    geom_col(fill='#3b82f6', width=.55) +
-    geom_text(aes(label=paste0(num(People), '\n(', pct(Share), ')')), hjust=-.12, size=3.3) +
-    scale_y_discrete(labels=function(x) wrap(x, 18)) +
-    scale_x_continuous(expand=expansion(mult=c(0,.4))) + theme_report() +
-    chart_labs('Recorded GitHub use and observation',
-      'No recorded use requires complete observation. Unresolved observation is not inactivity.',
-      paste('Shares of the full', num(nrow(baseline)), 'developer roster. Every published group must meet the privacy floor.'),
-      x='Developers (count)', y=NULL))
+```{r network-intensity, results='asis'}
+interval_cards(gh_observed, NETWORK_METRICS, group='GH_intensity',
+  caption=base_caption(nrow(gh_observed),
+    unit='distinct people per person. Trailing-window measures are never summed across weeks'))
 ```
 
-<p class="next-step"><strong>Explore the workflows:</strong> <a href="#github-copilot-breakdowns" data-report-page>feature, model and language breakdowns</a>, or <a href="#working-patterns-and-evaluation" data-report-page>working conditions by recorded-use group</a>. Neither demonstrates productivity impact.</p>
+<details><summary>Exact network percentiles by GitHub-intensity group</summary>
 
-<details><summary>Why joint-product comparisons are unavailable</summary>
-
-Microsoft 365 eligibility uses that week's `Total_Copilot_enabled_days`; static metadata cannot override a zero-enabled week. Eligibility and collection completeness are different requirements. The product calendar, static licence metadata and positive consumption rows do not certify complete collection.
-
-```{r joint-footprint, results='asis'}
-joint_stack <- joint_counts_public |> transmute(Group='Developer roster', Category=Display, People, Share)
-render_chart(stack_plot(joint_stack, 'Recorded product use and eligibility or observation status',
-  'Only and neither require established eligibility and observation. Any sub-10 cell withholds the entire partition.',
-  base_caption(unit=paste('share of', num(nrow(baseline)), 'developers'))))
+```{r network-intensity-table, results='asis'}
+html_table(interval_data(gh_observed, NETWORK_METRICS, 'GH_intensity') |>
+  left_join(gh_observed |> count(GH_intensity, name='People', .drop=TRUE) |> filter(People >= MIN_GROUP_N), by=c('Group'='GH_intensity'), relationship='many-to-one') |>
+  filter(!is.na(People)) |>
+  transmute(Group, Metric, `Developers (count)`=People, `25th percentile`=f1(p25), Median=f1(p50), `75th percentile`=f1(p75)),
+  paste('Distinct people |', period_label, '| Any sub-10 group is withheld.'))
 ```
 
 </details>
 
-<details><summary>Product denominators and coverage derivation</summary>
-
-GitHub activity includes explicit zero rows for inactive weekdays; absent rows leave activity observation unknown. GitHub credits are sparse billable-day records, so credit coverage is resolved separately and never invalidates an observed activity week. Missing Microsoft 365 values stay `NA` unless independent person-week coverage and positive enabled days justify a zero.
-
-```{r joint-details, results='asis'}
-html_table(joint_counts_public |> transmute(`Published tool-use status`=Display, `Developers (count)`=People, `Share of roster (%)`=pct(Share)),
-  'The entire partition is withheld if any positive cell is below the privacy floor; totals cannot reveal a withheld remainder.')
-eligibility_table <- bind_rows(lapply(c('GH','M365'), function(p) {
-  valid_col <- if (p=='GH') 'GH_activity_valid' else 'M365_valid'
-  b <- baseline_panel |> group_by(PersonId) |>
-    summarise(eligible=all(.data[[paste0(p,'_eligible')]]),
-              valid=all(.data[[valid_col]]), .groups='drop') |>
-    mutate(Status=case_when(
-      is.na(eligible) ~ 'Eligibility or observation unknown',
-      !eligible ~ 'Not eligible for the full window',
-      !valid ~ 'Eligible; completeness unresolved or incomplete',
-      TRUE ~ 'Eligible and valid'))
-  b |> count(Status, name='People') |> disclose_partition() |>
-    mutate(Product=if(p=='GH') 'GitHub Copilot' else 'Microsoft 365 Copilot', .before=1)
-}))
-html_table(eligibility_table, 'Each reportable product partition reconciles to the roster. An unsafe partition is withheld in full, including its complementary cells. GitHub validity here is activity-row coverage; credit coverage is resolved separately below.')
-html_table(baseline_panel |> group_by(PersonId) |>
-  summarise(activity=all(GH_activity_valid), credit=all(GH_credit_valid), .groups='drop') |>
-  count(`GitHub activity coverage`=if_else(activity,'Resolved','Unresolved'),
-        `GitHub credit coverage`=if_else(credit,'Resolved','Unresolved'), name='People') |>
-  disclose_partition() |>
-  transmute(`GitHub activity coverage`, `GitHub credit coverage`, `Developers (count)`=People),
-  'The credit export is sparse, so a week with no billable usage resolves to a measured zero rather than invalidating the observed activity week. Sparse credit rows never void observed activity.')
-html_table(coverage_derivation, 'No standalone coverage export is invented. Weekly eligibility, activity coverage and credit coverage are separate requirements.')
-```
-
-</details>
+<p class="next-step"><strong>Question to take to the team:</strong> does network breadth reflect role and coordination requirements rather than tool use? A larger network is not inherently better.</p>
 
 Row
 -------------------------------------
 
-### Product-specific frequency, intensity and services
+### How broad is each team's collaboration network?
 
-```{r product-usage, results='asis'}
-html_table(product_summary |> arrange(desc(`Recorded active (%)`)) |> mutate(across(-Product, as.character)) |>
-  pivot_longer(-Product, names_to='Product measure', values_to='Reported value') |>
-  pivot_wider(names_from=Product, values_from='Reported value'),
-  paste(period_label, '| Each product uses its own eligible and valid population. People with no recorded use remain in the denominator; credit measures require separately resolved credit coverage.'))
+<p class="leadline"><strong>`r network_lead_team`</strong> has the largest median internal network at <strong>`r f1(network_lead_value)` people</strong>, against a population median of <strong>`r f1(median(baseline$Internal_network_size))`</strong>. The team view remains because network breadth is shaped by role and team coordination requirements.</p>
+
+<p class="chart-note">Network measures count distinct people, not hours. Viva Insights derives them over a trailing window, so they describe a standing level of connection rather than activity inside a single week. A larger network is not inherently better; it reflects role and coordination requirements.</p>
+
+```{r network-intervals, results='asis'}
+interval_cards(baseline, NETWORK_METRICS,
+  caption=base_caption(unit='distinct people per person. Network measures use a trailing window and are never summed across weeks'))
 ```
 
-Microsoft 365 population rates are unavailable here, not zero. Credits, sessions, completion suggestions and chat requests are different units and are not added together.
+<details><summary>Population network baseline and exact team percentiles</summary>
 
-<details><summary>Observed Microsoft 365 service records and concentration definition</summary>
-
-```{r m365-service-records, results='asis'}
-html_table(m365_service_mix |> transmute(Service=ServiceName, `People (count)`=People,
-  `Sessions`=num(Sessions), `Credits`=num(Credits), `Credit share (%)`=pct(Share)),
-  'Recorded Microsoft 365 service rows over baseline weekdays. These observed sums and shares do not establish complete collection or complete-window population rates.')
+```{r network-tables, results='asis'}
+html_table(network_summary, paste('Population percentiles across', num(nrow(baseline)),
+  'developers | Distinct people |', period_label,
+  '| Each developer contributes one eight-week average of a trailing-window measure.'))
+html_table(interval_data(baseline, NETWORK_METRICS) |>
+  transmute(Team=Group, Metric, `25th percentile`=f1(p25), Median=f1(p50), `75th percentile`=f1(p75)),
+  paste('Distinct people |', period_label, '| 60 developers per team.'))
 ```
 
-The concentration row is the share of GitHub credits or Microsoft 365 credits attributable to the highest-volume 10% of active developers for that product. Identities and individual rankings are never displayed.
+**Internal network size** counts distinct internal people collaborated with. **Strong ties** and **diverse ties** describe the depth and spread of those connections. **Network outside organisation** counts connections beyond the person's own organisational unit, and **external network size** counts connections outside the company. These overlap and must not be added.
 
 </details>
 
@@ -530,34 +601,135 @@ html_table(language_feature_mix |>
 
 **Manager next step.** Use these breakdowns to ask which workflows each feature supports. Do not treat agent-type features or model choice as maturity, quality, productivity or time-saved measures.
 
+GitHub coverage {#github-coverage data-navmenu="More"}
+=====================================
+
+Row
+-------------------------------------
+
+### What GitHub observation and product coverage do these exports support?
+
+<p class="context">Synthetic demo · `r period_label` · `r num(nrow(baseline))`-developer roster</p>
+
+<p class="leadline"><strong>`r num(github_active_n)` developers have recorded GitHub use</strong> among <strong>`r num(github_observed_n)` with complete activity observation</strong> in the baseline. The heavy-user definition on the Overview is built on this population.</p>
+
+<p class="chart-note">Observed means complete activity-row coverage, not licensing. Microsoft 365 complete-window rates and two-product comparisons remain unavailable without independent completeness evidence.</p>
+
+```{r github-observation, results='asis'}
+render_chart(if (!nrow(github_use_counts)) unavailable_plot('GitHub observation partition withheld') else
+  ggplot(github_use_counts, aes(x=People, y=factor(GH_use, levels=rev(gh_use_levels)))) +
+    geom_col(fill='#3b82f6', width=.55) +
+    geom_text(aes(label=paste0(num(People), '\n(', pct(Share), ')')), hjust=-.12, size=3.3) +
+    scale_y_discrete(labels=function(x) wrap(x, 18)) +
+    scale_x_continuous(expand=expansion(mult=c(0,.4))) + theme_report() +
+    chart_labs('Recorded GitHub use and observation',
+      'No recorded use requires complete observation. Unresolved observation is not inactivity.',
+      paste('Shares of the full', num(nrow(baseline)), 'developer roster. Every published group must meet the privacy floor.'),
+      x='Developers (count)', y=NULL))
+```
+
+<p class="next-step"><strong>Explore the workflows:</strong> <a href="#github-copilot-breakdowns" data-report-page>feature, model and language breakdowns</a>, or <a href="#working-patterns-and-evaluation" data-report-page>working conditions by recorded-use group</a>. Neither demonstrates productivity impact.</p>
+
+<details><summary>Why joint-product comparisons are unavailable</summary>
+
+Microsoft 365 eligibility uses that week's `Total_Copilot_enabled_days`; static metadata cannot override a zero-enabled week. Eligibility and collection completeness are different requirements. The product calendar, static licence metadata and positive consumption rows do not certify complete collection.
+
+```{r joint-footprint, results='asis'}
+joint_stack <- joint_counts_public |> transmute(Group='Developer roster', Category=Display, People, Share)
+render_chart(stack_plot(joint_stack, 'Recorded product use and eligibility or observation status',
+  'Only and neither require established eligibility and observation. Any sub-10 cell withholds the entire partition.',
+  base_caption(unit=paste('share of', num(nrow(baseline)), 'developers'))))
+```
+
+</details>
+
+<details><summary>Product denominators and coverage derivation</summary>
+
+GitHub activity includes explicit zero rows for inactive weekdays; absent rows leave activity observation unknown. GitHub credits are sparse billable-day records, so credit coverage is resolved separately and never invalidates an observed activity week. Missing Microsoft 365 values stay `NA` unless independent person-week coverage and positive enabled days justify a zero.
+
+```{r joint-details, results='asis'}
+html_table(joint_counts_public |> transmute(`Published tool-use status`=Display, `Developers (count)`=People, `Share of roster (%)`=pct(Share)),
+  'The entire partition is withheld if any positive cell is below the privacy floor; totals cannot reveal a withheld remainder.')
+eligibility_table <- bind_rows(lapply(c('GH','M365'), function(p) {
+  valid_col <- if (p=='GH') 'GH_activity_valid' else 'M365_valid'
+  b <- baseline_panel |> group_by(PersonId) |>
+    summarise(eligible=all(.data[[paste0(p,'_eligible')]]),
+              valid=all(.data[[valid_col]]), .groups='drop') |>
+    mutate(Status=case_when(
+      is.na(eligible) ~ 'Eligibility or observation unknown',
+      !eligible ~ 'Not eligible for the full window',
+      !valid ~ 'Eligible; completeness unresolved or incomplete',
+      TRUE ~ 'Eligible and valid'))
+  b |> count(Status, name='People') |> disclose_partition() |>
+    mutate(Product=if(p=='GH') 'GitHub Copilot' else 'Microsoft 365 Copilot', .before=1)
+}))
+html_table(eligibility_table, 'Each reportable product partition reconciles to the roster. An unsafe partition is withheld in full, including its complementary cells. GitHub validity here is activity-row coverage; credit coverage is resolved separately below.')
+html_table(baseline_panel |> group_by(PersonId) |>
+  summarise(activity=all(GH_activity_valid), credit=all(GH_credit_valid), .groups='drop') |>
+  count(`GitHub activity coverage`=if_else(activity,'Resolved','Unresolved'),
+        `GitHub credit coverage`=if_else(credit,'Resolved','Unresolved'), name='People') |>
+  disclose_partition() |>
+  transmute(`GitHub activity coverage`, `GitHub credit coverage`, `Developers (count)`=People),
+  'The credit export is sparse, so a week with no billable usage resolves to a measured zero rather than invalidating the observed activity week. Sparse credit rows never void observed activity.')
+html_table(coverage_derivation, 'No standalone coverage export is invented. Weekly eligibility, activity coverage and credit coverage are separate requirements.')
+```
+
+</details>
+
+Row
+-------------------------------------
+
+### Product-specific frequency, intensity and services
+
+```{r product-usage, results='asis'}
+html_table(product_summary |> arrange(desc(`Recorded active (%)`)) |> mutate(across(-Product, as.character)) |>
+  pivot_longer(-Product, names_to='Product measure', values_to='Reported value') |>
+  pivot_wider(names_from=Product, values_from='Reported value'),
+  paste(period_label, '| Each product uses its own eligible and valid population. People with no recorded use remain in the denominator; credit measures require separately resolved credit coverage.'))
+```
+
+Microsoft 365 population rates are unavailable here, not zero. GitHub AI credits and Microsoft 365 Copilot credits are different units and are never pooled, totalled or cross-shared; completion suggestions and chat requests are different units again.
+
+<details><summary>Observed Microsoft 365 service records and concentration definition</summary>
+
+```{r m365-service-records, results='asis'}
+html_table(m365_service_mix |> transmute(Service=ServiceName, `People (count)`=People,
+  `Sessions`=num(Sessions), `Credits`=num(Credits), `Credit share (%)`=pct(Share)),
+  'Recorded Microsoft 365 service rows over baseline weekdays. These observed sums and shares do not establish complete collection or complete-window population rates.')
+```
+
+The concentration row is the share of GitHub credits or Microsoft 365 credits attributable to the highest-volume 10% of active developers for that product. Identities and individual rankings are never displayed.
+
+</details>
+
 Working patterns {#working-patterns-and-evaluation data-navmenu="More"}
 =====================================
 
 Row
 -------------------------------------
 
-### How do working conditions differ across recorded tool-use groups?
+### How do working conditions differ across GitHub-intensity groups?
 
 <p class="context">Synthetic demo · `r period_label` · `r num(github_observed_n)` developers with complete GitHub activity coverage</p>
 
-<p class="leadline">Compare working conditions for <strong>`r num(github_active_n)` developers with recorded GitHub use</strong> and <strong>`r num(github_observed_n - github_active_n)` observed developers with no recorded use</strong>.</p>
+<p class="leadline">Compare working conditions across <strong>Heavy GitHub use</strong> (`r num(heavy_github_n)`), <strong>Other recorded use</strong> (`r num(github_recorded_n - heavy_github_n)`) and <strong>No recorded use</strong> (`r num(github_observed_n - github_recorded_n)`).</p>
 
-<p class="chart-note">Unadjusted, descriptive comparisons only. Use and working conditions share the same window, so temporal direction and intervention effects cannot be established.</p>
+<p class="chart-note">`r heavy_confound_note` Unadjusted, descriptive comparisons only. Use and working conditions share the same window, so temporal direction and intervention effects cannot be established.</p>
 
 ```{r group-intervals, results='asis'}
-interval_cards(gh_observed, c('Collaboration_hours','Meeting_hours','Available_to_focus_hours','Uninterrupted_hours','After_hours_collaboration_hours'), group='GH_use')
+interval_cards(gh_observed, c('Collaboration_hours','Meeting_hours','Available_to_focus_hours','Uninterrupted_hours','After_hours_collaboration_hours'), group='GH_intensity')
 ```
 
 <details><summary>Exact reportable group sizes and percentile values</summary>
 
 ```{r group-percentiles, results='asis'}
-sizes <- gh_observed |> count(GH_use, name='People', .drop=TRUE) |> filter(People >= MIN_GROUP_N)
-html_table(interval_data(gh_observed, c('Collaboration_hours','Meeting_hours','Available_to_focus_hours','Uninterrupted_hours','After_hours_collaboration_hours'), 'GH_use') |>
-  left_join(sizes, by=c('Group'='GH_use'), relationship='many-to-one') |>
+sizes <- gh_observed |> count(GH_intensity, name='People', .drop=TRUE) |> filter(People >= MIN_GROUP_N)
+html_table(interval_data(gh_observed, c('Collaboration_hours','Meeting_hours','Available_to_focus_hours','Uninterrupted_hours','After_hours_collaboration_hours'), 'GH_intensity') |>
+  left_join(sizes, by=c('Group'='GH_intensity'), relationship='many-to-one') |>
   filter(!is.na(People)) |>
   group_by(Metric) |> arrange(desc(p50), .by_group=TRUE) |> ungroup() |>
   transmute(Group, Metric, `Developers (count)`=People, `25th percentile`=f1(p25), Median=f1(p50), `75th percentile`=f1(p75)),
-  paste('Hours/person/week |', period_label, '| Each person contributes one eight-week average. Sub-10 use groups are withheld.'))
+  paste('Hours/person/week |', period_label, '| Each person contributes one eight-week average. Sub-10 groups are withheld.'))
 ```
 
 </details>
@@ -571,25 +743,25 @@ The comparison includes developers valid for the Person Query and GitHub activit
 Row
 -------------------------------------
 
-### Network breadth by recorded GitHub use
+### Network breadth by GitHub intensity
 
-<p class="chart-note">Whether recorded GitHub use coincides with broader or narrower collaboration networks. Network measures count distinct people over a trailing window, so they are standing levels rather than weekly activity. Differences are unadjusted and descriptive; neither direction implies an effect of tool use.</p>
+<p class="chart-note">`r heavy_confound_note` Whether GitHub intensity coincides with broader or narrower collaboration networks. Network measures count distinct people over a trailing window, so they are standing levels rather than weekly activity. Differences are unadjusted and descriptive; neither direction implies an effect of tool use.</p>
 
 ```{r group-network, results='asis'}
-interval_cards(gh_observed, NETWORK_METRICS, group='GH_use',
+interval_cards(gh_observed, NETWORK_METRICS, group='GH_intensity',
   caption=base_caption(nrow(gh_observed),
     unit='distinct people per person. Trailing-window measures are never summed across weeks'))
 ```
 
-<details><summary>Exact network percentiles by reportable use group</summary>
+<details><summary>Exact network percentiles by reportable group</summary>
 
 ```{r group-network-table, results='asis'}
-html_table(interval_data(gh_observed, NETWORK_METRICS, 'GH_use') |>
-  left_join(sizes, by=c('Group'='GH_use'), relationship='many-to-one') |>
+html_table(interval_data(gh_observed, NETWORK_METRICS, 'GH_intensity') |>
+  left_join(sizes, by=c('Group'='GH_intensity'), relationship='many-to-one') |>
   filter(!is.na(People)) |>
   transmute(Group, Metric, `Developers (count)`=People,
     `25th percentile`=f1(p25), Median=f1(p50), `75th percentile`=f1(p75)),
-  paste('Distinct people |', period_label, '| Sub-10 use groups are withheld.'))
+  paste('Distinct people |', period_label, '| Sub-10 groups are withheld.'))
 ```
 
 </details>
@@ -600,7 +772,7 @@ Row
 ### Role and team context for the comparison
 
 ```{r role-group-context, results='asis'}
-render_chart(stack_plot(role_context, 'Role composition within the comparison groups',
+render_chart(stack_plot(role_context, 'Role composition within the recorded-use comparison groups',
   'Group sizes and roles can shape the comparison. Any group with a role cell below 10 is omitted from this breakdown.',
   base_caption(sum(role_context$People), unit='share of developers within each displayed use group')))
 ```
@@ -608,13 +780,13 @@ render_chart(stack_plot(role_context, 'Role composition within the comparison gr
 <details><summary>Exact role shares and team composition</summary>
 
 ```{r group-context-tables, results='asis'}
-html_table(composition_table(role_context), 'A role breakdown is withheld in full for any group containing a cell below 10 people.')
+html_table(composition_table(role_context), 'Role composition of the recorded-use vs no-recorded-use groups. A role breakdown is withheld in full for any group containing a cell below 10 people.')
 html_table(composition_table(team_joint_context), 'A team breakdown is withheld in full for any group containing a cell below 10 people. Shares use all developers in the displayed group.')
 ```
 
 </details>
 
-**Interpretation.** Team, role, seniority, task selection and tenure can influence working patterns and tool use. These charts are intentionally limited to agreed measures. No broad metric scan, adjustment model, causal claim or preferred tool-use group is presented.
+**Interpretation.** Team, role, seniority, task selection and tenure can influence working patterns and tool use, and heavy GitHub use is unevenly distributed across teams. These charts are intentionally limited to agreed measures. No broad metric scan, adjustment model, causal claim or preferred tool-use group is presented.
 
 Row
 -------------------------------------

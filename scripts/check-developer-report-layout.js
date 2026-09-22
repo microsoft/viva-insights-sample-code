@@ -11,8 +11,8 @@ const repo = path.resolve(__dirname, '..');
 const html = path.join(repo, 'examples', 'utility-r',
   'github-copilot-developer-productivity-simulation.html');
 const output = process.argv[2] ? path.resolve(process.argv[2]) : null;
-const pages = ['overview', 'collaboration', 'focus', 'after-hours',
-  'ai-use-and-query-coverage', 'github-copilot-breakdowns',
+const pages = ['overview', 'collaboration', 'focus', 'after-hours', 'network',
+  'github-copilot-breakdowns', 'github-coverage',
   'working-patterns-and-evaluation', 'appendix'];
 const sizes = [[1440, 900], [1024, 768], [768, 1024], [390, 844]];
 
@@ -79,7 +79,7 @@ async function geometry(page, id) {
       await page.goto(pathToFileURL(html).href, { waitUntil: 'load' });
       await page.waitForSelector('.navbar-nav a[data-toggle="tab"]', { state: 'attached' });
       assert.equal(await page.locator('.navbar-nav > li').count(), 6);
-      assert.equal(await page.locator('.navbar-nav a[data-toggle="tab"]').count(), 8);
+      assert.equal(await page.locator('.navbar-nav a[data-toggle="tab"]').count(), 9);
       for (const id of pages) {
         await selectPage(page, id, width < 768);
         const initial = await geometry(page, id);
@@ -90,7 +90,7 @@ async function geometry(page, id) {
         if (width >= 768) {
           check(initial.navRows === 1 && initial.navbarHeight < 70, `${width}px ${id}: navbar wraps`);
         }
-        if (['collaboration', 'focus', 'after-hours', 'ai-use-and-query-coverage'].includes(id)) {
+        if (['collaboration', 'focus', 'after-hours', 'network'].includes(id)) {
           check(initial.firstChartTop !== null && initial.firstChartTop < height - 80,
             `${width}px ${id}: no meaningful chart area in first viewport`);
         }
@@ -144,7 +144,7 @@ async function geometry(page, id) {
       await shortcut.focus();
       await page.keyboard.press('Enter');
       await page.locator('#focus').waitFor({ state: 'visible' });
-      check(await page.locator('#focus .chart-title').evaluate((heading) => heading === document.activeElement),
+      check(await page.locator('#focus .chart-title').first().evaluate((heading) => heading === document.activeElement),
         `${width}px: shortcut must transfer focus to destination`);
       if (width < 768) {
         await page.locator('.navbar-toggle').click();
