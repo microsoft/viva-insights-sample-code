@@ -418,34 +418,32 @@ test("heavy GitHub group reconciles to the observed population and reports the o
             counts[["Heavy GitHub use"]] + counts[["Other recorded use"]] ==
               env$github_recorded_n)
   # Headline share uses the observed denominator (13.8% of 268), NOT the
-  # recorded-use denominator (which is 20% by construction and tautological).
+  # recorded-use denominator (the population used to set the threshold).
   stopifnot(abs(env$heavy_github_share - 37 / 268) < 1e-9,
             abs(env$heavy_github_share - 0.138) < 5e-4,
             abs(env$heavy_github_n / env$github_recorded_n - 0.20) < 0.03)
   stopifnot(env$heavy_github_share != env$heavy_github_n / env$github_recorded_n)
-  # The generated rule text names the observed denominator, mirroring INTENSITY_RULE.
-  stopifnot(grepl("top 20%", env$HEAVY_GITHUB_RULE, fixed = TRUE),
-            grepl("268", env$HEAVY_GITHUB_RULE, fixed = TRUE),
-            grepl("not of the 184", env$HEAVY_GITHUB_RULE, fixed = TRUE))
-  # The confounding note is specific about team concentration, not generic.
-  stopifnot(grepl("unevenly distributed across teams", env$heavy_confound_note, fixed = TRUE),
-            grepl("Developer Experience", env$heavy_confound_note, fixed = TRUE))
+  stopifnot(grepl("80 percentile", env$HEAVY_GITHUB_RULE, fixed = TRUE),
+            grepl("All ties", env$HEAVY_GITHUB_RULE, fixed = TRUE),
+            !grepl("268|184", env$HEAVY_GITHUB_RULE),
+            grepl("withheld", env$heavy_confound_note, fixed = TRUE))
 })
-test("heavy-group concentration pools sub-floor cells and withholds when a group is below the floor", {
+test("heavy-group concentration withholds linked sub-floor intersections even after pooling", {
   env <- load_github(stage_fixtures("heavy-github-concentration"))
-  # Team concentration publishes with sub-floor teams pooled: every published
-  # heavy count and its complement clears the floor, and the counts reconcile
-  # to the 37 heavy users.
-  tc <- env$heavy_team_concentration
+  # Local pooling clears the margin floor, but the joint release must still
+  # reject small heavy Team x Role cells and their unresolved complements.
+  tc <- env$heavy_concentration("Team")
   stopifnot(nrow(tc) > 0,
             sum(tc$`Heavy GitHub users`) == env$heavy_github_n,
             all(mapply(env$disclosable_split, tc$`Recorded-use developers`,
                        tc$`Heavy GitHub users`)),
             "Developer Experience" %in% tc$Group,
             "Other (pooled)" %in% tc$Group)
-  # Role concentration clears the floor without pooling for these fixtures.
-  rc <- env$heavy_role_concentration
-  stopifnot(nrow(rc) > 0, sum(rc$`Heavy GitHub users`) == env$heavy_github_n)
+  rc <- env$heavy_concentration("Role")
+  stopifnot(nrow(rc) > 0, sum(rc$`Heavy GitHub users`) == env$heavy_github_n,
+            !env$heavy_composition_safe,
+            nrow(env$heavy_team_concentration) == 0L,
+            nrow(env$heavy_role_concentration) == 0L)
   # If a whole intensity group is forced below the floor, the partition is
   # withheld entirely rather than published in part.
   forced <- env$gh_observed
@@ -456,6 +454,93 @@ test("heavy-group concentration pools sub-floor cells and withholds when a group
     as.data.frame(table(forced$GH_intensity), responseName = "People") |>
       subset(People > 0))
   stopifnot(nrow(withheld) == 0L)
+})
+test("heavy threshold includes boundary ties and handles equal or empty recorded cohorts", {
+  d <- data.frame(GH_active_days = rep(1, 20), GH_accepted = 1:20, GH_chats = 0)
+  stopifnot(sum(github$github_intensity(d) == "Heavy GitHub use") == 4L)
+  d$GH_accepted <- c(1:14, rep(20, 6))
+  stopifnot(sum(github$github_intensity(d) == "Heavy GitHub use") == 6L)
+  d$GH_accepted <- 1
+  stopifnot(all(github$github_intensity(d) == "Heavy GitHub use"))
+  d$GH_active_days <- 0
+  stopifnot(all(github$github_intensity(d) == "No recorded use"),
+            length(github$github_intensity(d[0, ])) == 0L)
+})
+test("joint heavy margins cannot reveal one person by subtracting team from role", {
+  cells <- data.frame(
+    Team = c("A", "A", "B", "B", "B", "B", "C", "C"),
+    Role = c("X", "X", "X", "X", "Y", "Y", "X", "Y"),
+    GH_intensity = c("Heavy GitHub use", "Other recorded use",
+                     "Heavy GitHub use", "Other recorded use",
+                     "Heavy GitHub use", "Other recorded use",
+                     "Other recorded use", "Other recorded use"),
+    People = c(10, 60, 1, 29, 19, 21, 30, 40))
+  d <- cells[rep(seq_len(nrow(cells)), cells$People), ]
+  d$PersonId <- paste0("synthetic-joint-", seq_len(nrow(d)))
+  margins <- lapply(c("Team", "Role"), function(a)
+    d |> dplyr::count(.data[[a]], GH_intensity, name = "People"))
+  stopifnot(all(vapply(margins, function(m)
+    nrow(github$disclose_partition(m)) > 0L, logical(1))),
+    !github$heavy_hr_release_safe(d, d))
+  # A safe fixture must remain publishable; the fix is not unconditional hiding.
+  cells$People <- c(10, 60, 10, 20, 20, 20, 30, 40)
+  safe <- cells[rep(seq_len(nrow(cells)), cells$People), ]
+  safe$PersonId <- paste0("synthetic-safe-", seq_len(nrow(safe)))
+  stopifnot(github$heavy_hr_release_safe(safe, safe),
+            !github$heavy_hr_release_safe(safe, safe[-1, ]))
+})
+test("withheld intensity counts never reappear in rendered overview or pillar prose", {
+  env <- load_github(stage_fixtures("heavy-publication-text"))
+  rmd <- readLines(file.path(utility, "github-copilot-developer-productivity-simulation.Rmd"))
+  overview <- rmd[grep("^Overview$", rmd):(
+    grep("^### Where should we look", rmd) - 1L)]
+  contexts <- rmd[grep("^### Role and team context", rmd):(
+    grep("^### Weekly trends and valid", rmd) - 1L)]
+  inline <- regmatches(rmd, gregexpr("`r [^`]+`", rmd))
+  inline <- unlist(inline, use.names = FALSE)
+  affected <- inline[grepl("heavy_github|github_recorded|github_observed|HEAVY_GITHUB|heavy_confound", inline)]
+  refresh <- function() eval(parse(text = helper[
+    grep("^joint_counts <-", helper):(grep("^work_summary <-", helper) - 1L)]), env)
+  render_public <- function() {
+    old_options <- knitr::opts_chunk$get()
+    on.exit(knitr::opts_chunk$set(old_options), add = TRUE)
+    knitr::opts_chunk$set(echo = FALSE)
+    text <- paste(knitr::knit(text = c(overview, contexts, affected),
+                              envir = env, quiet = TRUE), collapse = "\n")
+    # Random base64 digits are not displayed counts; keep captions and prose.
+    gsub('data:image/[^"[:space:]]+', '<embedded-chart>', text)
+  }
+  forced <- which(env$gh_observed$GH_intensity == "Heavy GitHub use")
+  env$gh_observed$GH_intensity[forced[-seq_len(5)]] <- "Other recorded use"
+  refresh()
+  text <- render_public()
+  stopifnot(!env$gh_intensity_release$safe,
+            is.na(env$heavy_github_n), is.na(env$github_recorded_n),
+            is.na(env$heavy_github_share),
+            nrow(env$interval_data(env$gh_observed, "Collaboration_hours", "GH_intensity")) == 0L,
+            !grepl("(?<![[:digit:].])5(?![[:digit:].])", text, perl = TRUE),
+            grepl("withheld", text))
+  # Observe all but five developers: neither 355 nor its five-person complement
+  # may return through definitions, captions, KPI details or comparison charts.
+  original <- load_github(stage_fixtures("heavy-coverage-text"))
+  env$gh_observed <- original$gh_observed
+  ids <- setdiff(env$baseline$PersonId, env$gh_observed$PersonId)[seq_len(87)]
+  extra <- env$gh_observed[rep(which(env$gh_observed$GH_active_days == 0)[1], 87), ]
+  extra$PersonId <- ids
+  for (attribute in c("Team", "Role")) {
+    extra[[attribute]] <- env$baseline[[attribute]][match(ids, env$baseline$PersonId)]
+  }
+  env$gh_observed <- dplyr::bind_rows(env$gh_observed, extra)
+  env$baseline$GH_use[env$baseline$PersonId %in% ids] <- "No GitHub use recorded"
+  refresh()
+  text <- render_public()
+  stopifnot(nrow(env$gh_observed) == 355L,
+            !env$gh_intensity_release$safe, is.na(env$github_observed_n),
+            !env$hr_release_safe, nrow(env$role_context) == 0L,
+            nrow(env$team_joint_context) == 0L,
+            nrow(env$interval_data(env$gh_observed, "Collaboration_hours", "GH_intensity")) == 0L,
+            !grepl("(?<![[:digit:].])(5|355)(?![[:digit:].])", text, perl = TRUE),
+            grepl("withheld", text))
 })
 test("the developer report never reuses the canonical usage-segment names", {
   rmd <- paste(readLines(file.path(utility,

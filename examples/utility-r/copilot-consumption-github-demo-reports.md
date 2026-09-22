@@ -65,26 +65,32 @@ excluded from both the threshold and the per-person counts.
 ## Navigating Developer Experience
 GitHub Copilot usage is the organising lens of the whole report. Start with
 **Overview**, which defines the **heavy GitHub-use** group and shows where it
-concentrates by team and role, then explore **Collaboration**, **Focus**,
+concentrates by team and role where disclosure permits, then explore **Collaboration**, **Focus**,
 **After-hours** and **Network**. The **More** menu holds GitHub
 feature/model/language breakdowns, GitHub coverage, working-pattern comparisons
 and methods. The overview's pillar cards are links; exact values, composition
 and longer definitions expand in place.
 
 **Heavy GitHub use is defined on the GitHub-observed population.** Heavy users
-are the top `HEAVY_GITHUB_SHARE` (20%) of GitHub-observed developers with
-recorded use, ranked by accepted code completions plus user-initiated chat
-requests over the baseline. The published rule text is generated from the
+have accepted code completions plus user-initiated chat requests at or above
+the 80th percentile among GitHub-observed developers with recorded use over
+the baseline. These interaction types are not equivalent units of value.
+All ties at the threshold are included, so more than 20% can qualify, including
+all recorded users when volumes are equal. The published rule text is generated from the
 `HEAVY_GITHUB_SHARE` constant, so a threshold change cannot leave a stale rule
 on the page. The headline share is always reported against the GitHub-observed
-denominator — heavy users are 13.8% of the 268 observed developers, not 20% of
-the 184 with recorded use, which would be true by construction. The three groups
+denominator — heavy users are 13.8% of the 268 observed developers in this fixture,
+not a share of just the 184 with recorded use. The three groups
 (**Heavy GitHub use**, **Other recorded use**, **No recorded use**) partition the
 observed population and are gated by the same disclosure helpers as every other
-split: if any group falls below the floor the whole partition is withheld.
-Heavy use is unevenly distributed across teams, so each pillar page carries a
-specific confounding note that comparisons may reflect team composition rather
-than an effect of the tool.
+split: if any positive group or the unobserved complement falls below the floor,
+the whole partition, counts in prose, and comparisons are withheld.
+Heavy team and role breakdowns additionally require the joint Team x Role x
+intensity cells, including unresolved observation, to meet the floor. This
+conservative gate withholds those breakdowns in the supplied fixture even though
+the overall three-group comparison is publishable. Each pillar retains a
+confounding note: comparisons may reflect team or role composition rather than
+an effect of the tool.
 
 **Each pillar leads with the three-group GitHub-intensity comparison** and keeps
 the team view where it still adds value. The comparisons are unadjusted and

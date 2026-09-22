@@ -116,6 +116,44 @@ split_or_empty <- function(total, part, minimum = MIN_GROUP_N) {
     disclosable_split(total, part, minimum)
 }
 
+github_intensity <- function(data, share = 0.20) {
+  stopifnot(length(share) == 1L, is.finite(share), share > 0, share < 1)
+  active <- data$GH_active_days > 0
+  volume <- data$GH_accepted + data$GH_chats
+  cut <- if (any(active)) as.numeric(quantile(volume[active], 1 - share)) else Inf
+  factor(case_when(
+    active & volume >= cut ~ 'Heavy GitHub use',
+    active ~ 'Other recorded use',
+    TRUE ~ 'No recorded use'),
+    levels = c('Heavy GitHub use', 'Other recorded use', 'No recorded use'))
+}
+
+github_intensity_release <- function(observed, roster_n) {
+  counts <- observed |> count(GH_intensity, name = 'People', .drop = FALSE)
+  safe <- disclosable_split(roster_n, nrow(observed)) &&
+    nrow(observed) >= MIN_GROUP_N && nrow(disclose_partition(counts)) > 0L
+  if (!safe) counts <- counts[0, ]
+  count_for <- function(label) if (safe)
+    sum(counts$People[as.character(counts$GH_intensity) == label]) else NA_real_
+  heavy <- count_for('Heavy GitHub use')
+  other <- count_for('Other recorded use')
+  list(safe = safe, counts = counts, heavy = heavy, recorded = heavy + other,
+       observed = if (safe) nrow(observed) else NA_real_,
+       share = if (safe) heavy / nrow(observed) else NA_real_)
+}
+
+# Margins must not expose a small intersection by subtraction against the
+# published Team x Role roster. Include unobserved people as a complement.
+heavy_hr_release_safe <- function(roster, observed) {
+  cells <- roster |>
+    select(PersonId, Team, Role) |>
+    left_join(observed |> select(PersonId, GH_intensity), by = 'PersonId',
+              relationship = 'one-to-one') |>
+    mutate(GH_intensity = coalesce(as.character(GH_intensity), 'Unresolved')) |>
+    count(Team, Role, GH_intensity, name = 'People')
+  nrow(cells) > 0L && nrow(disclose_partition(cells)) > 0L
+}
+
 # Protect differences between overlapping service/category supports as well as
 # each positive-contributor count. Every membership pattern includes the full
 # parent population, so absent/noncontributing complements cannot be inferred.
@@ -495,8 +533,8 @@ gh_observed <- baseline |> filter(GH_all_valid)
 # GitHub-intensity grouping over the GitHub-observed population (GH_all_valid).
 # The volume measure is accepted code completions plus user-initiated chat
 # requests, summed over the baseline, among developers with recorded use
-# (GH_active_days > 0). Heavy GitHub use is the top HEAVY_GITHUB_SHARE quintile
-# of that volume. The share is an explicit parameter so the published rule text
+# (GH_active_days > 0). Heavy GitHub use includes all values at or above the
+# configured percentile, including ties. The share is a parameter so rule text
 # is generated from it, mirroring INTENSITY_RULE in the consumption report.
 # Developers with no recorded use are their own group and are never recoded as
 # heavy or light; developers with unresolved GitHub observation are excluded
@@ -504,14 +542,7 @@ gh_observed <- baseline |> filter(GH_all_valid)
 HEAVY_GITHUB_SHARE <- 0.20
 gh_intensity_levels <- c('Heavy GitHub use', 'Other recorded use', 'No recorded use')
 gh_recorded <- gh_observed |> filter(GH_active_days > 0)
-gh_volume <- gh_recorded$GH_accepted + gh_recorded$GH_chats
-heavy_github_cut <- if (nrow(gh_recorded))
-  as.numeric(quantile(gh_volume, 1 - HEAVY_GITHUB_SHARE, na.rm = TRUE)) else NA_real_
-gh_observed <- gh_observed |>
-  mutate(GH_intensity = factor(case_when(
-    GH_active_days > 0 & (GH_accepted + GH_chats) >= heavy_github_cut ~ 'Heavy GitHub use',
-    GH_active_days > 0 ~ 'Other recorded use',
-    TRUE ~ 'No recorded use'), levels = gh_intensity_levels))
+gh_observed$GH_intensity <- github_intensity(gh_observed, HEAVY_GITHUB_SHARE)
 
 measure_values <- c(
   unlist(pq |> select(where(is.numeric), -Total_Copilot_enabled_days,
@@ -701,7 +732,9 @@ render_chart <- function(plot, heading = NULL, layout = c('standard', 'panel', '
 
 interval_data <- function(data, metrics, group = 'Team') {
   sizes <- data |> count(.data[[group]], name = 'People', .drop = TRUE)
-  if (!nrow(data) || !nrow(disclose_partition(sizes))) {
+  intensity_safe <- group != 'GH_intensity' ||
+    github_intensity_release(data, nrow(baseline))$safe
+  if (!nrow(data) || !nrow(disclose_partition(sizes)) || !intensity_safe) {
     return(tibble(Group = character(), Metric = character(),
                   p25 = double(), p50 = double(), p75 = double()))
   }
@@ -846,25 +879,27 @@ github_observed_n <- if (nrow(github_use_counts))
 # population. Gated like every other partition: if any of the three groups
 # falls below the floor the whole split is withheld rather than published in
 # part. The headline share is always heavy users as a fraction of the
-# GitHub-observed population, never of the recorded-use subset (which is 20% by
-# construction and therefore tautological).
-gh_intensity_counts <- gh_observed |>
-  count(GH_intensity, name = 'People', .drop = FALSE) |>
-  disclose_partition() |>
-  mutate(Share = People / nrow(gh_observed))
-heavy_github_n <- sum(gh_observed$GH_intensity == 'Heavy GitHub use')
-github_recorded_n <- nrow(gh_recorded)
-heavy_github_share <- if (nrow(gh_intensity_counts))
-  heavy_github_n / nrow(gh_observed) else NA_real_
+# GitHub-observed population, never of the threshold-setting recorded subset.
+# All public counts and prose use this same release decision.
+gh_intensity_release <- github_intensity_release(gh_observed, nrow(baseline))
+gh_intensity_counts <- gh_intensity_release$counts |>
+  mutate(Share = People / gh_intensity_release$observed)
+heavy_github_n <- gh_intensity_release$heavy
+github_recorded_n <- gh_intensity_release$recorded
+heavy_github_share <- gh_intensity_release$share
 # Built from the constant so a threshold change can never leave the published
 # rule describing the previous cut.
 HEAVY_GITHUB_RULE <- sprintf(
-  paste('Heavy GitHub use: the top %s of GitHub-observed developers with',
-        'recorded use, ranked by accepted code completions plus user-initiated',
-        'chat requests over the %s-week baseline. Reported as a share of all %s',
-        'GitHub-observed developers, not of the %s with recorded use.'),
-  scales::percent(HEAVY_GITHUB_SHARE, accuracy = 1), BASELINE_WEEKS,
-  num(nrow(gh_observed)), num(github_recorded_n))
+  paste('Heavy GitHub use: volume at or above the %s percentile among',
+        'GitHub-observed developers with recorded use. Volume combines accepted',
+        'code completions and user-initiated chat requests over the %s-week baseline;',
+        'these are different interactions, not equivalent units of value.',
+        'All ties at the threshold are included, so the heavy group can exceed %s',
+        'of recorded users (all recorded users when every volume is equal).',
+        'The headline denominator is the complete GitHub-observed population,',
+        'not just developers with recorded use.'),
+  format(100 * (1 - HEAVY_GITHUB_SHARE), trim = TRUE), BASELINE_WEEKS,
+  scales::percent(HEAVY_GITHUB_SHARE, accuracy = 1))
 
 # Team concentration of the heavy group, reported as heavy users within each
 # team's recorded-use population -- the denominator the confounding note refers
@@ -908,24 +943,29 @@ composition_counts <- bind_rows(lapply(c('Role','Seniority','Tenure'), function(
 # sub-floor group. Gating instead on the full Team x Role x Seniority x Tenure
 # intersection withheld the whole family unconditionally: at this population
 # size that intersection can never reach ten people, and it is never published.
-# The heavy-use margins are subordinate to this gate rather than inputs to it:
-# heavy_concentration() already pools its own sub-floor cells, but releasing a
-# pooled margin while the rest of the family is withheld would still let a
-# reader difference it against the suppressed margins.
+# Heavy-use margins have an additional joint-cell gate below; pooling their
+# individual margins alone does not prevent differencing against this roster.
 hr_published <- list(
   baseline |> count(Team, Role, name = 'People'),
   baseline |> count(Role, name = 'People'),
   baseline |> count(Seniority, name = 'People'),
   baseline |> count(Tenure, name = 'People'),
-  gh_observed |> count(GH_use, Role, name = 'People', .drop = TRUE),
-  gh_observed |> count(GH_use, Team, name = 'People', .drop = TRUE))
-hr_release_safe <- all(vapply(hr_published,
+  # Include unresolved observation: the published roster makes it a recoverable
+  # complement of each recorded-use margin, even though it is not charted.
+  baseline |> count(GH_use, Role, name = 'People', .drop = TRUE),
+  baseline |> count(GH_use, Team, name = 'People', .drop = TRUE))
+hr_release_safe <- disclosable_split(nrow(baseline), nrow(gh_observed)) &&
+  all(vapply(hr_published,
   function(x) nrow(x) > 0L && nrow(disclose_partition(x)) > 0L, logical(1)))
 if (!hr_release_safe) {
   team_context <- team_context[0, ]
   role_context <- role_context[0, ]
   team_joint_context <- team_joint_context[0, ]
   composition_counts <- composition_counts[0, ]
+}
+heavy_composition_safe <- hr_release_safe && gh_intensity_release$safe &&
+  heavy_hr_release_safe(baseline, gh_observed)
+if (!heavy_composition_safe) {
   heavy_team_concentration <- heavy_team_concentration[0, ]
   heavy_role_concentration <- heavy_role_concentration[0, ]
 }
@@ -934,16 +974,20 @@ if (!hr_release_safe) {
 # differences may reflect team composition rather than tool use. Computed after
 # the release gate so a withheld concentration cannot leak a team name here.
 heavy_confound_note <- if (!nrow(heavy_team_concentration)) {
-  paste('Heavy GitHub use is unevenly distributed across teams, so differences',
-        'between these groups may reflect team composition rather than tool use.')
+  paste('Team and role composition of the heavy-use group is withheld because',
+        'linked breakdowns could reveal a small group. Unadjusted comparisons',
+        'may reflect team or role composition rather than an effect of the tool.')
 } else {
   named <- heavy_team_concentration[heavy_team_concentration$Group != 'Other (pooled)', ]
-  top <- named[which.max(named$`Heavy GitHub users`), ]
-  sprintf(paste('Heavy GitHub use is unevenly distributed across teams: %s alone',
-                'accounts for %s of the %s heavy users, and some teams contribute',
-                'none. Differences between these groups may reflect team composition',
-                'rather than tool use, not an effect of the tool.'),
-          top$Group, num(top$`Heavy GitHub users`), num(heavy_github_n))
+  if (!nrow(named)) {
+    'Team counts are pooled. Unadjusted comparisons may reflect team or role composition rather than an effect of the tool.'
+  } else {
+    top <- named[which.max(named$`Heavy GitHub users`), ]
+    sprintf(paste('%s accounts for %s of the %s heavy users.',
+                  'Unadjusted comparisons may reflect team or role composition',
+                  'rather than an effect of the tool.'),
+            top$Group, num(top$`Heavy GitHub users`), num(heavy_github_n))
+  }
 }
 
 work_summary <- bind_rows(lapply(c('Collaboration_hours', 'Meeting_hours', 'Email_hours',
@@ -1158,8 +1202,6 @@ validation_summary <- tibble(
              'Passed',
              'Checked only by the synthetic generator; not enforced as a real-export contract. Model attribution is illustrative, including completions.',
              'Weekly enabled days govern M365 eligibility; independent M365 completeness unavailable by default. No coverage file invented.',
-             paste(num(sum(baseline$GH_all_valid)), 'developers have complete GitHub activity weeks;',
-                   num(sum(baseline$GH_credits_all_valid)),
-                   'also have resolved credit coverage. Sparse credit rows never void observed activity.'),
+             'Activity and credit coverage are assessed separately. Sparse credit rows never void observed activity; publishable counts appear in the coverage section.',
              'Internal joint counts reconcile to the roster; public partitions are withheld if any positive cell is below the privacy floor.',
              paste('At least', MIN_GROUP_N, 'distinct people in every published group')))

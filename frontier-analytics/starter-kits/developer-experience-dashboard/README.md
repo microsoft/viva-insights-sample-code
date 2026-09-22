@@ -5,7 +5,7 @@ whether real GitHub query inputs have a sufficient contract for future adaptatio
 
 | Journey | What you receive |
 |---|---|
-| Reproduce demo | Eight-page synthetic HTML, isolated helper/source, config and provenance |
+| Reproduce demo | Nine-page synthetic HTML, isolated helper/source, config and provenance |
 | Customise demo | Modified copied report retaining coverage, privacy and interpretation rules |
 | Inspect real data | Bounded readiness assessment; no verified real GitHub build adapter in v1 |
 

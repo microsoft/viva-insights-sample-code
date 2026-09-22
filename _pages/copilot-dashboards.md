@@ -108,7 +108,7 @@ date grains, licence history and expected coverage before adapting, and note tha
 eligibility and coverage must be derived because no query emits them.
 
 Start with Overview, which defines the **heavy GitHub-use** group and shows where
-it concentrates by team and role, then explore **Collaboration**, **Focus**,
+it concentrates by team and role where disclosure permits, then explore **Collaboration**, **Focus**,
 **After-hours** and **Network** — each leads with the three-group GitHub-intensity
 comparison. The **More** menu contains GitHub breakdowns, GitHub coverage,
 working-pattern comparisons and methods. Detailed tables expand in place, and

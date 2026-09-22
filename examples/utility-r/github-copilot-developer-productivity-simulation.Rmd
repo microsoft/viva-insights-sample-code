@@ -140,7 +140,10 @@ Row
 ```{r landscape-kpis, results='asis'}
 cat('<div class="kpis">')
 card('Heavy GitHub users', pct(heavy_github_share),
-  paste(num(heavy_github_n), 'of', num(github_observed_n), 'GitHub-observed developers; top', scales::percent(HEAVY_GITHUB_SHARE, accuracy=1), 'by accepted completions plus chats among the', num(github_recorded_n), 'with recorded use'))
+  if (gh_intensity_release$safe)
+    paste(num(heavy_github_n), 'of', num(github_observed_n),
+          'GitHub-observed developers; percentile threshold includes ties')
+  else 'Group counts and share withheld to protect small groups')
 card('Developers with recorded GitHub use', num(github_active_n),
   paste('Among', num(github_observed_n), 'developers with complete activity coverage'))
 card('Collaboration hours / week', f1(median(baseline$Collaboration_hours)), 'Median of person-level eight-week averages')
@@ -148,7 +151,7 @@ card('Available-to-focus hours / week', f1(median(baseline$Available_to_focus_ho
 cat('</div>')
 ```
 
-<p class="chart-note">Synthetic examples, not productivity scores or intervention effects. The heavy-user share uses the `r num(github_observed_n)` GitHub-observed developers as its denominator, never the `r num(github_recorded_n)` with recorded use (which would be `r scales::percent(HEAVY_GITHUB_SHARE, accuracy=1)` by construction). Microsoft 365 complete-window rates are unavailable without independent collection evidence; missing observation is not non-use.</p>
+<p class="chart-note">Synthetic examples, not productivity scores or intervention effects. The heavy-user share uses all developers with complete GitHub observation as its denominator, not just those with recorded use. The percentile threshold is relative to recorded users; including ties can make that group's heavy-user share larger than the nominal cut. Microsoft 365 complete-window rates are unavailable without independent collection evidence; missing observation is not non-use.</p>
 
 Row
 -------------------------------------
@@ -163,7 +166,7 @@ Row
 
 ```{r overview-heavy-concentration, results='asis'}
 if (!nrow(heavy_team_concentration)) {
-  cat('<p>Team concentration withheld: a published cell or its complement falls below the privacy floor.</p>')
+  cat('<p>Team and role concentration withheld: a cell, complement or intersection recoverable from linked breakdowns falls below the privacy floor. The overall intensity comparison is assessed separately.</p>')
 } else {
   render_chart(
     ggplot(heavy_team_concentration,
@@ -188,14 +191,14 @@ if (!nrow(heavy_team_concentration)) {
 html_table(heavy_team_concentration |>
   transmute(Team = Group, `Recorded-use developers`, `Heavy GitHub users`,
             `Heavy share (%)` = pct(`Heavy GitHub users` / `Recorded-use developers`)),
-  'Heavy GitHub users within each team’s recorded-use population. Teams with a positive sub-floor heavy count are pooled; the whole table is withheld if any published count or its complement is below 10.')
+  'Heavy GitHub users within each team’s recorded-use population. Pooling is followed by a joint Team x Role x intensity disclosure gate; linked intersections and complements must meet the privacy floor.')
 html_table(heavy_role_concentration |>
   transmute(Role = Group, `Recorded-use developers`, `Heavy GitHub users`,
             `Heavy share (%)` = pct(`Heavy GitHub users` / `Recorded-use developers`)),
-  'Heavy GitHub users within each role’s recorded-use population, released on the same floor and complement rules.')
+  'Heavy GitHub users within each role’s recorded-use population, released on the same joint-intersection and complement rules.')
 ```
 
-Heavy GitHub use concentrates in a small number of teams and roles. Because the groups differ in team and role mix, comparisons on the pillar pages are descriptive and unadjusted; they may reflect that composition rather than an effect of the tool.
+Comparisons on the pillar pages are descriptive and unadjusted. Groups may differ in team and role mix; any observed differences may reflect that composition rather than an effect of the tool.
 
 </details>
 
@@ -786,7 +789,7 @@ html_table(composition_table(team_joint_context), 'A team breakdown is withheld 
 
 </details>
 
-**Interpretation.** Team, role, seniority, task selection and tenure can influence working patterns and tool use, and heavy GitHub use is unevenly distributed across teams. These charts are intentionally limited to agreed measures. No broad metric scan, adjustment model, causal claim or preferred tool-use group is presented.
+**Interpretation.** Team, role, seniority, task selection and tenure can influence working patterns and tool use. Heavy GitHub use may differ across these groups. These charts are intentionally limited to agreed measures. No broad metric scan, adjustment model, causal claim or preferred tool-use group is presented.
 
 Row
 -------------------------------------
