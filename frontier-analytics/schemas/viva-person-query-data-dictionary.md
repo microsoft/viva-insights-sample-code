@@ -4,6 +4,15 @@ This document describes the structure, columns, and data patterns of the **Viva 
 
 > **Note:** Column names and available metrics vary by tenant configuration and Viva Insights version. Always verify your actual column headers against this reference. For authoritative metric definitions, see [Microsoft Learn — Viva Insights metrics](https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics).
 
+> **For inferential analysis:** this dictionary includes illustrative headers
+> and conventions that are not a complete current export contract. Person Query
+> supports daily, weekly and monthly grouping. Verify the actual period boundaries,
+> metric definitions and coverage before modelling. Null action metrics alone
+> do not establish licence status. An organisational attribute repeated across
+> rows may be a static or lower-frequency outcome. Apply the
+> [Person Query causal-analysis contract](../skills/viva-insights-causal-analysis/reference/person-query-contract.md)
+> before treating it as longitudinal evidence.
+
 ---
 
 ## Panel structure

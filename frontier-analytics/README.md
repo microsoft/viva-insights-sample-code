@@ -38,6 +38,18 @@ Once installed, open the agent in a folder that has R or Python available, then 
 
 ## What's inside
 
+### Assess an exposure-outcome relationship
+
+Use the [Person Query causal-diagnostics prompt](prompts/person-query/causal-diagnostics.md)
+or [optional skill](skills/viva-insights-causal-analysis/) to assess grain,
+outcome timing and coverage before selecting models. The workflow supports a
+chosen Viva Insights exposure and another metric or supplied organisational
+outcome. A quarterly score copied onto weekly rows remains a quarterly outcome.
+Matched [R and Python synthetic examples](skills/viva-insights-causal-analysis/examples/README.md)
+demonstrate these gates. The existing
+[Copilot Causal Toolkit](prompts/copilot-adoption/copilot-causal-toolkit.md)
+remains a separate prescribed Copilot/DML workflow.
+
 ### Build or customise query dashboards
 
 Start with the [Consumption](starter-kits/consumption-dashboard/) or
@@ -63,7 +75,7 @@ without a measured comparison.
 
 ### Prerequisites
 
-- **Exported Viva Insights data.** Typically a person query CSV from the Viva Insights Analyst portal. Person query data has a panel structure with rows keyed by `PersonId` and `MetricDate` (person-week or person-day granularity), with HR attributes such as organization, function, geography, and level as columns.
+- **Exported Viva Insights data.** Typically a person query CSV from the Viva Insights Analyst portal. Person query data has a panel structure with rows keyed by `PersonId` and `MetricDate` (daily, weekly or monthly grouping), with HR attributes such as organization, function, geography, and level as columns. Verify the actual query settings and each selected metric's measurement window.
 - **An R or Python environment**, with the [vivainsights R package](https://microsoft.github.io/vivainsights/) or the [vivainsights Python package](https://microsoft.github.io/vivainsights-py/) installed. See "Recommended packages" below.
 - **A coding agent.** See "Don't have a coding agent yet?" above if you need one.
 

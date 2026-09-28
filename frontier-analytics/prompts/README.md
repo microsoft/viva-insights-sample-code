@@ -39,6 +39,12 @@ A prompt card is a structured document that contains:
 | [Executive PowerPoint Deck](copilot-adoption/executive-powerpoint-deck.md) | Generate an exec-ready 10-15 page PowerPoint deck with editable native charts. |
 | [Copilot Causal Toolkit](copilot-adoption/copilot-causal-toolkit.md) | Run a causal inference analysis using the Copilot Causal Toolkit, then interpret results for senior leadership. Two prompts: one to run the analysis, one to interpret outputs. |
 
+### Person Query analysis
+
+| Prompt Card | Description |
+|---|---|
+| [Exposure-outcome analysis and causal diagnostics](person-query/causal-diagnostics.md) | Assess actual outcome frequency, coverage and design before running compatible panel diagnostics. Allows a selected metric or organisational outcome, with R/Python guidance. Complements the fixed-treatment Copilot Causal Toolkit. |
+
 ### Query dashboards
 
 Use these R-first journeys to reuse the reference implementations rather than
