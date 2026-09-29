@@ -26,11 +26,11 @@ Frontier offers four ways to bring this work into a coding agent. Pick a card to
     <span class="vi-card-desc">Copy a ready-made prompt into your agent for a one-off analysis. No setup required.</span>
     <span class="vi-card-more">Browse prompts →</span>
   </a>
-  <a class="vi-card" href="https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/skills">
+  <a class="vi-card" href="{{ site.baseurl }}/frontier-analytics-skills/">
     <span class="vi-card-icon">🧠</span>
     <span class="vi-card-title">Skills</span>
     <span class="vi-card-desc">Your agent loads the right conventions automatically for ongoing work. Needs a Skill-compatible agent, for example GitHub Copilot CLI or Claude Code.</span>
-    <span class="vi-card-more">View on GitHub →</span>
+    <span class="vi-card-more">Explore Skills →</span>
   </a>
   <a class="vi-card" href="https://github.com/microsoft/viva-insights-sample-code/blob/main/vivainsights-context.md">
     <span class="vi-card-icon">📄</span>
@@ -51,7 +51,7 @@ Frontier offers four ways to bring this work into a coding agent. Pick a card to
 | Mechanism | What it is | Status | Use it when |
 |-----------|------------|--------|-------------|
 | [Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/) | Structured text you copy and paste into any coding agent for a single analysis task. | Available | Your agent does not support Skills or MCP, or you want a one-off analysis without any setup. |
-| Skills | A packaged capability that a compatible coding agent loads automatically, so it applies the right conventions without you pasting anything. See the [skills folder on GitHub](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/skills). | Available | Your coding agent supports the Skill format (for example GitHub Copilot CLI or Claude Code) and you want ongoing, repeated Viva Insights work to follow consistent conventions. |
+| [Agent Skills]({{ site.baseurl }}/frontier-analytics-skills/) | A packaged capability that a compatible coding agent loads automatically, so it applies the right conventions without you pasting anything. | Available | Your coding agent supports the Skill format (for example GitHub Copilot CLI or Claude Code) and you want ongoing, repeated Viva Insights work to follow consistent conventions. |
 | [vivainsights-context.md](https://github.com/microsoft/viva-insights-sample-code/blob/main/vivainsights-context.md) | A single context file you paste once at the start of a session. | Available | Your agent does not support Skills, but you still want to avoid repeating setup instructions in every prompt. |
 | [mcp/](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/mcp) | A protocol-level integration that would let an agent query prompts, schemas, and tools directly from a server. | Concept only, no server implemented | Not yet. Read the folder for the design intent and to track progress. |
 
@@ -151,7 +151,7 @@ See "Responsible use & data privacy" below before you work with real HR data.
 
 - [Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/)
 - [Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)
-- [Skills library](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/skills)
+- [Agent Skills]({{ site.baseurl }}/frontier-analytics-skills/)
 - [Browse on GitHub](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics)
 - [Contributing](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/CONTRIBUTING.md)
 - [Changelog](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/CHANGELOG.md)
