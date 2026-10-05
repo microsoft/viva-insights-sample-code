@@ -2,40 +2,48 @@
 layout: page
 title: "Joining People Skills Data with Viva Insights: Complete Tutorial"
 eyebrow: "People Skills"
+description: "A practical R and Python walkthrough for joining People Skills data with Viva Insights metrics."
 permalink: /skills-data-join/
 ---
-This comprehensive tutorial walks through how to join [People Skills](https://learn.microsoft.com/en-us/copilot/microsoft-365/people-skills-overview) data with [Viva Insights](https://learn.microsoft.com/en-us/viva/insights/introduction) to answer common business questions that analysts frequently encounter. We'll demonstrate practical scenarios using both R and Python, showing you how to transform raw skills data into actionable organizational insights.
+Use this tutorial to join [People Skills](https://learn.microsoft.com/en-us/copilot/microsoft-365/people-skills-overview) data with [Viva Insights](https://learn.microsoft.com/en-us/viva/insights/introduction) exports, then explore common organisational questions with R or Python.
+
+<p><strong>Demo-data note:</strong> Scenarios 4 and 5 use randomly generated collaboration-hours and Copilot-action values, not real employee activity. Their results demonstrate code only. Add actual outcome metrics to your Person Query before drawing conclusions.</p>
 
 ## What You'll Learn
 
-By the end of this tutorial, you'll be able to:
-
-- **Set up and join** multiple skills datasets with Viva Insights data
-- **Answer strategic questions** about organizational capabilities and talent
-- **Identify specific expertise** within your organization (e.g., "Who has AI skills?")
-- **Analyze broader capabilities** using skill hierarchies and relationships
-- **Map your skills landscape** to understand organizational strengths
-- **Assess talent well-being** by combining skills data with collaboration metrics
-- **Evaluate technology adoption** patterns based on employee skills
+You will learn how to join the Skills landscape tables to a Person Query, explore skill hierarchies and organisational patterns, and distinguish the mechanics of a demo from evidence based on real data.
 
 ## Business Scenarios Covered
 
-This tutorial demonstrates five key scenarios that analysts commonly need to address:
+Recommended path: review the [prerequisites](#prerequisites), [load and join the data](#data-loading-and-joining), then choose a question below.
 
-1. [Deep Knowledge Discovery]({{ site.baseurl }}/skills-data-join/#scenario-1-deep-knowledge-discovery): Finding people with specific skills (e.g., "Prompt Engineering")
-2. [Broader Capability Assessment]({{ site.baseurl }}/skills-data-join/#scenario-2-broader-capability-assessment): Understanding AI skills across the organization including subskills and related skills
-3. [Skills Landscape Mapping]({{ site.baseurl }}/skills-data-join/#scenario-3-skills-landscape-mapping): Identifying top skill areas and organizational strengths
-4. [Talent Well-being Analysis]({{ site.baseurl }}/skills-data-join/#scenario-4-talent-well-being-analysis): Comparing work patterns between different skill groups
-5. [Technology Adoption Insights]({{ site.baseurl }}/skills-data-join/#scenario-5-technology-adoption-insights): Analyzing the relationship between skills and tool usage (e.g. Copilot)
-
-Each scenario includes:
-
-- **Business context** and questions being answered
-- **Methodology explanation** for the analytical approach
-- **Complete code examples** in both R and Python
-- **Interpretation guidance** for the results
-
---- 
+<nav class="vi-card-grid" aria-label="Business scenario shortcuts">
+  <a class="vi-card" href="#scenario-1-deep-knowledge-discovery">
+    <span class="vi-card-title">Find specific expertise</span>
+    <span class="vi-card-desc">Locate people with a selected skill and compare its distribution across organisations.</span>
+    <span class="vi-card-more">Scenario 1 →</span>
+  </a>
+  <a class="vi-card" href="#scenario-2-broader-capability-assessment">
+    <span class="vi-card-title">Explore related capabilities</span>
+    <span class="vi-card-desc">Use skill hierarchies and relationships to identify a broader capability area.</span>
+    <span class="vi-card-more">Scenario 2 →</span>
+  </a>
+  <a class="vi-card" href="#scenario-3-skills-landscape-mapping">
+    <span class="vi-card-title">Map the skills landscape</span>
+    <span class="vi-card-desc">Summarise top-level skill areas and organisational strengths.</span>
+    <span class="vi-card-more">Scenario 3 →</span>
+  </a>
+  <a class="vi-card" href="#scenario-4-talent-well-being-analysis">
+    <span class="vi-card-title">Compare well-being measures</span>
+    <span class="vi-card-desc">See how a skills-group comparison can be structured. Demo outcome values are simulated.</span>
+    <span class="vi-card-more">Scenario 4 →</span>
+  </a>
+  <a class="vi-card" href="#scenario-5-technology-adoption-insights">
+    <span class="vi-card-title">Explore technology adoption</span>
+    <span class="vi-card-desc">Compare Copilot activity by skill group. Demo outcome values are simulated.</span>
+    <span class="vi-card-more">Scenario 5 →</span>
+  </a>
+</nav>
 
 ## Prerequisites
 
@@ -929,5 +937,6 @@ If you encounter issues or want to extend these analyses:
 ## Related pages
 
 - [Skills Data Join Requirements]({{ site.baseurl }}/skills-data-join-requirements/) — developer prerequisites and setup
+- [Advanced Analytics]({{ site.baseurl }}/advanced/) — machine learning, regression, and statistical testing
 - [Essentials]({{ site.baseurl }}/essentials/) — core Viva Insights analysis scripts
 - [Network Analysis]({{ site.baseurl }}/network/) — analyze collaboration alongside skills data
