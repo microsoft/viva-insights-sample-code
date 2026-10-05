@@ -4,6 +4,15 @@ This document describes the structure, columns, and data patterns of the **Viva 
 
 > **Note:** Column names and available metrics vary by tenant configuration and Viva Insights version. Always verify your actual column headers against this reference. For authoritative metric definitions, see [Microsoft Learn — Viva Insights metrics](https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics).
 
+> **For inferential analysis:** this dictionary includes illustrative headers
+> and conventions that are not a complete current export contract. Person Query
+> supports daily, weekly and monthly grouping. Verify the actual period boundaries,
+> metric definitions and coverage before modelling. Null action metrics alone
+> do not establish licence status. An organisational attribute repeated across
+> rows may be a static or lower-frequency outcome. Apply the
+> [Person Query causal-analysis contract](../skills/viva-insights-causal-analysis/reference/person-query-contract.md)
+> before treating it as longitudinal evidence.
+
 ---
 
 ## Panel structure
@@ -93,11 +102,14 @@ Collaboration metrics measure how a person spends their work time. Values are ty
 
 ## Copilot metric columns
 
-Copilot metrics measure Microsoft 365 Copilot usage. These columns are **only populated for licensed Copilot users**. For unlicensed users, values are `NA` / `null` / `NaN` — **not zero**.
+Copilot metrics measure Microsoft 365 Copilot usage. Availability depends on
+the metric definition, licence eligibility and export coverage. A missing value
+(`NA` / `null` / `NaN`) is not an observed zero and does not, by itself, identify
+an unlicensed user.
 
 | Column | Type | Description | Typical Range | Notes |
 |--------|------|-------------|---------------|-------|
-| `Copilot_Actions` | integer | Total number of Copilot actions (prompts, completions, suggestions accepted) in the period. | 0–500/wk | Primary activity volume metric. Zero means licensed but inactive. |
+| `Copilot_Actions` | integer | Total number of Copilot actions (prompts, completions, suggestions accepted) in the period. | 0–500/wk | Primary activity volume metric. A recorded zero indicates no observed actions for this metric and period, not licence status. |
 | `Copilot_Assisted_Hours` | float | Estimated hours where Copilot assisted the user's work. | 0–20 hrs/wk | Derived metric; methodology may vary by version. |
 | `Copilot_Chat_Queries` | integer | Number of queries sent to Copilot chat interfaces (e.g., M365 Chat, in-app chat). | 0–200/wk | Subset of Copilot_Actions focused on conversational interactions. |
 | `Copilot_Summarized_Hours` | float | Hours of meetings or content summarized by Copilot on the user's behalf. | 0–10 hrs/wk | Includes meeting summaries, email summaries, document summaries. |
@@ -105,7 +117,11 @@ Copilot metrics measure Microsoft 365 Copilot usage. These columns are **only po
 | `Copilot_Assisted_Email_Hours` | float | Email hours where Copilot assisted with drafting or summarizing. | 0–5 hrs/wk | |
 | `Copilot_Assisted_Document_Hours` | float | Hours of document work where Copilot assisted (e.g., in Word, PowerPoint, Excel). | 0–10 hrs/wk | |
 
-> **Important:** A `null`/`NA` value in a Copilot column means the user was **not licensed** for Copilot that week. A value of `0` means the user **was licensed but did not use Copilot** that week. This distinction is critical for adoption analysis.
+> **Important:** Keep missing values distinct from recorded zeros. Establish
+> licence eligibility for the relevant period using documented licence or
+> enabled-days evidence, and verify metric coverage before classifying a user
+> as licensed but inactive or unlicensed. Do not infer either status from an
+> action metric alone.
 
 ---
 
@@ -124,9 +140,9 @@ The following table shows example rows with fake data to illustrate the structur
 
 **Reading the example:**
 
-- **`abc123`** (Engineering, Senior IC) is a licensed Copilot user who was active both weeks.
-- **`def456`** (Marketing, Manager) is **not licensed** for Copilot — Copilot columns are blank (null).
-- **`ghi789`** (Sales, IC) is a licensed user who was active week 1 but **inactive** week 2 (Copilot_Actions = 0, not null).
+- **`abc123`** (Engineering, Senior IC) has observed Copilot actions in both weeks.
+- **`def456`** (Marketing, Manager) has missing Copilot values. Licence and coverage evidence is needed before classifying either week.
+- **`ghi789`** (Sales, IC) has observed actions in week 1 and a recorded zero in week 2. Check licence and coverage evidence before labelling week 2 as licensed but inactive.
 
 ---
 
@@ -150,21 +166,14 @@ granularity <- if (gap >= 7) "weekly" else "daily"
 
 ### Identifying licensed vs. unlicensed users
 
-A user is **Copilot-licensed** in a given period if any Copilot metric column has a non-null value for that row. A user is **active** if they are licensed AND have `Copilot_Actions > 0`.
-
-```python
-# Python
-copilot_cols = [c for c in df.columns if c.startswith('Copilot_')]
-df['is_licensed'] = df[copilot_cols].notna().any(axis=1)
-df['is_active'] = df['is_licensed'] & (df['Copilot_Actions'] > 0)
-```
-
-```r
-# R
-copilot_cols <- grep("^Copilot_", names(df), value = TRUE)
-df$is_licensed <- rowSums(!is.na(df[copilot_cols])) > 0
-df$is_active <- df$is_licensed & !is.na(df$Copilot_Actions) & df$Copilot_Actions > 0
-```
+First confirm which fields document licence eligibility for each person and
+period, and whether the selected metric was observed for that period. Some
+Copilot metric families cover unlicensed activity, so a non-null value in a
+column containing `Copilot` is not proof of a licence. Classify observed
+activity from the selected metric separately from licence status. Only label
+a recorded zero as **licensed but inactive** when eligibility and coverage
+are confirmed. Keep unresolved cases as **unknown** rather than assigning
+them to the unlicensed population.
 
 ### Validating panel completeness
 

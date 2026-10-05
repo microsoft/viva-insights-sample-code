@@ -23,6 +23,7 @@ The Skill format used here follows the convention introduced by Anthropic's Clau
 |---|---|
 | [viva-insights-analysis/](viva-insights-analysis/) | Analyzing Viva Insights data with the open-source vivainsights R and Python packages: importing and validating a query, computing and visualizing metrics, segmenting Copilot usage, building common deliverables (dashboards, executive summaries, ROI estimates), running network or information-value analysis, and avoiding well-known export data pitfalls. |
 | [viva-insights-copilot-dashboards/](viva-insights-copilot-dashboards/) | Optional, R-first workflow for the Consumption and Developer Experience reference dashboards: reproduce, inspect/adapt and customise. Uses shared analysis contracts rather than duplicating them. |
+| [viva-insights-causal-analysis/](viva-insights-causal-analysis/) | Optional Person Query design and diagnostic workflow for a selected exposure and metric or organisational outcome. Checks actual outcome frequency before panel analysis, with matched synthetic R/Python demonstrations. |
 
 ## Installing a skill
 
@@ -63,6 +64,30 @@ download dependencies. No private services, telemetry or credentials are needed.
 Start with: **"Reproduce the Consumption demo using the dashboard skill."**
 For real data, Consumption v1 supports a scoped credits report; GitHub supports
 inspection only until a verified real-data adapter is added.
+
+## Person Query causal-analysis skill installation
+
+For repeated use, copy both `viva-insights-analysis` and
+`viva-insights-causal-analysis` from this directory into the same agent skills
+directory, preserving `reference/` and `examples/`, from the same checkout
+revision. Review existing customised copies before replacing them. The causal
+skill reads its sibling references directly and has no automatic dependency
+installer. Keep the checkout available for repository prompt links, or provide
+its location when asked.
+
+For one-off use, start with the
+[Person Query causal-diagnostics prompt](../prompts/person-query/causal-diagnostics.md).
+For practice, use the [R and Python examples](viva-insights-causal-analysis/examples/README.md).
+The examples contain fabricated values in Person Query-shaped data. They
+demonstrate readiness decisions and limited balanced-panel reference estimates,
+not a validated model runner for arbitrary real exports.
+
+Start with: **"Assess whether my Person Query and quarterly outcome can support
+within-person analysis before running models."**
+
+The existing [Copilot Causal Toolkit prompt](../prompts/copilot-adoption/copilot-causal-toolkit.md)
+remains the entry point for its prescribed Copilot/DML notebooks. The new skill
+does not replace that toolkit or modify its treatment and helpers.
 
 ## Contributing a new skill
 

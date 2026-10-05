@@ -1,0 +1,17 @@
+key,value
+generator,viva-causal-synthetic-v1
+synthetic_only,true
+case,annual
+row_grain,person-month
+outcome_grain,annual
+outcome_derived_from_exposure,false
+known_effect,not_identified
+exposure_field,CollaborationHours
+outcome_field,CustomOutcome
+exposure_meaning,"Fictional monthly collaboration hours; blank means unknown, never zero."
+count_meaning,"Fictional monthly Copilot action count; descriptive only, not a covariate."
+outcome_meaning,Fictional custom organisational operational score attached to a person; not a Viva built-in metric.
+outcome_units,score points
+identity_meaning,"Generated fictional person key, not a real identifier."
+measurement_meaning,OutcomePeriod is the actual measurement window; repeated values are not new measurements.
+design,Independent seeded exposure shocks plus person and month effects; no customer observations.

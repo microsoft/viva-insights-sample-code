@@ -23,6 +23,12 @@ reference dashboards, use the optional `viva-insights-copilot-dashboards`
 skill as the workflow owner. This skill supplies shared analytical rules;
 do not start a competing build workflow.
 
+For Person Query exposure-outcome design, within-person comparisons and causal
+diagnostics, use the optional `viva-insights-causal-analysis` skill as workflow
+owner. It reads this skill's shared conventions directly and adds measurement-
+frequency and inferential gates. An explicit Copilot Causal Toolkit request
+stays with its existing prompt and prescribed notebooks.
+
 Microsoft Viva Insights lets analysts export "flexible queries" as CSVs from the
 Analyst portal. The open-source **`vivainsights`** packages (R and Python) read,
 validate, analyse, and visualise those exports in a consistent, best-practice way.

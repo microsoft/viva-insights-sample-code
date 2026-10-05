@@ -54,7 +54,9 @@ MAPPING: dict[str, str] = {
 }
 
 # Prompt cards that are intentionally repo-only, with no site-page mirror.
-KNOWN_SITE_LESS_CARDS: set[str] = set()
+KNOWN_SITE_LESS_CARDS: set[str] = {
+    "person-query/causal-diagnostics.md",
+}
 
 # Keywords that must appear in both copies of a pair, or neither, since they
 # encode a specific classification rule that has drifted between copies

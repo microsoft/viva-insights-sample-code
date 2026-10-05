@@ -1,5 +1,10 @@
 # Copilot Causal Toolkit: Run and Interpret
 
+For a user-selected exposure, a custom organisational outcome whose measurement
+frequency needs checking, or a broader panel-readiness assessment, use
+[Person Query causal diagnostics](../person-query/causal-diagnostics.md).
+This card continues to own the existing fixed-treatment Copilot/DML workflow.
+
 ## Purpose
 
 Help users run a causal inference analysis using the Copilot Causal Toolkit with their own data, and then interpret the results in a non-technical, business-ready format. This page contains two prompts:

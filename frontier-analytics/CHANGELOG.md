@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Optional `viva-insights-causal-analysis` skill and Person Query diagnostic
+  prompt. Adds explicit measurement-frequency gates for organisational outcomes,
+  design/inference and privacy contracts, a report specification, and matched
+  synthetic R/Python readiness and balanced-panel examples.
+- Separates general exposure-outcome diagnostics from the existing prescribed
+  Copilot Causal Toolkit, without changing its helpers or notebooks.
+
 - Two AI-guided query-dashboard journeys (Consumption and Developer Experience),
   with prompt cards, site pages and starter kits sharing a reusable R runner.
 - Optional `viva-insights-copilot-dashboards` skill with reproduce, adapt and
