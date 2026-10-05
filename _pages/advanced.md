@@ -49,6 +49,12 @@ Pick a card to jump straight to a technique, or read the short intro above each 
     <span class="vi-card-desc">Rank the meeting characteristics that drive in-meeting messaging, used here as a proxy for disengagement.</span>
     <span class="vi-card-more">Jump to section →</span>
   </a>
+  <a class="vi-card" href="{{ site.baseurl }}/skills-data-join/">
+    <span class="vi-card-icon">🧩</span>
+    <span class="vi-card-title">Joining People Skills Data</span>
+    <span class="vi-card-desc">Enrich Viva Insights analysis by joining People Skills data, with examples in R and Python.</span>
+    <span class="vi-card-more">Open tutorial →</span>
+  </a>
 </div>
 
 <div class="lang-switch" role="group" aria-label="Choose code language for this page">
