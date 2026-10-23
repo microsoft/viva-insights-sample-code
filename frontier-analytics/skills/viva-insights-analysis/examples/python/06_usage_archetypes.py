@@ -140,12 +140,17 @@ def surface_mix(counts):
     return "Broad"
 
 
-# Boundary self-checks of the integer rule.
-assert surface_mix([4, 3, 2, 1]) == "Specialised"  # 40% share, 10-point lead
-assert surface_mix([4, 4, 1, 1]) == "Broad"        # tied leading groups
-assert surface_mix([8, 7, 5, 0]) == "Specialised"  # exactly 40% and 5 points
-assert surface_mix([8, 7, 6, 0]) == "Broad"        # share 8/21 is under 40%
-assert surface_mix([0, 0, 0, 0]) is None           # no group-weeks
+# Boundary self-checks of the integer rule (explicit so `python -O` keeps them).
+SURFACE_MIX_CHECKS = [
+    ([4, 3, 2, 1], "Specialised"),  # 40% share, 10-point lead
+    ([4, 4, 1, 1], "Broad"),        # tied leading groups
+    ([8, 7, 5, 0], "Specialised"),  # exactly 40% and 5 points
+    ([8, 7, 6, 0], "Broad"),        # share 8/21 is under 40%
+    ([0, 0, 0, 0], None),           # no group-weeks
+]
+for check_counts, expected in SURFACE_MIX_CHECKS:
+    if surface_mix(check_counts) != expected:
+        raise AssertionError(f"surface_mix({check_counts}) should be {expected}")
 
 
 def protect(counts, margins=()):
@@ -278,24 +283,35 @@ print("GitHub credits flag the GitHub group only and are never added to M365 cre
 # 6. Privacy-safe summaries ---------------------------------------------------
 print(f"\n=== Evidence states (groups under {MIN_GROUP_SIZE} withheld) ===")
 state_counts = [int((people["state"] == s).sum()) for s in STATES]
-for s, shown in zip(STATES, show(state_counts, protect(state_counts))):
+state_hidden = protect(state_counts)
+for s, shown in zip(STATES, show(state_counts, state_hidden)):
     print(f"  {s:<52} {shown:>9}")
 print(f"  {'Supplied synthetic roster':<52} {len(people):>9}")
 
-print(f"\n=== Profiles among full profiles (groups under {MIN_GROUP_SIZE} withheld) ===")
+# The full-profile count reappears as the profile-table total and the
+# sensitivity denominator. If the state table withholds it, for example
+# because the other states together number fewer than 10, both sections are
+# withheld instead.
+breakdown_ok = not state_hidden[0]
 profile_counts = [int((people["profile"] == code).sum()) for code, _ in PROFILES]
 # A median split makes the Lean and Intensive totals close to half of the
 # full profiles, so treat both as known margins in the disclosure check.
 lean_cells = [k for k, (code, _) in enumerate(PROFILES) if code.endswith("L")]
 intensive_cells = [k for k, (code, _) in enumerate(PROFILES) if code.endswith("I")]
 profile_hidden = protect(profile_counts, [lean_cells, intensive_cells])
-for (code, label), shown in zip(PROFILES, show(profile_counts, profile_hidden)):
-    print(f"  {code}  {label:<36} {shown:>9}")
-print(f"  {'Full profiles':<42} {int(full.sum()):>9}")
-print("  'withheld' marks cells under 10 and further cells chosen so that, within")
-print("  the printed total and the Lean and Intensive totals implied by the median")
-print("  split, withheld cells number at least two and sum to at least 10. Only")
-print("  their combined total can be derived. Withholding itself conveys information.")
+if breakdown_ok:
+    print(f"\n=== Profiles among full profiles (groups under {MIN_GROUP_SIZE} withheld) ===")
+    for (code, label), shown in zip(PROFILES, show(profile_counts, profile_hidden)):
+        print(f"  {code}  {label:<36} {shown:>9}")
+    print(f"  {'Full profiles':<42} {int(full.sum()):>9}")
+    print("  'withheld' marks cells under 10 and further cells chosen so that, within")
+    print("  the printed total and the Lean and Intensive totals implied by the median")
+    print("  split, withheld cells number at least two and sum to at least 10. Only")
+    print("  their combined total can be derived. Withholding itself conveys information.")
+else:
+    print("\n=== Profiles and sensitivity ===")
+    print("  withheld: population too small for this breakdown")
+    print("  (the full-profile count is withheld in the evidence-state table)")
 
 # 7. Sensitivity diagnostics (Surface mix) -------------------------------------
 flags_by_person = {pid: g[GROUPS].astype(int).values.tolist()
@@ -335,9 +351,10 @@ if (s_margin_safe and publishable(s_changed, s_total)
 else:
     specialised_row = "withheld (would reveal a withheld profile cell or a group under 10)"
 
-print("\n=== Sensitivity: Surface mix (stability diagnostics rather than observed change) ===")
-print("Label changed in at least one leave-one-week recalculation:")
-print(f"  all full profiles: {share(all_changed, n_full)}")
-print(f"  Specialised:       {specialised_row}")
-print("First versus last six weeks, label disagreement among people with")
-print(f"group-weeks in both halves: {share(split_disagree, split_eligible, parent=n_full)}")
+if breakdown_ok:
+    print("\n=== Sensitivity: Surface mix (stability diagnostics rather than observed change) ===")
+    print("Label changed in at least one leave-one-week recalculation:")
+    print(f"  all full profiles: {share(all_changed, n_full)}")
+    print(f"  Specialised:       {specialised_row}")
+    print("First versus last six weeks, label disagreement among people with")
+    print(f"group-weeks in both halves: {share(split_disagree, split_eligible, parent=n_full)}")

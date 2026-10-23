@@ -62,11 +62,15 @@ Prerequisites: `pip install vivainsights` (Python) or
    record, a profile summary that withholds groups under 10 (with further
    cells withheld so that no withheld cell can be recovered from printed or
    median-implied totals), and leave-one-week and split-half sensitivity
-   with the same disclosure checks. Both scripts share a small Park-Miller
-   generator, so R and Python build the same panel. For the committed seed,
-   byte-identical output and identical person-level classifications were
-   checked manually. There is no automated parity test. The numbers describe
-   synthetic data only.
+   with the same disclosure checks. The full-profile count reappears as the
+   profile total and the sensitivity denominator. So whenever the
+   evidence-state table withholds it, including whenever the other states
+   together number fewer than 10, the profile summary and sensitivity are
+   replaced by a "population too small for this breakdown" message. Both
+   scripts share a small Park-Miller generator, so R and Python build the
+   same panel. For the committed seed, byte-identical output and identical
+   person-level classifications were checked manually. There is no automated
+   parity test. The numbers describe synthetic data only.
 
 ## Conventions on display in these examples
 
