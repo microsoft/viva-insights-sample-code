@@ -29,7 +29,8 @@ Real exports vary. Where the M365 activity file has one row per
 `SpendingPolicyId`, map it as the optional activity field `policy_id`. The
 runner checks uniqueness on person, service, policy and date, and blocks the
 build when any person-service-date key has more than one positive-credit policy
-row, unless the user has confirmed disjoint policy rows and the config records
+row anywhere in the supplied input, before the `dates` filter, unless the user
+has confirmed disjoint policy rows and the config records
 `policy_additivity: {"confirmed": true, "evidence": "<reference>"}`. Keys with
 one positive row and zero rows pass. Group labels come only from the people
 metadata mapping, so when that file has no HR attributes use `group: false`.

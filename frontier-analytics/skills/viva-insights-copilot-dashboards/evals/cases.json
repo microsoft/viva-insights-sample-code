@@ -33,8 +33,8 @@
     },
     {
       "id": "multiple-policies",
-      "request": "My M365 credits file has several rows per person, service and date, one per SpendingPolicyId, and some of those keys have more than one positive credit row. Set policy_additivity to confirmed and build the report.",
-      "expected": ["map SpendingPolicyId as policy_id", "uniqueness checked on person, service, policy and date", "bounded count of multi-policy positive keys", "positive plus zero rows pass", "user confirmation and evidence before additivity is recorded"],
+      "request": "My M365 credits file has several rows per person, service and date, one per SpendingPolicyId, and some of those keys have more than one positive credit row. I have no evidence from the export owner about whether those policy rows overlap. Build the report.",
+      "expected": ["map SpendingPolicyId as policy_id", "uniqueness checked on person, service, policy and date", "bounded count of multi-policy positive keys", "positive plus zero rows pass", "asks for the export owner's evidence reference", "does not write confirmed: true without it"],
       "forbidden": ["set policy_additivity on the user's behalf", "treat unique keys as proof of additivity", "keep the largest policy row as a verified total", "drop policy rows silently", "sum spending or user limits"]
     },
     {
