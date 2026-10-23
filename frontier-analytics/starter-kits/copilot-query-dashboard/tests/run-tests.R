@@ -293,6 +293,10 @@ test("HTML attribute values escaped and CSV formulas neutralized", {
   build_dashboard(bad, kit)
   csv <- read.csv(file.path(bad$output_dir, "build", "aggregates.csv"))
   stopifnot(all(csv$group == "'=1+1"))
+  stopifnot(identical(csv_safe_text(c("Synthetic Alpha", "plain", "=1+1", " +SUM(A1)", "-5", "@x",
+                                      "tab\there", "line\nbreak", "cr\rhere")),
+                      c("Synthetic Alpha", "plain", "'=1+1", "' +SUM(A1)", "'-5", "'@x",
+                        "'tab\there", "'line\nbreak", "'cr\rhere")))
 })
 # Policy-aware Consumption: synthetic people-service-days split across spending policies,
 # with metadata that carries no HR attributes (group=false).
@@ -545,8 +549,7 @@ test("policy-mapped build with group=true sums policy rows within each group", {
   capture.output(build_dashboard(grouped, kit))
   csv <- read.csv(file.path(grouped$output_dir, "build", "aggregates.csv"))
   csv <- csv[order(csv$group), ]
-  # Compare labels without the CSV formula guard's apostrophe prefix.
-  stopifnot(identical(sub("^'", "", csv$group), c("Synthetic Alpha", "Synthetic Beta")),
+  stopifnot(identical(csv$group, c("Synthetic Alpha", "Synthetic Beta")),
             all(csv$people == 10L), identical(csv$credits, c(70L, 155L)),
             !any(grepl("synthetic-policy|synthetic-person|synthetic-history", unlist(csv))))
 })

@@ -467,6 +467,13 @@ dashboard_html <- function(release, cfg,
          '</body></html>')
 }
 
+# Prefix spreadsheet-formula triggers and control characters so CSV viewers treat labels as text.
+csv_safe_text <- function(x) {
+  dangerous <- grepl("^[[:space:]]*[=+@-]|[\r\n\t]", x)
+  x[dangerous] <- paste0("'", x[dangerous])
+  x
+}
+
 build_dashboard <- function(cfg, kit) {
   if (cfg$mode != "real") fail("build is real-only. Use reproduce for synthetic references.")
   if (cfg$report == "github")
@@ -485,10 +492,7 @@ build_dashboard <- function(cfg, kit) {
   dest <- output_folder(cfg, "build")
   # Do not serialize pre-suppression counts, raw rows, keys, or group labels.
   csv <- release$table
-  for (column in c("service", "group")) {
-    dangerous <- grepl("^[[:space:]]*[=+@-]|[\\r\\n\\t]", csv[[column]])
-    csv[[column]][dangerous] <- paste0("'", csv[[column]][dangerous])
-  }
+  for (column in c("service", "group")) csv[[column]] <- csv_safe_text(csv[[column]])
   utils::write.csv(csv, file.path(dest, "aggregates.csv"), row.names = FALSE,
                    fileEncoding = "UTF-8")
   writeLines(dashboard_html(release, cfg, prov$generated_utc),
