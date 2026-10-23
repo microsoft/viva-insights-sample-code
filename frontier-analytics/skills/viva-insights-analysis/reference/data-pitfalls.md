@@ -150,6 +150,48 @@ if they were people, or summing person-week metrics without accounting for the
 week grain, gives confidently wrong numbers. Check with `extract_date_range()`
 and a quick `nrow` / `groupby` sanity count first.
 
+## 9. Unique keys do not prove amounts can be added
+
+**Symptom:** a key-uniqueness check passes, but summed totals are too high or
+change depending on which rows are kept.
+**Cause:** some Consumption exports carry several rows for the same person,
+service and date, one per `SpendingPolicyId`. The full key is unique, yet more
+than one of those rows can hold a positive amount. Uniqueness describes the
+table structure. It says nothing about whether the amounts overlap.
+**Fix:** check additivity as a separate step. Count person-service-date keys
+with more than one positive-credit row. A positive row alongside zero rows is
+safe to sum. Multiple positive rows need the data owner's confirmation that the
+policies record disjoint consumption before you add them. See the
+[shared query contract](copilot-query-contracts.md#key-uniqueness-and-additivity-are-separate-checks).
+
+```python
+key = ["PersonId", "ServiceId", "MetricDate"]
+pos = m365[m365["Total Copilot Credits used"] > 0]
+multi_positive = (pos.groupby(key).size() > 1).sum()   # report the count only
+```
+
+## 10. Network stocks repeat within months
+
+**Symptom:** a person's monthly network size is several times larger than any
+weekly value, or a "later" network outcome already reflects the exposure period.
+**Cause:** `Internal_network_size` and `External_network_size` are stocks
+measured over a window. In some exports they repeat across the weekly rows of a
+person-month, so the weekly row grain is not their measurement frequency (see
+pitfall 5). A value dated in a boundary month can include contacts outside the
+selected weeks.
+**Fix:** never sum network sizes across weeks. Average them, or keep one value
+per measurement window, and record which. Check how many distinct values each
+person-month holds. When comparing periods, or ordering exposure before outcome,
+confirm that the measurement windows behind the dates do not overlap.
+
+```r
+pq |>
+  dplyr::mutate(month = format(as.Date(MetricDate), "%Y-%m")) |>
+  dplyr::group_by(PersonId, month) |>
+  dplyr::summarise(distinct_values = dplyr::n_distinct(Internal_network_size),
+                   Internal_network_size = mean(Internal_network_size), .groups = "drop")
+```
+
 ## Quick diagnostic checklist
 
 - [ ] Loaded with `import_query()` so columns are underscore-named?
@@ -160,3 +202,5 @@ and a quick `nrow` / `groupby` sanity count first.
 - [ ] Trailing-window plateaus not misread as change?
 - [ ] Holiday / inactive weeks flagged before period comparison?
 - [ ] Grain confirmed before aggregation?
+- [ ] Additivity checked separately from key uniqueness (multiple positive policy rows)?
+- [ ] Network stocks averaged rather than summed, with boundary-month windows checked?
