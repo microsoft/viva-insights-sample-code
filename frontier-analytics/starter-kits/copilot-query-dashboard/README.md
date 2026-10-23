@@ -79,9 +79,10 @@ If you move an example config, update its paths. Do not commit private configs/d
 | `inputs` | Real only. Object with `activity` and (for Consumption) `people` CSV paths. GitHub inspection accepts activity plus optional people. No Person Query adapter. |
 | `mappings` | Real Consumption only: exact source-column mappings below; no normalization or fuzzy guessing |
 | `mapping_approval` | Build requires `{"approved":true,"evidence":"reviewed contract or approval reference"}`. Inspection validates structure without approval. |
+| `policy_additivity` | Real Consumption only, and only when `mappings.activity.policy_id` is mapped: `{"confirmed":true,"evidence":"export owner's confirmation reference"}`. Exactly these two fields. Required before build when several spending policy rows carry positive credits for the same person, service and date |
 | `granularity` | Consumption validation/build requires `"day"`, `"week"` or `"month"` matching the export; no inference/rebucketing |
 | `dates` | Optional inclusive **period-label** filter: `{"start":"YYYY-MM-DD","end":"YYYY-MM-DD"}` |
-| `group` | Optional boolean, default `false`; `true` requires the metadata group mapping |
+| `group` | Optional boolean, default `false`; `true` requires the metadata group mapping. Keep it false when the metadata has no HR attributes |
 | `privacy_min` | Optional integer >=10, default 10; demo references require exactly 10 |
 
 Required Consumption mappings:
@@ -107,11 +108,40 @@ Required Consumption mappings:
 
 Omit `mappings.people.group` when `group` is false. Mapping objects must have exactly
 the required fields, each pointing to a distinct, exact existing source column.
-`configs/real-consumption.example.json` deliberately starts with approval **false**.
+The activity mapping also accepts one optional field, `policy_id`, for exports whose
+native key includes **SpendingPolicyId**. No other optional or unknown fields are accepted:
+
+```json
+{
+  "mappings": {
+    "activity": {
+      "person_id": "PersonId",
+      "service_id": "ServiceId",
+      "policy_id": "SpendingPolicyId",
+      "date": "MetricDate",
+      "people_id": "PeopleHistoricalId",
+      "credits": "Total Copilot Credits used"
+    }
+  },
+  "policy_additivity": {
+    "confirmed": false,
+    "evidence": "REPLACE with the export owner's confirmation reference"
+  }
+}
+```
+
+`configs/real-consumption.example.json` follows the policy-aware layout observed in
+real exports in October 2026. It reads `PersonM365CreditsMetrics.csv`, maps
+`policy_id`, sets `group` to false because that metadata carried no HR attributes,
+and deliberately starts with approval and additivity confirmation **false**.
 Inspect it with local paths and explicit mappings while approval is false or
 absent. Inspection validates numeric/date values, keys, joins and declared grain,
 then reports `status: "awaiting_approval"`, `structural_validation: "passed"`,
 `supported_panels`, `excluded_panels`, `privacy_status` and `next_action`.
+When `policy_id` is mapped it also reports `multi_policy_positive_keys` (a count only)
+and `policy_additivity_status`. If that count is above zero and additivity is not
+confirmed, the status is `awaiting_policy_confirmation` and the next action asks you
+to confirm with the export owner that the policy rows are disjoint before approval.
 Structural validation does not independently establish a source's business semantics:
 review the export contract, declared credits unit and selected group/grain/window.
 Only **after the user's decision**, set approval to true and record the decision
@@ -133,12 +163,41 @@ have unique PeopleHistoricalId and explicit **IsCopilotLicensed** (`true`/`false
 case-insensitive). This adapter validates licensing metadata but does not report
 licensed denominators or infer licensing from activity.
 
+Real exports observed in October 2026 showed a policy-aware variant. Their
+`PersonM365CreditsMetrics.csv` had the native key **PersonId + ServiceId +
+SpendingPolicyId + MetricDate**, and some people had more than one row for the
+same person, service and day under different SpendingPolicyId values. Without a
+`policy_id` mapping such an export fails the three-column key check, and the error
+suggests mapping SpendingPolicyId. With `policy_id` mapped, the adapter:
+
+- requires a nonblank, unpadded SpendingPolicyId on every row
+- rejects duplicates of the four-column key
+- counts the person-service-date keys that have more than one row with positive credits
+- blocks build while that count is above zero, unless `policy_additivity` has
+  `confirmed: true` and nonblank `evidence`
+- sums credits across policy rows only after that gate, so output keeps the
+  three-column grain and never reports per-policy values
+
+A unique four-column key does not prove that the policy rows can be added. Two
+positive rows for one person, service and day may describe disjoint policies or
+overlapping views of the same use, and only the export owner can say which. One
+positive row alongside zero rows is not ambiguous and passes without confirmation.
+Errors and inspection report only the number of affected keys, never identifiers.
+`policy_additivity` is rejected in demo mode, for real GitHub inspection, and when
+`policy_id` is not mapped, so it is never silently ignored.
+
+The same observed exports had a `PeopleMetaData.csv` with only PeopleHistoricalId and
+IsCopilotLicensed. When the metadata has no HR attributes, set `group` to false and
+omit `mappings.people.group`. Organisation grouping from Person Query remains
+unsupported by this adapter.
+
 The current official metrics include **Total Copilot Credits used**, **Session
 count**, **User limit**, and **Spending policy limit**. This version deliberately
 uses only credits. It does not sum limits, infer tokens/task types, or treat credits
 as currency. Extra unmapped columns are ignored, not reverse-engineered.
 
-Build rejects duplicate activity or metadata keys, one historical ID assigned to
+Build rejects duplicate activity or metadata keys, unconfirmed positive credits on
+several policy rows for one person-service-date, one historical ID assigned to
 multiple people, unmatched metadata (even without grouping), missing/padded IDs,
 missing groups, invalid dates, negative/nonfinite/malformed credits, ambiguous
 mappings and schema-normalization collisions. CSVs must be UTF-8, comma separated
@@ -188,7 +247,8 @@ coverage and semantics. No fabricated “verified GitHub adapter” is provided.
 Readiness embeds provenance; build/reproduce write it separately. It records
 explicit real/synthetic mode, repository HEAD, **MD5 content checksums** of input
 and runtime files, loaded package versions, R version, configuration mappings,
-approval reference, privacy rule and UTC execution time. Demo provenance also
+approval reference, policy additivity confirmation, privacy rule and UTC execution
+time. Demo provenance also
 records Pandoc and isolated work-file hashes. MD5 is a reproducibility checksum,
 not an authenticity/security guarantee. Real raw records and input absolute paths
 are not copied into provenance. Do not put customer values into approval text.
@@ -203,6 +263,7 @@ Rscript frontier-analytics/starter-kits/copilot-query-dashboard/tests/run-tests.
 
 The output parent must already exist outside the repository. Tests generate small,
 explicitly synthetic CSV cases there, exercise validation, aggregate totals,
+policy-aware keys and the additivity gate,
 whole-table suppression, output isolation, escaping and mode separation, and write
 `dashboard-tests-<timestamp>/test-results.txt`. Fixtures and generated test artifacts
 are never placed in the source tree.
