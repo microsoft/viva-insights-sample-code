@@ -18,11 +18,13 @@ Always confirm the grain before aggregating. A Person Query is already
 person-level. A Meeting Query is meeting-level and must be filtered and
 aggregated before it means anything at the person or group level.
 
-For Consumption and GitHub queries, read
+For Consumption, GitHub and Agent queries, read
 [copilot-query-contracts.md](copilot-query-contracts.md). Consumption can have
-multiple services per person-period and separate historical people metadata.
+multiple services and spending policies per person-period, separate historical
+people metadata and more than one dated file layout. The Agent query has an
+observed weekly person-agent layout and an earlier dated variant.
 The supplied GitHub demo schema is illustrative, not a verified real export.
-Do not apply the Person Query key or licensing assumptions to either source.
+Do not apply the Person Query key or licensing assumptions to any of these sources.
 
 ## Column naming: raw export vs imported
 
