@@ -24,8 +24,10 @@ Present a short supported/excluded/reason table. In v1:
   field `policy_id`. The runner then checks key uniqueness on person, service,
   policy and date, and reports the grain with a bounded count of
   person-service-date keys that have more than one positive-credit policy row.
-  A positive row alongside zero rows passes. If any key has multiple positive
-  rows, build is blocked until the user confirms that the policy rows record
+  The count and the gate cover every supplied row, before the `dates` filter,
+  so a narrower window does not avoid them. A positive row alongside zero rows
+  passes. If any key has multiple positive rows, build is blocked until the
+  user confirms that the policy rows record
   disjoint consumption and the config holds
   `policy_additivity: {"confirmed": true, "evidence": "<reference>"}`. Without
   the mapping, duplicated person-service-date keys fail with a suggestion to map
