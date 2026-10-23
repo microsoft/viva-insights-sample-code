@@ -485,6 +485,71 @@ test("real Consumption example maps SpendingPolicyId and inspects metadata witho
   stopifnot(report$status == "awaiting_policy_confirmation", report$multi_policy_positive_keys == 3L)
   blocked(build_dashboard(read_config("example-policy.json", kit), kit), "approval")
 })
+test("pending additivity stays in next_action when privacy withholds or the window is empty", {
+  small <- policy_activity[policy_activity$PersonId %in% sprintf("synthetic-person-%02d", 1:9), ]
+  small[["Total Copilot Credits used"]] <- c(1:9, 5, 5, 5, rep(0, 6))
+  write.csv(small, "policy-small.csv", row.names = FALSE)
+  pending <- policy_cfg
+  pending$inputs$activity <- file.path(root, "policy-small.csv")
+  pending$output_dir <- file.path(root, "policy-small-inspect")
+  text <- capture.output(report <- inspect_dashboard(pending, kit))
+  privacy_at <- regexpr("approval does not override privacy", report$next_action, fixed = TRUE)
+  owner_at <- regexpr("export owner", report$next_action, fixed = TRUE)
+  stopifnot(report$status == "awaiting_policy_confirmation", report$privacy_status == "suppressed",
+            report$multi_policy_positive_keys == 3L, privacy_at > 0, owner_at > privacy_at,
+            length(report$supported_panels) == 0L,
+            !any(grepl("synthetic-person|synthetic-history|synthetic-policy", text)))
+  blocked(build_dashboard(modifyList(pending, list(output_dir = file.path(root, "policy-small-build"))),
+                          kit), "Policy additivity unconfirmed")
+  empty <- pending
+  empty$inputs$activity <- file.path(root, "policy-overlap.csv")
+  empty$dates <- list(start = "2025-01-01", end = "2025-01-31")
+  empty$output_dir <- file.path(root, "policy-empty-inspect")
+  capture.output(report <- inspect_dashboard(empty, kit))
+  coverage_at <- regexpr("Review source coverage", report$next_action, fixed = TRUE)
+  owner_at <- regexpr("export owner", report$next_action, fixed = TRUE)
+  stopifnot(report$status == "awaiting_policy_confirmation", report$privacy_status == "no_data",
+            report$rows_in_window == 0L, coverage_at > 0, owner_at > coverage_at)
+})
+test("multi-policy count covers all supplied rows, so an out-of-window overlap still blocks", {
+  earlier <- policy_activity
+  earlier$MetricDate <- "2026-05-15"
+  earlier[["Total Copilot Credits used"]] <- overlap_credits
+  window <- policy_activity
+  window[["Total Copilot Credits used"]] <- c(1:20, rep(0, 20))
+  write.csv(rbind(window, earlier), "policy-out-of-window.csv", row.names = FALSE)
+  outside <- policy_cfg
+  outside$inputs$activity <- file.path(root, "policy-out-of-window.csv")
+  outside$dates <- list(start = "2026-06-01", end = "2026-06-30")
+  outside_tables <- lapply(outside$inputs, read_csv)
+  blocked(validate_consumption(outside, outside_tables), "Policy additivity unconfirmed: 3 ")
+  outside$output_dir <- file.path(root, "policy-out-of-window-build")
+  blocked(build_dashboard(outside, kit), "Policy additivity unconfirmed")
+  stopifnot(!dir.exists(file.path(outside$output_dir, "build")))
+  outside$output_dir <- file.path(root, "policy-out-of-window-inspect")
+  capture.output(report <- inspect_dashboard(outside, kit))
+  stopifnot(report$status == "awaiting_policy_confirmation", report$rows_in_window == 40L,
+            report$multi_policy_positive_keys == 3L, identical(report$date_range, c("2026-06-01", "2026-06-01")))
+  outside$policy_additivity <- disjoint
+  data <- validate_consumption(outside, outside_tables)
+  stopifnot(nrow(data) == 40L, sum(aggregate_credits(data, 10)$table$credits) == 210)
+})
+test("policy-mapped build with group=true sums policy rows within each group", {
+  grouped <- policy_cfg
+  grouped$group <- TRUE
+  grouped$mappings$people$group <- "Organization"
+  grouped$policy_additivity <- disjoint
+  grouped$inputs <- list(activity = file.path(root, "policy-overlap.csv"),
+                         people = file.path(root, "synthetic-people.csv"))
+  grouped$output_dir <- file.path(root, "policy-grouped-build")
+  capture.output(build_dashboard(grouped, kit))
+  csv <- read.csv(file.path(grouped$output_dir, "build", "aggregates.csv"))
+  csv <- csv[order(csv$group), ]
+  # Compare labels without the CSV formula guard's apostrophe prefix.
+  stopifnot(identical(sub("^'", "", csv$group), c("Synthetic Alpha", "Synthetic Beta")),
+            all(csv$people == 10L), identical(csv$credits, c(70L, 155L)),
+            !any(grepl("synthetic-policy|synthetic-person|synthetic-history", unlist(csv))))
+})
 source(file.path(kit, "tests", "query-fixture-tests.R"))
 test("demo source isolation preflight: tracked references and exact copy targets", {
   for (report in c("consumption", "github")) {
