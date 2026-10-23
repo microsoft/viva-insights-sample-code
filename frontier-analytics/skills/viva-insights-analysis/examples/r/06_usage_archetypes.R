@@ -22,8 +22,8 @@
 #
 # The random generator is a minimal-standard (Park-Miller) generator written
 # out identically in python/06_usage_archetypes.py, so both scripts build the
-# same synthetic panel and the same classifications for the same seed.
-# Base R only.
+# same synthetic panel. Identical output was checked manually for the
+# committed seed. Base R only.
 
 SEED <- 20250105
 N_PEOPLE <- 600
@@ -164,24 +164,64 @@ surface_mix <- function(counts) {
   }
 }
 
-# Withhold cells under MIN_GROUP_SIZE. If exactly one cell is withheld and the
-# total is published, also withhold the next smallest cell so the first cannot
-# be recovered by subtraction. Real releases must check all related outputs
-# jointly rather than one table at a time.
-protect <- function(counts) {
-  shown <- ifelse(counts >= MIN_GROUP_SIZE, counts, NA)
-  if (sum(is.na(shown)) == 1) {
-    visible <- which(!is.na(shown))
-    if (length(visible) > 0) {
-      shown[visible[order(shown[visible], visible)][1]] <- NA
+# Boundary self-checks of the integer rule.
+stopifnot(
+  identical(surface_mix(c(4, 3, 2, 1)), "Specialised"),  # 40% share, 10-point lead
+  identical(surface_mix(c(4, 4, 1, 1)), "Broad"),        # tied leading groups
+  identical(surface_mix(c(8, 7, 5, 0)), "Specialised"),  # exactly 40% and 5 points
+  identical(surface_mix(c(8, 7, 6, 0)), "Broad"),        # share 8/21 is under 40%
+  is.na(surface_mix(c(0, 0, 0, 0)))                      # no group-weeks
+)
+
+# Return a withheld flag per cell. Cells under MIN_GROUP_SIZE are withheld.
+# Each margin is a vector of cell indices whose total is printed or can be
+# inferred (the table total is always included). Within every margin the
+# withheld cells must number at least two and sum to at least MIN_GROUP_SIZE,
+# so no single withheld cell can be recovered by subtraction. Otherwise the
+# smallest visible cell in that margin is also withheld. Real releases must
+# check all related outputs jointly.
+protect <- function(counts, margins = list()) {
+  n <- length(counts)
+  margins <- c(margins, list(seq_len(n)))
+  hidden <- counts < MIN_GROUP_SIZE
+  changed <- TRUE
+  while (changed && !all(hidden)) {
+    changed <- FALSE
+    for (margin in margins) {
+      withheld <- margin[hidden[margin]]
+      if (length(withheld) == 0 ||
+          (length(withheld) > 1 && sum(counts[withheld]) >= MIN_GROUP_SIZE)) {
+        next
+      }
+      visible <- margin[!hidden[margin]]
+      if (length(visible) > 0) {
+        hidden[visible[order(counts[visible], visible)][1]] <- TRUE
+      } else {
+        hidden[] <- TRUE
+      }
+      changed <- TRUE
+      break
     }
   }
-  ifelse(is.na(shown), "withheld", as.character(shown))
+  hidden
 }
 
-share <- function(numerator, denominator) {
-  if (numerator < MIN_GROUP_SIZE || denominator < MIN_GROUP_SIZE) {
-    return("withheld (fewer than 10)")
+show <- function(counts, hidden) {
+  ifelse(hidden, "withheld", as.character(counts))
+}
+
+# A share needs at least MIN_GROUP_SIZE people in the numerator, in its
+# complement, and in any group excluded from a printed parent total.
+publishable <- function(numerator, denominator, parent = NULL) {
+  excluded <- if (is.null(parent)) 0 else parent - denominator
+  numerator >= MIN_GROUP_SIZE &&
+    denominator - numerator >= MIN_GROUP_SIZE &&
+    !(excluded > 0 && excluded < MIN_GROUP_SIZE)
+}
+
+share <- function(numerator, denominator, parent = NULL) {
+  if (!publishable(numerator, denominator, parent)) {
+    return("withheld (a count, its complement or an excluded group is under 10)")
   }
   sprintf("%d of %d (%.1f%%)", as.integer(numerator), as.integer(denominator),
           100 * numerator / denominator)
@@ -275,7 +315,7 @@ cat("GitHub credits flag the GitHub group only and are never added to M365 credi
 # 6. Privacy-safe summaries -----------------------------------------------------
 cat(sprintf("\n=== Evidence states (groups under %d withheld) ===\n", MIN_GROUP_SIZE))
 state_counts <- vapply(STATES, function(s) sum(people$state == s), numeric(1))
-state_shown <- protect(state_counts)
+state_shown <- show(state_counts, protect(state_counts))
 for (k in seq_along(STATES)) {
   cat(sprintf("  %-52s %9s\n", STATES[k], state_shown[k]))
 }
@@ -283,15 +323,23 @@ cat(sprintf("  %-52s %9d\n", "Supplied synthetic roster", nrow(people)))
 
 cat(sprintf("\n=== Profiles among full profiles (groups under %d withheld) ===\n",
             MIN_GROUP_SIZE))
-profile_counts <- vapply(PROFILE_CODES, function(code) sum(people$profile == code, na.rm = TRUE),
-                         numeric(1))
-profile_shown <- protect(profile_counts)
+profile_counts <- unname(vapply(PROFILE_CODES,
+                                function(code) sum(people$profile == code, na.rm = TRUE),
+                                numeric(1)))
+# A median split makes the Lean and Intensive totals close to half of the
+# full profiles, so treat both as known margins in the disclosure check.
+lean_cells <- which(substr(PROFILE_CODES, 5, 5) == "L")
+intensive_cells <- which(substr(PROFILE_CODES, 5, 5) == "I")
+profile_hidden <- protect(profile_counts, list(lean_cells, intensive_cells))
+profile_shown <- show(profile_counts, profile_hidden)
 for (k in seq_along(PROFILE_CODES)) {
   cat(sprintf("  %s  %-36s %9s\n", PROFILE_CODES[k], PROFILE_LABELS[k], profile_shown[k]))
 }
 cat(sprintf("  %-42s %9d\n", "Full profiles", sum(full)))
-cat("  'withheld' means fewer than 10 people, or withheld so that another cell\n")
-cat("  cannot be recovered by subtraction. Withholding itself conveys information.\n")
+cat("  'withheld' marks cells under 10 and further cells chosen so that, within\n")
+cat("  the printed total and the Lean and Intensive totals implied by the median\n")
+cat("  split, withheld cells number at least two and sum to at least 10. Only\n")
+cat("  their combined total can be derived. Withholding itself conveys information.\n")
 
 # 7. Sensitivity diagnostics (Surface mix) --------------------------------------
 flags_by_person <- lapply(split(pw[, GROUPS], person),
@@ -320,11 +368,27 @@ for (k in which(full)) {
 }
 
 specialised <- full & people$surface_mix %in% "Specialised"
+n_full <- sum(full)
+all_changed <- sum(people$loo_surface_changed[full])
+s_total <- sum(specialised)
+s_changed <- sum(people$loo_surface_changed[specialised])
+# The Specialised total is printable only if it adds nothing to the profile
+# table: every Specialised cell, or every Broad cell, must be visible. The
+# Broad row follows by subtraction, so it must also be publishable.
+s_cells <- which(substr(PROFILE_CODES, 3, 3) == "S")
+b_cells <- which(substr(PROFILE_CODES, 3, 3) == "B")
+s_margin_safe <- !any(profile_hidden[s_cells]) || !any(profile_hidden[b_cells])
+specialised_row <- if (s_margin_safe && publishable(s_changed, s_total) &&
+                       publishable(all_changed - s_changed, n_full - s_total)) {
+  share(s_changed, s_total)
+} else {
+  "withheld (would reveal a withheld profile cell or a group under 10)"
+}
+
 cat("\n=== Sensitivity: Surface mix (stability diagnostics rather than observed change) ===\n")
 cat("Label changed in at least one leave-one-week recalculation:\n")
-cat(sprintf("  all full profiles: %s\n",
-            share(sum(people$loo_surface_changed[full]), sum(full))))
-cat(sprintf("  Specialised:       %s\n",
-            share(sum(people$loo_surface_changed[specialised]), sum(specialised))))
+cat(sprintf("  all full profiles: %s\n", share(all_changed, n_full)))
+cat(sprintf("  Specialised:       %s\n", specialised_row))
 cat("First versus last six weeks, label disagreement among people with\n")
-cat(sprintf("group-weeks in both halves: %s\n", share(split_disagree, split_eligible)))
+cat(sprintf("group-weeks in both halves: %s\n",
+            share(split_disagree, split_eligible, parent = n_full)))

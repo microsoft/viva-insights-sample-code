@@ -23,7 +23,7 @@ period. Never use them to rank or monitor individuals.
 
 The random generator is a minimal-standard (Park-Miller) generator written out
 identically in r/06_usage_archetypes.R, so both scripts build the same
-synthetic panel and the same classifications for the same seed.
+synthetic panel. Identical output was checked manually for the committed seed.
 """
 import pandas as pd
 
@@ -140,22 +140,59 @@ def surface_mix(counts):
     return "Broad"
 
 
-def protect(counts):
-    """Withhold cells under MIN_GROUP_SIZE. If exactly one cell is withheld and
-    the total is published, also withhold the next smallest cell so the first
-    cannot be recovered by subtraction. Real releases must check all related
-    outputs jointly rather than one table at a time."""
-    shown = [n if n >= MIN_GROUP_SIZE else None for n in counts]
-    if shown.count(None) == 1:
-        visible = sorted((n, k) for k, n in enumerate(shown) if n is not None)
-        if visible:
-            shown[visible[0][1]] = None
-    return ["withheld" if n is None else str(n) for n in shown]
+# Boundary self-checks of the integer rule.
+assert surface_mix([4, 3, 2, 1]) == "Specialised"  # 40% share, 10-point lead
+assert surface_mix([4, 4, 1, 1]) == "Broad"        # tied leading groups
+assert surface_mix([8, 7, 5, 0]) == "Specialised"  # exactly 40% and 5 points
+assert surface_mix([8, 7, 6, 0]) == "Broad"        # share 8/21 is under 40%
+assert surface_mix([0, 0, 0, 0]) is None           # no group-weeks
 
 
-def share(numerator, denominator):
-    if numerator < MIN_GROUP_SIZE or denominator < MIN_GROUP_SIZE:
-        return "withheld (fewer than 10)"
+def protect(counts, margins=()):
+    """Return a withheld flag per cell. Cells under MIN_GROUP_SIZE are withheld.
+    Each margin is a list of cell indices whose total is printed or can be
+    inferred (the table total is always included). Within every margin the
+    withheld cells must number at least two and sum to at least
+    MIN_GROUP_SIZE, so no single withheld cell can be recovered by
+    subtraction. Otherwise the smallest visible cell in that margin is also
+    withheld. Real releases must check all related outputs jointly."""
+    n = len(counts)
+    margins = list(margins) + [list(range(n))]
+    hidden = [c < MIN_GROUP_SIZE for c in counts]
+    changed = True
+    while changed and not all(hidden):
+        changed = False
+        for margin in margins:
+            withheld = [k for k in margin if hidden[k]]
+            if not withheld or (len(withheld) > 1
+                                and sum(counts[k] for k in withheld) >= MIN_GROUP_SIZE):
+                continue
+            visible = sorted((counts[k], k) for k in margin if not hidden[k])
+            if visible:
+                hidden[visible[0][1]] = True
+            else:
+                hidden = [True] * n
+            changed = True
+            break
+    return hidden
+
+
+def show(counts, hidden):
+    return ["withheld" if h else str(c) for c, h in zip(counts, hidden)]
+
+
+def publishable(numerator, denominator, parent=None):
+    """A share needs at least MIN_GROUP_SIZE people in the numerator, in its
+    complement, and in any group excluded from a printed parent total."""
+    excluded = 0 if parent is None else parent - denominator
+    return (numerator >= MIN_GROUP_SIZE
+            and denominator - numerator >= MIN_GROUP_SIZE
+            and not 0 < excluded < MIN_GROUP_SIZE)
+
+
+def share(numerator, denominator, parent=None):
+    if not publishable(numerator, denominator, parent):
+        return "withheld (a count, its complement or an excluded group is under 10)"
     return f"{numerator} of {denominator} ({100 * numerator / denominator:.1f}%)"
 
 
@@ -241,17 +278,24 @@ print("GitHub credits flag the GitHub group only and are never added to M365 cre
 # 6. Privacy-safe summaries ---------------------------------------------------
 print(f"\n=== Evidence states (groups under {MIN_GROUP_SIZE} withheld) ===")
 state_counts = [int((people["state"] == s).sum()) for s in STATES]
-for s, shown in zip(STATES, protect(state_counts)):
+for s, shown in zip(STATES, show(state_counts, protect(state_counts))):
     print(f"  {s:<52} {shown:>9}")
 print(f"  {'Supplied synthetic roster':<52} {len(people):>9}")
 
 print(f"\n=== Profiles among full profiles (groups under {MIN_GROUP_SIZE} withheld) ===")
 profile_counts = [int((people["profile"] == code).sum()) for code, _ in PROFILES]
-for (code, label), shown in zip(PROFILES, protect(profile_counts)):
+# A median split makes the Lean and Intensive totals close to half of the
+# full profiles, so treat both as known margins in the disclosure check.
+lean_cells = [k for k, (code, _) in enumerate(PROFILES) if code.endswith("L")]
+intensive_cells = [k for k, (code, _) in enumerate(PROFILES) if code.endswith("I")]
+profile_hidden = protect(profile_counts, [lean_cells, intensive_cells])
+for (code, label), shown in zip(PROFILES, show(profile_counts, profile_hidden)):
     print(f"  {code}  {label:<36} {shown:>9}")
 print(f"  {'Full profiles':<42} {int(full.sum()):>9}")
-print("  'withheld' means fewer than 10 people, or withheld so that another cell")
-print("  cannot be recovered by subtraction. Withholding itself conveys information.")
+print("  'withheld' marks cells under 10 and further cells chosen so that, within")
+print("  the printed total and the Lean and Intensive totals implied by the median")
+print("  split, withheld cells number at least two and sum to at least 10. Only")
+print("  their combined total can be derived. Withholding itself conveys information.")
 
 # 7. Sensitivity diagnostics (Surface mix) -------------------------------------
 flags_by_person = {pid: g[GROUPS].astype(int).values.tolist()
@@ -274,9 +318,26 @@ for pid, base in people.loc[full, ["PersonId", "surface_mix"]].itertuples(index=
 people["loo_surface_changed"] = people["PersonId"].map(loo_changed)
 
 specialised = full & (people["surface_mix"] == "Specialised")
+n_full = int(full.sum())
+all_changed = int(people.loc[full, "loo_surface_changed"].sum())
+s_total = int(specialised.sum())
+s_changed = int(people.loc[specialised, "loo_surface_changed"].sum())
+# The Specialised total is printable only if it adds nothing to the profile
+# table: every Specialised cell, or every Broad cell, must be visible. The
+# Broad row follows by subtraction, so it must also be publishable.
+s_cells = [k for k, (code, _) in enumerate(PROFILES) if code[2] == "S"]
+b_cells = [k for k, (code, _) in enumerate(PROFILES) if code[2] == "B"]
+s_margin_safe = (not any(profile_hidden[k] for k in s_cells)
+                 or not any(profile_hidden[k] for k in b_cells))
+if (s_margin_safe and publishable(s_changed, s_total)
+        and publishable(all_changed - s_changed, n_full - s_total)):
+    specialised_row = share(s_changed, s_total)
+else:
+    specialised_row = "withheld (would reveal a withheld profile cell or a group under 10)"
+
 print("\n=== Sensitivity: Surface mix (stability diagnostics rather than observed change) ===")
 print("Label changed in at least one leave-one-week recalculation:")
-print(f"  all full profiles: {share(int(people.loc[full, 'loo_surface_changed'].sum()), int(full.sum()))}")
-print(f"  Specialised:       {share(int(people.loc[specialised, 'loo_surface_changed'].sum()), int(specialised.sum()))}")
+print(f"  all full profiles: {share(all_changed, n_full)}")
+print(f"  Specialised:       {specialised_row}")
 print("First versus last six weeks, label disagreement among people with")
-print(f"group-weeks in both halves: {share(split_disagree, split_eligible)}")
+print(f"group-weeks in both halves: {share(split_disagree, split_eligible, parent=n_full)}")

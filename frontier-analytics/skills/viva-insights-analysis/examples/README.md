@@ -58,11 +58,15 @@ Prerequisites: `pip install vivainsights` (Python) or
    from `reference/usage-archetypes.md`. It assigns a named evidence state to
    everyone, then Consistency, Surface mix (integer group-week rule) and
    Metered use (median split of positive M365 credits, ties Lean) to full
-   profiles. It prints the context record, a profile summary that withholds
-   groups under 10, and leave-one-week and split-half sensitivity. Both
-   scripts share a small Park-Miller generator, so R and Python build the
-   same panel and produce identical classifications and output for the same
-   seed. The numbers describe synthetic data only.
+   profiles. It checks Surface mix boundary cases, then prints the context
+   record, a profile summary that withholds groups under 10 (with further
+   cells withheld so that no withheld cell can be recovered from printed or
+   median-implied totals), and leave-one-week and split-half sensitivity
+   with the same disclosure checks. Both scripts share a small Park-Miller
+   generator, so R and Python build the same panel. For the committed seed,
+   byte-identical output and identical person-level classifications were
+   checked manually. There is no automated parity test. The numbers describe
+   synthetic data only.
 
 ## Conventions on display in these examples
 
@@ -75,4 +79,5 @@ Sample dataset sizes differ slightly between packages (for instance the R
 `pq_data` has fewer person-weeks than the Python `load_pq_data()`), so exact
 counts in the printed output will not match line for line across languages. The
 shapes and conclusions do. Example 6 is the exception: its synthetic panel is
-generated identically in both languages, so its output matches exactly.
+generated identically in both languages, and its output was checked manually
+to match exactly for the committed seed.
