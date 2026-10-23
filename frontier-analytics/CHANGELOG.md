@@ -21,6 +21,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   with an explicit `policy_additivity` confirmation before multiple positive
   spending-policy rows for the same person, service and date are summed.
   Includes synthetic regression tests and four new dashboard skill evaluation cases.
+- New data pitfalls and causal-design checks for repeated network stocks and
+  their measurement windows, effective controls and cluster support.
+- Skill versions: `viva-insights-analysis` now records `metadata.version`
+  1.1.0, and `viva-insights-copilot-dashboards` moves from 1.0.0 to 1.1.0.
 
 - Optional `viva-insights-causal-analysis` skill and Person Query diagnostic
   prompt. Adds explicit measurement-frequency gates for organisational outcomes,
@@ -54,8 +58,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   documented layout as a dated variant, and separates key uniqueness from
   additivity. Organisational attributes come from the Person Query when the
   people metadata has no HR attributes.
-- New data pitfalls and causal-design checks for repeated network stocks and
-  their measurement windows, effective controls and cluster support.
 - The dashboard skill's adapt and Consumption references describe the
   policy-aware key, the additivity gate and `group: false` for metadata without
   HR attributes. The example real Consumption configuration follows the
