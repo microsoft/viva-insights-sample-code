@@ -4,32 +4,36 @@
   "repo_root": "../../../..",
   "output_dir": "../../../../../copilot-dashboard-work/real-consumption",
   "inputs": {
-    "activity": "../../../../../private-inputs/PersonServiceCreditsMetrics.csv",
+    "activity": "../../../../../private-inputs/PersonM365CreditsMetrics.csv",
     "people": "../../../../../private-inputs/PeopleMetaData.csv"
   },
   "mappings": {
     "activity": {
       "person_id": "PersonId",
       "service_id": "ServiceId",
+      "policy_id": "SpendingPolicyId",
       "date": "MetricDate",
       "people_id": "PeopleHistoricalId",
       "credits": "Total Copilot Credits used"
     },
     "people": {
       "people_id": "PeopleHistoricalId",
-      "licensed": "IsCopilotLicensed",
-      "group": "Organization"
+      "licensed": "IsCopilotLicensed"
     }
   },
   "mapping_approval": {
     "approved": false,
     "evidence": "REPLACE with analyst-reviewed export contract or approval reference; do not insert customer records."
   },
+  "policy_additivity": {
+    "confirmed": false,
+    "evidence": "REPLACE with the export owner's confirmation that SpendingPolicyId rows are disjoint; do not insert customer records."
+  },
   "granularity": "day",
   "dates": {
     "start": "2026-06-01",
     "end": "2026-06-30"
   },
-  "group": true,
+  "group": false,
   "privacy_min": 10
 }

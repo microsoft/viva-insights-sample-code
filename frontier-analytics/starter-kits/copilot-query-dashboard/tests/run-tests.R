@@ -293,6 +293,265 @@ test("HTML attribute values escaped and CSV formulas neutralized", {
   build_dashboard(bad, kit)
   csv <- read.csv(file.path(bad$output_dir, "build", "aggregates.csv"))
   stopifnot(all(csv$group == "'=1+1"))
+  stopifnot(identical(csv_safe_text(c("Synthetic Alpha", "plain", "=1+1", " +SUM(A1)", "-5", "@x",
+                                      "tab\there", "line\nbreak", "cr\rhere")),
+                      c("Synthetic Alpha", "plain", "'=1+1", "' +SUM(A1)", "'-5", "'@x",
+                        "'tab\there", "'line\nbreak", "'cr\rhere")))
+})
+# Policy-aware Consumption: synthetic people-service-days split across spending policies,
+# with metadata that carries no HR attributes (group=false).
+policy_people <- people[c("PeopleHistoricalId", "IsCopilotLicensed")]
+policy_activity <- expand.grid(PersonId = sprintf("synthetic-person-%02d", 1:20),
+                               SpendingPolicyId = c("synthetic-policy-a", "synthetic-policy-b"),
+                               stringsAsFactors = FALSE)
+policy_activity$ServiceId <- "Synthetic Service A"
+policy_activity$MetricDate <- "2026-06-01"
+policy_activity$PeopleHistoricalId <- people$PeopleHistoricalId[match(policy_activity$PersonId,
+                                                                   sprintf("synthetic-person-%02d", 1:20))]
+policy_activity[["Total Copilot Credits used"]] <- c(1:20, rep(0, 20))
+write.csv(policy_activity, "policy-activity.csv", row.names = FALSE)
+write.csv(policy_people, "policy-people.csv", row.names = FALSE)
+policy_cfg <- loaded
+policy_cfg$inputs <- list(activity = file.path(root, "policy-activity.csv"),
+                          people = file.path(root, "policy-people.csv"))
+policy_cfg$mappings$activity$policy_id <- "SpendingPolicyId"
+policy_cfg$mappings$people$group <- NULL
+policy_cfg$group <- FALSE
+policy_tables <- lapply(policy_cfg$inputs, read_csv)
+with_credits <- function(values) {
+  out <- policy_tables
+  out$activity[["Total Copilot Credits used"]] <- as.character(values)
+  out
+}
+overlap_credits <- c(1:20, 5, 5, 5, rep(0, 17))
+disjoint <- list(confirmed = TRUE, evidence = "Synthetic export-owner confirmation of disjoint policies")
+test("policy rows with one positive and other zero rows pass and sum per person-service-date", {
+  data <- validate_consumption(policy_cfg, policy_tables)
+  agg <- aggregate_credits(data, 10)
+  stopifnot(attr(data, "multi_policy_positive_keys") == 0L, nrow(data) == 40L,
+            agg$status == "ready", nrow(agg$table) == 1L, agg$table$people == 20L,
+            agg$table$credits == 210, agg$table$group == "All people")
+  built <- policy_cfg
+  built$output_dir <- file.path(root, "policy-zero-build")
+  capture.output(build_dashboard(built, kit))
+  csv <- read.csv(file.path(built$output_dir, "build", "aggregates.csv"))
+  prov <- jsonlite::read_json(file.path(built$output_dir, "build", "provenance.json"))
+  stopifnot(csv$credits == 210, csv$people == 20L,
+            !any(grepl("synthetic-policy|synthetic-person|synthetic-history", unlist(csv))),
+            identical(prov$mappings$activity$policy_id, "SpendingPolicyId"),
+            "policy_additivity" %in% names(prov), is.null(prov$policy_additivity))
+})
+test("multiple positive policy rows block build without additivity confirmation", {
+  err <- tryCatch({ validate_consumption(policy_cfg, with_credits(overlap_credits)); NULL },
+                  dashboard_error = function(e) conditionMessage(e))
+  stopifnot(!is.null(err), grepl("Policy additivity unconfirmed: 3 ", err, fixed = TRUE),
+            grepl("export owner", err), !grepl("synthetic", err, ignore.case = TRUE))
+  overlap <- policy_activity
+  overlap[["Total Copilot Credits used"]] <- overlap_credits
+  write.csv(overlap, "policy-overlap.csv", row.names = FALSE)
+  blocked_cfg <- policy_cfg
+  blocked_cfg$inputs$activity <- file.path(root, "policy-overlap.csv")
+  blocked_cfg$output_dir <- file.path(root, "policy-overlap-build")
+  blocked(build_dashboard(blocked_cfg, kit), "Policy additivity unconfirmed")
+  stopifnot(!dir.exists(file.path(blocked_cfg$output_dir, "build")))
+  blocked_cfg$policy_additivity <- list(confirmed = FALSE, evidence = "Pending export-owner reply")
+  blocked(validate_consumption(blocked_cfg, with_credits(overlap_credits)), "Policy additivity unconfirmed")
+})
+test("confirmed policy additivity with evidence allows build and sums policy rows", {
+  confirmed <- policy_cfg
+  confirmed$policy_additivity <- disjoint
+  data <- validate_consumption(confirmed, with_credits(overlap_credits))
+  agg <- aggregate_credits(data, 10)
+  stopifnot(attr(data, "multi_policy_positive_keys") == 3L, agg$status == "ready",
+            agg$table$people == 20L, agg$table$credits == 225)
+  confirmed$inputs$activity <- file.path(root, "policy-overlap.csv")
+  confirmed$output_dir <- file.path(root, "policy-confirmed-build")
+  capture.output(build_dashboard(confirmed, kit))
+  csv <- read.csv(file.path(confirmed$output_dir, "build", "aggregates.csv"))
+  prov <- jsonlite::read_json(file.path(confirmed$output_dir, "build", "provenance.json"))
+  stopifnot(csv$credits == 225, identical(prov$policy_additivity$confirmed, TRUE),
+            identical(prov$policy_additivity$evidence, disjoint$evidence))
+})
+test("confirmed policy additivity with blank evidence still blocks", {
+  for (evidence in c("", " ")) {
+    blank <- policy_cfg
+    blank$policy_additivity <- list(confirmed = TRUE, evidence = evidence)
+    blocked(validate_consumption(blank, with_credits(overlap_credits)), "Policy additivity unconfirmed")
+  }
+})
+test("policy-aware key rejects duplicates, blank policies and loose mappings", {
+  duplicate <- policy_tables
+  duplicate$activity <- rbind(duplicate$activity, duplicate$activity[1, ])
+  blocked(validate_consumption(policy_cfg, duplicate), "SpendingPolicyId, MetricDate")
+  for (value in c(NA_character_, "", " synthetic-policy-a")) {
+    bad <- policy_tables
+    bad$activity$SpendingPolicyId[1] <- value
+    blocked(validate_consumption(policy_cfg, bad), "identifiers")
+  }
+  bad <- policy_cfg
+  bad$mappings$activity$unknown_field <- "IsCopilotLicensed"
+  blocked(validate_consumption(bad, policy_tables), "exactly the documented")
+  bad <- policy_cfg
+  bad$mappings$activity$credits <- NULL
+  blocked(validate_consumption(bad, policy_tables), "exactly the documented")
+  bad <- policy_cfg
+  bad$mappings$activity$policy_id <- "PersonId"
+  blocked(validate_consumption(bad, policy_tables), "same source")
+  bad <- policy_cfg
+  bad$mappings$activity$policy_id <- "No such column"
+  blocked(validate_consumption(bad, policy_tables), "absent")
+})
+test("unmapped policy column with duplicated three-column key suggests SpendingPolicyId", {
+  unmapped <- policy_cfg
+  unmapped$mappings$activity$policy_id <- NULL
+  err <- tryCatch({ validate_consumption(unmapped, policy_tables); NULL },
+                  dashboard_error = function(e) conditionMessage(e))
+  stopifnot(!is.null(err), grepl("Duplicate activity key", err),
+            grepl("map it as activity policy_id", err, fixed = TRUE),
+            grepl("confirm policy additivity", err, fixed = TRUE))
+  unmapped$policy_additivity <- disjoint
+  blocked(validate_consumption(unmapped, policy_tables), "applies only when")
+})
+test("policy_additivity validated and rejected in demo and real GitHub modes", {
+  demo <- list(report = "consumption", mode = "demo", repo_root = repo,
+               output_dir = file.path(root, "demo-policy"), privacy_min = 10,
+               policy_additivity = list(confirmed = FALSE, evidence = "Synthetic"))
+  write_json(demo, "demo-policy.json")
+  blocked(read_config("demo-policy.json", kit), "fixed reference")
+  gh <- list(report = "github", mode = "real", repo_root = repo,
+             output_dir = file.path(root, "github-policy"),
+             inputs = list(activity = "synthetic-activity.csv"), privacy_min = 10,
+             policy_additivity = disjoint)
+  write_json(gh, "github-policy.json")
+  blocked(read_config("github-policy.json", kit), "does not accept analytical")
+  for (shape in list(list(confirmed = "yes", evidence = "Synthetic"),
+                     list(confirmed = TRUE),
+                     list(confirmed = TRUE, evidence = "Synthetic", extra = 1),
+                     list(confirmed = TRUE, evidence = 1), "confirmed")) {
+    bad <- cfg
+    bad$policy_additivity <- shape
+    write_json(bad, "bad-policy.json")
+    blocked(read_config("bad-policy.json", kit), "policy_additivity requires")
+  }
+  good <- cfg
+  good$policy_additivity <- disjoint
+  write_json(good, "good-policy.json")
+  stopifnot(identical(read_config("good-policy.json", kit)$policy_additivity, disjoint))
+})
+test("inspect reports policy grain and bounded multi-policy count without identifiers", {
+  pending <- policy_cfg
+  pending$inputs$activity <- file.path(root, "policy-overlap.csv")
+  pending$mapping_approval <- NULL
+  pending$output_dir <- file.path(root, "policy-inspect")
+  text <- capture.output(report <- inspect_dashboard(pending, kit))
+  stopifnot(report$status == "awaiting_policy_confirmation",
+            report$structural_validation == "passed",
+            report$grain == "PersonId + ServiceId + SpendingPolicyId + MetricDate; day export periods",
+            identical(report$multi_policy_positive_keys, 3L),
+            report$policy_additivity_status == "awaiting_confirmation",
+            grepl("export owner", report$next_action), grepl("Before deciding approval", report$next_action),
+            any(grepl("Spending policy breakdowns", report$excluded_panels)),
+            !any(grepl("synthetic-person|synthetic-history|synthetic-policy|Synthetic Service", text)))
+  saved <- jsonlite::read_json(file.path(pending$output_dir, "inspect", "readiness.json"))
+  stopifnot(saved$multi_policy_positive_keys == 3L,
+            !any(grepl("synthetic-person|synthetic-policy", unlist(saved[names(saved) != "provenance"]))))
+  pending$mapping_approval <- loaded$mapping_approval
+  pending$output_dir <- file.path(root, "policy-inspect-approved")
+  capture.output(report <- inspect_dashboard(pending, kit))
+  stopifnot(report$status == "awaiting_policy_confirmation")
+  pending$policy_additivity <- disjoint
+  pending$output_dir <- file.path(root, "policy-inspect-confirmed")
+  capture.output(report <- inspect_dashboard(pending, kit))
+  stopifnot(report$status == "ready", report$policy_additivity_status == "confirmed")
+  zero <- policy_cfg
+  zero$mapping_approval <- NULL
+  zero$output_dir <- file.path(root, "policy-inspect-zero")
+  capture.output(report <- inspect_dashboard(zero, kit))
+  stopifnot(report$status == "awaiting_approval", report$multi_policy_positive_keys == 0L,
+            report$policy_additivity_status == "not_required")
+  capture.output(report <- inspect_dashboard(modifyList(loaded, list(
+    mapping_approval = NULL, output_dir = file.path(root, "unmapped-policy-inspect"))), kit))
+  stopifnot(report$grain == "PersonId + ServiceId + MetricDate; day export periods",
+            is.null(report$multi_policy_positive_keys), is.null(report$policy_additivity_status))
+})
+test("real Consumption example maps SpendingPolicyId and inspects metadata without HR attributes", {
+  example <- jsonlite::read_json(file.path(kit, "configs", "real-consumption.example.json"))
+  stopifnot(basename(example$inputs$activity) == "PersonM365CreditsMetrics.csv",
+            identical(example$mappings$activity$policy_id, "SpendingPolicyId"),
+            identical(example$policy_additivity$confirmed, FALSE),
+            grepl("^REPLACE", example$policy_additivity$evidence),
+            identical(example$group, FALSE), is.null(example$mappings$people$group))
+  example$repo_root <- repo
+  example$output_dir <- file.path(root, "example-policy")
+  example$inputs <- list(activity = "policy-overlap.csv", people = "policy-people.csv")
+  write_json(example, "example-policy.json")
+  capture.output(report <- run_dashboard("inspect", "example-policy.json", kit))
+  stopifnot(report$status == "awaiting_policy_confirmation", report$multi_policy_positive_keys == 3L)
+  blocked(build_dashboard(read_config("example-policy.json", kit), kit), "approval")
+})
+test("pending additivity stays in next_action when privacy withholds or the window is empty", {
+  small <- policy_activity[policy_activity$PersonId %in% sprintf("synthetic-person-%02d", 1:9), ]
+  small[["Total Copilot Credits used"]] <- c(1:9, 5, 5, 5, rep(0, 6))
+  write.csv(small, "policy-small.csv", row.names = FALSE)
+  pending <- policy_cfg
+  pending$inputs$activity <- file.path(root, "policy-small.csv")
+  pending$output_dir <- file.path(root, "policy-small-inspect")
+  text <- capture.output(report <- inspect_dashboard(pending, kit))
+  privacy_at <- regexpr("approval does not override privacy", report$next_action, fixed = TRUE)
+  owner_at <- regexpr("export owner", report$next_action, fixed = TRUE)
+  stopifnot(report$status == "awaiting_policy_confirmation", report$privacy_status == "suppressed",
+            report$multi_policy_positive_keys == 3L, privacy_at > 0, owner_at > privacy_at,
+            length(report$supported_panels) == 0L,
+            !any(grepl("synthetic-person|synthetic-history|synthetic-policy", text)))
+  blocked(build_dashboard(modifyList(pending, list(output_dir = file.path(root, "policy-small-build"))),
+                          kit), "Policy additivity unconfirmed")
+  empty <- pending
+  empty$inputs$activity <- file.path(root, "policy-overlap.csv")
+  empty$dates <- list(start = "2025-01-01", end = "2025-01-31")
+  empty$output_dir <- file.path(root, "policy-empty-inspect")
+  capture.output(report <- inspect_dashboard(empty, kit))
+  coverage_at <- regexpr("Review source coverage", report$next_action, fixed = TRUE)
+  owner_at <- regexpr("export owner", report$next_action, fixed = TRUE)
+  stopifnot(report$status == "awaiting_policy_confirmation", report$privacy_status == "no_data",
+            report$rows_in_window == 0L, coverage_at > 0, owner_at > coverage_at)
+})
+test("multi-policy count covers all supplied rows, so an out-of-window overlap still blocks", {
+  earlier <- policy_activity
+  earlier$MetricDate <- "2026-05-15"
+  earlier[["Total Copilot Credits used"]] <- overlap_credits
+  window <- policy_activity
+  window[["Total Copilot Credits used"]] <- c(1:20, rep(0, 20))
+  write.csv(rbind(window, earlier), "policy-out-of-window.csv", row.names = FALSE)
+  outside <- policy_cfg
+  outside$inputs$activity <- file.path(root, "policy-out-of-window.csv")
+  outside$dates <- list(start = "2026-06-01", end = "2026-06-30")
+  outside_tables <- lapply(outside$inputs, read_csv)
+  blocked(validate_consumption(outside, outside_tables), "Policy additivity unconfirmed: 3 ")
+  outside$output_dir <- file.path(root, "policy-out-of-window-build")
+  blocked(build_dashboard(outside, kit), "Policy additivity unconfirmed")
+  stopifnot(!dir.exists(file.path(outside$output_dir, "build")))
+  outside$output_dir <- file.path(root, "policy-out-of-window-inspect")
+  capture.output(report <- inspect_dashboard(outside, kit))
+  stopifnot(report$status == "awaiting_policy_confirmation", report$rows_in_window == 40L,
+            report$multi_policy_positive_keys == 3L, identical(report$date_range, c("2026-06-01", "2026-06-01")))
+  outside$policy_additivity <- disjoint
+  data <- validate_consumption(outside, outside_tables)
+  stopifnot(nrow(data) == 40L, sum(aggregate_credits(data, 10)$table$credits) == 210)
+})
+test("policy-mapped build with group=true sums policy rows within each group", {
+  grouped <- policy_cfg
+  grouped$group <- TRUE
+  grouped$mappings$people$group <- "Organization"
+  grouped$policy_additivity <- disjoint
+  grouped$inputs <- list(activity = file.path(root, "policy-overlap.csv"),
+                         people = file.path(root, "synthetic-people.csv"))
+  grouped$output_dir <- file.path(root, "policy-grouped-build")
+  capture.output(build_dashboard(grouped, kit))
+  csv <- read.csv(file.path(grouped$output_dir, "build", "aggregates.csv"))
+  csv <- csv[order(csv$group), ]
+  stopifnot(identical(csv$group, c("Synthetic Alpha", "Synthetic Beta")),
+            all(csv$people == 10L), identical(csv$credits, c(70L, 155L)),
+            !any(grepl("synthetic-policy|synthetic-person|synthetic-history", unlist(csv))))
 })
 source(file.path(kit, "tests", "query-fixture-tests.R"))
 test("demo source isolation preflight: tracked references and exact copy targets", {

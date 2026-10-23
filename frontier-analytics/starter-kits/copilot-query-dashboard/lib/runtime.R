@@ -44,7 +44,8 @@ read_config <- function(path, kit) {
   path <- normalizePath(path, winslash = "/", mustWork = TRUE)
   cfg <- jsonlite::fromJSON(path, simplifyVector = FALSE)
   allowed <- c("report", "mode", "repo_root", "output_dir", "inputs", "mappings",
-               "mapping_approval", "granularity", "dates", "group", "privacy_min")
+               "mapping_approval", "policy_additivity", "granularity", "dates", "group",
+               "privacy_min")
   if (!is.list(cfg) || is.null(names(cfg)) || anyDuplicated(names(cfg)) ||
       any(!names(cfg) %in% allowed)) fail("Unknown or duplicate configuration fields.")
   if (!scalar_text(cfg$report) || !cfg$report %in% c("consumption", "github"))
@@ -75,13 +76,25 @@ read_config <- function(path, kit) {
     bounds <- strict_date(c(cfg$dates$start, cfg$dates$end))
     if (bounds[1] > bounds[2]) fail("dates.start must not exceed dates.end.")
   }
+  if (!is.null(cfg$policy_additivity)) {
+    additivity <- cfg$policy_additivity
+    if (!is.list(additivity) || is.null(names(additivity)) ||
+        anyDuplicated(names(additivity)) ||
+        !setequal(names(additivity), c("confirmed", "evidence")) ||
+        !is.logical(additivity$confirmed) || length(additivity$confirmed) != 1L ||
+        is.na(additivity$confirmed) || !is.character(additivity$evidence) ||
+        length(additivity$evidence) != 1L || is.na(additivity$evidence))
+      fail("policy_additivity requires exactly confirmed (true or false) and evidence (a string).")
+  }
   if (cfg$report == "github" && cfg$mode == "real" &&
-      any(c("dates", "group", "granularity", "mappings", "mapping_approval") %in% names(cfg)))
+      any(c("dates", "group", "granularity", "mappings", "mapping_approval",
+            "policy_additivity") %in% names(cfg)))
     fail("Real GitHub inspection does not accept analytical filters, mappings, or approval settings because no verified adapter exists.")
   if (cfg$mode == "demo" && (!is.null(cfg$inputs) || !is.null(cfg$mappings)))
     fail("Demo mode does not accept real inputs or mappings.")
   if (cfg$mode == "demo" && (cfg$privacy_min != 10L || cfg$group ||
-      !is.null(cfg$dates) || !is.null(cfg$granularity) || !is.null(cfg$mapping_approval)))
+      !is.null(cfg$dates) || !is.null(cfg$granularity) || !is.null(cfg$mapping_approval) ||
+      !is.null(cfg$policy_additivity)))
     fail("Demo reproduces fixed reference settings (privacy_min=10); real-data filters, approvals and custom thresholds do not apply.")
   if (!is.null(cfg$inputs)) {
     if (!is.list(cfg$inputs) || is.null(names(cfg$inputs)) ||
@@ -131,7 +144,8 @@ provenance <- function(cfg, action, inputs, kit) {
        generated_utc = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
        granularity = cfg$granularity, privacy_min = cfg$privacy_min,
        group = cfg$group, dates = cfg$dates,
-       mapping_approval = cfg$mapping_approval, mappings = cfg$mappings)
+       mapping_approval = cfg$mapping_approval,
+       policy_additivity = cfg$policy_additivity, mappings = cfg$mappings)
 }
 
 read_csv <- function(path) {
@@ -151,17 +165,18 @@ read_csv <- function(path) {
   data
 }
 
-mapped <- function(data, mapping, required) {
+mapped <- function(data, mapping, required, optional = character()) {
   if (!is.list(mapping) || is.null(names(mapping)) || anyDuplicated(names(mapping)) ||
-      !setequal(names(mapping), required) ||
+      !all(required %in% names(mapping)) ||
+      !all(names(mapping) %in% c(required, optional)) ||
       !all(vapply(mapping, scalar_text, logical(1))))
-    fail("Explicit mappings must contain exactly the documented required fields.")
+    fail("Explicit mappings must contain exactly the documented required fields and only documented optional fields.")
   columns <- unlist(mapping, use.names = FALSE)
   if (anyDuplicated(columns)) fail("Two mapped fields cannot use the same source column.")
   if (!all(columns %in% names(data))) fail("A mapped source column is absent; review the schema.")
   data <- data[, columns, drop = FALSE]
   names(data) <- names(mapping)
-  data[, required, drop = FALSE]
+  data[, c(required, optional[optional %in% names(mapping)]), drop = FALSE]
 }
 
 require_ids <- function(data, columns) {
@@ -177,6 +192,18 @@ has_mapping_approval <- function(cfg) {
   is.list(approval) && identical(approval$approved, TRUE) && scalar_text(approval$evidence)
 }
 
+has_policy_additivity <- function(cfg) {
+  additivity <- cfg$policy_additivity
+  is.list(additivity) && identical(additivity$confirmed, TRUE) && scalar_text(additivity$evidence)
+}
+
+# Counts person-service-date keys with more than one positive-credit policy row.
+# A positive row beside zero rows is not ambiguous, so zero rows are ignored.
+multi_policy_positive_keys <- function(data) {
+  positive <- data[data$credits > 0, c("person_id", "service_id", "date"), drop = FALSE]
+  nrow(unique(positive[duplicated(positive), , drop = FALSE]))
+}
+
 validate_consumption <- function(cfg, tables, require_approval = TRUE) {
   if (is.null(cfg$granularity)) fail("Declare export granularity explicitly: day, week, or month.")
   if (require_approval && !has_mapping_approval(cfg))
@@ -186,14 +213,21 @@ validate_consumption <- function(cfg, tables, require_approval = TRUE) {
   if (is.null(tables$activity) || is.null(tables$people))
     fail("Consumption requires both activity and people metadata CSVs.")
   a <- mapped(tables$activity, cfg$mappings$activity,
-              c("person_id", "service_id", "date", "people_id", "credits"))
+              c("person_id", "service_id", "date", "people_id", "credits"), "policy_id")
+  policy <- "policy_id" %in% names(a)
+  if (!policy && !is.null(cfg$policy_additivity))
+    fail("policy_additivity applies only when the activity mapping includes policy_id.")
   required <- c("people_id", "licensed", if (cfg$group) "group")
   p <- mapped(tables$people, cfg$mappings$people, required)
-  require_ids(a, c("person_id", "service_id", "people_id"))
+  require_ids(a, c("person_id", "service_id", "people_id", if (policy) "policy_id"))
   require_ids(p, c("people_id", if (cfg$group) "group"))
   a$date <- strict_date(a$date)
-  if (anyDuplicated(a[c("person_id", "service_id", "date")]))
-    fail("Duplicate activity key: expected one row per PersonId, ServiceId, MetricDate.")
+  if (policy && anyDuplicated(a[c("person_id", "service_id", "policy_id", "date")]))
+    fail("Duplicate activity key: expected one row per PersonId, ServiceId, SpendingPolicyId, MetricDate.")
+  if (!policy && anyDuplicated(a[c("person_id", "service_id", "date")]))
+    fail(paste("Duplicate activity key: expected one row per PersonId, ServiceId, MetricDate.",
+               "If the export has a SpendingPolicyId column, map it as activity policy_id",
+               "and confirm policy additivity with the export owner before building."))
   if (anyDuplicated(p$people_id)) fail("Duplicate PeopleHistoricalId in metadata; join is ambiguous.")
   links <- unique(a[c("people_id", "person_id")])
   if (anyDuplicated(links$people_id))
@@ -204,6 +238,14 @@ validate_consumption <- function(cfg, tables, require_approval = TRUE) {
   a$credits <- suppressWarnings(as.numeric(a$credits))
   if (any(!is.finite(a$credits)) || any(a$credits < 0))
     fail("Credits must be nonnegative finite numbers.")
+  # Key uniqueness does not prove additivity: several positive policy rows for one
+  # person-service-date need confirmed disjoint policies before they are summed.
+  multi_policy <- if (policy) multi_policy_positive_keys(a) else NA_integer_
+  if (require_approval && policy && multi_policy > 0L && !has_policy_additivity(cfg))
+    fail(paste0("Policy additivity unconfirmed: ", multi_policy,
+                " PersonId, ServiceId, MetricDate keys have more than one SpendingPolicyId row",
+                " with positive credits. Confirm with the export owner that these policy rows are",
+                " disjoint, then set policy_additivity.confirmed=true with nonblank evidence."))
   if (anyNA(p$licensed) || any(!tolower(p$licensed) %in% c("true", "false")))
     fail("IsCopilotLicensed must contain explicit true/false values; activity does not establish licensing.")
   match_id <- match(a$people_id, p$people_id)
@@ -215,6 +257,7 @@ validate_consumption <- function(cfg, tables, require_approval = TRUE) {
     end <- strict_date(cfg$dates$end)
     a <- a[a$date >= start & a$date <= end, , drop = FALSE]
   }
+  attr(a, "multi_policy_positive_keys") <- multi_policy
   a
 }
 
@@ -312,33 +355,53 @@ inspect_dashboard <- function(cfg, kit) {
     } else {
       release <- aggregate_credits(validation, cfg$privacy_min)
       approved <- has_mapping_approval(cfg)
-      report$status <- if (approved) release$status else "awaiting_approval"
+      policy <- "policy_id" %in% names(validation)
+      multi_policy <- attr(validation, "multi_policy_positive_keys")
+      additivity_pending <- policy && multi_policy > 0L && !has_policy_additivity(cfg)
+      report$status <- if (additivity_pending) "awaiting_policy_confirmation" else
+        if (approved) release$status else "awaiting_approval"
       report$structural_validation <- "passed"
       report$approval_status <- if (approved) "approved" else "awaiting_approval"
       report$privacy_status <- release$status
+      if (policy) {
+        report$multi_policy_positive_keys <- multi_policy
+        report$policy_additivity_status <- if (multi_policy == 0L) "not_required" else
+          if (additivity_pending) "awaiting_confirmation" else "confirmed"
+      }
       report$supported_panels <- if (release$status == "ready")
         c("Copilot credits by source period and service",
           if (cfg$group) "Copilot credits by configured metadata group") else character()
       report$excluded_panels <- c(
         "Tokens and task types: absent from the verified Consumption contract",
         "Sessions, user limits and spending policy limits: not implemented by this credits-only adapter",
+        if (policy) "Spending policy breakdowns: credits are summed across SpendingPolicyId rows, not reported per policy",
         "Person Query associations and GitHub panels: no verified real-data adapter",
         "Licensed population denominators, individual ranks, causal/ROI/productivity/burnout claims: unsupported",
         if (release$status != "ready") "All aggregate panels: withheld by privacy or unavailable in the selected window")
-      report$grain <- paste("PersonId + ServiceId + MetricDate;", cfg$granularity, "export periods")
+      report$grain <- paste(if (policy) "PersonId + ServiceId + SpendingPolicyId + MetricDate;" else
+        "PersonId + ServiceId + MetricDate;", cfg$granularity, "export periods")
       report$metric_unit <- "Copilot credits, as explicitly mapped; not currency. Confirm source semantics before approval."
       report$rows_in_window <- nrow(validation)
       report$distinct_people <- length(unique(validation$person_id))
       report$date_range <- if (nrow(validation)) as.character(range(validation$date)) else character()
+      additivity_action <- paste(
+        "Several SpendingPolicyId rows carry positive credits for the same person, service and date.",
+        "Before deciding approval, confirm with the export owner that these policy rows are disjoint,",
+        "then set policy_additivity.confirmed=true with nonblank evidence and inspect again.")
       report$next_action <- if (release$status == "suppressed") {
         "All aggregate panels are withheld. Review an appropriately broader source scope and inspect again; approval does not override privacy."
       } else if (release$status == "no_data") {
         "Review source coverage and the selected period window, then inspect again; no panels are available."
+      } else if (additivity_pending) {
+        additivity_action
       } else if (!approved) {
         "Review the validated scope, declared units/granularity and excluded panels with the user. Only after their decision, set mapping_approval.approved=true with nonblank evidence, then build."
       } else {
         "Build the approved supported panels; no values/identifiers are included in this inspection."
       }
+      # Privacy and coverage come first, but a pending additivity check is never hidden.
+      if (additivity_pending && release$status != "ready")
+        report$next_action <- paste(report$next_action, additivity_action)
     }
   }
   report$provenance <- provenance(cfg, "inspect", inputs, kit)
@@ -404,6 +467,13 @@ dashboard_html <- function(release, cfg,
          '</body></html>')
 }
 
+# Prefix spreadsheet-formula triggers and control characters so CSV viewers treat labels as text.
+csv_safe_text <- function(x) {
+  dangerous <- grepl("^[[:space:]]*[=+@-]|[\r\n\t]", x)
+  x[dangerous] <- paste0("'", x[dangerous])
+  x
+}
+
 build_dashboard <- function(cfg, kit) {
   if (cfg$mode != "real") fail("build is real-only. Use reproduce for synthetic references.")
   if (cfg$report == "github")
@@ -422,10 +492,7 @@ build_dashboard <- function(cfg, kit) {
   dest <- output_folder(cfg, "build")
   # Do not serialize pre-suppression counts, raw rows, keys, or group labels.
   csv <- release$table
-  for (column in c("service", "group")) {
-    dangerous <- grepl("^[[:space:]]*[=+@-]|[\\r\\n\\t]", csv[[column]])
-    csv[[column]][dangerous] <- paste0("'", csv[[column]][dangerous])
-  }
+  for (column in c("service", "group")) csv[[column]] <- csv_safe_text(csv[[column]])
   utils::write.csv(csv, file.path(dest, "aggregates.csv"), row.names = FALSE,
                    fileEncoding = "UTF-8")
   writeLines(dashboard_html(release, cfg, prov$generated_utc),

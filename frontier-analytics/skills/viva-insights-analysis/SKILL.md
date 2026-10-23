@@ -4,16 +4,18 @@ description: >
   Analyze Microsoft Viva Insights data with the open-source vivainsights R and
   Python packages. Use this skill whenever working with Viva Insights query
   exports (Person Query, Meeting Query, Consumption query, GitHub query,
-  person-to-person or group-to-group
-  network queries) or the vivainsights packages: importing and validating a
-  query, computing metrics, segmenting Copilot usage, building the standard
-  visualisations, running network or information-value analysis, building a
-  common deliverable (adoption dashboard, executive summary memo, ROI estimate),
-  and avoiding the well-known export data pitfalls (IsManager strings, "#N/A"
-  text, non-English locales, privacy thresholds, trailing-window metric
-  plateaus, holiday weeks). It also points to the viva-insights-sample-code
-  repo and its Frontier Analytics toolkit for ready-made prompts, starter kits,
-  and schema docs.
+  person-to-person or group-to-group network queries) or the vivainsights
+  packages: importing and validating a query, computing metrics, segmenting
+  Copilot usage (including experimental usage archetypes), building the
+  standard visualisations, running network or information-value analysis,
+  building a common deliverable (adoption dashboard, executive summary memo,
+  ROI estimate), and avoiding the well-known export data pitfalls (IsManager
+  strings, "#N/A" text, non-English locales, privacy thresholds,
+  trailing-window metric plateaus, holiday weeks). It also points to the
+  viva-insights-sample-code repo and its Frontier Analytics toolkit for
+  ready-made prompts, starter kits, and schema docs.
+metadata:
+  version: "1.1.0"
 ---
 
 ## What this skill is for
@@ -36,11 +38,13 @@ validate, analyse, and visualise those exports in a consistent, best-practice wa
 Use this skill when a task involves any of:
 
 - Importing or validating a Viva Insights query export.
-- Checking Consumption or GitHub query evidence, grain, joins and coverage
+- Checking Consumption, GitHub or Agent query evidence, grain, joins and coverage
   before analysis; see the dedicated on-demand contract reference.
 - Computing or visualising collaboration, meeting, email, focus, after-hours, or
   Copilot metrics.
 - Segmenting a licensed population by Copilot usage.
+- Describing how AI use is spread over time and across tool groups with the
+  experimental usage archetypes, alongside the unchanged usage ladder.
 - Person-to-person or group-to-group network analysis.
 - Information Value / driver analysis, key-metrics scans, interrupted time-series.
 - Debugging why a Viva Insights export loaded or aggregated strangely.
@@ -97,9 +101,10 @@ everything:
 |---|---|
 | `reference/packages.md` | The function inventory, grouped by purpose, with R/Python parity and verified signatures. A curated complement to the live `llms.txt` (see above). |
 | `reference/query-schemas.md` | The shape of each query type (grain, key columns, raw vs imported column names) and the meeting quality filter. |
-| `reference/copilot-query-contracts.md` | Consumption or GitHub query analysis: documented versus illustrative inputs, joins, coverage, units, privacy and claim limits. |
+| `reference/copilot-query-contracts.md` | Consumption, GitHub or Agent query analysis: documented versus illustrative inputs, joins, coverage, units, privacy and claim limits. |
 | `reference/data-pitfalls.md` | To diagnose or pre-empt a loading / aggregation problem (IsManager, "#N/A", locales, privacy threshold, trailing windows, holidays). |
 | `reference/analysis-conventions.md` | To write honest, defensible claims (association vs causation), segment definitions, and period framing. |
+| `reference/usage-archetypes.md` | Experimental usage archetypes (Consistency, Surface mix, Metered use): reference rule v1, evidence states, context record, sensitivity diagnostics, publication and governance rules. Descriptive only. |
 | `reference/deliverables.md` | To build a standard deliverable (adoption dashboard, executive summary, ROI estimate, usage segmentation) when there is no Frontier Analytics prompt card for the task, or the user wants a faster first pass. |
 | `reference/ecosystem.md` | The canonical upstream: package docs, the sample-code repo, and the Frontier Analytics toolkit to defer to. |
 | `reference/environment.md` | Practical run tips: performant loads, headless plotting, script-file vs inline execution. |
@@ -110,7 +115,8 @@ The `examples/` folder has matched Python and R scripts that run against the
 built-in sample datasets (no customer data), each verified end-to-end. See
 `examples/README.md` for the index. They cover import and validation, metric
 ranking, Copilot usage segmentation, the Meeting Query quality filter, and
-person-to-person network analysis.
+person-to-person network analysis. Example 6 applies the experimental usage
+archetypes to a seeded synthetic panel generated in the script.
 
 ## Minimal workflow
 

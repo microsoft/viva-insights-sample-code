@@ -8,6 +8,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Experimental AI usage archetype guidance for the `viva-insights-analysis`
+  skill: three descriptive dimensions (Consistency, Surface mix, Metered use),
+  a versioned reference rule with explicit measurement units, evidence states,
+  sensitivity diagnostics and publication rules. Includes matched synthetic
+  R and Python examples, and a link from the Copilot Usage Segments page. The
+  existing usage ladder is unchanged.
+- Agent query rules in the shared query contract, covering the activity layout
+  observed in real exports, optional agent metadata and the earlier
+  credits/responses layout as a dated variant.
+- Optional policy-aware Consumption key in the dashboard runner (`policy_id`),
+  with an explicit `policy_additivity` confirmation before multiple positive
+  spending-policy rows for the same person, service and date are summed.
+  Includes synthetic regression tests and four new dashboard skill evaluation cases.
+- New data pitfalls and causal-design checks for repeated network stocks and
+  their measurement windows, effective controls and cluster support.
+- Skill versions: `viva-insights-analysis` now records `metadata.version`
+  1.1.0, and `viva-insights-copilot-dashboards` moves from 1.0.0 to 1.1.0.
+
 - Optional `viva-insights-causal-analysis` skill and Person Query diagnostic
   prompt. Adds explicit measurement-frequency gates for organisational outcomes,
   design/inference and privacy contracts, a report specification, and matched
@@ -34,6 +52,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `reference/deliverables.md` in the `viva-insights-analysis` skill, distilling the same dashboard, executive summary, ROI, and segmentation conventions used in the prompt cards, so a Skill-driven session can produce those deliverables without a prompt card being pasted.
 
 ### Changed
+
+- The Consumption contract now records the four-file layout and
+  `SpendingPolicyId` native key observed in real exports, keeps the earlier
+  documented layout as a dated variant, and separates key uniqueness from
+  additivity. Organisational attributes come from the Person Query when the
+  people metadata has no HR attributes.
+- The dashboard skill's adapt and Consumption references describe the
+  policy-aware key, the additivity gate and `group: false` for metadata without
+  HR attributes. The example real Consumption configuration follows the
+  observed layout.
 
 - Existing dashboard guidance now requires licence/coverage evidence, stops on
   duplicate keys and uses privacy-protected groups rather than individual ranks.

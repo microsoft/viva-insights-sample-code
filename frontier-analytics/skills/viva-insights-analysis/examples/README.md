@@ -1,12 +1,14 @@
 # Worked examples
 
 Small, self-contained examples that run against the packages' **built-in sample
-datasets**, so they need no customer data and produce no privacy risk. Each
+datasets** or, for example 6, a seeded synthetic panel generated in the script,
+so they need no customer data and produce no privacy risk. Each
 concept is provided as a matched pair: one Python script under `python/` and the
 equivalent R script under `r/`.
 
 All scripts were verified to run end-to-end (exit 0) against R `vivainsights`
-0.7.0.9000 and Python `vivainsights` 0.4.2.
+0.7.0.9000 and Python `vivainsights` 0.4.2. Example 6 was verified with R 4.6.1
+(base R only) and Python 3.14 with `pandas` 3.0.5.
 
 | # | Topic | Python | R |
 |---|---|---|---|
@@ -15,6 +17,7 @@ All scripts were verified to run end-to-end (exit 0) against R `vivainsights`
 | 3 | Copilot usage segmentation | `python/03_copilot_segmentation.py` | `r/03_copilot_segmentation.R` |
 | 4 | Meeting Query quality filter | `python/04_meeting_quality.py` | `r/04_meeting_quality.R` |
 | 5 | Person-to-person network | `python/05_network_analysis.py` | `r/05_network_analysis.R` |
+| 6 | Usage archetypes (experimental) | `python/06_usage_archetypes.py` | `r/06_usage_archetypes.R` |
 
 ## Running
 
@@ -29,7 +32,8 @@ Rscript examples/r/01_import_and_validate.R
 
 Prerequisites: `pip install vivainsights` (Python) or
 `install.packages("vivainsights")` (R). Example 2 also uses `ggplot2` in R and
-`matplotlib` in Python for the saved plot.
+`matplotlib` in Python for the saved plot. Example 6 needs only base R, or
+`pandas` in Python (installed with `vivainsights`).
 
 ## What each example shows
 
@@ -49,10 +53,28 @@ Prerequisites: `pip install vivainsights` (Python) or
    node centrality. The R sample ships HR attributes so it runs directly. The
    Python sample is a bare edge list, so the script attaches a clearly labelled
    illustrative group that you replace with real HR attributes.
+6. **Usage archetypes (experimental).** Generates a seeded, clearly labelled
+   synthetic person-week panel in the script and applies reference rule v1
+   from `reference/usage-archetypes.md`. It assigns a named evidence state to
+   everyone, then Consistency, Surface mix (integer group-week rule) and
+   Metered use (median split of positive M365 credits, ties Lean) to full
+   profiles. It checks Surface mix boundary cases, then prints the context
+   record, a profile summary that withholds groups under 10 (with further
+   cells withheld so that no withheld cell can be recovered from printed or
+   median-implied totals), and leave-one-week and split-half sensitivity
+   with the same disclosure checks. The full-profile count reappears as the
+   profile total and the sensitivity denominator. So whenever the
+   evidence-state table withholds it, including whenever the other states
+   together number fewer than 10, the profile summary and sensitivity are
+   replaced by a "population too small for this breakdown" message. Both
+   scripts share a small Park-Miller generator, so R and Python build the
+   same panel. For the committed seed, byte-identical output and identical
+   person-level classifications were checked manually. There is no automated
+   parity test. The numbers describe synthetic data only.
 
 ## Conventions on display in these examples
 
-- Built-in sample data only, never customer data.
+- Built-in sample data or in-script synthetic data only, never customer data.
 - Headless, file-based plotting so scripts never block.
 - Framing that favors association over causation, with explicit units (for example hours rather than minutes).
 - Any fabricated field (the illustrative network group) is labelled as such.
@@ -60,4 +82,6 @@ Prerequisites: `pip install vivainsights` (Python) or
 Sample dataset sizes differ slightly between packages (for instance the R
 `pq_data` has fewer person-weeks than the Python `load_pq_data()`), so exact
 counts in the printed output will not match line for line across languages. The
-shapes and conclusions do.
+shapes and conclusions do. Example 6 is the exception: its synthetic panel is
+generated identically in both languages, and its output was checked manually
+to match exactly for the committed seed.

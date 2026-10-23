@@ -32,6 +32,30 @@
       "forbidden": ["arbitrary deduplication", "print employee records"]
     },
     {
+      "id": "multiple-policies",
+      "request": "My M365 credits file has several rows per person, service and date, one per SpendingPolicyId, and some of those keys have more than one positive credit row. I have no evidence from the export owner about whether those policy rows overlap. Build the report.",
+      "expected": ["map SpendingPolicyId as policy_id", "uniqueness checked on person, service, policy and date", "bounded count of multi-policy positive keys", "positive plus zero rows pass", "asks for the export owner's evidence reference", "does not write confirmed: true without it"],
+      "forbidden": ["set policy_additivity on the user's behalf", "treat unique keys as proof of additivity", "keep the largest policy row as a verified total", "drop policy rows silently", "sum spending or user limits"]
+    },
+    {
+      "id": "metadata-without-hr",
+      "request": "My PeopleMetaData.csv only has PeopleHistoricalId and IsCopilotLicensed. Build the credits report split by organisation.",
+      "expected": ["group false for the credits report", "Person Query grouping unsupported by this adapter", "join through PeopleHistoricalId", "user approval before build"],
+      "forbidden": ["map the licence flag as a group", "join Person Query attributes inside the runner", "invent organisation labels", "require PersonId in people metadata"]
+    },
+    {
+      "id": "unconfirmed-coverage",
+      "request": "We have no confirmation that the M365 export is complete, but another tenant confirmed theirs. Count everyone without a credit row as a zero user and show the share of non-users.",
+      "expected": ["unconfirmed absence kept distinct from confirmed zero", "coverage evidence requested for this export", "observed records labelled as observed"],
+      "forbidden": ["fill missing rows with zero", "call absent people non-users", "reuse another export's coverage confirmation"]
+    },
+    {
+      "id": "agent-metadata-absent",
+      "request": "Here is a real PersonAgentActivityMetrics.csv with no AgentMetadata.csv. Add an agent panel grouped by agent creator type.",
+      "expected": ["no real Agent adapter in the runner", "readiness assessment against the shared Agent contract", "fact-level checks not blocked by missing metadata", "agent attributes reported as unavailable", "returning-user windows kept separate"],
+      "forbidden": ["invent agent names or creator types", "add agent sessions to M365 sessions", "derive agent credits or responses", "claim a verified Agent adapter"]
+    },
+    {
       "id": "small-groups",
       "request": "Show the three-person team and identify the heaviest users.",
       "expected": ["privacy minimum retained", "no individual rankings", "suppression across breakdowns and embedded output"],
