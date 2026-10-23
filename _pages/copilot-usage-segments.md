@@ -223,7 +223,7 @@ The archetypes describe how AI use was spread during a twelve-week window, using
 - **Surface mix** (Specialised or Broad): whether use was concentrated in one tool group.
 - **Metered use** (Lean or Intensive): M365 Copilot credit consumption relative to a stated reference median.
 
-Report them alongside the usage segments and continuous measures. Each label describes recorded behaviour during a period. It is not a performance rating, and it must not be used for individual ranking, punitive monitoring or to assume that someone needs support. The framework has been applied to real exports in internal studies. It is descriptive only, and its thresholds are experimental and not validated for prediction, causal or intervention use.
+Report them alongside the usage segments and continuous measures. Each label describes recorded behaviour during a period. It is not a performance rating, and it must not be used for individual ranking, punitive monitoring or to assume that someone needs support. The framework has been trialled descriptively on real exports in internal studies. It is descriptive only, and its thresholds are experimental and not validated for prediction, causal or intervention use.
 
 For the definitions, evidence states, publication rules and synthetic R and Python examples, see the [usage archetypes reference on GitHub](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/skills/viva-insights-analysis/reference/usage-archetypes.md).
 

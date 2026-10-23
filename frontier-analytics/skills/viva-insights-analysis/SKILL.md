@@ -4,17 +4,16 @@ description: >
   Analyze Microsoft Viva Insights data with the open-source vivainsights R and
   Python packages. Use this skill whenever working with Viva Insights query
   exports (Person Query, Meeting Query, Consumption query, GitHub query,
-  person-to-person or group-to-group
-  network queries) or the vivainsights packages: importing and validating a
-  query,   computing metrics, segmenting Copilot usage (including experimental usage
-  archetypes), building the standard
-  visualisations, running network or information-value analysis, building a
-  common deliverable (adoption dashboard, executive summary memo, ROI estimate),
-  and avoiding the well-known export data pitfalls (IsManager strings, "#N/A"
-  text, non-English locales, privacy thresholds, trailing-window metric
-  plateaus, holiday weeks). It also points to the viva-insights-sample-code
-  repo and its Frontier Analytics toolkit for ready-made prompts, starter kits,
-  and schema docs.
+  person-to-person or group-to-group network queries) or the vivainsights
+  packages: importing and validating a query, computing metrics, segmenting
+  Copilot usage (including experimental usage archetypes), building the
+  standard visualisations, running network or information-value analysis,
+  building a common deliverable (adoption dashboard, executive summary memo,
+  ROI estimate), and avoiding the well-known export data pitfalls (IsManager
+  strings, "#N/A" text, non-English locales, privacy thresholds,
+  trailing-window metric plateaus, holiday weeks). It also points to the
+  viva-insights-sample-code repo and its Frontier Analytics toolkit for
+  ready-made prompts, starter kits, and schema docs.
 metadata:
   version: "1.1.0"
 ---

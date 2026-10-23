@@ -1,8 +1,9 @@
 # Usage archetypes (experimental)
 
 > **Experimental.** This guidance describes reference rule v1 of the AI usage
-> archetype framework. The rule has been applied to real exports in internal
-> studies. Results are descriptive only, and the thresholds are experimental.
+> archetype framework. The rule has been trialled descriptively on real
+> exports in internal studies. Results are descriptive only, and the
+> thresholds are experimental.
 > They are not validated for prediction, causal inference or intervention use.
 > Expect the rule, labels and requirements to change.
 
@@ -116,14 +117,28 @@ however unevenly their effort is divided.
 Classify everyone into a named state before assigning labels. Never drop a
 person silently or force a label.
 
+Assign states in this order. The first matching check wins.
+
+1. Not selected by the cohort rule: **Outside the analysis cohort**.
+2. Ineligible in any week, missing a required indicator or conflicting licence
+   evidence: **Incomplete evidence or eligibility**.
+3. Positive credits on overlapping spending-policy rows without confirmed
+   additivity: **Unresolved credit additivity**.
+4. No positive M365 credits in the window: **Confirmed zero M365 credits** if
+   coverage is confirmed for that export, otherwise **No positive observed
+   credits, coverage unconfirmed**. This applies whatever the group-weeks.
+5. Positive M365 credits but no group-weeks, so Surface mix cannot be
+   assigned: **Incomplete evidence or eligibility**.
+6. Otherwise: **Full profile**.
+
 | State | Meaning | Treatment |
 |---|---|---|
-| Full profile | Eligible in every week, complete required indicators, positive M365 credits that can be totalled, and at least one group-week | One label on each dimension |
-| Confirmed zero M365 credits | Coverage and eligibility confirmed, with no M365 credits recorded | Report as "No M365 metered use", outside the Lean/Intensive split |
-| No positive observed credits, coverage unconfirmed | Absent or zero credit facts without confirmation that capture is complete | Report separately. Never relabel as confirmed zero |
-| Unresolved credit additivity | Positive credits on overlapping spending-policy rows that may not be safely added | Exclude from primary results. Examine only in labelled sensitivity scenarios |
-| Incomplete evidence or eligibility | Missing required indicators, fewer than 7 enabled days in any week, conflicting licence evidence, or no group-weeks | Count and exclude from full profiles |
-| Outside the analysis cohort | Not selected by the cohort rule, for example absent from an optional query | Describe in the population accounting |
+| Full profile | Passed checks 1 to 5: eligible in every week, complete required indicators, positive M365 credits that can be totalled, and at least one group-week | One label on each dimension |
+| Confirmed zero M365 credits | Passed checks 1 to 3, with no M365 credits recorded and coverage confirmed | Report as "No M365 metered use", outside the Lean/Intensive split |
+| No positive observed credits, coverage unconfirmed | Passed checks 1 to 3, with absent or zero credit facts and no confirmation that capture is complete | Report separately. Never relabel as confirmed zero |
+| Unresolved credit additivity | Passed checks 1 and 2, with positive credits on overlapping spending-policy rows that may not be safely added | Exclude from primary results. Examine only in labelled sensitivity scenarios |
+| Incomplete evidence or eligibility | Failed check 2, or reached check 5 with positive credits and no group-weeks | Count and exclude from full profiles |
+| Outside the analysis cohort | Failed check 1, for example absent from an optional query | Describe in the population accounting |
 
 A coverage confirmation applies to one export only. Unique keys on
 `PersonId`, `ServiceId`, `SpendingPolicyId` and `MetricDate` do not show that
@@ -190,7 +205,16 @@ does not make every cell reportable.
   stricter organisational requirement. This is stricter than the package
   default of 5.
 - Check related tables, filters, periods and rule variants together. Exact
-  margins can reveal a withheld cell by subtraction.
+  margins can reveal a withheld cell by subtraction. Within every printed or
+  inferable total, withheld cells should number at least two and together
+  reach the minimum group size, so that only their combined total can be
+  derived.
+- A median split makes the Lean and Intensive totals close to half of the
+  full profiles. Treat both as known margins in the disclosure check.
+- Print a subtotal, such as the number of Specialised people in a
+  sensitivity summary, only when it can already be derived from visible
+  cells. A share also needs at least 10 people in its complement and in any
+  group excluded from a printed parent total.
 - Withholding conveys information, for example that a count lies below 10.
   State this in the disclosure audit.
 - Do not change thresholds, categories or the window solely to avoid
@@ -225,7 +249,7 @@ time, when the full breakdown would require heavy withholding.
 
 ## Validation status
 
-Applied to real exports in internal studies. Descriptive only.
+Trialled descriptively on real exports in internal studies. Descriptive only.
 
 Not yet established:
 
