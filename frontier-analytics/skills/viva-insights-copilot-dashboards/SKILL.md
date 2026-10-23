@@ -8,7 +8,7 @@ description: >
   periods. Do not use for general Person Query analysis, unrelated dashboards,
   direct GitHub API analytics, or causal impact estimation.
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Copilot query dashboards
