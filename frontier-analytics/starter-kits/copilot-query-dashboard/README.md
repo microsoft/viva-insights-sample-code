@@ -138,10 +138,15 @@ Inspect it with local paths and explicit mappings while approval is false or
 absent. Inspection validates numeric/date values, keys, joins and declared grain,
 then reports `status: "awaiting_approval"`, `structural_validation: "passed"`,
 `supported_panels`, `excluded_panels`, `privacy_status` and `next_action`.
-When `policy_id` is mapped it also reports `multi_policy_positive_keys` (a count only)
-and `policy_additivity_status`. If that count is above zero and additivity is not
-confirmed, the status is `awaiting_policy_confirmation` and the next action asks you
-to confirm with the export owner that the policy rows are disjoint before approval.
+When `policy_id` is mapped it also reports `multi_policy_positive_keys` and
+`policy_additivity_status`. The count covers all supplied rows, before the `dates`
+filter, because validation always covers the whole input. It can therefore be above
+zero when `rows_in_window` counts none of the affected rows. If the count is above
+zero and additivity is not confirmed, the status is `awaiting_policy_confirmation`
+and `next_action` asks you to confirm with the export owner that the policy rows are
+disjoint before approval. When privacy also withholds the release or the window is
+empty, `next_action` gives the privacy or coverage action first and the confirmation
+request after it.
 Structural validation does not independently establish a source's business semantics:
 review the export contract, declared credits unit and selected group/grain/window.
 Only **after the user's decision**, set approval to true and record the decision
