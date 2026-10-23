@@ -314,15 +314,19 @@ cat("GitHub credits flag the GitHub group only and are never added to M365 credi
 
 # 6. Privacy-safe summaries -----------------------------------------------------
 cat(sprintf("\n=== Evidence states (groups under %d withheld) ===\n", MIN_GROUP_SIZE))
-state_counts <- vapply(STATES, function(s) sum(people$state == s), numeric(1))
-state_shown <- show(state_counts, protect(state_counts))
+state_counts <- unname(vapply(STATES, function(s) sum(people$state == s), numeric(1)))
+state_hidden <- protect(state_counts)
+state_shown <- show(state_counts, state_hidden)
 for (k in seq_along(STATES)) {
   cat(sprintf("  %-52s %9s\n", STATES[k], state_shown[k]))
 }
 cat(sprintf("  %-52s %9d\n", "Supplied synthetic roster", nrow(people)))
 
-cat(sprintf("\n=== Profiles among full profiles (groups under %d withheld) ===\n",
-            MIN_GROUP_SIZE))
+# The full-profile count reappears as the profile-table total and the
+# sensitivity denominator. If the state table withholds it, for example
+# because the other states together number fewer than 10, both sections are
+# withheld instead.
+breakdown_ok <- !state_hidden[1]
 profile_counts <- unname(vapply(PROFILE_CODES,
                                 function(code) sum(people$profile == code, na.rm = TRUE),
                                 numeric(1)))
@@ -331,15 +335,23 @@ profile_counts <- unname(vapply(PROFILE_CODES,
 lean_cells <- which(substr(PROFILE_CODES, 5, 5) == "L")
 intensive_cells <- which(substr(PROFILE_CODES, 5, 5) == "I")
 profile_hidden <- protect(profile_counts, list(lean_cells, intensive_cells))
-profile_shown <- show(profile_counts, profile_hidden)
-for (k in seq_along(PROFILE_CODES)) {
-  cat(sprintf("  %s  %-36s %9s\n", PROFILE_CODES[k], PROFILE_LABELS[k], profile_shown[k]))
+if (breakdown_ok) {
+  cat(sprintf("\n=== Profiles among full profiles (groups under %d withheld) ===\n",
+              MIN_GROUP_SIZE))
+  profile_shown <- show(profile_counts, profile_hidden)
+  for (k in seq_along(PROFILE_CODES)) {
+    cat(sprintf("  %s  %-36s %9s\n", PROFILE_CODES[k], PROFILE_LABELS[k], profile_shown[k]))
+  }
+  cat(sprintf("  %-42s %9d\n", "Full profiles", sum(full)))
+  cat("  'withheld' marks cells under 10 and further cells chosen so that, within\n")
+  cat("  the printed total and the Lean and Intensive totals implied by the median\n")
+  cat("  split, withheld cells number at least two and sum to at least 10. Only\n")
+  cat("  their combined total can be derived. Withholding itself conveys information.\n")
+} else {
+  cat("\n=== Profiles and sensitivity ===\n")
+  cat("  withheld: population too small for this breakdown\n")
+  cat("  (the full-profile count is withheld in the evidence-state table)\n")
 }
-cat(sprintf("  %-42s %9d\n", "Full profiles", sum(full)))
-cat("  'withheld' marks cells under 10 and further cells chosen so that, within\n")
-cat("  the printed total and the Lean and Intensive totals implied by the median\n")
-cat("  split, withheld cells number at least two and sum to at least 10. Only\n")
-cat("  their combined total can be derived. Withholding itself conveys information.\n")
 
 # 7. Sensitivity diagnostics (Surface mix) --------------------------------------
 flags_by_person <- lapply(split(pw[, GROUPS], person),
@@ -385,10 +397,12 @@ specialised_row <- if (s_margin_safe && publishable(s_changed, s_total) &&
   "withheld (would reveal a withheld profile cell or a group under 10)"
 }
 
-cat("\n=== Sensitivity: Surface mix (stability diagnostics rather than observed change) ===\n")
-cat("Label changed in at least one leave-one-week recalculation:\n")
-cat(sprintf("  all full profiles: %s\n", share(all_changed, n_full)))
-cat(sprintf("  Specialised:       %s\n", specialised_row))
-cat("First versus last six weeks, label disagreement among people with\n")
-cat(sprintf("group-weeks in both halves: %s\n",
-            share(split_disagree, split_eligible, parent = n_full)))
+if (breakdown_ok) {
+  cat("\n=== Sensitivity: Surface mix (stability diagnostics rather than observed change) ===\n")
+  cat("Label changed in at least one leave-one-week recalculation:\n")
+  cat(sprintf("  all full profiles: %s\n", share(all_changed, n_full)))
+  cat(sprintf("  Specialised:       %s\n", specialised_row))
+  cat("First versus last six weeks, label disagreement among people with\n")
+  cat(sprintf("group-weeks in both halves: %s\n",
+              share(split_disagree, split_eligible, parent = n_full)))
+}
