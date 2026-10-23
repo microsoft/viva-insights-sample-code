@@ -384,19 +384,24 @@ inspect_dashboard <- function(cfg, kit) {
       report$rows_in_window <- nrow(validation)
       report$distinct_people <- length(unique(validation$person_id))
       report$date_range <- if (nrow(validation)) as.character(range(validation$date)) else character()
+      additivity_action <- paste(
+        "Several SpendingPolicyId rows carry positive credits for the same person, service and date.",
+        "Before deciding approval, confirm with the export owner that these policy rows are disjoint,",
+        "then set policy_additivity.confirmed=true with nonblank evidence and inspect again.")
       report$next_action <- if (release$status == "suppressed") {
         "All aggregate panels are withheld. Review an appropriately broader source scope and inspect again; approval does not override privacy."
       } else if (release$status == "no_data") {
         "Review source coverage and the selected period window, then inspect again; no panels are available."
       } else if (additivity_pending) {
-        paste("Several SpendingPolicyId rows carry positive credits for the same person, service and date.",
-              "Before deciding approval, confirm with the export owner that these policy rows are disjoint,",
-              "then set policy_additivity.confirmed=true with nonblank evidence and inspect again.")
+        additivity_action
       } else if (!approved) {
         "Review the validated scope, declared units/granularity and excluded panels with the user. Only after their decision, set mapping_approval.approved=true with nonblank evidence, then build."
       } else {
         "Build the approved supported panels; no values/identifiers are included in this inspection."
       }
+      # Privacy and coverage come first, but a pending additivity check is never hidden.
+      if (additivity_pending && release$status != "ready")
+        report$next_action <- paste(report$next_action, additivity_action)
     }
   }
   report$provenance <- provenance(cfg, "inspect", inputs, kit)
