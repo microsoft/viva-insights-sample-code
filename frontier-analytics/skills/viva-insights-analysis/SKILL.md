@@ -39,7 +39,7 @@ validate, analyse, and visualise those exports in a consistent, best-practice wa
 Use this skill when a task involves any of:
 
 - Importing or validating a Viva Insights query export.
-- Checking Consumption or GitHub query evidence, grain, joins and coverage
+- Checking Consumption, GitHub or Agent query evidence, grain, joins and coverage
   before analysis; see the dedicated on-demand contract reference.
 - Computing or visualising collaboration, meeting, email, focus, after-hours, or
   Copilot metrics.
@@ -102,7 +102,7 @@ everything:
 |---|---|
 | `reference/packages.md` | The function inventory, grouped by purpose, with R/Python parity and verified signatures. A curated complement to the live `llms.txt` (see above). |
 | `reference/query-schemas.md` | The shape of each query type (grain, key columns, raw vs imported column names) and the meeting quality filter. |
-| `reference/copilot-query-contracts.md` | Consumption or GitHub query analysis: documented versus illustrative inputs, joins, coverage, units, privacy and claim limits. |
+| `reference/copilot-query-contracts.md` | Consumption, GitHub or Agent query analysis: documented versus illustrative inputs, joins, coverage, units, privacy and claim limits. |
 | `reference/data-pitfalls.md` | To diagnose or pre-empt a loading / aggregation problem (IsManager, "#N/A", locales, privacy threshold, trailing windows, holidays). |
 | `reference/analysis-conventions.md` | To write honest, defensible claims (association vs causation), segment definitions, and period framing. |
 | `reference/usage-archetypes.md` | Experimental usage archetypes (Consistency, Surface mix, Metered use): reference rule v1, evidence states, context record, sensitivity diagnostics, publication and governance rules. Descriptive only. |
