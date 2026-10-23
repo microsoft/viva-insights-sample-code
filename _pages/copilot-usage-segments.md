@@ -213,6 +213,22 @@ To implement these segments in your analysis, you can use our pre-built DAX calc
 
 ---
 
+## Experimental: usage archetypes
+
+> **Experimental**: The usage archetypes are an experimental, descriptive layer. The Power, Habitual, Novice, Low and Non-user segments on this page are unchanged and remain the standard way to describe how established Copilot use is.
+
+The archetypes describe how AI use was spread during a twelve-week window, using three dimensions:
+
+- **Consistency** (Consistent or Episodic): how regularly AI was used.
+- **Surface mix** (Specialised or Broad): whether use was concentrated in one tool group.
+- **Metered use** (Lean or Intensive): M365 Copilot credit consumption relative to a stated reference median.
+
+Report them alongside the usage segments and continuous measures. Each label describes recorded behaviour during a period. It is not a performance rating, and it must not be used for individual ranking, punitive monitoring or to assume that someone needs support. The framework has been applied to real exports in internal studies. It is descriptive only, and its thresholds are experimental and not validated for prediction, causal or intervention use.
+
+For the definitions, evidence states, publication rules and synthetic R and Python examples, see the [usage archetypes reference on GitHub](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/skills/viva-insights-analysis/reference/usage-archetypes.md).
+
+---
+
 ## Need Help?
 
 - **Methodology Questions**: Review the FAQ section above for common implementation questions
