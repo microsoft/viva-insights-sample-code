@@ -124,9 +124,35 @@ additively.
 
 Source: [Create a custom consumption query](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query).
 
-A real run downloads a single `.zip` containing these three files. The sample
+A real run downloads a single `.zip`. The fixtures reproduce three files from
+it, and the file set in a genuine download varies as described in
+[Real-export variants](#real-export-variants). The sample
 covers the final 13 weeks of the Person query window, from `2026-04-05` onward,
 at daily grain and weekdays only.
+
+### Real-export variants
+
+The fixtures follow one layout among several. Check a genuine download against
+the [shared query contract](../../../frontier-analytics/skills/viva-insights-analysis/reference/copilot-query-contracts.md)
+before reusing code written for these files. Real exports observed in October
+2026 differed from the fixtures in three ways.
+
+- **A fourth file.** `M365SpendingPolicyMetaData.csv` holds one row per
+  `SpendingPolicyId` and supports reference-integrity checks on the M365 facts.
+- **A policy-aware key.** `PersonM365CreditsMetrics.csv` could hold several rows
+  for one person, service and date, one per `SpendingPolicyId`, so its native
+  key was `PersonId` × `ServiceId` × `SpendingPolicyId` × `MetricDate`. A unique
+  key does not show that credits can be added across policies. Where more than
+  one policy row is positive for the same person, service and date, confirm
+  with the data owner that the rows are disjoint before summing them.
+- **Metadata without HR attributes.** `PeopleMetaData.csv` contained only
+  `PeopleHistoricalId` and `IsCopilotLicensed`. Organisational attributes then
+  come from the Person query, under a declared rule for which dated value
+  applies.
+
+Public documentation checked in September 2026 described a two-file layout with
+a single activity file. These fixtures remain synthetic and unchanged, and they
+still use the three-file layout described below.
 
 ### `PeopleMetaData.csv`
 
@@ -230,6 +256,23 @@ agent names and creator metadata change over time.
 
 The sample sits under `github/agent-query/` and covers 53 Sunday-start weeks
 from `2025-09-07` to `2026-09-06`, across 300 people and 914 agents.
+
+### Observed real-export layout
+
+This sample follows an earlier three-file layout, kept here as a dated variant.
+Real exports observed in October 2026 used a different fact file,
+`PersonAgentActivityMetrics.csv`, keyed by `PersonId` × `AgentId` ×
+`MetricDate` at a Sunday-start weekly grain, with these measures:
+
+`Conversational agent sessions, Returning Agent 365 user (most recent and prior 7 days), Returning Agent 365 user (most recent and prior 28 days)`
+
+That layout has no agent credits or responses. `AgentMetadata.csv` was optional,
+present in some exports and absent in others, so enrich facts with it only when
+it is supplied with unique `AgentId` values. Sum sessions across agents to the
+person-week, and keep each returning-user indicator at its own window. The
+fixtures below are unchanged. See the
+[shared query contract](../../../frontier-analytics/skills/viva-insights-analysis/reference/copilot-query-contracts.md#agent-query-observed-layout-and-dated-variant)
+for the full rules.
 
 ### `AgentMetadata.csv`
 
