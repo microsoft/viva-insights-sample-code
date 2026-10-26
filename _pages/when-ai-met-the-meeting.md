@@ -120,7 +120,7 @@ AI does not fix meeting culture. It amplifies the culture already present. Organ
 
 <aside class="callout reveal" markdown="1">
 <span class="callout-label">Supporting evidence</span>
-In Org B, meeting duration was the strongest predictor of distraction signal, and meetings 60+ minutes accounted for a majority of meeting hours despite minority share by count.
+In Case Study B, meeting duration was the strongest predictor of distraction signal, and meetings 60+ minutes accounted for a majority of meeting hours despite minority share by count.
 </aside>
 
 <blockquote class="pull-quote reveal">AI does not fix meeting culture. It amplifies the culture already present.</blockquote>
@@ -271,32 +271,32 @@ Aim reduction at long, large, recurring sessions with low contribution density �
 
 <figure class="article-figure reveal">
 <svg viewBox="0 0 980 520" role="img" aria-labelledby="fig6-title fig6-desc">
-  <title id="fig6-title">Copilot recap adoption by anonymized function</title>
-  <desc id="fig6-desc">Bar chart with anonymized functions A to E and adoption percentages.</desc>
+  <title id="fig6-title">Copilot recap adoption: synthetic illustration</title>
+  <desc id="fig6-desc">Synthetic illustration of low, uneven recap adoption across five invented groups, with illustrative rates of 6, 3, 4, 1 and 3 percent. These are not Case Study B measurements.</desc>
   <rect width="980" height="520" rx="16" fill="#F7FAFD"/>
-  <text x="48" y="54" font-size="28" fill="#11365A" font-family="Segoe UI, Arial" font-weight="700">Copilot Recap Adoption by Function — Org B (anonymized)</text>
-  <text x="48" y="82" font-size="14" fill="#5B6573" font-family="Segoe UI, Arial">Regular recap usage (% of users)</text>
+  <text x="48" y="54" font-size="28" fill="#11365A" font-family="Segoe UI, Arial" font-weight="700">Copilot Recap Adoption: Synthetic Illustration</text>
+  <text x="48" y="82" font-size="14" fill="#5B6573" font-family="Segoe UI, Arial">Invented groups and perturbed percentages, not case-study measurements.</text>
   <line x1="150" y1="430" x2="900" y2="430" stroke="#B9C8D8"/>
   <line x1="150" y1="150" x2="150" y2="430" stroke="#B9C8D8"/>
   <g font-family="Segoe UI, Arial" font-size="14" fill="#5B6573">
-    <text x="120" y="434">0</text><text x="112" y="370">2</text><text x="112" y="306">4</text><text x="112" y="242">6</text><text x="112" y="178">8</text>
+    <text x="120" y="434">0%</text><text x="112" y="364">2%</text><text x="112" y="294">4%</text><text x="112" y="224">6%</text><text x="112" y="154">8%</text>
   </g>
   <g font-family="Segoe UI, Arial" font-size="15" fill="#1f2a33">
-    <rect x="190" y="190" width="110" height="240" rx="8" fill="#11365A"/><text x="220" y="452">Function A</text><text x="230" y="180" fill="#11365A" font-weight="700">7.0%</text>
-    <rect x="330" y="270" width="110" height="160" rx="8" fill="#2E5C8A"/><text x="360" y="452">Function B</text><text x="370" y="260" fill="#2E5C8A" font-weight="700">4.0%</text>
-    <rect x="470" y="310" width="110" height="120" rx="8" fill="#4C8C65"/><text x="500" y="452">Function C</text><text x="510" y="300" fill="#4C8C65" font-weight="700">3.0%</text>
-    <rect x="610" y="350" width="110" height="80" rx="8" fill="#C79A3A"/><text x="640" y="452">Function D</text><text x="650" y="340" fill="#C79A3A" font-weight="700">2.0%</text>
-    <rect x="750" y="350" width="110" height="80" rx="8" fill="#C0392B"/><text x="780" y="452">Function E</text><text x="790" y="340" fill="#C0392B" font-weight="700">2.0%</text>
+    <rect x="190" y="220" width="110" height="210" rx="8" fill="#11365A"/><text x="220" y="452">Group 1</text><text x="230" y="210" fill="#11365A" font-weight="700">6%</text>
+    <rect x="330" y="325" width="110" height="105" rx="8" fill="#2E5C8A"/><text x="360" y="452">Group 2</text><text x="370" y="315" fill="#2E5C8A" font-weight="700">3%</text>
+    <rect x="470" y="290" width="110" height="140" rx="8" fill="#4C8C65"/><text x="500" y="452">Group 3</text><text x="510" y="280" fill="#4C8C65" font-weight="700">4%</text>
+    <rect x="610" y="395" width="110" height="35" rx="8" fill="#C79A3A"/><text x="640" y="452">Group 4</text><text x="650" y="385" fill="#C79A3A" font-weight="700">1%</text>
+    <rect x="750" y="325" width="110" height="105" rx="8" fill="#C0392B"/><text x="780" y="452">Group 5</text><text x="790" y="315" fill="#C0392B" font-weight="700">3%</text>
   </g>
   <rect x="48" y="474" width="884" height="30" rx="8" fill="#EAF1F8" stroke="#B9C8D8"/>
-  <text x="62" y="494" font-family="Segoe UI, Arial" font-size="14" fill="#11365A"><tspan font-weight="700">Overall Org B baseline: 5.3%</tspan><tspan fill="#1f2a33"> regular usage. Technology is deployed; behavior is uneven.</tspan></text>
+  <text x="62" y="494" font-family="Segoe UI, Arial" font-size="14" fill="#11365A">Illustrative values only. No case-study baseline is plotted.</text>
 </svg>
-<figcaption><strong>Figure 6 —</strong> Function labels are intentionally anonymized. Core signal retained: low baseline adoption and material variance across functions.</figcaption>
+<figcaption><strong>Figure 6 — Synthetic illustration.</strong> Group labels are invented and percentages have been perturbed to illustrate low, uneven adoption. These values are not measurements from Case Study B and should not be used to estimate its results.</figcaption>
 </figure>
 
 <aside class="callout reveal" markdown="1">
-<span class="callout-label">Supporting evidence (anonymized)</span>
-In Org B, only **5.3% of users** regularly used recap. Adoption variance by function indicates norm maturity differences, not tool-availability differences.
+<span class="callout-label">Supporting evidence: Case Study B</span>
+In Case Study B, regular recap usage fell in the **5% to under 10%** band, with variation across functions. The practical priority is to investigate barriers to routine use. Figure 6 is a synthetic illustration and separate from these case-study results.
 </aside>
 
 ### Practice 2 · Follow the conflict
@@ -422,5 +422,5 @@ In Org B, only **5.3% of users** regularly used recap. Adoption variance by func
   <li id="ref-21">Mark, G., Gudith, D., & Klocke, U. (2008). The cost of interrupted work. CHI.</li>
   <li id="ref-22">Olson, G. M., & Olson, J. S. (2000). Distance matters. <em>HCI</em>.</li>
 </ol>
-<p class="article-end-note">Org A = anonymized European mobility/IT enterprise diagnostic. Org B = anonymized global luxury brand diagnostic. Metrics shown in aggregate only.</p>
+<p class="article-end-note">Case-study labels omit sector and location details. Case-study percentages are reported in broad bands. Figure 6 uses invented groups and perturbed percentages as a synthetic illustration, rather than reporting exact organisational results. Statistics attributed to public research retain their published values.</p>
 </section>
