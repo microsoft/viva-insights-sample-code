@@ -5,6 +5,9 @@ Use synthetic fixture inputs only. For the two reproduction cases, supply a
 checkout path and a fresh output directory and run the real runner. For blocked
 cases, give only the stated evidence; do not let the evaluator invent approvals
 or a production schema. The out-of-scope case evaluates routing, not execution.
+For the policy, people-metadata, coverage and Agent cases, build small synthetic
+CSVs that reproduce only the stated structure, such as several positive policy
+rows for one person, service and date, or metadata without HR attributes.
 
 Record per case: source revision, agent/model, loaded references, commands,
 result, observed safety decisions, token counts when exposed, elapsed time

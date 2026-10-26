@@ -13,6 +13,15 @@ usage. Randomised access does not make observed usage random. Draw a simple
 causal ordering or diagram to select baseline controls and avoid adjusting for
 mediators, post-exposure selection or outcome components.
 
+Network sizes and similar stocks can repeat across the weekly rows of a month.
+Their dates identify snapshots rather than the dates of the interactions they
+count, and a boundary-month value can include contacts from outside the selected
+weeks. Before treating a snapshot as a later outcome, or an earlier one as a
+baseline, verify that its measurement window does not overlap the exposure
+period. Averaging repeated values fixes aggregation but does not establish
+temporal order. See the variable suitability table in the
+[Person Query contract](person-query-contract.md).
+
 ## Observational menu
 
 | Label | Question | Required support and caveat |
@@ -63,6 +72,20 @@ level. A large number of weekly rows does not compensate for few people or
 teams. Few-cluster bootstrap methods are estimator- and design-specific. Verify
 implementation, null restrictions and applicability rather than copying a custom
 bootstrap from another project. Report the interval and p-value methods separately.
+
+Check cluster support before fitting. Count the clusters in each model sample
+and their sizes, and look for a dominant cluster or high-leverage units. When
+too few clusters remain, say that clustered inference is unavailable and name
+the assumption behind any interval reported instead. Independent-person
+intervals such as HC3 do not address team or organisation dependence, so do not
+present them under a clustered-inference claim.
+
+Name the effective controls, meaning the terms that still vary in the fitted
+sample. Pooling rare categories can leave a tiny remainder or make an attribute
+constant, and a constant attribute contributes no adjustment even when it is
+listed in the specification. Keep pooling and modelling thresholds separate
+from the privacy minimum for publication. Attributes assigned from the first
+observed in-window value are not verified pre-exposure controls.
 
 ## Credibility checks
 
