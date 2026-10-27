@@ -452,7 +452,7 @@
 }
 .references li { margin-bottom: 0.5rem; }
 .references li a { color: var(--art-navy); word-break: break-word; }
-.article-end-note {
+.article-body p.article-end-note {
   margin: 1.4rem 0 0;
   padding-top: 1rem;
   border-top: 1px solid var(--art-line);

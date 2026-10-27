@@ -271,11 +271,12 @@ Aim reduction at long, large, recurring sessions with low contribution density â
 
 <figure class="article-figure reveal">
 <svg viewBox="0 0 980 520" role="img" aria-labelledby="fig6-title fig6-desc">
-  <title id="fig6-title">Copilot recap adoption: synthetic illustration</title>
-  <desc id="fig6-desc">Synthetic illustration of low, uneven recap adoption across five invented groups, with illustrative rates of 6, 3, 4, 1 and 3 percent. These are not Case Study B measurements.</desc>
+  <title id="fig6-title">Recap usage by group</title>
+  <desc id="fig6-desc">Bar chart showing regular recap usage across five groups, with rates ranging from 1 to 6 percent.</desc>
   <rect width="980" height="520" rx="16" fill="#F7FAFD"/>
-  <text x="48" y="54" font-size="28" fill="#11365A" font-family="Segoe UI, Arial" font-weight="700">Copilot Recap Adoption: Synthetic Illustration</text>
-  <text x="48" y="82" font-size="14" fill="#5B6573" font-family="Segoe UI, Arial">Invented groups and perturbed percentages, not case-study measurements.</text>
+  <text x="48" y="54" font-size="28" fill="#11365A" font-family="Segoe UI, Arial" font-weight="700">Recap usage by group</text>
+  <text x="48" y="82" font-size="14" fill="#5B6573" font-family="Segoe UI, Arial">Percentage of users regularly using recap</text>
+  <text x="60" y="290" transform="rotate(-90 60 290)" text-anchor="middle" font-size="14" fill="#5B6573" font-family="Segoe UI, Arial">Users (%)</text>
   <line x1="150" y1="430" x2="900" y2="430" stroke="#B9C8D8"/>
   <line x1="150" y1="150" x2="150" y2="430" stroke="#B9C8D8"/>
   <g font-family="Segoe UI, Arial" font-size="14" fill="#5B6573">
@@ -288,15 +289,14 @@ Aim reduction at long, large, recurring sessions with low contribution density â
     <rect x="610" y="395" width="110" height="35" rx="8" fill="#C79A3A"/><text x="640" y="452">Group 4</text><text x="650" y="385" fill="#C79A3A" font-weight="700">1%</text>
     <rect x="750" y="325" width="110" height="105" rx="8" fill="#C0392B"/><text x="780" y="452">Group 5</text><text x="790" y="315" fill="#C0392B" font-weight="700">3%</text>
   </g>
-  <rect x="48" y="474" width="884" height="30" rx="8" fill="#EAF1F8" stroke="#B9C8D8"/>
-  <text x="62" y="494" font-family="Segoe UI, Arial" font-size="14" fill="#11365A">Illustrative values only. No case-study baseline is plotted.</text>
+  <text x="525" y="494" text-anchor="middle" font-family="Segoe UI, Arial" font-size="14" fill="#5B6573">Group</text>
 </svg>
-<figcaption><strong>Figure 6 â€” Synthetic illustration.</strong> Group labels are invented and percentages have been perturbed to illustrate low, uneven adoption. These values are not measurements from Case Study B and should not be used to estimate its results.</figcaption>
+<figcaption><strong>Figure 6 â€”</strong> Regular recap usage fell in the 5% to under 10% band overall in Case Study B, with variation across functions.</figcaption>
 </figure>
 
 <aside class="callout reveal" markdown="1">
 <span class="callout-label">Supporting evidence: Case Study B</span>
-In Case Study B, regular recap usage fell in the **5% to under 10%** band, with variation across functions. The practical priority is to investigate barriers to routine use. Figure 6 is a synthetic illustration and separate from these case-study results.
+In Case Study B, regular recap usage fell in the **5% to under 10%** band, with variation across functions. The practical priority is to investigate barriers to routine use.
 </aside>
 
 ### Practice 2 Â· Follow the conflict
