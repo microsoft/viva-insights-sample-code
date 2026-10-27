@@ -3,7 +3,7 @@
 
   {%- include head.html -%}
 
-  <body class="article-mode">
+  <body class="article-mode{% if page.editorial %} article-editorial{% endif %}">
 
     <a class="article-skiplink" href="#article-content">Skip to article</a>
 
@@ -132,11 +132,12 @@
             var target = document.getElementById(id);
             if (target) anchors.push({ id: id, link: clone, target: target });
           });
+          if (anchors.length) document.body.classList.add('has-article-toc');
           var spy = function () {
             var pos = (window.pageYOffset || document.documentElement.scrollTop) + 140;
             var current = null;
             for (var i = 0; i < anchors.length; i++) {
-              if (anchors[i].target.offsetTop <= pos) current = anchors[i];
+              if (anchors[i].target.getBoundingClientRect().top + window.pageYOffset <= pos) current = anchors[i];
             }
             anchors.forEach(function (a) { a.link.classList.toggle('is-current', a === current); });
           };
