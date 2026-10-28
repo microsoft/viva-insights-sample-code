@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Native query join tutorial under Advanced > Data enrichment, with Person,
+  Consumption, GitHub and Agent schemas, a downloadable JSON contract and a
+  reproducible page builder. Dashboard setup and Frontier journeys link to the
+  shared guidance while preserving existing real-adapter limits. Related schema
+  references now detect the week start rather than assuming Monday.
 - Experimental AI usage archetype guidance for the `viva-insights-analysis`
   skill: three descriptive dimensions (Consistency, Surface mix, Metered use),
   a versioned reference rule with explicit measurement units, evidence states,

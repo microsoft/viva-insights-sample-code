@@ -51,7 +51,7 @@ To determine whether your data is person-week or person-day:
 | Column | Type | Description | Notes |
 |--------|------|-------------|-------|
 | `PersonId` | string | Anonymized unique identifier for each person. | Consistent across time periods within the same export. Format varies by tenant (may be a hash, GUID, or encoded string). |
-| `MetricDate` | date | Start date of the measurement period. | For weekly data, this is typically the Monday of each week. Format is usually `YYYY-MM-DD` or `M/D/YYYY`. Parse carefully. |
+| `MetricDate` | date | Start date of the measurement period. | For weekly data, detect the week-start day rather than assuming Monday or Sunday. Format is usually `YYYY-MM-DD` or `M/D/YYYY`. Parse carefully. See the [query join tutorial](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/#keys). |
 
 ---
 

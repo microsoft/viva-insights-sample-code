@@ -70,6 +70,11 @@ Open a demo in your browser without installing anything. Both reports use **synt
 
 **[Browse dashboard templates]({{ site.baseurl }}/copilot-dashboards/)** for previews, required queries, source code, and setup guidance.
 
+For an analysis that combines working patterns with AI activity or consumption,
+start with [Joining Viva Insights queries]({{ site.baseurl }}/query-join-guide/).
+It explains how to prepare a person-week panel from Person, Consumption, GitHub
+and Agent exports.
+
 ---
 
 ## Analysis Scripts

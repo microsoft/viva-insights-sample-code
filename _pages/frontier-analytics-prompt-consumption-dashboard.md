@@ -102,6 +102,7 @@ privacy checks. Person Query associations require a separately verified adapter.
 
 ## Resources
 
+- [Joining Viva Insights queries]({{ site.baseurl }}/query-join-guide/) for a separately implemented cross-query analysis. The real v1 credits-only adapter does not require a Person Query or accept the tutorial's joined panel.
 - [Starter kit](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/starter-kits/consumption-dashboard)
 - [Shared runner](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/starter-kits/copilot-query-dashboard)
 - [Optional skill installation](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/skills/README.md#dashboard-skill-installation)

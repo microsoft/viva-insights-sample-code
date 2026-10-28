@@ -121,10 +121,22 @@ aggregated group comparisons may be possible, but are not linked-person evidence
 
 Person query data is aggregated to **weekly** periods, while Purview audit logs are **event-level** (individual timestamps). To join them, you must align the time granularity:
 
+Confirm that the Person Query uses weekly grouping. Parse `MetricDate` and
+`creation_time` as dates/timestamps in the agreed calendar time zone before
+these examples. Use the Person Query's weekday as the week boundary.
+The Python example then uses calendar dates for both keys so daylight-saving
+changes do not shift a week boundary by an hour.
+
 ```python
 # Python — aggregate audit events to person-week
-purview_mapped['event_week'] = purview_mapped['creation_time'].dt.to_period('W-SUN').apply(
-    lambda x: x.start_time
+person_query = person_query.copy()
+person_query['MetricDate'] = pd.to_datetime(person_query['MetricDate'].dt.date)
+week_starts = person_query['MetricDate'].dt.dayofweek.unique()
+if len(week_starts) != 1 or pd.isna(week_starts).any():
+    raise ValueError("Confirm one week-start weekday in the Person Query")
+event_days = pd.to_datetime(purview_mapped['creation_time'].dt.date)
+purview_mapped['event_week'] = event_days - pd.to_timedelta(
+    (event_days.dt.dayofweek - int(week_starts[0])) % 7, unit='D'
 )
 
 purview_weekly = (
@@ -152,6 +164,11 @@ enriched = person_query.merge(
 # R — aggregate audit events to person-week
 library(lubridate)
 
+week_starts <- unique(wday(person_query$MetricDate, week_start = 1))
+if (length(week_starts) != 1 || anyNA(week_starts)) {
+  stop("Confirm one week-start weekday in the Person Query")
+}
+
 # Map Purview identities through the authorised identity bridge
 purview_mapped <- purview |>
   left_join(mapping,
@@ -162,7 +179,8 @@ if (any(is.na(purview_mapped$PersonId))) {
 }
 
 purview_mapped <- purview_mapped |>
-  mutate(event_week = floor_date(creation_time, unit = "week", week_start = 1))
+  mutate(event_week = floor_date(creation_time, unit = "week",
+                                week_start = week_starts[[1]]))
 
 purview_weekly <- purview_mapped |>
   group_by(PersonId, event_week) |>
@@ -183,7 +201,7 @@ enriched <- person_query |>
 ### Pitfalls
 
 - **Identifier mismatch is the #1 problem.** Never assume `PersonId == UserId`. They are different identifiers from different systems.
-- **Week start alignment.** Viva Insights `MetricDate` is typically a Monday. Ensure your Purview weekly aggregation also uses Monday as the week start.
+- **Week start alignment.** Detect the weekday of the weekly Person Query's `MetricDate` and align Purview aggregation to it. Do not assume Monday or Sunday. See the [query join tutorial](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/#keys).
 - **Many-to-one vs. many-to-many.** Each person should have one row per week in the person query. If your join produces more rows than the original person query, you have a many-to-many join — investigate duplicate keys.
 
 ---
@@ -265,7 +283,7 @@ Small mismatches are expected (license activation delays, mid-week changes). Lar
 
 | Data Source | Granularity | Time Key | Week Start |
 |---|---|---|---|
-| Person query | Weekly (or daily) | `MetricDate` | Typically Monday |
+| Person query | Weekly (or daily) | `MetricDate` | Detect from the export |
 | Purview audit logs | Event-level | `CreationTime` | N/A (aggregate to match) |
 | HR data | Snapshot or versioned | `EffectiveDate` (if available) | N/A |
 | License data | Event-level (assign/remove) | `LicenseAssignedDate` | N/A |

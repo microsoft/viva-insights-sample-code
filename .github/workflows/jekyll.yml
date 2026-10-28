@@ -32,6 +32,12 @@ jobs:
         with:
           ruby-version: '3.1'
           bundler-cache: true
+
+      - name: Check generated join guide
+        run: |
+          python3 -m pip install -r scripts/requirements-doc-tests.txt
+          python3 -B scripts/build_join_guide.py --check
+          python3 -B -m unittest discover -s scripts -p test_join_guide.py
           
       - name: Setup Pages
         id: pages
