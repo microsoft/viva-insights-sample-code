@@ -1,6 +1,6 @@
 {
   "contract_id": "viva-insights-query-join",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "date": "2026-10-28",
   "status": "reference",
   "scope": "Joining weekly Viva Insights Person Query exports with Consumption, GitHub and Agent query exports into one person-week panel",
@@ -30,7 +30,14 @@
     ],
     "person_query_cadence_required": "weekly",
     "week_start": "detect_from_person_query",
-    "rule": "This contract requires a weekly Person Query. `WeekStart` is its `MetricDate`. Consumption and GitHub exports are daily by default and can be grouped by week at setup. Agent exports are weekly. Bring every source onto the same `WeekStart` (G03, G03b)."
+    "rule": "Export all selected queries grouped by week, with the same week start, wherever possible. This contract requires a weekly Person Query. `WeekStart` is its `MetricDate`. Consumption and GitHub default to daily, so change their grouping at setup. Use daily exports only when daily detail or week-start alignment is needed (G03, G03b)."
+  },
+  "coverage_assumption": {
+    "complete_by_default": true,
+    "scope": "The configured population, date window and product filters of each supplied Viva Insights query.",
+    "missing_activity_rows": "Inactive person-days are excluded by default. Within the query's scope, treat omitted activity rows as zero activity, including a person-week with no activity rows. This does not require separate completeness evidence.",
+    "exceptions": "Keep unavailable queries, out-of-scope people or periods, null cells in existing rows and known export problems distinct from inactivity. Partial boundary weeks do not establish full-week totals.",
+    "eligibility": "Activity zeros do not establish product eligibility or licence status. Use product-specific evidence for adoption denominators."
   },
   "header_matching": "Headers are listed in their raw export form, with spaces. The vivainsights R and Python packages replace spaces with underscores when they import a query, so `Collaboration hours` becomes Collaboration_hours. Treat the two forms as the same column. This applies to headers only, never to identifier values.",
   "query_setup_recommendation": "For all four queries, we recommend the Create analysis route because it offers more customisation parameters than dashboard exports.",
@@ -951,7 +958,7 @@
         "Feature Usage Count"
       ],
       "kind": "additive_within_file",
-      "person_week_rule": "Sum within this file only, across days when the export is daily. Never add to another breakdown."
+      "person_week_rule": "Sum days within this file when daily, retaining Feature for each person-week. Keep as linked detail. Never add to another breakdown."
     },
     {
       "id": "M08",
@@ -960,7 +967,7 @@
         "Usage count by language and feature"
       ],
       "kind": "additive_within_file",
-      "person_week_rule": "Sum within this file only, across days when the export is daily. Never add to another breakdown."
+      "person_week_rule": "Sum days within this file when daily, retaining Language and Feature for each person-week. Keep as linked detail. Never add to another breakdown."
     },
     {
       "id": "M09",
@@ -969,7 +976,7 @@
         "Usage count by language and model"
       ],
       "kind": "additive_within_file",
-      "person_week_rule": "Sum within this file only, across days when the export is daily. Never add to another breakdown."
+      "person_week_rule": "Sum days within this file when daily, retaining Language and Model for each person-week. Keep as linked detail. Never add to another breakdown."
     },
     {
       "id": "M10",
@@ -978,7 +985,7 @@
         "Usage count by model and feature"
       ],
       "kind": "additive_within_file",
-      "person_week_rule": "Sum within this file only, across days when the export is daily. Never add to another breakdown."
+      "person_week_rule": "Sum days within this file when daily, retaining Model and Feature for each person-week. Keep as linked detail. Never add to another breakdown."
     },
     {
       "id": "M11",
@@ -1045,12 +1052,16 @@
       "meaning": "A row exists with a recorded zero"
     },
     {
-      "id": "absent_confirmed_zero",
-      "meaning": "No row, and eligibility and complete coverage are confirmed for that product, so the value is zero"
+      "id": "absent_inactive_zero",
+      "meaning": "No activity row within a supplied query's configured population and date window. Assume complete Viva Insights data and record zero activity"
     },
     {
       "id": "absent_unknown",
-      "meaning": "No row, and coverage or eligibility for that product is not confirmed. Keep as unknown"
+      "meaning": "The query is unavailable, the person or period is outside its scope, a known export problem applies, or an absent non-activity measure has no defined zero interpretation. Keep as unknown"
+    },
+    {
+      "id": "observed_null",
+      "meaning": "A row exists but the measure is null. Do not apply the omitted-inactive-row default to this cell"
     },
     {
       "id": "ineligible",
@@ -1075,12 +1086,12 @@
     {
       "id": "G03",
       "level": "MUST",
-      "rule": "Confirm the Person Query is weekly, with one row per `PersonId` and `MetricDate`, and detect the weekday of `MetricDate`. Stop if it is daily or monthly. Do not assume Monday or Sunday."
+      "rule": "Confirm weekly grouping from the Person Query configuration or equivalent export metadata, then validate one row per `PersonId` and `MetricDate` and detect the weekday of `MetricDate`. Stop if grouping is unknown, daily or monthly. Do not assume Monday or Sunday."
     },
     {
       "id": "G03b",
       "level": "MUST",
-      "rule": "Detect each fact export's period from its `MetricDate` values. Daily and weekly exports are supported. A weekly export must start on the same weekday as the Person Query. Stop for any other period, such as monthly, or for a different week start."
+      "rule": "Record each fact export's configured date grouping from query setup or equivalent export metadata, then validate `MetricDate` against it. Sparse dates alone cannot establish cadence. Recommend weekly grouping for all queries. Daily and weekly exports are supported. A weekly export must start on the same weekday as the Person Query. Stop for unknown grouping, any other period such as monthly, or a different weekly start."
     },
     {
       "id": "G04",
@@ -1105,7 +1116,7 @@
     {
       "id": "G07",
       "level": "MUST",
-      "rule": "Bring each fact file to one row per `PersonId` and `WeekStart` before joining. Sum days into weeks only when the export is daily. Aggregate across services, spending policies and agents in every case. Never expand weekly rows into invented daily rows."
+      "rule": "Bring only panel-bound summaries to one row per `PersonId` and `WeekStart` before joining. Apply the measure rules: sum days only for configured daily exports, credits across policies only after G05, and sessions across policies only after G05b. Otherwise retain sessions per policy outside the panel. Keep GitHub breakdown dimensions as linked detail under G11. Never expand weekly rows into invented daily rows."
     },
     {
       "id": "G08",
@@ -1115,7 +1126,7 @@
     {
       "id": "G09",
       "level": "MUST",
-      "rule": "Keep missing values distinct from zero. A missing row becomes zero only when eligibility and complete coverage are confirmed for that specific product. Microsoft 365 licence evidence never confirms GitHub eligibility."
+      "rule": "Assume supplied Viva Insights queries are complete within their configured population, date window and product filters. Omitted activity rows represent inactivity by default, so record zero activity within that scope without requiring separate completeness evidence. Do not zero-fill unavailable queries, out-of-scope periods or people, null cells in existing rows, rolling indicators, limits, or known export problems. Record partial boundary weeks separately. Eligibility is a separate attribute: Microsoft 365 licence evidence never confirms GitHub eligibility."
     },
     {
       "id": "G10",
@@ -1130,7 +1141,7 @@
     {
       "id": "G12",
       "level": "SHOULD",
-      "rule": "Treat integration and cohort selection as separate, declared steps. Absence from an optional query does not establish non-use."
+      "rule": "Treat integration and cohort selection as separate, declared steps. An unavailable query does not establish non-use."
     },
     {
       "id": "G13",
@@ -1145,7 +1156,7 @@
     {
       "id": "G15",
       "level": "MUST",
-      "rule": "Check `PersonId` overlap between sources before joining. Low overlap indicates different pseudonymisation or populations. Do not repair it by matching on attributes."
+      "rule": "Check `PersonId` overlap between sources before joining. Investigate low overlap against activity filters, omitted inactive people and configured populations before concluding that pseudonymisation differs. Do not repair identifiers by matching on attributes."
     },
     {
       "id": "G16",

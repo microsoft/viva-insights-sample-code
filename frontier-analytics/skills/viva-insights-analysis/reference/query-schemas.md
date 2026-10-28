@@ -18,13 +18,16 @@ Always confirm the grain before aggregating. A Person Query is already
 person-level. A Meeting Query is meeting-level and must be filtered and
 aggregated before it means anything at the person or group level.
 
-For Consumption, GitHub and Agent queries, read
-[copilot-query-contracts.md](copilot-query-contracts.md). Consumption can have
-multiple services and spending policies per person-period, separate historical
-people metadata and more than one dated file layout. The Agent query has an
-observed weekly person-agent layout and an earlier dated variant.
-The supplied GitHub demo schema is illustrative, not a verified real export.
-Do not apply the Person Query key or licensing assumptions to any of these sources.
+For current Person, Consumption, GitHub and Agent integration, follow
+[Joining Viva Insights queries](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/).
+It takes precedence over older integration guidance and recommends exporting
+all selected queries grouped by week. Consumption can have multiple services
+and spending policies per person-period; Agent activity has person-agent-week
+grain. Use the guide's configured-cadence and missing-row rules, rather than
+inferring cadence from sparse activity dates.
+[copilot-query-contracts.md](copilot-query-contracts.md) retains historical layouts
+and synthetic-demo context. No verified real GitHub dashboard adapter is supplied.
+Do not apply the Person Query key or licensing assumptions to the other sources.
 
 ## Column naming: raw export vs imported
 

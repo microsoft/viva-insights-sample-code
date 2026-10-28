@@ -8,12 +8,15 @@ Paths below are relative to `repo_root`.
 | `examples/utility-r/github-developer-experience-helpers.R` | Fixture loading, coverage derivation, aggregation, assertions and plot helpers |
 | `examples/utility-r/render-github-developer-experience.R` | Existing rendering entry point |
 | `examples/utility-r/simulate-query-exports.R` | Single deterministic generator for every fixture under `_data` |
-| `examples/utility-r/_data/README.md` | Authoritative schema manifest: real export file names, keys, grains, units and join rules |
+| `examples/utility-r/_data/README.md` | Authoritative manifest for committed fixtures only: file names, keys, grains, units and synthetic assumptions |
 | `frontier-analytics/starter-kits/copilot-query-dashboard/README.md` | Isolated runner and readiness interface |
 
 Reproduce the demo only in the runner's copied workspace. The helper reads the
 committed fixtures and must never be treated as a real-data loader; fixture
 generation belongs to `simulate-query-exports.R`.
+For current export schemas and cross-query joins, defer to
+[Joining Viva Insights queries](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/).
+Its complete-data default does not supply a verified real GitHub dashboard adapter.
 
 ## Capability boundary
 

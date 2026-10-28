@@ -8,11 +8,14 @@ Paths below are relative to `repo_root`. Read only the needed sections.
 | `examples/utility-r/_data/consumption-query/` | Consumption query fixtures: `PeopleMetaData`, `PersonM365CreditsMetrics`, `PersonGitHubCreditsMetrics` |
 | `examples/utility-r/_data/person-query/PersonQuery.csv` | Person query fixture supplying collaboration metrics and HR attributes |
 | `examples/utility-r/_data/github-query/PersonGitHubActivityMetrics.csv` | GitHub activity fixture; its explicit weekday zero rows separate observed non-use from absent observation in the product usage mix. The four GitHub breakdown exports are **not** read by this report |
-| `examples/utility-r/_data/README.md` | Authoritative schema manifest: keys, grains, units and join rules |
+| `examples/utility-r/_data/README.md` | Authoritative manifest for committed fixtures only: keys, grains, units and synthetic assumptions |
 | `examples/utility-r/copilot-consumption-github-demo-reports.md` | Background documentation; actual source and fixture manifest determine runtime inputs |
 | `frontier-analytics/starter-kits/copilot-query-dashboard/README.md` | Runner configuration, dependencies and output contracts |
 
 The existing Rmd reads fixtures; do not assume it generates them on render.
+For current export schemas and cross-query joins, defer to
+[Joining Viva Insights queries](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/).
+Its complete-data default does not change the runner's mappings or capabilities.
 Use the runner's exact asset list, not a recursive copy of all examples.
 Dependencies are determined from source and checked by the runner; do not
 assume a short documentation list is exhaustive (the demo uses `ggrepel`).

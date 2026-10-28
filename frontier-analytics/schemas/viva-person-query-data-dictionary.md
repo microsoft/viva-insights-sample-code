@@ -4,6 +4,12 @@ This document describes the structure, columns, and data patterns of the **Viva 
 
 > **Note:** Column names and available metrics vary by tenant configuration and Viva Insights version. Always verify your actual column headers against this reference. For authoritative metric definitions, see [Microsoft Learn — Viva Insights metrics](https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics).
 
+> **Current cross-query guidance:** Use
+> [Joining Viva Insights queries](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/)
+> for current Person, Consumption, GitHub and Agent schemas and integration.
+> It takes precedence over this older illustrative dictionary and recommends
+> exporting all selected queries grouped by week.
+
 > **For inferential analysis:** this dictionary includes illustrative headers
 > and conventions that are not a complete current export contract. Person Query
 > supports daily, weekly and monthly grouping. Verify the actual period boundaries,
@@ -39,10 +45,15 @@ Person query data follows a **person-time panel** format:
 
 ### How to detect granularity
 
-To determine whether your data is person-week or person-day:
+Record the date grouping selected at query setup, or obtain equivalent export
+metadata, before inspecting dates. Do not infer cadence from gaps or the count of
+observed dates. A daily export can be sparse because inactive person-days are
+excluded by default, while a monthly gap must not be interpreted as weekly.
 
-1. **Check the date intervals.** Sort by `MetricDate` for a single person and look at the gap between consecutive dates. A 7-day gap indicates weekly; a 1-day gap indicates daily.
-2. **Count distinct dates.** If a 3-month export has ~13 distinct `MetricDate` values, it is weekly. If it has ~90, it is daily.
+Validate `MetricDate` against the configured grouping. For weekly exports, detect
+one week-start weekday and check it matches the other weekly queries. Stop if the
+grouping is unknown. The join guide requires a weekly Person Query and supports
+daily or weekly companion facts, rather than monthly integration.
 
 ---
 
@@ -150,18 +161,27 @@ The following table shows example rows with fake data to illustrate the structur
 
 ### Detecting time granularity
 
+Here `export_config` records the date grouping selected for the supplied query,
+obtained from query setup or export metadata. It must not be filled by guessing
+from observed dates. The examples recognise monthly data so that it can be
+excluded from this guide's daily/weekly integration.
+
 ```python
 # Python
-dates = df['MetricDate'].sort_values().unique()
-gap = (pd.to_datetime(dates[1]) - pd.to_datetime(dates[0])).days
-granularity = 'weekly' if gap >= 7 else 'daily'
+grouping = export_config.get('date_grouping')
+if grouping not in ('day', 'week', 'month'):
+    raise ValueError("Record the configured date grouping before integration")
+granularity = {'day': 'daily', 'week': 'weekly', 'month': 'monthly'}[grouping]
 ```
 
 ```r
 # R
-dates <- sort(unique(df$MetricDate))
-gap <- as.numeric(difftime(dates[2], dates[1], units = "days"))
-granularity <- if (gap >= 7) "weekly" else "daily"
+grouping <- export_config[["date_grouping"]]
+if (length(grouping) != 1 || is.na(grouping) ||
+    !grouping %in% c("day", "week", "month")) {
+  stop("Record the configured date grouping before integration")
+}
+granularity <- switch(grouping, day = "daily", week = "weekly", month = "monthly")
 ```
 
 ### Identifying licensed vs. unlicensed users
@@ -177,7 +197,11 @@ them to the unlicensed population.
 
 ### Validating panel completeness
 
-Check that each person appears in every time period. Missing person-periods may indicate employees joining or leaving.
+Summarise how many person-periods are present. This diagnostic alone does not
+establish cadence or a data-quality failure. Within a supplied Viva Insights
+query's configured scope, assume completeness and treat omitted inactive
+person-days as zero activity. People outside the population or date window
+remain out of scope.
 
 ```python
 # Python

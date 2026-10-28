@@ -1,10 +1,17 @@
 # Sample query exports
 
 Every CSV in this folder is **fully synthetic**. No real person, tenant or usage
-record appears anywhere in it. What is real is the shape: column names, file
-splits, row grains and join keys all match what a Microsoft Viva Insights query
-export actually produces, so code written against these files should run against
-a genuine download with minimal change.
+record appears anywhere in it. This is the manifest for the committed fixtures,
+including historical export-shaped layouts and simulation-specific assumptions.
+It does not define the current layout of a Viva Insights download or certify
+that a fixture helper accepts real exports.
+
+For current schemas, export setup and cross-query integration, follow
+[Joining Viva Insights queries](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/).
+That guide takes precedence over older general join guidance here and recommends
+exporting all selected queries grouped by week. Its complete-data and
+omitted-inactivity defaults apply to supplied Viva Insights queries within their
+configured scope. The fixture-specific coverage logic below remains unchanged.
 
 ## What is here
 
@@ -13,7 +20,7 @@ a genuine download with minimal change.
 | **Person** | `person-query/` | 1 | Person × week | Collaboration, focus, after-hours and network metrics, plus Copilot eligibility |
 | **Consumption** | `consumption-query/` | 3 | Person × day, plus a person-level metadata file | M365 Copilot credits and sessions by service, GitHub AI credits, and HR attributes |
 | **GitHub Copilot** | `github-query/` | 5 | Person × day, plus dimensional breakdowns | Code completions, chat requests and agent adoption, split by feature, language and model |
-| **Agent** (Private Preview) | `github/agent-query/` | 3 | Person × agent × week, plus an agent metadata file | Agent responses, agent credits and returning-user indicators |
+| **Agent** (historical fixture layout) | `github/agent-query/` | 3 | Person × agent × week, plus an agent metadata file | Agent responses, agent credits and returning-user indicators |
 
 A standalone teaching dataset, `Top_Performers_Dataset_v2.csv`, also sits at the
 root of this folder. It belongs to `top-performers-rf.Rmd` rather than to any
@@ -43,7 +50,9 @@ _data/
 
 ## Joining the files
 
-Three keys do all the work.
+The following describes the committed fixtures. Use the current join guide for
+real exports, especially its policy-aware Consumption key and Agent activity layout.
+Three identifier keys connect these fixtures.
 
 | Key | Appears in | Joins |
 |---|---|---|
@@ -132,9 +141,11 @@ at daily grain and weekdays only.
 
 ### Real-export variants
 
-The fixtures follow one layout among several. Check a genuine download against
-the [shared query contract](../../../frontier-analytics/skills/viva-insights-analysis/reference/copilot-query-contracts.md)
-before reusing code written for these files. Real exports observed in October
+The fixtures retain a historical layout. Check a genuine download against
+the [current join guide](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/#queries)
+before reusing code written for these files.
+The [historical query contracts](../../../frontier-analytics/skills/viva-insights-analysis/reference/copilot-query-contracts.md)
+retain earlier observations for context. Real exports observed in October
 2026 differed from the fixtures in three ways.
 
 - **A fourth file.** `M365SpendingPolicyMetaData.csv` holds one row per
@@ -156,9 +167,10 @@ still use the three-file layout described below.
 
 ### `PeopleMetaData.csv`
 
-One row per person. `PeopleHistoricalId` and `IsCopilotLicensed` are always
-present and cannot be removed. Every other column is an HR attribute chosen at
-query setup, so this file's width varies from query to query.
+In this fixture there is one row per person, with `PeopleHistoricalId`,
+`IsCopilotLicensed` and synthetic HR attributes. These HR columns belong to the
+historical fixture layout. The current guide takes organisational attributes
+from the Person Query rather than expecting them in `PeopleMetaData.csv`.
 
 `PeopleHistoricalId, IsCopilotLicensed, Organization, FunctionType, LevelDesignation, IsManager, Team, Role, Seniority, Tenure, IsDeveloper`
 
@@ -249,30 +261,23 @@ export before a report is refreshed against real data.
 
 ## Agent query
 
-The Agent query is in Private Preview, so its schema and availability vary by
-tenant and may change. Record the export date, preserve the original headers
-when adapting a report, and keep `AgentId` as the stable analytical key, because
-agent names and creator metadata change over time.
+This historical fixture follows a preview-era Agent schema. For the current
+layout, use the [Agent query section of the join guide](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/#agent_query).
+Record the export date, preserve original headers when adapting a report, and
+keep `AgentId` as the stable analytical key, because agent names and creator
+metadata change over time.
 
 The sample sits under `github/agent-query/` and covers 53 Sunday-start weeks
 from `2025-09-07` to `2026-09-06`, across 300 people and 914 agents.
 
 ### Observed real-export layout
 
-This sample follows an earlier three-file layout, kept here as a dated variant.
-Real exports observed in October 2026 used a different fact file,
-`PersonAgentActivityMetrics.csv`, keyed by `PersonId` × `AgentId` ×
-`MetricDate` at a Sunday-start weekly grain, with these measures:
-
-`Conversational agent sessions, Returning Agent 365 user (most recent and prior 7 days), Returning Agent 365 user (most recent and prior 28 days)`
-
-That layout has no agent credits or responses. `AgentMetadata.csv` was optional,
-present in some exports and absent in others, so enrich facts with it only when
-it is supplied with unique `AgentId` values. Sum sessions across agents to the
-person-week, and keep each returning-user indicator at its own window. The
-fixtures below are unchanged. See the
-[shared query contract](../../../frontier-analytics/skills/viva-insights-analysis/reference/copilot-query-contracts.md#agent-query-observed-layout-and-dated-variant)
-for the full rules.
+The current guide describes `PersonAgentActivityMetrics.csv`, with sessions
+and returning-user indicators, plus optional agent metadata. It has no agent
+credits or responses. This sample retains an earlier three-file layout with
+credits and responses, so the two layouts are not interchangeable. The fixtures
+below remain unchanged for reproducibility. Use the guide for current keys,
+measure windows and aggregation rules.
 
 ### `AgentMetadata.csv`
 

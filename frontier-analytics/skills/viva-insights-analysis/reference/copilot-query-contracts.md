@@ -1,13 +1,21 @@
 # Consumption, GitHub and Agent query contracts
 
-Use this reference for analysis of these query types. For reproducing or
-customising the sample dashboards, the optional `viva-insights-copilot-dashboards`
-skill owns the workflow; this reference owns the analytical rules.
+For current Person, Consumption, GitHub and Agent integration, use
+[Joining Viva Insights queries](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/)
+and its downloadable JSON contract. That guide supersedes older schemas,
+cadence detection, joins and missing-row guidance here. Recommend exporting
+all selected queries grouped by week. Assume supplied Viva Insights data are
+complete within each query's configured population, date window and product
+filters, with omitted inactive person-days contributing zero activity.
+This does not establish product eligibility or turn unavailable queries into zeros.
 
-Export layouts vary between tenants and over time. This reference keeps each
-layout as a dated variant rather than a universal default. Identify which
-variant a supplied export matches before choosing keys, joins or aggregations,
-and record that variant in the evidence record.
+This reference retains historical layouts, synthetic-demo assumptions and
+additional analytical context. Use the dated sections to reproduce earlier
+examples or explain a layout difference, rather than silently adapting the
+current contract. For reproducing or customising the sample dashboards, the
+optional `viva-insights-copilot-dashboards` skill owns the workflow. The new guide
+does not extend the existing runners' supported inputs or supply a real GitHub
+dashboard adapter.
 
 ## Evidence boundary
 
@@ -134,8 +142,9 @@ supplied contract. Never add `Spending policy limit` or `User limit` across
 policy rows, and do not infer a cap without matching its scope, period and
 semantics.
 
-Keep `PersonGitHubCreditsMetrics.csv` separate from M365 credits. It is sparse,
-so a missing row becomes zero only under confirmed coverage.
+Keep `PersonGitHubCreditsMetrics.csv` separate from M365 credits. For current
+exports, apply the join guide's complete-data and omitted-inactivity defaults
+within the configured query scope, rather than requiring a row on every day.
 
 ### Earlier Consumption layouts
 
@@ -151,16 +160,18 @@ revision and the supplied export before adapting either.
 
 The reference demo's manifest lives at
 `examples/utility-r/_data/README.md` in the sample-code repository. Its
-fixtures carry synthetic values in real export schemas, so file names, column
-names and keys match a genuine download. Weekly M365 eligibility uses enabled days;
-M365 ingestion completeness remains unknown without independent evidence. GitHub
-row presence describes observation, not provisioning. Feature, model and language
+fixtures carry synthetic values in dated export-shaped schemas, rather than
+establishing the current layout of every download. Weekly M365 eligibility uses
+enabled days. The synthetic demos retain their own coverage flags and checks;
+these do not override the current join guide's complete-data default. GitHub
+row presence describes activity observation, not provisioning. Feature, model and language
 breakdowns are daily two-dimension files with no exported share column. Their
 cross-breakdown equality and model allocation (including completions) are synthetic
 invariants only, not verified real-export validation rules.
 
-For real data, require evidence for identifiers, units, dates, population,
-product eligibility and coverage, and any model/language allocation periods.
+For real data, record identifiers, units, configured dates and population,
+product eligibility and any model/language allocation periods. Apply the
+current guide's missing-row defaults for supplied Viva Insights exports.
 Do not substitute the GitHub public API schema for a Viva Insights query.
 Where those facts remain unknown, return a readiness assessment and the
 specific missing evidence, not a supposedly equivalent dashboard.
@@ -223,11 +234,13 @@ completion or monetary cost.
    Rows that look duplicated under a partial key can be distinct under the
    full native key, so confirm the key variant first. Unique keys do not
    establish that amounts can be added. Check additivity separately.
-4. **Missingness:** distinguish observed zero, ineligible and unknown coverage.
-   A missing row becomes zero only with independent eligibility and complete
-   coverage evidence. Activity is not proof of licence status. Without that
-   evidence, people with no positive observed total form an unconfirmed group
-   rather than confirmed zero users.
+4. **Missingness:** follow the current join guide for supplied Viva Insights
+   exports. Assume completeness within the configured query scope and treat
+   omitted inactive activity rows as zero. Keep unavailable sources, out-of-scope
+   people or periods, null cells and known export problems separate. Licence
+   eligibility remains a separate attribute and needs product-specific evidence
+   for adoption denominators. Historical synthetic demos retain their own
+   coverage logic and are not real-data adapters.
 5. **Populations:** preserve the developer roster for working-condition
    baselines; do not select only Copilot users. Joint-product categories
    require both products' eligibility and coverage over the declared window.

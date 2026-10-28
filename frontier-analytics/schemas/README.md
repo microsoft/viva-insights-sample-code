@@ -4,6 +4,7 @@ This directory contains **data dictionaries and schema references** for the data
 
 ## How to use these docs
 
+- **Joining current queries:** Start with [Joining Viva Insights queries](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/). It takes precedence over older Person, Consumption, GitHub and Agent integration guidance here. Export all selected queries grouped by week where possible.
 - **Building prompts:** Reference the data dictionaries when writing or adapting prompt cards. Understanding column names, types, and edge cases will produce better prompts.
 - **Sharing with coding agents:** Paste the relevant schema documentation into your coding agent's context window (or point it at the file) before running an analytics prompt. This gives the agent the structural knowledge it needs to handle your data correctly.
 - **Data validation:** Use the example rows and column descriptions to verify that your export matches the expected format before running any analysis.
@@ -14,11 +15,12 @@ This directory contains **data dictionaries and schema references** for the data
 
 | Document | Description |
 |---|---|
+| [Joining Viva Insights queries](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/) | Current cross-query contract, recommended weekly exports, schemas, joins, missing-row defaults and aggregation rules. |
 | [Person Query Data Dictionary](viva-person-query-data-dictionary.md) | Column definitions, data types, and value patterns for the Viva Insights person query export (person-week or person-day panel). |
 | [Purview Audit Data Dictionary](purview-audit-data-dictionary.md) | Column definitions and nested JSON structure for Microsoft Purview unified audit log exports, including Copilot event data. |
 | [Join Patterns](join-patterns.md) | How to join person query data with Purview audit logs, external HR data, and license records — with code examples in R and Python. |
 | [Common Pitfalls](common-pitfalls.md) | Data quality issues, analytical mistakes, and edge cases to watch for when working with Viva Insights exports. |
-| [Consumption, GitHub and Agent query contracts](../skills/viva-insights-analysis/reference/copilot-query-contracts.md) | Shared, on-demand contract for documented and observed Consumption and Agent layouts versus synthetic GitHub inputs, safe joins, additivity, units, coverage and claim limits. |
+| [Historical Consumption, GitHub and Agent query contracts](../skills/viva-insights-analysis/reference/copilot-query-contracts.md) | Dated layouts, synthetic-demo assumptions and analytical context. Defer to the current join guide for cross-query integration. |
 
 ## Important notes
 

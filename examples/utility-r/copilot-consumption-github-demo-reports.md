@@ -114,20 +114,20 @@ These presentation changes do not equate missing observation with zero or weaken
 the privacy floor. "Recorded GitHub use" is a subset of developers with complete
 GitHub activity observation, not another name for that observed population.
 
-## Simulated values, real schema
+## Synthetic fixtures and their schema
 
-The `_data/` folder contains **fully synthetic values in real export schemas**. Every file
-name, column name and key matches a real Viva Insights query export. This is a deliberate
-correction: an earlier version of these demos simulated the schema as well as the values,
-and carried columns that exist in no export — token counts, a task-type breakdown, an
-eligibility/coverage reference file, and an M365 actions feed with no corresponding
-query.
+The `_data/` folder contains **fully synthetic values in dated export-shaped
+schemas**. Its Consumption layout and metadata differ from the current join
+guide, so matching fixture headers does not establish compatibility with a
+current download. Earlier versions also carried token counts, a task-type
+breakdown, an eligibility/coverage reference file and an M365 actions feed with
+no corresponding query. Those invented fields were removed.
 
-Sample code written against an invented schema cannot be pointed at a real export without
-rework, so the fixtures were rebuilt against the published contracts. The single
+The current [join tutorial](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/)
+takes precedence for real cross-query integration. The single
 deterministic generator is [simulate-query-exports.R](simulate-query-exports.R), and
-[_data/README.md](_data/README.md) is the authoritative manifest for keys, fields, grains
-and join rules.
+[_data/README.md](_data/README.md) is the authoritative manifest for the committed
+fixtures' keys, fields, grains and synthetic assumptions.
 
 ```
 _data/

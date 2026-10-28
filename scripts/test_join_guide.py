@@ -1,5 +1,6 @@
 """Regression checks for the generated site page and its machine-readable contract."""
 import copy
+import html
 from html.parser import HTMLParser
 import json
 import re
@@ -73,6 +74,67 @@ class JoinGuideTests(unittest.TestCase):
         contract["relationships"][0]["to_id"] = "unknown"
         with self.assertRaises(AssertionError):
             guide.validate_contract(contract)
+
+    def test_query_entry_points_defer_to_current_guide(self):
+        for path in [
+            "frontier-analytics/schemas/README.md",
+            "frontier-analytics/schemas/viva-person-query-data-dictionary.md",
+            "frontier-analytics/skills/viva-insights-analysis/SKILL.md",
+            "frontier-analytics/skills/viva-insights-analysis/reference/query-schemas.md",
+            "frontier-analytics/skills/viva-insights-analysis/reference/copilot-query-contracts.md",
+            "frontier-analytics/skills/viva-insights-analysis/reference/deliverables.md",
+            "frontier-analytics/skills/viva-insights-copilot-dashboards/SKILL.md",
+            "frontier-analytics/skills/viva-insights-copilot-dashboards/reference/consumption.md",
+            "frontier-analytics/skills/viva-insights-copilot-dashboards/reference/github.md",
+            "examples/utility-r/_data/README.md",
+        ]:
+            with self.subTest(path=path):
+                text = guide.ROOT.joinpath(*path.split("/")).read_text(encoding="utf-8")
+                self.assertIn("https://microsoft.github.io/viva-insights-sample-code/query-join-guide/", text)
+                self.assertNotIn("this reference owns the analytical rules", text)
+
+    def test_documented_cadence_uses_configuration_not_sparse_dates(self):
+        text = (guide.ROOT / "frontier-analytics" / "schemas" / "viva-person-query-data-dictionary.md").read_text(encoding="utf-8")
+        section = text.split("### Detecting time granularity\n", 1)[1]
+        code = re.search(r"```python\n(.*?)\n```", section, re.S).group(1)
+        for grouping, dates, expected in [
+            ("day", ["2026-10-19", "2026-10-26"], "daily"),
+            ("day", ["2026-10-19"], "daily"),
+            ("week", ["2026-10-19", "2026-11-02"], "weekly"),
+            ("month", ["2026-01-01", "2026-02-01"], "monthly"),
+            (None, ["2026-10-19", "2026-10-26"], None),
+        ]:
+            with self.subTest(grouping=grouping, dates=dates):
+                scope = {
+                    "pd": pd,
+                    "df": pd.DataFrame({"MetricDate": dates}),
+                    "export_config": {"date_grouping": grouping},
+                }
+                if expected is None:
+                    with self.assertRaisesRegex(ValueError, "configured date grouping"):
+                        exec(code, scope)
+                else:
+                    exec(code, scope)
+                    self.assertEqual(scope["granularity"], expected)
+
+    def test_coverage_defaults_and_aggregation_exceptions_are_visible(self):
+        page = guide.build_html()
+        for rule in guide.CONTRACT["coverage_assumption"].values():
+            if isinstance(rule, str):
+                self.assertIn(html.escape(rule, quote=True), page)
+        gates = {g["id"]: g["rule"] for g in guide.CONTRACT["gates"]}
+        self.assertIn("panel-bound summaries", gates["G07"])
+        self.assertIn("G05b", gates["G07"])
+        self.assertIn("G11", gates["G07"])
+        self.assertNotIn("in every case", gates["G07"])
+        files = {f["id"]: f for q in guide.CONTRACT["queries"] for f in q["files"]}
+        for measure in guide.CONTRACT["measures"]:
+            if measure["file_id"].startswith("github.by_"):
+                rule = measure["person_week_rule"]
+                self.assertIn("linked detail", rule)
+                for dimension in files[measure["file_id"]]["native_key"]:
+                    if dimension not in {"PersonId", "MetricDate"}:
+                        self.assertIn(dimension, rule)
 
     def test_documented_week_alignment_uses_detected_weekday(self):
         text = (guide.ROOT / "frontier-analytics" / "schemas" / "join-patterns.md").read_text(encoding="utf-8")

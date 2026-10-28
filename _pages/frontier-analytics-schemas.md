@@ -37,7 +37,9 @@ These are not interchangeable with a Person Query.
 
 For the four query families and their native keys, use the
 [join tutorial]({{ site.baseurl }}/query-join-guide/#queries).
-It supports daily or weekly facts aligned to a weekly Person Query.
+It is the current cross-query reference and supersedes older integration
+guidance in this repository. Export all selected queries grouped by week where
+possible. It also supports configured daily facts aligned to a weekly Person Query.
 Other export periods require a separately defined integration.
 
 | Source | Contract boundary | Guided journey |
@@ -46,10 +48,15 @@ Other export periods require a separately defined integration.
 | GitHub | Activity summary plus four dimensional breakdown files. Synthetic demos use export headers, but a real GitHub dashboard adapter is not verified in v1. | [Build a Developer Experience dashboard]({{ site.baseurl }}/frontier-analytics-prompt-developer-experience-dashboard/) |
 | Agent | Person-agent-week activity, with optional agent metadata. Aggregate sessions across agents before joining to the Person Query. | [Agent schema and joins]({{ site.baseurl }}/query-join-guide/#agent_query) |
 
-Read the [shared query contract](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/skills/viva-insights-analysis/reference/copilot-query-contracts.md)
-for keys, units, coverage, privacy and interpretation rules, and the
+Use the tutorial for current keys, aggregation, missing-row defaults and privacy
+rules. Assume supplied Viva Insights queries are complete within their configured
+population and date window. Daily exports omit inactive person-days by default,
+so those missing activity rows contribute zero, without establishing licence status.
+Keep unavailable queries, out-of-scope periods and null cells separate.
+The [historical query contracts](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/skills/viva-insights-analysis/reference/copilot-query-contracts.md)
+retain dated layouts and analytical context. See the
 [public Consumption documentation](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query)
-for its current export schema. Missing fields exclude panels; agents must not
+for official product documentation. Missing fields exclude panels; agents must not
 generate synthetic replacements in a real-data run.
 
 ## Person Query — Key Concepts {#person-query-key-concepts}
@@ -75,7 +82,7 @@ Person query exports typically contain these categories of columns. Exact column
 | **Identifiers** | `PersonId` (anonymized), `MetricDate` (period start date) |
 | **HR attributes** | Organizational metadata (org, function, level, region, etc.) — configurable per tenant |
 | **Collaboration metrics** | Meeting hours, email hours, chat hours, focus hours, network size, etc. |
-| **Copilot metrics** | Copilot actions, assisted hours, chat queries, etc. — only populated for licensed users |
+| **Copilot metrics** | Selected activity metrics with product-specific definitions. Licensed Copilot activity and unlicensed Copilot Chat are separate families. |
 
 ### Licensed vs. unlicensed vs. active
 
@@ -84,11 +91,15 @@ This distinction is critical for any Copilot adoption analysis:
 | Status | Meaning | How to detect |
 |--------|---------|---------------|
 | **Unlicensed** | User does not have a Copilot license | Explicit licence evidence for the period |
-| **Licensed but inactive** | User has a license but did not use Copilot | Confirmed licence, complete coverage and observed zero activity |
+| **Licensed but inactive** | User has a license but did not use Copilot | Confirmed licence and zero activity, including omitted inactive rows within a supplied query's scope |
 | **Active** | Observed use of the selected Copilot metric | Verified activity metric > 0; licence status is a separate attribute |
 | **Unknown** | Eligibility or observation coverage is unresolved | Retain separately; do not infer from absence |
 
-> **Critical:** `null` is not `0`, and neither establishes licensing by itself. Use documented enabled-days or licence records and coverage evidence. If a denominator is unknown, report observed activity and omit adoption rates.
+> **Critical:** A null cell in an existing row is different from an omitted
+> inactive row. Neither an activity zero nor a null establishes licensing.
+> Use documented enabled-days or licence records for eligibility. Assume supplied
+> Viva Insights queries are complete within their configured scope unless a known
+> issue applies. If a denominator is unknown, omit adoption rates.
 
 ---
 

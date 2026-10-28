@@ -53,7 +53,7 @@ SURFACE_DAY_HEADERS = [h for h in SURFACE_HEADERS if h.startswith("Days of activ
 
 CONTRACT = {
     "contract_id": "viva-insights-query-join",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "date": "2026-10-28",
     "status": "reference",
     "scope": "Joining weekly Viva Insights Person Query exports with Consumption, GitHub and Agent query exports into one person-week panel",
@@ -74,7 +74,14 @@ CONTRACT = {
         "keys": ["PersonId", "WeekStart"],
         "person_query_cadence_required": "weekly",
         "week_start": "detect_from_person_query",
-        "rule": "This contract requires a weekly Person Query. WeekStart is its MetricDate. Consumption and GitHub exports are daily by default and can be grouped by week at setup. Agent exports are weekly. Bring every source onto the same WeekStart (G03, G03b).",
+        "rule": "Export all selected queries grouped by week, with the same week start, wherever possible. This contract requires a weekly Person Query. WeekStart is its MetricDate. Consumption and GitHub default to daily, so change their grouping at setup. Use daily exports only when daily detail or week-start alignment is needed (G03, G03b).",
+    },
+    "coverage_assumption": {
+        "complete_by_default": True,
+        "scope": "The configured population, date window and product filters of each supplied Viva Insights query.",
+        "missing_activity_rows": "Inactive person-days are excluded by default. Within the query's scope, treat omitted activity rows as zero activity, including a person-week with no activity rows. This does not require separate completeness evidence.",
+        "exceptions": "Keep unavailable queries, out-of-scope people or periods, null cells in existing rows and known export problems distinct from inactivity. Partial boundary weeks do not establish full-week totals.",
+        "eligibility": "Activity zeros do not establish product eligibility or licence status. Use product-specific evidence for adoption denominators.",
     },
     "header_matching": "Headers are listed in their raw export form, with spaces. The vivainsights R and Python packages replace spaces with underscores when they import a query, so Collaboration hours becomes Collaboration_hours. Treat the two forms as the same column. This applies to headers only, never to identifier values.",
     "query_setup_recommendation": "For all four queries, we recommend the Create analysis route because it offers more customisation parameters than dashboard exports.",
@@ -226,10 +233,10 @@ CONTRACT = {
         {"id": "M04", "file_id": "consumption.github_credits", "columns": ["Total GitHub AI Credits used"], "kind": "additive", "person_week_rule": "Sum across days when the export is daily. Keep separate from Microsoft 365 credits."},
         {"id": "M05", "file_id": "github.activity", "columns": ["Code completions accepted", "Code completions suggested", "User-initiated chat requests"], "kind": "additive", "person_week_rule": "Sum across days when the export is daily. Acceptance rate is summed accepted divided by summed suggested, with a stated zero-denominator rule."},
         {"id": "M06", "file_id": "github.activity", "columns": ["Agent adoption"], "kind": "indicator", "person_week_rule": "Do not sum. For a daily export, state a derived weekly rule, for example any positive day in the week. For a weekly export, use the exported value."},
-        {"id": "M07", "file_id": "github.by_feature", "columns": ["Feature Usage Count"], "kind": "additive_within_file", "person_week_rule": "Sum within this file only, across days when the export is daily. Never add to another breakdown."},
-        {"id": "M08", "file_id": "github.by_language_feature", "columns": ["Usage count by language and feature"], "kind": "additive_within_file", "person_week_rule": "Sum within this file only, across days when the export is daily. Never add to another breakdown."},
-        {"id": "M09", "file_id": "github.by_language_model", "columns": ["Usage count by language and model"], "kind": "additive_within_file", "person_week_rule": "Sum within this file only, across days when the export is daily. Never add to another breakdown."},
-        {"id": "M10", "file_id": "github.by_model_feature", "columns": ["Usage count by model and feature"], "kind": "additive_within_file", "person_week_rule": "Sum within this file only, across days when the export is daily. Never add to another breakdown."},
+        {"id": "M07", "file_id": "github.by_feature", "columns": ["Feature Usage Count"], "kind": "additive_within_file", "person_week_rule": "Sum days within this file when daily, retaining Feature for each person-week. Keep as linked detail. Never add to another breakdown."},
+        {"id": "M08", "file_id": "github.by_language_feature", "columns": ["Usage count by language and feature"], "kind": "additive_within_file", "person_week_rule": "Sum days within this file when daily, retaining Language and Feature for each person-week. Keep as linked detail. Never add to another breakdown."},
+        {"id": "M09", "file_id": "github.by_language_model", "columns": ["Usage count by language and model"], "kind": "additive_within_file", "person_week_rule": "Sum days within this file when daily, retaining Language and Model for each person-week. Keep as linked detail. Never add to another breakdown."},
+        {"id": "M10", "file_id": "github.by_model_feature", "columns": ["Usage count by model and feature"], "kind": "additive_within_file", "person_week_rule": "Sum days within this file when daily, retaining Model and Feature for each person-week. Keep as linked detail. Never add to another breakdown."},
         {"id": "M11", "file_id": "agent.activity", "columns": ["Conversational agent sessions"], "kind": "additive", "person_week_rule": "Sum across agents to person-week."},
         {"id": "M12", "file_id": "agent.activity", "columns": ["Returning Agent 365 user (most recent and prior 7 days)"], "kind": "window_indicator", "person_week_rule": "Do not sum across agents or weeks. A person-level flag, such as returning for any agent, is a stated derived definition."},
         {"id": "M13", "file_id": "agent.activity", "columns": ["Returning Agent 365 user (most recent and prior 28 days)"], "kind": "window_indicator", "person_week_rule": "Do not sum across agents or weeks. A person-level flag, such as returning for any agent, is a stated derived definition."},
@@ -239,43 +246,44 @@ CONTRACT = {
     "missingness_states": [
         {"id": "observed_positive", "meaning": "A row exists with a positive value"},
         {"id": "observed_zero", "meaning": "A row exists with a recorded zero"},
-        {"id": "absent_confirmed_zero", "meaning": "No row, and eligibility and complete coverage are confirmed for that product, so the value is zero"},
-        {"id": "absent_unknown", "meaning": "No row, and coverage or eligibility for that product is not confirmed. Keep as unknown"},
+        {"id": "absent_inactive_zero", "meaning": "No activity row within a supplied query's configured population and date window. Assume complete Viva Insights data and record zero activity"},
+        {"id": "absent_unknown", "meaning": "The query is unavailable, the person or period is outside its scope, a known export problem applies, or an absent non-activity measure has no defined zero interpretation. Keep as unknown"},
+        {"id": "observed_null", "meaning": "A row exists but the measure is null. Do not apply the omitted-inactive-row default to this cell"},
         {"id": "ineligible", "meaning": "Not eligible for that product in the week"},
         {"id": "outside_cohort", "meaning": "Not selected by the analysis cohort rule"},
     ],
     "gates": [
         {"id": "G01", "level": "MUST", "rule": "Require the Person Query plus at least one of Consumption, GitHub or Agent. Record which queries are supplied and identify each export's layout. Within each selected query, files with `required_for_layout_match` set to true must all be present. If files or key columns differ from this contract, stop and record the difference."},
         {"id": "G02", "level": "MUST", "rule": "Read identifiers as text. Do not change their case, trim them silently or fuzzy-match people."},
-        {"id": "G03", "level": "MUST", "rule": "Confirm the Person Query is weekly, with one row per PersonId and MetricDate, and detect the weekday of MetricDate. Stop if it is daily or monthly. Do not assume Monday or Sunday."},
-        {"id": "G03b", "level": "MUST", "rule": "Detect each fact export's period from its MetricDate values. Daily and weekly exports are supported. A weekly export must start on the same weekday as the Person Query. Stop for any other period, such as monthly, or for a different week start."},
+        {"id": "G03", "level": "MUST", "rule": "Confirm weekly grouping from the Person Query configuration or equivalent export metadata, then validate one row per PersonId and MetricDate and detect the weekday of MetricDate. Stop if grouping is unknown, daily or monthly. Do not assume Monday or Sunday."},
+        {"id": "G03b", "level": "MUST", "rule": "Record each fact export's configured date grouping from query setup or equivalent export metadata, then validate MetricDate against it. Sparse dates alone cannot establish cadence. Recommend weekly grouping for all queries. Daily and weekly exports are supported. A weekly export must start on the same weekday as the Person Query. Stop for unknown grouping, any other period such as monthly, or a different weekly start."},
         {"id": "G04", "level": "MUST", "rule": "Assert uniqueness of each file's native key. Report duplicate counts and stop. Never keep an arbitrary first row."},
         {"id": "G05", "level": "MUST", "rule": "Before summing Microsoft 365 credits across SpendingPolicyId, count person-service-period keys with more than one positive-credit row. If any exist, obtain a documented confirmation that the rows record disjoint consumption."},
         {"id": "G05b", "level": "MUST", "rule": "Sum Session count across SpendingPolicyId rows only when the documented confirmation explicitly covers sessions. Otherwise keep sessions per policy."},
         {"id": "G06", "level": "MUST", "rule": "Join metadata many-to-one on unique keys. Report unmatched key counts without identifiers. Check that each PeopleHistoricalId maps to one PersonId."},
-        {"id": "G07", "level": "MUST", "rule": "Bring each fact file to one row per PersonId and WeekStart before joining. Sum days into weeks only when the export is daily. Aggregate across services, spending policies and agents in every case. Never expand weekly rows into invented daily rows."},
+        {"id": "G07", "level": "MUST", "rule": "Bring only panel-bound summaries to one row per PersonId and WeekStart before joining. Apply the measure rules: sum days only for configured daily exports, credits across policies only after G05, and sessions across policies only after G05b. Otherwise retain sessions per policy outside the panel. Keep GitHub breakdown dimensions as linked detail under G11. Never expand weekly rows into invented daily rows."},
         {"id": "G08", "level": "MUST", "rule": "Left join each person-week summary onto the Person Query. Assert one-to-one, preserve the Person Query row count, and reconcile additive totals before and after."},
-        {"id": "G09", "level": "MUST", "rule": "Keep missing values distinct from zero. A missing row becomes zero only when eligibility and complete coverage are confirmed for that specific product. Microsoft 365 licence evidence never confirms GitHub eligibility."},
+        {"id": "G09", "level": "MUST", "rule": "Assume supplied Viva Insights queries are complete within their configured population, date window and product filters. Omitted activity rows represent inactivity by default, so record zero activity within that scope without requiring separate completeness evidence. Do not zero-fill unavailable queries, out-of-scope periods or people, null cells in existing rows, rolling indicators, limits, or known export problems. Record partial boundary weeks separately. Eligibility is a separate attribute: Microsoft 365 licence evidence never confirms GitHub eligibility."},
         {"id": "G10", "level": "MUST", "rule": "Keep Microsoft 365 and GitHub credits in separate columns. Never derive tokens or currency from credits."},
         {"id": "G11", "level": "MUST", "rule": "Do not join GitHub breakdown files wide. Keep them as linked detail tables."},
-        {"id": "G12", "level": "SHOULD", "rule": "Treat integration and cohort selection as separate, declared steps. Absence from an optional query does not establish non-use."},
+        {"id": "G12", "level": "SHOULD", "rule": "Treat integration and cohort selection as separate, declared steps. An unavailable query does not establish non-use."},
         {"id": "G13", "level": "SHOULD", "rule": "Record each variable's measurement window. Network sizes can repeat within a month and are averaged rather than summed."},
         {"id": "G14", "level": "MUST", "rule": "Coverage, licence and additivity confirmations apply only to the export they were given for."},
-        {"id": "G15", "level": "MUST", "rule": "Check PersonId overlap between sources before joining. Low overlap indicates different pseudonymisation or populations. Do not repair it by matching on attributes."},
+        {"id": "G15", "level": "MUST", "rule": "Check PersonId overlap between sources before joining. Investigate low overlap against activity filters, omitted inactive people and configured populations before concluding that pseudonymisation differs. Do not repair identifiers by matching on attributes."},
         {"id": "G16", "level": "MUST", "rule": "Publish a group only when it contains at least 10 distinct people, counted with count_distinct(PersonId), in every filter and time slice. Withhold an entire related breakdown if remaining cells or totals would reveal a suppressed cell by subtraction. Never output identifiers."},
         {"id": "G17", "level": "MUST", "rule": "Describe joined results as associations. Credits, sessions and actions do not measure value, quality or productivity."},
     ],
 }
 
 PROCEDURE = [
-    ("Match the layout", "G01", "Confirm that the Person Query and at least one of Consumption, GitHub or Agent are supplied. List the files for each selected query and compare their names and key columns with the schema tables. Record the export date, which layout matched and which queries are unavailable."),
+    ("Match the layout", "G01", "Confirm that the Person Query and at least one of Consumption, GitHub or Agent are supplied. List the files for each selected query and compare their names and key columns with the schema tables. Record the export date, configured population, date window and product filters, which layout matched and which queries are unavailable."),
     ("Load safely", "G02", "Read every identifier column as text and parse dates explicitly. Headers may arrive in raw form with spaces, or with underscores after import through the vivainsights packages."),
-    ("Fix the target grain", "G03, G03b", "Confirm the Person Query is weekly with one row per PersonId and MetricDate, and detect the weekday of MetricDate. That week definition is WeekStart. Then check whether each fact export is daily or weekly, and that weekly exports start on the same weekday."),
+    ("Fix the target grain", "G03, G03b", "Recommend weekly grouping for every selected query. Record each configured grouping from query setup or equivalent export metadata before checking dates. Confirm the Person Query is weekly with one row per PersonId and MetricDate, and detect its weekday as WeekStart. Validate daily fact dates or matching weekly starts. Stop if grouping is unknown, rather than inferring it from sparse dates."),
     ("Validate each file", "G04, G06", "Assert each native key. Join metadata files many-to-one and report unmatched counts. Check that each PeopleHistoricalId maps to one PersonId."),
     ("Check policy additivity", "G05, G05b", "In PersonM365CreditsMetrics.csv, count person-service-period keys with more than one positive-credit SpendingPolicyId row. Zero means credits can be summed. Otherwise stop for a documented decision, and confirm separately whether it covers sessions."),
-    ("Bring each source to person-week", "G07, G10, G11", "For a daily export, map MetricDate to WeekStart and aggregate the days. For a weekly export, use MetricDate as WeekStart. In both cases aggregate across services, spending policies and agents, apply each measure rule, keep Microsoft 365 and GitHub credits separate, and keep GitHub breakdowns out of the panel."),
+    ("Bring each source to person-week", "G07, G10, G11", "Build only panel-bound summaries at one row per person-week. For a configured daily export, map MetricDate to WeekStart and sum permitted measures across days. For a weekly export, use MetricDate as WeekStart. Follow the measure-specific service, policy and agent rules, including G05b for sessions. Keep unconfirmed per-policy sessions and dimension-preserving GitHub breakdowns as linked detail. Keep Microsoft 365 and GitHub credits separate."),
     ("Join onto the spine", "G08, G15", "Left join each summary to the Person Query on PersonId and WeekStart. Assert one-to-one, check PersonId overlap, and reconcile row counts and additive totals."),
-    ("Label missing values", "G09", "For every joined measure, record whether a value is observed positive, observed zero, confirmed zero, unknown, ineligible or outside the cohort, using product-specific eligibility evidence."),
+    ("Label missing values", "G09", "Assume supplied Viva Insights data are complete within the recorded query scope. For activity measures, treat omitted inactive person-days, or an entire inactive person-week, as zero. Label unavailable or out-of-scope data, known export problems and null cells separately. Record partial boundary weeks and keep licence eligibility separate from activity zeros."),
     ("Select the cohort", "G12, G13", "Choose the population for the question, for example everyone eligible for an adoption view, and record the rule and the measurement windows."),
     ("Publish safely", "G14, G16, G17", "Publish only groups of at least 10 distinct people in every slice, withhold related breakdowns that would allow subtraction, keep identifiers out of every output and describe results as associations."),
 ]
@@ -351,7 +359,7 @@ ERRORS = [
     ("Network size totals look implausibly large", "Repeated monthly snapshots were summed", "Average snapshots and record the measurement window."),
     ("Total active days exceed seven per week", "Per-surface active days were added together", "Use Total Copilot active days for the total."),
     ("Weekly Consumption or GitHub rows match no Person Query weeks", "The weekly export starts on a different weekday from the Person Query", "Export the query daily and aggregate the days to the Person Query weeks. Weekly totals cannot be shifted to another week start."),
-    ("Missing GitHub rows treated as zero", "The GitHub files are sparse and coverage was assumed, sometimes from Microsoft 365 licence evidence", "Keep as unknown unless GitHub eligibility and coverage are confirmed."),
+    ("Out-of-scope GitHub periods treated as zero", "The query's configured date window or population differs from the Person Query", "Apply the inactivity default only within the supplied query's scope. Keep unavailable or out-of-scope data unknown. Microsoft 365 licence evidence does not establish GitHub eligibility."),
 ]
 
 
@@ -594,9 +602,11 @@ lang: en-GB
 <div class="query-join-guide">
 <h2 id="overview">Overview</h2>
 <p>This tutorial walks through how to join the four custom queries in Viva Insights (Person, Consumption, GitHub and Agent) to bring together behavioural and AI usage metrics, alongside organisational attributes, in a single panel data file for analysis and reporting. The resulting file has one row per person per week.</p>
+<p>This is the current reference for these cross-query joins and takes precedence over older schema and join guidance in this repository. Historical layouts and synthetic fixture manifests remain available for reproducing earlier examples. This guide does not extend the existing dashboard runners' supported inputs.</p>
 <p>You need the <strong>Person Query</strong> plus at least one of the Consumption, GitHub or Agent queries. We recommend using all four for a broader view of a population's ways of working and AI usage across the products and activities they measure.</p>
 <p>All four queries are available under <strong>Create analysis &gt; Customized query</strong> in <a href="https://analysis.insights.cloud.microsoft/">Viva Insights</a>, where you can adjust parameters such as date grouping and population filters. We recommend this route because it offers more customisation parameters than dashboard exports.</p>
-<p>Choose <strong>Week</strong> for this tutorial, with the same week start across queries. Consumption and GitHub default to Day, so selecting Week removes the need to sum days into weeks. If you need daily detail or must align different week starts, export those queries by Day and aggregate to the Person Query weeks.</p>
+<p>We recommend exporting <strong>all selected queries grouped by Week</strong>, with the same week start. Consumption and GitHub default to Day, so change their grouping at setup. Weekly exports avoid daily-to-weekly aggregation and sparse-day handling, although service, spending-policy and agent rules still apply. If you need daily detail or must align different week starts, export those queries by Day and aggregate to the Person Query weeks.</p>
+<p>Record the configured grouping for every query before validating its dates. Sparse observed dates alone cannot distinguish daily from weekly or monthly data.</p>
 {table("The four queries", ["Query", "Files", "Period", "Role"], query_rows, "query-summary", widths=[18, 40, 22, 20])}
 
 <h2 id="architecture">Join architecture</h2>
@@ -627,7 +637,7 @@ lang: en-GB
 {table("Detail outside the person-week panel", ["Source files", "Treatment", "How to relate them"], detail_rows, widths=[40, 25, 35])}
 
 <h2 id="measures">Aggregation rules</h2>
-<p>Apply these rules when bringing each source to the person-week, whether that means summing days, services, spending policies or agents, and when rolling person-weeks up to longer periods.</p>
+<p>Apply these rules to panel-bound summaries and when rolling person-weeks up to longer periods. Weekly grouping removes daily aggregation, but does not make every measure additive across services, spending policies or agents. GitHub breakdowns remain separate, retaining their dimensions.</p>
 {table("Person-week rule for each measure", ["ID", "Columns", "File", "Kind", "Person-week rule"], measure_rows, widths=[6, 28, 19, 12, 35])}
 
 <h2 id="procedure">Join procedure</h2>
@@ -638,7 +648,9 @@ lang: en-GB
 {table(f"{n_gates} checks before and during the join", ["ID", "Level", "Rule"], gate_rows, widths=[7, 10, 83])}
 
 <h2 id="missingness">Missing values</h2>
-<p>Every joined measure should carry one of these states, judged separately for each product. Only <code>absent_confirmed_zero</code> turns a missing row into zero.</p>
+<p><strong>Default:</strong> assume supplied Viva Insights queries are complete. {e(c["coverage_assumption"]["missing_activity_rows"])}</p>
+<p><strong>Scope:</strong> {e(c["coverage_assumption"]["scope"])} {e(c["coverage_assumption"]["exceptions"])}</p>
+<p>{e(c["coverage_assumption"]["eligibility"])} Every joined measure should carry a state below, judged separately for each product. Use <code>absent_inactive_zero</code> for omitted activity rows under this default. Do not fill null cells, rolling indicators or limits merely because omitted activity is zero.</p>
 {table("Missingness states", ["State", "Meaning"], miss_rows, widths=[25, 75])}
 
 <h2 id="errors">Common errors</h2>
@@ -649,6 +661,7 @@ lang: en-GB
 <ul>
 <li>This page is designed to be read by coding agents as well as people. The complete contract is embedded as JSON in the script element with id <code>join-contract</code> and type <code>application/json</code>. Parse it instead of scraping the tables. The tables are generated from the same JSON.</li>
 <li>Use <code>input_requirements</code> to check that the Person Query and at least one other query are supplied. Apply file requirements, joins and source-specific gates only to the selected queries. Record the unavailable queries explicitly.</li>
+<li>Read <code>coverage_assumption</code> before handling absent rows. Assume complete Viva Insights exports within their configured scope, with omitted inactive person-days contributing zero activity. This is separate from product eligibility and does not apply to unavailable queries or null cells.</li>
 <li>Every file, derived dataset, relationship (<code>J1</code> to <code>J9</code>), measure (<code>M01</code> to <code>M15</code>) and gate has a stable ID. These are contract references, not exported columns or required script object names. Resolve file IDs to <code>file</code> and derived IDs to their <code>label</code>, then map them to your own objects. Cite contract IDs in logs and summaries.</li>
 <li><code>WeekStart</code> is a chosen name for the aligned week date. Map it to your implementation, including <code>MetricDate</code> if you keep that header. See <code>naming_conventions</code> in the contract. <code>build_steps</code> refers to the numbered Join procedure on this page.</li>
 <li><code>columns</code> lists literal headers to find. <code>column_groups</code> describes configurable sets whose headers must be inspected in each export.</li>

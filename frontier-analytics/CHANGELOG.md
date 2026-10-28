@@ -12,7 +12,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   Consumption, GitHub and Agent schemas, a downloadable JSON contract and a
   reproducible page builder. Dashboard setup and Frontier journeys link to the
   shared guidance while preserving existing real-adapter limits. Related schema
-  references now detect the week start rather than assuming Monday.
+  references now defer to this guide for current joins, with older layouts and
+  fixture manifests explicitly scoped. All queries should be exported weekly
+  where possible, with cadence confirmed from query configuration. Supplied
+  Viva Insights data are assumed complete within the configured scope, and omitted
+  inactive activity rows contribute zero. Panel aggregation preserves detail
+  dimensions and conditional session additivity.
 - Experimental AI usage archetype guidance for the `viva-insights-analysis`
   skill: three descriptive dimensions (Consistency, Surface mix, Metered use),
   a versioned reference rule with explicit measurement units, evidence states,
