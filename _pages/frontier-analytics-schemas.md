@@ -25,6 +25,7 @@ For authoritative and up-to-date metric definitions and column references, see:
 
 - [Prompt Card Library]({{ site.baseurl }}/frontier-analytics-prompts/) — ready-to-use prompts for coding agents
 - [Frontier Overview]({{ site.baseurl }}/frontier-analytics/) — overview and getting started
+- [Joining Viva Insights queries]({{ site.baseurl }}/query-join-guide/) — Person, Consumption, GitHub and Agent schemas, export setup and person-week joins
 - [vivainsights R package](https://microsoft.github.io/vivainsights/)
 - [vivainsights Python package](https://microsoft.github.io/vivainsights-py/)
 
@@ -34,15 +35,28 @@ For authoritative and up-to-date metric definitions and column references, see:
 
 These are not interchangeable with a Person Query.
 
+For the four query families and their native keys, use the
+[join tutorial]({{ site.baseurl }}/query-join-guide/#queries).
+It is the current cross-query reference and supersedes older integration
+guidance in this repository. Export all selected queries grouped by week where
+possible. It also supports configured daily facts aligned to a weekly Person Query.
+Other export periods require a separately defined integration.
+
 | Source | Contract boundary | Guided journey |
 |---|---|---|
-| Consumption | The public export has activity by person/service/date and people metadata joined through `PeopleHistoricalId`. Confirm day/week/month grouping. Credits and sessions do not establish tokens, task types or monetary value. | [Build a Consumption dashboard]({{ site.baseurl }}/frontier-analytics-prompt-consumption-dashboard/) |
-| GitHub demo | The source manifest is an extended synthetic schema, including illustrative M365 activity and coverage flags. A real GitHub export adapter is not verified in v1. | [Build a Developer Experience dashboard]({{ site.baseurl }}/frontier-analytics-prompt-developer-experience-dashboard/) |
+| Consumption | M365 facts include person, service, spending policy and period. Join people metadata through `PeopleHistoricalId`. Credits and sessions do not establish tokens, task types or monetary value. | [Build a Consumption dashboard]({{ site.baseurl }}/frontier-analytics-prompt-consumption-dashboard/) |
+| GitHub | Activity summary plus four dimensional breakdown files. Synthetic demos use export headers, but a real GitHub dashboard adapter is not verified in v1. | [Build a Developer Experience dashboard]({{ site.baseurl }}/frontier-analytics-prompt-developer-experience-dashboard/) |
+| Agent | Person-agent-week activity, with optional agent metadata. Aggregate sessions across agents before joining to the Person Query. | [Agent schema and joins]({{ site.baseurl }}/query-join-guide/#agent_query) |
 
-Read the [shared query contract](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/skills/viva-insights-analysis/reference/copilot-query-contracts.md)
-for keys, units, coverage, privacy and interpretation rules, and the
+Use the tutorial for current keys, aggregation, missing-row defaults and privacy
+rules. Assume supplied Viva Insights queries are complete within their configured
+population and date window. Daily exports omit inactive person-days by default,
+so those missing activity rows contribute zero, without establishing licence status.
+Keep unavailable queries, out-of-scope periods and null cells separate.
+The [historical query contracts](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/skills/viva-insights-analysis/reference/copilot-query-contracts.md)
+retain dated layouts and analytical context. See the
 [public Consumption documentation](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query)
-for its current export schema. Missing fields exclude panels; agents must not
+for official product documentation. Missing fields exclude panels; agents must not
 generate synthetic replacements in a real-data run.
 
 ## Person Query — Key Concepts {#person-query-key-concepts}
@@ -56,7 +70,8 @@ Person query data follows a **person-time panel** format:
 - **Granularity** is usually **person-week** (one row per person per week), but some exports use **person-day**.
 - A typical export contains `N_persons × N_periods` rows. For example, 5,000 employees over 12 weeks produces approximately 60,000 rows.
 
-To detect granularity, check the gap between consecutive `MetricDate` values for a single person: a 7-day gap indicates weekly data; a 1-day gap indicates daily.
+Confirm the configured date grouping, then check the gaps between `MetricDate`
+values. Sparse observed dates alone do not establish the export's cadence.
 
 ### Column categories
 
@@ -67,7 +82,7 @@ Person query exports typically contain these categories of columns. Exact column
 | **Identifiers** | `PersonId` (anonymized), `MetricDate` (period start date) |
 | **HR attributes** | Organizational metadata (org, function, level, region, etc.) — configurable per tenant |
 | **Collaboration metrics** | Meeting hours, email hours, chat hours, focus hours, network size, etc. |
-| **Copilot metrics** | Copilot actions, assisted hours, chat queries, etc. — only populated for licensed users |
+| **Copilot metrics** | Selected activity metrics with product-specific definitions. Licensed Copilot activity and unlicensed Copilot Chat are separate families. |
 
 ### Licensed vs. unlicensed vs. active
 
@@ -76,11 +91,15 @@ This distinction is critical for any Copilot adoption analysis:
 | Status | Meaning | How to detect |
 |--------|---------|---------------|
 | **Unlicensed** | User does not have a Copilot license | Explicit licence evidence for the period |
-| **Licensed but inactive** | User has a license but did not use Copilot | Confirmed licence, complete coverage and observed zero activity |
+| **Licensed but inactive** | User has a license but did not use Copilot | Confirmed licence and zero activity, including omitted inactive rows within a supplied query's scope |
 | **Active** | Observed use of the selected Copilot metric | Verified activity metric > 0; licence status is a separate attribute |
 | **Unknown** | Eligibility or observation coverage is unresolved | Retain separately; do not infer from absence |
 
-> **Critical:** `null` is not `0`, and neither establishes licensing by itself. Use documented enabled-days or licence records and coverage evidence. If a denominator is unknown, report observed activity and omit adoption rates.
+> **Critical:** A null cell in an existing row is different from an omitted
+> inactive row. Neither an activity zero nor a null establishes licensing.
+> Use documented enabled-days or licence records for eligibility. Assume supplied
+> Viva Insights queries are complete within their configured scope unless a known
+> issue applies. If a denominator is unknown, omit adoption rates.
 
 ---
 
@@ -126,6 +145,10 @@ This section describes how to join different Viva Insights data sources together
 
 ### Overview of join scenarios
 
+For Person, Consumption, GitHub and Agent exports, follow
+[Joining Viva Insights queries]({{ site.baseurl }}/query-join-guide/#relationships).
+The scenarios below cover other sources, including Purview and external HR data.
+
 | Join | Left Source | Right Source | Join Keys | Difficulty |
 |------|------------|-------------|-----------|------------|
 | Person query across time | Person query (period A) | Person query (period B) | `PersonId` | Low |
@@ -147,7 +170,9 @@ The key challenge is that person query data uses an anonymized `PersonId` while 
 - **Authorised mapping table** — a verified `PersonId` → UPN lookup where available. Apply only contract-approved normalisation to UPNs; preserve opaque PersonIds exactly.
 - **No authorised identity bridge:** stop the person-level join; shared HR attributes are not unique identities and must not be used for fuzzy employee matching.
 
-**Time alignment:** Person query data is weekly; Purview logs are event-level. Aggregate audit events to the person-week level before joining. Ensure both use the same week-start day (typically Monday).
+**Time alignment:** Purview logs are event-level. For a weekly Person Query,
+aggregate audit events to its detected week start before joining.
+Do not assume Monday or Sunday.
 
 ### External HR data and license data
 

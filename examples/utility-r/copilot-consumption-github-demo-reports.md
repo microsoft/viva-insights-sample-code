@@ -4,13 +4,10 @@ Two self-contained R Markdown flexdashboards demonstrate different analysis ques
 All data used by these two demos are generated synthetic data. Neither report establishes
 causal effects, wellbeing or overall productivity from tool activity.
 
-Both reports are built around the Consumption query and the GitHub Copilot query, both
-accessible from the **Customised query** tab under **Create analysis** in the Viva Insights
-analyst experience. See the
-[AI cost query documentation](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query)
-and the
-[metric reference](https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics)
-for the official contracts.
+Use [Joining Viva Insights queries](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/)
+for query setup, export schemas and person-week integration. This page covers the
+templates' specific inputs, synthetic assumptions and rendering commands.
+The general tutorial does not extend the real runner's supported inputs.
 
 | Report | Source | Rendered report | Scope |
 |---|---|---|---|
@@ -19,7 +16,9 @@ for the official contracts.
 
 ## Which queries each report needs
 
-Both reports draw on all three queries, but they do not need the same files.
+Both synthetic reports draw on Person, Consumption and GitHub fixtures, but they
+do not need the same files. This table describes demo inputs, rather than the
+narrower real-v1 adapter. Neither demo uses Agent exports.
 
 | Export | Query | Consumption | Developer Experience |
 |---|---|---|---|
@@ -115,20 +114,20 @@ These presentation changes do not equate missing observation with zero or weaken
 the privacy floor. "Recorded GitHub use" is a subset of developers with complete
 GitHub activity observation, not another name for that observed population.
 
-## Simulated values, real schema
+## Synthetic fixtures and their schema
 
-The `_data/` folder contains **fully synthetic values in real export schemas**. Every file
-name, column name and key matches a real Viva Insights query export. This is a deliberate
-correction: an earlier version of these demos simulated the schema as well as the values,
-and carried columns that exist in no export — token counts, a task-type breakdown, an
-eligibility/coverage reference file, and an M365 actions feed with no corresponding
-query.
+The `_data/` folder contains **fully synthetic values in dated export-shaped
+schemas**. Its Consumption layout and metadata differ from the current join
+guide, so matching fixture headers does not establish compatibility with a
+current download. Earlier versions also carried token counts, a task-type
+breakdown, an eligibility/coverage reference file and an M365 actions feed with
+no corresponding query. Those invented fields were removed.
 
-Sample code written against an invented schema cannot be pointed at a real export without
-rework, so the fixtures were rebuilt against the published contracts. The single
+The current [join tutorial](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/)
+takes precedence for real cross-query integration. The single
 deterministic generator is [simulate-query-exports.R](simulate-query-exports.R), and
-[_data/README.md](_data/README.md) is the authoritative manifest for keys, fields, grains
-and join rules.
+[_data/README.md](_data/README.md) is the authoritative manifest for the committed
+fixtures' keys, fields, grains and synthetic assumptions.
 
 ```
 _data/
@@ -179,18 +178,15 @@ The generator is seeded and validates the whole ordered schema bundle and synthe
 allocation invariants before writing.
 It fails rather than exporting a broken file.
 
-### Points where real exports catch people out
+### Fixture-specific assumptions
 
-- **`PeopleHistoricalId`, not `PersonId`, joins the Consumption activity files to
-  `PeopleMetaData`.** The metadata file has no `PersonId` column at all, and the key is
-  **opaque**: read the `PersonId` → `PeopleHistoricalId` crosswalk out of the activity
-  files rather than reconstructing it. A real download may coincidentally show the same
-  constant numeric suffix on every row; that is not a contract. These fixtures mint the
-  key independently of `PersonId`, so reconstruction fails here instead of in production.
-- **`PersonM365CreditsMetrics` is one row per person _per service_ per day.** Code that
-  assumes one row per person per day silently over-counts.
-- **Consumption metric columns contain spaces** (`Total Copilot Credits used`,
-  `Session count`). Read with `check.names = FALSE`.
+For historical-person keys, spending-policy grain, raw headers and conditional
+daily-to-weekly aggregation, follow the
+[join tutorial](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/).
+The assumptions below explain these particular fixtures. The helper's daily
+coverage logic is not automatically compatible with weekly exports just because
+the general tutorial supports them.
+
 - **Empty policy/limit cells need a verified interpretation.** This recipe uses empty
   values alongside an all-zero policy ID for no policy; a real empty value alone
   does not establish absence of policy.
@@ -290,8 +286,11 @@ Pass an output directory to the layout script to retain screenshots.
 Never replace committed fixtures with customer files. Use a separate approved workspace.
 The supplied real v1 runner is credits-only; sessions, Person Query associations and
 GitHub panels need separately implemented and verified adapters. Matching fixture headers
-is not a like-for-like real build or semantic certification. Confirm population scope, person identifiers, date grains, licence history, expected
-coverage, metric units, query filters and privacy before relying on the joins.
+is not a like-for-like real build or semantic certification. The credits-only
+adapter uses Consumption activity and matching people metadata without requiring
+a Person Query. For a separately implemented cross-query adaptation, follow the
+[join tutorial](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/);
+its combined panel is not a drop-in input to the existing runner.
 `vivainsights::import_query()` can import supported flexible queries.
 
 ## Research and measurement gaps

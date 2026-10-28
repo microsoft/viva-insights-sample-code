@@ -10,7 +10,9 @@ permalink: /copilot-dashboards/
 
 **Just exploring?** Open either demo in your browser; no installation is required.
 
-**Building your own?** Review the required queries, get the source, and follow the setup guide below.
+**Building your own?** Follow the [setup guide](#build-with-your-own-data).
+For cross-query analysis, use [Joining Viva Insights queries]({{ site.baseurl }}/query-join-guide/)
+for export setup, schemas and person-week joins.
 
 Both reports use **synthetic data**. They illustrate analysis approaches, not evidence of Copilot's impact. Assumptions and simulation details are included in each report's methods or appendix.
 
@@ -65,7 +67,12 @@ reproduce the demo or build a scoped credits report with an agent and reusable R
 
 [![Consumption report overview]({{ site.baseurl }}/assets/images/reports/copilot-consumption-overview.png)]({{ site.baseurl }}/examples/utility-r/copilot-consumption-ways-of-working-simulation.html)
 
-**Demo inputs:** A Person Query fixture, the Consumption query fixtures (`PeopleMetaData`, `PersonM365CreditsMetrics`, `PersonGitHubCreditsMetrics`) and one GitHub query fixture (`PersonGitHubActivityMetrics`) — five files across three queries. The GitHub activity file is what separates "observed with no use" from "not observed" in the product usage mix; the four GitHub breakdown exports are **not** required by this report. These carry simulated values in the real [public Consumption schema](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query), so credits, sessions, service grain and the `PeopleHistoricalId` join key all match a genuine export. Earlier versions of this demo carried token and task-type fields that exist in no export; those have been removed.
+**Demo inputs:** Five fixture files across Person, Consumption and GitHub queries.
+The GitHub activity summary is used to distinguish recorded zero activity from
+missing observation. Its four breakdown files are not used by this report.
+See the [template input manifest](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-github-demo-reports.md#which-queries-each-report-needs)
+for the exact files, and the [join tutorial]({{ site.baseurl }}/query-join-guide/#queries)
+for export schemas.
 
 **Interpretation:** Associations only. Credit intensity is a cost measure, not a measure of value or quality. Concentration curves and banded percentiles help describe skewed consumption without relying on an average.
 
@@ -99,13 +106,12 @@ credit measures, in separately named units; it does not include the GitHub activ
 breakdowns. Neither demo establishes credit-unit equivalence. These synthetic-demo
 capabilities do not expand the narrower M365 credits-only real-v1 adapter.
 
-**Prerequisites for real data:** you need a **Person Query** export (working-pattern
-metrics and organisational attributes), the five GitHub query files and the Consumption
-query files, per the [data contract](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/_data/README.md).
-The demo fixtures already match the real export schemas, so no column renaming should be
-needed — but column parity is not semantic parity. Confirm population scope, identifiers,
-date grains, licence history and expected coverage before adapting, and note that
-eligibility and coverage must be derived because no query emits them.
+**Inputs for a real-data adaptation:** Person, GitHub and Consumption exports,
+including GitHub breakdowns. Use the [join tutorial]({{ site.baseurl }}/query-join-guide/)
+for query setup and integration, and the
+[template input manifest](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-github-demo-reports.md#which-queries-each-report-needs)
+for this report's file requirements. The tutorial does not supply a verified real
+GitHub dashboard adapter or establish eligibility and coverage for your exports.
 
 Start with Overview, which defines the **heavy GitHub-use** group and shows where
 it concentrates by team and role where disclosure permits, then explore **Collaboration**, **Focus**,
@@ -140,10 +146,11 @@ The demos need only a browser. To render or adapt the templates, use **R**, **Pa
 
 1. **Get the files.** Start with the report source linked above. For Developer Experience, also get [github-developer-experience-helpers.R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/github-developer-experience-helpers.R) and [render-github-developer-experience.R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/render-github-developer-experience.R), keeping the repository folder structure.
 2. **Render the synthetic example first.** Dependencies include `vivainsights`, `dplyr`, `tidyr`, `ggplot2`, `ggrepel`, `scales`, `stringr`, `flexdashboard`, `knitr`, and `rmarkdown`. The AI-guided journeys copy the required fixtures and source into an isolated output folder before rendering.
-3. **Adapt only supported inputs.** Use the [Consumption journey]({{ site.baseurl }}/frontier-analytics-prompt-consumption-dashboard/) for the scoped credits adapter. Use the [Developer Experience journey]({{ site.baseurl }}/frontier-analytics-prompt-developer-experience-dashboard/) for a real-input readiness assessment. Verify contracts before replacing any simulation; do not assume a CSV with similar headers is equivalent.
+3. **Choose the real-data path.** The [Consumption journey]({{ site.baseurl }}/frontier-analytics-prompt-consumption-dashboard/) builds the scoped M365 credits-only report from activity and people metadata, without requiring a Person Query. The [Developer Experience journey]({{ site.baseurl }}/frontier-analytics-prompt-developer-experience-dashboard/) assesses readiness only. For a separately implemented cross-query adaptation, follow the [join tutorial]({{ site.baseurl }}/query-join-guide/). Its person-week panel is not a drop-in input to either runner.
 4. **Review before sharing.** Update simulation labels and methodology to describe your actual inputs. Apply your organization's privacy requirements and retain the distinction between association and causation. Do not put customer exports in this sample repository or in shareable HTML.
 
-[Read the full template setup guide](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-github-demo-reports.md)
+[Template setup and rendering commands](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-github-demo-reports.md#rerun)
+· [Query setup and joins]({{ site.baseurl }}/query-join-guide/)
 
 ## Continue exploring
 

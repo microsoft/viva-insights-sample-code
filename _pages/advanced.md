@@ -13,6 +13,11 @@ This page covers machine learning, regression models, and statistical analysis t
 Pick a card to jump straight to a technique, or read the short intro above each section for guidance on which one fits your question.
 
 <div class="vi-card-grid" markdown="0">
+  <a class="vi-card" href="{{ site.baseurl }}/query-join-guide/">
+    <span class="vi-card-title">Joining Viva Insights Queries</span>
+    <span class="vi-card-desc">Combine Person, Consumption, GitHub and Agent exports into a person-week panel, with schemas and join guidance.</span>
+    <span class="vi-card-more">Open tutorial →</span>
+  </a>
   <a class="vi-card" href="#top-performers-modeling">
     <span class="vi-card-icon">🌳</span>
     <span class="vi-card-title">Top Performers Modeling</span>

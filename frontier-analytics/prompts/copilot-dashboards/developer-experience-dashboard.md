@@ -98,6 +98,7 @@ adapter. Do not rename public GitHub API fields into an assumed Viva contract.
 
 ## Resources
 
+- [Joining Viva Insights queries](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/) for export setup and person-week integration. A verified real GitHub dashboard adapter is still required.
 - [Starter kit](../../starter-kits/developer-experience-dashboard/README.md)
 - [Shared runner](../../starter-kits/copilot-query-dashboard/README.md)
 - [Optional skill installation](../../skills/README.md#dashboard-skill-installation)

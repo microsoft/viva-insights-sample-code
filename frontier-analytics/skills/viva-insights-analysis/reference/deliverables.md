@@ -19,10 +19,15 @@ user wants a faster first pass.
 - **Unlicensed:** explicit licence evidence, not missing or zero activity.
 - **Unknown:** retain unresolved eligibility and incomplete coverage separately.
 
-Do not infer licensing from activity. Missing rows become zero only with
-independent eligibility and completeness evidence. For Consumption or GitHub,
-read [copilot-query-contracts.md](copilot-query-contracts.md) rather than
-assuming the Person Query's semantics apply.
+Do not infer licensing from activity. For current cross-query integration, follow
+[Joining Viva Insights queries](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/).
+Recommend weekly exports and assume supplied Viva Insights queries are complete
+within their configured population, date window and product filters. Omitted
+inactive activity rows contribute zero without separate completeness evidence.
+Keep unavailable queries, out-of-scope periods, null cells and known export
+problems separate. Eligibility still needs product-specific evidence for adoption
+denominators. [copilot-query-contracts.md](copilot-query-contracts.md) retains
+historical layouts and analytical context, rather than overriding the current guide.
 
 ## Copilot adoption dashboard
 

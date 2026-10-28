@@ -27,8 +27,13 @@ versions rather than assuming live package documentation matches them.
 
 If installing, install this skill alongside `viva-insights-analysis` from the
 same checkout. Prompt-only use reads these files in place; no installation is needed.
-Read its [shared contract](../viva-insights-analysis/reference/copilot-query-contracts.md)
-directly; do not recursively launch that skill for the same task. If the sibling
+For current export schemas and cross-query integration, read
+[Joining Viva Insights queries](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/)
+and its downloadable JSON. It takes precedence over older join guidance and
+recommends weekly exports, with complete-data and omitted-inactivity defaults
+within each supplied query's scope. It does not extend the runner's supported inputs.
+Read the sibling [historical contracts and analytical context](../viva-insights-analysis/reference/copilot-query-contracts.md)
+directly when needed; do not recursively launch that skill for the same task. If the sibling
 file is absent, read the corresponding file in `repo_root`. If neither exists,
 stop and explain how to obtain the paired skills. Never fall back to invented
 schema or licensing rules.
