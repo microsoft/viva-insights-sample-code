@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Product query icons and exact Viva Insights descriptions in the join tutorial,
+  with schema jump cards and matching icons on query section headings.
 - Native query join tutorial under Advanced > Data enrichment, with Person,
   Consumption, GitHub and Agent schemas, a downloadable JSON contract and a
   reproducible page builder. Dashboard setup and Frontier journeys link to the

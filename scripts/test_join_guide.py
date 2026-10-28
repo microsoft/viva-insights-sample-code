@@ -5,6 +5,7 @@ from html.parser import HTMLParser
 import json
 import re
 import unittest
+from xml.etree import ElementTree
 
 import pandas as pd
 
@@ -16,6 +17,7 @@ class PageParser(HTMLParser):
         super().__init__()
         self.ids = []
         self.anchors = []
+        self.images = []
         self.contract = ""
         self.in_contract = False
 
@@ -25,6 +27,8 @@ class PageParser(HTMLParser):
             self.ids.append(attrs["id"])
         if tag == "a" and attrs.get("href", "").startswith("#"):
             self.anchors.append(attrs["href"][1:])
+        if tag == "img":
+            self.images.append(attrs)
         if tag == "script" and attrs.get("id") == "join-contract":
             self.in_contract = True
 
@@ -74,6 +78,38 @@ class JoinGuideTests(unittest.TestCase):
         contract["relationships"][0]["to_id"] = "unknown"
         with self.assertRaises(AssertionError):
             guide.validate_contract(contract)
+
+    def test_product_cards_preserve_product_wording_and_schema_links(self):
+        descriptions = {
+            "person_query": "Analyse collaboration trends across the company",
+            "consumption_query": "Analyse credit usage across services, users, groups, and spending policies.",
+            "github_query": "Analyse GitHub Copilot usage to understand developer activity and coding trends.",
+            "agent_query": "Analyse agent adoption trends across the company",
+        }
+        page = guide.build_html()
+        cards = re.findall(r'<a class="query-product-card" href="#([^"]+)">(.*?)</a>', page, re.S)
+        self.assertEqual(len(cards), 4)
+        self.assertEqual({query_id for query_id, _ in cards}, set(descriptions))
+        for query_id, card in cards:
+            with self.subTest(query=query_id):
+                self.assertIn(html.escape(descriptions[query_id], quote=True), card)
+                self.assertIn(f"/assets/images/queries/{query_id.replace('_', '-')}.svg", card)
+                self.assertIn(f'<section id="{query_id}"', page)
+
+    def test_query_logos_resolve_and_repeat_at_schema_headings(self):
+        parser = PageParser()
+        parser.feed(guide.build_html())
+        self.assertEqual(len(parser.images), 8)
+        for query in guide.CONTRACT["queries"]:
+            with self.subTest(query=query["id"]):
+                src = "{{ '" + query["icon"] + "' | relative_url }}"
+                images = [image for image in parser.images if image["src"] == src]
+                self.assertEqual(len(images), 2)
+                for image in images:
+                    self.assertEqual(image["alt"], "")
+                    self.assertEqual((image["width"], image["height"]), ("52", "52"))
+                path = guide.ROOT.joinpath(*query["icon"].lstrip("/").split("/"))
+                self.assertEqual(ElementTree.parse(path).getroot().tag, "{http://www.w3.org/2000/svg}svg")
 
     def test_query_entry_points_defer_to_current_guide(self):
         for path in [
