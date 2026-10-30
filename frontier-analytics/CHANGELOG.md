@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Synced the detailed prompt blocks in the canonical prompt Markdown files with
+  their published prompt pages. The dashboard prompts were already in sync.
 - Product query icons and exact Viva Insights descriptions in the join tutorial,
   with schema jump cards and matching icons on query section headings.
 - Native query join tutorial under Advanced > Data enrichment, with Person,

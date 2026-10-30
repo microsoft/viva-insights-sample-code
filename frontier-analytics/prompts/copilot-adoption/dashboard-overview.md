@@ -50,28 +50,22 @@ Use the detailed prompt below for a reproducible, exact-structure output. Use th
 ## Prompt
 
 ```
-You are a people analytics engineer. Your task is to build a self-contained static HTML dashboard
-that visualizes Microsoft Copilot adoption from a Viva Insights person query export.
+You are a people analytics engineer. Your task is to build a self-contained static HTML dashboard that visualizes Microsoft Copilot adoption from a Viva Insights person query export.
+
+LANGUAGE CHOICE
+Choose R or Python based on what is already installed in your environment to minimize setup.
 
 DATA LOADING AND VALIDATION
-1. Load the person query CSV file into a DataFrame (use pandas in Python or readr/vroom in R).
-2. Parse the MetricDate column as a date type. Ensure PersonId is treated as a string.
-3. Verify the panel structure: each row should represent a unique PersonId × MetricDate combination.
-   If there are duplicates, report their count and stop for an explicit resolution rule.
-4. Print the shape of the data, the date range covered, and the number of unique persons.
-5. List all column names so I can verify the Copilot metric columns and HR attribute columns
-   match what is expected. Auto-detect columns that start with "Copilot_" as Copilot metric columns.
+1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python). This handles variable name cleaning and type parsing automatically.
+2. Ensure PersonId is treated as a string and MetricDate is parsed as a date type.
+3. Run `extract_hr(df)` from the `vivainsights` library to identify the available HR / organizational attribute columns in the data. Use the returned list of HR attributes for all segmentation breakdowns instead of hard-coding column names like Organization, FunctionType, or LevelDesignation.
+4. Verify the panel structure: each row should represent a unique PersonId × MetricDate combination. If there are duplicates, report their count and stop for an explicit resolution rule.
+5. Print the shape of the data, the date range covered, and the number of unique persons.
+6. List all column names so I can verify the Copilot metric columns and HR attribute columns match what is expected. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity proxy **if it is present** — validate it against the taxonomy first, as it may not capture every Copilot surface or app.
 
 IDENTIFYING LICENSED USERS
-6. A user is considered "Copilot-licensed" in a given week using this rule, in order:
-   a. If an enabled-days column is present (for example `Total_Copilot_enabled_days`), the user
-      is licensed when that column is greater than zero for the week.
-   b. Otherwise, use documented licence records for that period. If unavailable, retain
-      unknown licensing and omit adoption rates; do not infer licences from activity.
-   Create `is_licensed` with unknown values retained. Confirm coverage before filling absent
-   activity with zero.
-7. Also flag "active" users: licensed users who have Copilot_Actions > 0 (or the equivalent primary
-   activity metric) in that week. Create a boolean column `is_active`.
+6. Use a documented enabled-days column (for example `Total_Copilot_enabled_days > 0`) or explicit licence records for the period. If unavailable, retain unknown licensing and omit adoption rates; do not infer licences from activity. Create `is_licensed` with unknown values retained. Confirm coverage before filling absent activity with zero.
+7. Also flag "active" users: licensed users who have Total_Copilot_actions_taken > 0 (the primary activity metric) in that week. Create a boolean column `is_active`.
 8. Print a summary: total person-weeks, licensed person-weeks, active person-weeks.
 
 METRIC CALCULATIONS
@@ -79,9 +73,9 @@ METRIC CALCULATIONS
    a. Total licensed users (count of distinct PersonId where is_licensed == True)
    b. Total active users (count of distinct PersonId where is_active == True)
    c. Adoption rate = active users / licensed users (as a percentage)
-   d. Mean Copilot_Actions per active user
+   d. Mean Total_Copilot_actions_taken per active user
    e. Mean Copilot_Assisted_Hours per active user
-   f. Median Copilot_Actions per active user
+   f. Median Total_Copilot_actions_taken per active user
 10. Store these weekly aggregates in a summary DataFrame called `weekly_summary`.
 
 SEGMENTATION METRICS
@@ -89,13 +83,11 @@ SEGMENTATION METRICS
     a. Licensed user count
     b. Active user count
     c. Adoption rate
-    d. Mean Copilot_Actions per active user
+    d. Mean Total_Copilot_actions_taken per active user
 12. Store each in a separate DataFrame (e.g., `org_summary`, `function_summary`, `level_summary`).
 
 GROUP SUMMARY TABLE
-13. Compute activity summaries by an approved HR group using distinct people and the declared
-    time window. Apply privacy suppression to every cell and omit the entire breakdown if
-    remaining cells or totals could reveal a suppressed value. Do not publish person rows.
+13. Compute activity summaries by an approved HR group using distinct people and the declared time window. Apply privacy suppression to every cell and omit the entire breakdown if remaining cells or totals could reveal a suppressed value. Do not publish person rows.
 
 SUMMARY STATISTICS PANEL
 14. Calculate overall summary statistics for the dashboard header:
@@ -103,24 +95,20 @@ SUMMARY STATISTICS PANEL
     b. Trend direction: compare the last 4 weeks' average adoption rate to the prior 4 weeks
     c. Total unique licensed users across the entire period
     d. Total unique active users across the entire period
-    e. Average Copilot_Actions per active user per week (grand mean)
+    e. Average Total_Copilot_actions_taken per active user per week (grand mean)
     f. Most active organization (highest adoption rate in the latest week)
 
 DASHBOARD GENERATION
-15. Generate a single self-contained HTML file. Do NOT use a web framework or server. All CSS and
-    JavaScript must be inline. Use one of these approaches:
-    - Python: use matplotlib/seaborn to create chart images, base64-encode them, and embed in HTML
-      using an HTML template string or Jinja2.
-    - R: use ggplot2 to create chart images, base64-encode them, and embed in an R Markdown document
-      rendered to self-contained HTML (self_contained: true), or build the HTML manually.
+15. Create the dashboard as an intermediary document first, then export to HTML:
+    - R: Create an RMarkdown file (.Rmd) with ggplot2 charts, then knit to a self-contained HTML file (output: html_document, self_contained: true).
+    - Python: Create a Jupyter notebook (.ipynb) with matplotlib/seaborn charts, then export to a self-contained HTML file (e.g., `jupyter nbconvert --to html`). Keep the intermediary .Rmd or .ipynb file alongside the HTML output — it makes troubleshooting and iteration easier. Do NOT use a web framework or server.
 
 16. The HTML dashboard should contain these sections in order:
     a. HEADER: Title ("Copilot Adoption Dashboard"), date range, generation timestamp.
-    b. SUMMARY PANEL: Cards showing the key metrics from step 14 (adoption rate, trend, total users,
-       avg actions, top org). Use colored indicators (green for positive trend, red for negative).
+    b. SUMMARY PANEL: Cards showing the key metrics from step 14 (adoption rate, trend, total users, avg actions, top org). Use colored indicators (green for positive trend, red for negative).
     c. TREND CHARTS:
        - Line chart: Weekly adoption rate over time
-       - Line chart: Mean Copilot_Actions per active user over time
+       - Line chart: Mean Total_Copilot_actions_taken per active user over time
        - Line chart: Mean Copilot_Assisted_Hours per active user over time
     d. SEGMENTATION CHARTS:
        - Grouped bar chart: Adoption rate by Organization (latest 4-week average)
@@ -128,24 +116,18 @@ DASHBOARD GENERATION
        - Grouped bar chart: Adoption rate by LevelDesignation (latest 4-week average)
        - Heatmap: Adoption rate by Organization × week (if number of orgs <= 15)
     e. GROUP SUMMARY TABLE: privacy-protected aggregate table from step 13, with no identifiers.
-    f. METHODOLOGY NOTE: Brief paragraph explaining how adoption rate is calculated, what
-       "licensed" and "active" mean, and the data source.
+    f. METHODOLOGY NOTE: Brief paragraph explaining how adoption rate is calculated, what "licensed" and "active" mean, and the data source.
 
-17. Style the HTML with a clean, professional design. Use a sans-serif font, consistent color
-    palette, and adequate whitespace. The dashboard should look presentable when opened in a browser.
+17. Style the HTML with a clean, professional design. Use a sans-serif font, consistent color palette, and adequate whitespace. The dashboard should look presentable when opened in a browser.
 
-18. Save the HTML file to the working directory with a descriptive filename like
-    "copilot_adoption_dashboard_YYYYMMDD.html".
+18. Save the HTML file and the intermediary .Rmd or .ipynb to the working directory with descriptive filenames like "copilot_adoption_dashboard_YYYYMMDD.html".
 
 IMPORTANT NOTES
-- Do NOT create interactive plots that require a running server (no plotly, no bokeh server).
-  Static images embedded as base64 are preferred.
+- Do NOT create interactive plots that require a running server (no plotly, no bokeh server). Static charts embedded in the RMarkdown/Jupyter output are preferred.
 - Preserve unknown coverage and eligibility. NaN is not proof of an unlicensed user.
-- Omit metrics without verified inputs, including assisted hours or licensing-dependent
-  summaries. Describe skipped panels rather than estimating missing values.
+- Omit metrics without verified inputs, including assisted hours or licensing-dependent summaries. Describe skipped panels rather than estimating missing values.
 - If any HR attribute column is missing from the data, skip that segmentation chart and note it.
-- Use the vivainsights package for any helper functions it provides, but do not depend on it for
-  core logic — the dashboard should work with just pandas/matplotlib or base R/ggplot2.
+- Use the `vivainsights` package (R or Python) for data loading (`import_query()`) and HR attribute discovery (`extract_hr()`). Use ggplot2 (R) or matplotlib/seaborn (Python) for charting.
 - All charts should have clear titles, axis labels, and legends.
 - Use at least 10 distinct people per published group, or the stricter organisational minimum.
 ```
