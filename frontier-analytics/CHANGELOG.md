@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Agent Skills catalogue on the Frontier Skills page. Each Skill opens a
+  details panel with tested `gh skill install` steps, a copyable starter prompt,
+  the questions it helps answer and the results to expect, including labelled
+  synthetic dashboard previews. Content stays readable inline without
+  JavaScript. The Skills README now documents `gh skill install`.
 - Prompt Library catalogue cards with responsive details dialogs, copyable quick
   prompts generated from canonical Markdown cards, and direct links to the full
   prompt pages. The cards remain readable inline without JavaScript.

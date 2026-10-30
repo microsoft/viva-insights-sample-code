@@ -1,0 +1,126 @@
+# Agent Skills catalogue for /frontier-analytics-skills/.
+# Each Skill is rendered once inline by _includes/skill-catalogue.html and
+# enhanced into a pop-up by assets/js/skill-dialog.js. Text fields accept
+# Markdown. Keep installation facts in step with frontier-analytics/skills/README.md.
+
+- slug: viva-insights-analysis
+  name: Viva Insights analysis
+  badge: Core Skill
+  summary: Import, validate and analyse Viva Insights exports in R or Python with the vivainsights packages.
+  card_note: Start here for general Viva Insights work.
+  source: https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/skills/viva-insights-analysis
+  steps:
+    - title: Install the Skill
+      text: >-
+        Run this in a terminal with a recent [GitHub CLI](https://cli.github.com/). It copies the whole Skill folder,
+        including its reference files and worked examples, into your personal Copilot Skills directory.
+      command: gh skill install microsoft/viva-insights-sample-code frontier-analytics/skills/viva-insights-analysis --agent github-copilot --scope user
+    - title: Load and check the Skill
+      text: >-
+        In GitHub Copilot CLI, run `/skills reload` and then `/skills info viva-insights-analysis`.
+        For another agent, change `--agent` in the install command and restart the agent.
+  prompt: Use the Viva Insights analysis Skill to import my Person Query export, validate it and summarise any data-quality issues before we start the analysis.
+  prompt_note: Add the location of your export and whether you prefer R or Python.
+  questions:
+    - Is my Person Query export complete enough to analyse, and which data-quality issues should I fix first?
+    - How is Copilot usage distributed across my organisation, and which usage segments stand out?
+    - Which collaboration metrics differ most between groups, without reporting groups below the privacy threshold?
+    - Can you turn this export into an adoption summary or an executive memo with reproducible code?
+  outputs:
+    - R or Python code that uses existing vivainsights functions before writing custom logic.
+    - A validation summary that flags common export pitfalls, such as text-coded flags, literal "#N/A" values, holiday weeks and groups below the privacy threshold.
+    - Standard visualisations and common deliverables, such as an adoption dashboard, an executive summary memo or an ROI estimate.
+  limitations:
+    - Written claims describe associations unless a designed experiment supports a causal reading.
+    - Groups below the minimum aggregation size (5 by default) are not reported.
+    - Installing the Skill does not install R, Python or their packages.
+
+- slug: viva-insights-copilot-dashboards
+  name: Copilot query dashboards
+  badge: Optional add-on
+  summary: Reproduce or customise the Consumption and Developer Experience reference dashboards with reusable R code.
+  card_note: Installs alongside Viva Insights analysis and needs a local checkout.
+  requires: viva-insights-analysis
+  source: https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/skills/viva-insights-copilot-dashboards
+  steps:
+    - title: Clone the repository and keep the checkout
+      text: >-
+        The Skill runs the dashboard runner from this checkout, so keep it after installation.
+        Note where it is saved, because the agent will ask for it as `repo_root`.
+      command: git clone https://github.com/microsoft/viva-insights-sample-code.git
+    - title: Install both Skills from that checkout
+      text: >-
+        Run these from the folder where you ran `git clone`, which contains the `viva-insights-sample-code` folder.
+        Installing both from the same checkout keeps the dashboard Skill and the shared analysis Skill at the same revision.
+      command: |-
+        gh skill install ./viva-insights-sample-code viva-insights-analysis --from-local --agent github-copilot --scope user
+        gh skill install ./viva-insights-sample-code viva-insights-copilot-dashboards --from-local --agent github-copilot --scope user
+    - title: Load and check the Skills
+      text: >-
+        In GitHub Copilot CLI, run `/skills reload` and then `/skills info viva-insights-copilot-dashboards`.
+        For another agent, change `--agent` in the install commands and restart the agent.
+        The dashboards are rendered with R Markdown, so install R, Pandoc and the packages the agent lists before building.
+  prompt: "Reproduce the Consumption demo using the dashboard Skill. My checkout of viva-insights-sample-code is at:"
+  prompt_note: Paste the full path to your checkout after the prompt. For your own data, describe the query export and ask the agent to inspect it first.
+  questions:
+    - Can I reproduce the Consumption or Developer Experience reference dashboard from the synthetic demo data?
+    - Does my Consumption query export contain what the dashboard needs, and which sections would be excluded?
+    - Can you regroup the dashboard by a different organisational attribute or change its reporting periods?
+  outputs:
+    - A self-contained HTML dashboard with its local location, the reproducible command and configuration, and a validation summary.
+    - A list of the supported and excluded sections, with the evidence limitations for each.
+    - For inspection or a blocked build, a readiness assessment with the missing evidence and the next supported action.
+  previews:
+    - src: /assets/images/reports/copilot-consumption-overview.png
+      alt: Overview page of the Consumption and Ways of Working reference dashboard, built from synthetic data.
+      caption: Consumption dashboard overview
+    - src: /assets/images/reports/copilot-consumption-product-usage-mix.png
+      alt: Product usage mix page of the Consumption reference dashboard, built from synthetic data.
+      caption: Consumption product usage mix
+    - src: /assets/images/reports/github-copilot-devex-overview.png
+      alt: Overview page of the Developer Experience and Copilot reference dashboard, built from synthetic data.
+      caption: Developer Experience overview
+    - src: /assets/images/reports/github-copilot-devex-network.png
+      alt: Network page of the Developer Experience reference dashboard, built from synthetic data.
+      caption: Developer Experience network
+  preview_note: These previews use the synthetic demo data that ships with the starter kit.
+  limitations:
+    - Real Consumption data is supported only for the documented credit fields.
+    - Real GitHub query exports can be inspected, but a GitHub adapter has not yet been verified.
+    - A successful render does not validate the business meaning of the results.
+
+- slug: viva-insights-causal-analysis
+  name: Person Query causal analysis
+  badge: Optional add-on
+  summary: Check whether an exposure and an outcome in a Person Query support within-person analysis, then run design-first diagnostics.
+  card_note: Installs alongside Viva Insights analysis.
+  requires: viva-insights-analysis
+  source: https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/skills/viva-insights-causal-analysis
+  steps:
+    - title: Install both Skills
+      text: >-
+        Each command installs the current version from the main branch, so run them one after the other.
+        To guarantee a matching revision, or to let the agent follow links to repository prompts, clone the repository
+        and install both Skills from that checkout with `--from-local`, as in the dashboard Skill steps.
+      command: |-
+        gh skill install microsoft/viva-insights-sample-code frontier-analytics/skills/viva-insights-analysis --agent github-copilot --scope user
+        gh skill install microsoft/viva-insights-sample-code frontier-analytics/skills/viva-insights-causal-analysis --agent github-copilot --scope user
+    - title: Load and check the Skills
+      text: >-
+        In GitHub Copilot CLI, run `/skills reload` and then `/skills info viva-insights-causal-analysis`.
+        For another agent, change `--agent` in the install commands and restart the agent.
+  prompt: Assess whether my Person Query and quarterly outcome can support within-person analysis before running models.
+  prompt_note: Add the exposure and outcome you have in mind, how often the outcome is measured, and whether you prefer R or Python.
+  questions:
+    - Is my outcome measured often enough to support a within-person comparison?
+    - Does higher Copilot usage go with a change in a collaboration metric for the same people over time?
+    - Does the relationship survive prior-outcome adjustment, timing placebos and sensitivity checks?
+  outputs:
+    - A readiness assessment that states whether the data can support the question and what is missing, without fitting models.
+    - After a supported analysis, reproducible scripts, audit and results records, and a self-contained HTML report.
+    - Model-labelled results with visible caveats and plain-language definitions.
+  limitations:
+    - The R and Python examples use fabricated data and are not a general real-data modelling engine.
+    - Published groups need at least 10 people, or a stricter requirement where one applies.
+    - Collaboration activity is not translated directly into productivity, performance or ROI.
+    - For the Copilot Causal Toolkit notebooks, use the existing toolkit prompt instead.

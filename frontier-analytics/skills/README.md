@@ -29,6 +29,14 @@ The Skill format used here follows the convention introduced by Anthropic's Clau
 
 Copy the skill's folder (for example `viva-insights-analysis/`, including its `reference/` and `examples/` subfolders) into the skills directory your agent reads from. Consult your agent's documentation for the exact location, since this varies by tool.
 
+With a recent [GitHub CLI](https://cli.github.com/), `gh skill install` copies the whole folder for you. For example, this installs the analysis skill into your personal GitHub Copilot skills directory:
+
+```bash
+gh skill install microsoft/viva-insights-sample-code frontier-analytics/skills/viva-insights-analysis --agent github-copilot --scope user
+```
+
+Change `--agent` for another supported agent. To install from a local checkout, run `gh skill install ./viva-insights-sample-code viva-insights-analysis --from-local` with the same `--agent` and `--scope` options. The [Agent Skills page](https://microsoft.github.io/viva-insights-sample-code/frontier-analytics-skills/) lists the commands for each skill, including the paired installs below. `gh skill` is a preview feature and skills are not verified by GitHub, so review the installed files before use.
+
 ## Dashboard skill installation
 
 For one-off use, copy a [dashboard prompt](../prompts/README.md#query-dashboards)
