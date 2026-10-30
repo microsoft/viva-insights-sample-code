@@ -52,7 +52,7 @@
         <h4>Quick prompt</h4>
         <p>Copy this shorter starting point, or open the full prompt card for detailed instructions and adaptation notes.</p>
         <div class="prompt-copyable">
-          <pre class="prompt-code" id="{{ base }}-quick"><code>{{ prompt.quick_prompt | escape }}</code></pre>
+          <pre class="prompt-code" id="{{ base }}-quick" tabindex="0" role="region" aria-label="Quick prompt for {{ prompt.title | escape }}"><code>{{ prompt.quick_prompt | escape }}</code></pre>
           <button type="button" class="prompt-copy" data-copy-target="{{ base }}-quick" hidden>Copy quick prompt</button>
         </div>
       </div>
