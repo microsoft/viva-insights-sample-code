@@ -1,0 +1,173 @@
+[
+  {
+    "title": "Copilot adoption",
+    "prompts": [
+      {
+        "slug": "dashboard",
+        "title": "Dashboard Overview — Copilot Adoption",
+        "summary": "Generate a comprehensive static HTML dashboard showing Copilot adoption trends, usage patterns, and organizational breakdowns.",
+        "page_url": "/frontier-analytics-prompt-dashboard/",
+        "source_card": "copilot-adoption/dashboard-overview.md",
+        "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/copilot-adoption/dashboard-overview.md",
+        "badges": {
+          "data_source": "Person Query",
+          "min_data": "8+ weeks",
+          "language": "R or Python",
+          "output": "Static HTML dashboard",
+          "difficulty": "Intermediate",
+          "est_time": "~30 min"
+        },
+        "quick_prompt": "Help me create a self-contained static HTML dashboard for people analytics and IT leaders that summarizes Copilot adoption trends and group differences from a Viva Insights person query export.\nStart by loading the actual CSV and printing the row count, column names, data types, date range, and number of unique people, then map the real metric and HR columns from what is present.\nDo not assume exact field names, and ask me to confirm the primary activity metric or any missing HR columns if the mapping is ambiguous.\nSeparate licensed users from active users using explicit licensing and coverage evidence. If those are unavailable, show observed activity and mark adoption rates unavailable; do not infer licensing from activity or missingness.\nBuild weekly adoption metrics using distinct people per week, then add the most useful group views from the available HR attributes.\nThe output must be a single self-contained static HTML file with inline assets and no server or external dependencies.\nSuppress any group with fewer than 10 distinct people, or the stricter organisational minimum, and withhold breakdowns that could reveal suppressed cells. Do not publish individual rankings. Note skipped charts or missing segments.\nAt the end, list any assumptions you made about metric selection, licensing logic, or field mappings."
+      },
+      {
+        "slug": "executive-summary",
+        "title": "Executive Summary — Copilot Adoption",
+        "summary": "Generate a concise executive summary memo that distills Copilot adoption metrics into key findings, trend analysis, and actionable recommendations for senior leadership.",
+        "page_url": "/frontier-analytics-prompt-executive-summary/",
+        "source_card": "copilot-adoption/executive-summary.md",
+        "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/copilot-adoption/executive-summary.md",
+        "badges": {
+          "data_source": "Person Query",
+          "min_data": "8+ weeks",
+          "language": "R or Python",
+          "output": "HTML / Markdown memo",
+          "difficulty": "Beginner",
+          "est_time": "~20 min"
+        },
+        "quick_prompt": "Help me produce a concise executive summary memo for senior leaders that explains Copilot adoption progress, risks, and recommended next actions from a Viva Insights person query export.\nStart by loading the real CSV and printing row count, column names, data types, date range, and unique people so you can map the actual Copilot and HR fields.\nAdapt the column names dynamically rather than assuming the defaults, and ask me for the file path, preferred output format, or any ambiguous field mapping before you proceed.\nSeparate licensed, active, and unlicensed person-weeks correctly before computing headline metrics, and calculate every reported number directly from the data.\nCompare recent adoption and usage trends using the amount of history actually available, and call out when the dataset is too short for the preferred comparison window.\nKeep the tone balanced and executive-friendly, include specific numbers in findings and recommendations, and avoid unsupported claims.\nSuppress organizational breakouts below about 5 people for privacy, and note data quality or missing-field limitations clearly.\nEnd by listing any assumptions you made about activity metrics, comparison windows, or segment mappings."
+      },
+      {
+        "slug": "roi",
+        "title": "ROI Estimation — Copilot Adoption",
+        "summary": "Estimate the return on investment (ROI) for Microsoft Copilot by quantifying time savings, translating them into monetary value, and comparing against license costs to build a defensible business case.",
+        "page_url": "/frontier-analytics-prompt-roi/",
+        "source_card": "copilot-adoption/roi-estimation.md",
+        "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/copilot-adoption/roi-estimation.md",
+        "badges": {
+          "data_source": "Person Query",
+          "min_data": "8+ weeks",
+          "language": "R or Python",
+          "output": "HTML / Markdown report",
+          "difficulty": "Intermediate",
+          "est_time": "~30 min"
+        },
+        "quick_prompt": "Help me build an ROI summary report for finance and IT leaders that estimates the value of Copilot usage from a Viva Insights person query export.\nStart by loading the actual CSV and printing row count, column names, data types, date range, and unique people so you can identify the real Copilot and collaboration fields.\nAdapt to the column names that are present, and ask me for the file path, hourly rate, license cost, or any ambiguous metric mapping instead of guessing.\nSeparate licensed, active, and unlicensed rows correctly, use a recent multi-week average rather than a single week for annualization, and make the break-even threshold explicit.\nIf Copilot_Assisted_Hours is missing, use the best available proxy only after telling me what you chose and why.\nInclude a sensitivity analysis under multiple hourly-rate and adoption scenarios, and be explicit that any licensed versus unlicensed comparison is observational and does not prove causation.\nReport negative or uncertain ROI honestly, suppress any segment below about 5 people, and keep assumptions and caveats prominent throughout the output.\nFinish by listing every assumption you had to make about value realization, proxies, and segment definitions."
+      },
+      {
+        "slug": "segmentation",
+        "title": "Segmentation & Churn Analysis — Copilot Adoption",
+        "summary": "Classify Copilot users into behavioral segments based on usage intensity, track how users move between segments over time, and quantify churn — the rate at which users disengage from Copilot after initial adoption.",
+        "page_url": "/frontier-analytics-prompt-segmentation/",
+        "source_card": "copilot-adoption/segmentation-and-churn.md",
+        "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/copilot-adoption/segmentation-and-churn.md",
+        "badges": {
+          "data_source": "Person Query",
+          "min_data": "8–12+ weeks",
+          "language": "R or Python",
+          "output": "HTML report / notebook",
+          "difficulty": "Intermediate",
+          "est_time": "~30 min"
+        },
+        "quick_prompt": "Help me create a segmentation and churn analysis for Copilot usage that classifies licensed users, tracks movement between segments over time, and highlights at-risk groups.\nStart by loading the actual CSV and printing row count, column names, data types, date range, and unique people so you can map the real activity and HR fields.\nDo not assume exact column names, and ask me for the file path, the main activity metric, or any unclear field mapping before you continue.\nExclude unlicensed users from denominators, then use `identify_usage_segments()` (vivainsights) to compute weekly usage segments when available. If you cannot use it, fall back to percentile-based thresholds and print the thresholds you used.\nInclude both week-level segment trends and a stable user segment for group breakdowns, then build a week-to-week transition matrix only for users present in consecutive weeks.\nUse the stated churn logic unless I tell you otherwise, flag if the time span is too short for reliable churn analysis, and identify currently at-risk users separately from fully churned users.\nSuppress group views below about 5 people for privacy, and note any missing HR attributes or holiday-related caveats that affect interpretation.\nEnd by listing any assumptions you made about thresholds, churn rules, or field mappings."
+      },
+      {
+        "slug": "powerpoint",
+        "title": "Executive PowerPoint Deck: Copilot Adoption",
+        "summary": "Generate an exec-ready 10-15 page PowerPoint deck (.pptx) with editable native PowerPoint charts, summarizing Copilot adoption trends, organizational breakdowns, and key recommendations.",
+        "page_url": "/frontier-analytics-prompt-powerpoint/",
+        "source_card": "copilot-adoption/executive-powerpoint-deck.md",
+        "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/copilot-adoption/executive-powerpoint-deck.md",
+        "badges": {
+          "data_source": "Person Query",
+          "min_data": "8+ weeks",
+          "language": "R or Python (R preferred)",
+          "output": "PowerPoint (.pptx)",
+          "difficulty": "Advanced",
+          "est_time": "~45 min"
+        },
+        "quick_prompt": "Help me generate an exec-ready PowerPoint deck that summarizes Copilot adoption for senior leaders from a Viva Insights person query export.\nStart by loading the actual CSV and printing row count, column names, data types, date range, and unique people so you can map the real Copilot and HR fields before building slides.\nAdapt field names dynamically, use the installed toolchain that best supports native PowerPoint charts, and ask me for the file path, template path, or any ambiguous metric mapping before you proceed.\nClassify licensed versus active users correctly, using the real primary activity metric from the data rather than assuming the default names blindly.\nCreate the deck directly as a .pptx file with native editable chart objects wherever the library supports them, and avoid HTML to PowerPoint conversion pipelines.\nIf a needed chart type cannot be created natively, simplify it to a supported native chart where possible and clearly note any remaining slide that must fall back to an image.\nKeep the deck concise, data-driven, and presentation-ready, suppress segments below about 5 people, and skip slides that depend on unavailable metrics rather than leaving blanks.\nFinish by listing any assumptions you made about chart support, metric mappings, or optional slide substitutions."
+      },
+      {
+        "slug": "causal-toolkit",
+        "title": "Copilot Causal Toolkit: Run and Interpret",
+        "summary": "Help users run a causal inference analysis using the Copilot Causal Toolkit with their own data, and then interpret the results in a non-technical, business-ready format. This page contains two prompts:",
+        "page_url": "/frontier-analytics-prompt-causal-toolkit/",
+        "source_card": "copilot-adoption/copilot-causal-toolkit.md",
+        "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/copilot-adoption/copilot-causal-toolkit.md",
+        "badges": {
+          "data_source": "Person Query / Super Users Report",
+          "min_data": "12+ weeks",
+          "language": "Python only",
+          "output": "Notebooks + interpretation",
+          "difficulty": "Advanced",
+          "est_time": "~60 min"
+        },
+        "quick_prompt": "Help me use the Copilot Causal Toolkit end to end by first configuring and running the right notebook for my data, then interpreting the outputs for a business audience.\nStart by loading the actual CSV and printing row count, column names, data types, date range, and unique people so you can determine whether it is a Person Query or Super Users Report and map the real fields.\nDo not assume exact paths or variables, and ask me for the CSV location, toolkit location, and business question if any of those are missing or ambiguous.\nKeep the required two-part flow from this card, which means run and validate the analysis first, then interpret the generated outputs in a separate pass.\nDo not change the treatment variable from Total_Copilot_actions_taken, do not edit shared helper modules, and warn me if the dataset is shorter than about 12 weeks.\nWhen choosing or configuring the notebook, adapt subgroup, collaboration, and outcome variables to the columns that actually exist in my data.\nWhen interpreting results, explain the ATE direction in business terms, include the sensitivity analysis, and avoid overstating causation or borderline significance.\nFinish each phase by listing any assumptions you made about notebook choice, variable mappings, or output interpretation."
+      }
+    ]
+  },
+  {
+    "title": "Query dashboards",
+    "prompts": [
+      {
+        "slug": "consumption-dashboard",
+        "title": "Build with AI: Consumption and Ways of Working",
+        "summary": "Reproduce the synthetic seven-page R demo, then customise it or build a narrower\ncredits dashboard from documented Consumption exports without starting over.",
+        "page_url": "/frontier-analytics-prompt-consumption-dashboard/",
+        "source_card": "copilot-dashboards/consumption-dashboard.md",
+        "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/copilot-dashboards/consumption-dashboard.md",
+        "badges": {},
+        "quick_prompt": "Help me reproduce or customise the Consumption and Ways of Working dashboard.\nRecover choices already supplied, then ask only for missing checkout, demo versus real mode, output folder and intended changes.\nRead frontier-analytics/skills/viva-insights-copilot-dashboards/SKILL.md in that checkout as workflow instructions, without requiring skill installation.\nUse its Consumption manifest and the shared R runner; do not regenerate the dashboard from scratch.\nFor real exports, inspect locally, show supported and excluded panels, and get my approval before building.\nDo not invent tokens, licensing, coverage, identity mappings or causal conclusions."
+      },
+      {
+        "slug": "developer-experience-dashboard",
+        "title": "Build with AI: Developer Experience and Copilot",
+        "summary": "Reproduce and customise the synthetic developer dashboard with its existing R\nimplementation, and assess real GitHub query inputs without guessing their contract.",
+        "page_url": "/frontier-analytics-prompt-developer-experience-dashboard/",
+        "source_card": "copilot-dashboards/developer-experience-dashboard.md",
+        "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/copilot-dashboards/developer-experience-dashboard.md",
+        "badges": {},
+        "quick_prompt": "Help me reproduce or customise the Developer Experience and Copilot dashboard.\nRecover choices already supplied, then ask only for missing checkout, demo versus real mode, output folder and intended changes.\nRead frontier-analytics/skills/viva-insights-copilot-dashboards/SKILL.md in that checkout as workflow instructions, without requiring skill installation.\nUse its GitHub manifest and shared R runner; preserve coverage, privacy and synthetic labels.\nFor real GitHub files, inspect only and explain the missing contract evidence; v1 has no verified real build adapter.\nDo not infer productivity, code quality, burnout, licensing or non-use from activity alone."
+      }
+    ]
+  },
+  {
+    "title": "Purview augmentation",
+    "prompts": [
+      {
+        "slug": "audit-parsing",
+        "title": "Audit Log Parsing — Purview Audit Logs",
+        "summary": "Parse and clean raw Microsoft Purview audit log exports into a flat, analysis-ready dataset. This is a data engineering prompt that prepares audit log data for downstream analytics (such as the [Agent Usage Analysis](../purview-augmentation/agent-usage-analysis.md) prompt).",
+        "page_url": "/frontier-analytics-prompt-audit-parsing/",
+        "source_card": "purview-augmentation/audit-log-parsing.md",
+        "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/purview-augmentation/audit-log-parsing.md",
+        "badges": {
+          "data_source": "Purview audit log",
+          "min_data": "Any export",
+          "language": "R or Python",
+          "output": "Cleaned flat CSV",
+          "difficulty": "Beginner",
+          "est_time": "~20 min"
+        },
+        "quick_prompt": "Help me parse a raw Microsoft Purview audit log export into a clean flat dataset and data dictionary that are ready for downstream analysis.\nStart by loading the actual file and printing row count, column names, data types, date range if available, and sample records so you can inspect the real schema before assuming any mappings.\nDo not assume exact Purview or AuditData field names, and ask me for the file path or any known Copilot operation names if the mapping or filter logic is unclear.\nParse AuditData defensively with error handling, count malformed rows, and adapt extracted columns to the structures actually present in the data.\nFlatten nested JSON only one level deep, keep deeper structures as JSON strings, standardize final names to snake_case, and avoid exposing raw UserIds in printed output.\nIf the file is large, process it in chunks, then produce both a full cleaned output and a Copilot-focused output when the filter finds relevant events.\nAlso generate a data dictionary that records source, type, null rate, and examples for each final column so downstream users can understand the schema.\nEnd by listing any assumptions you made about field mappings, event classification, or anonymization."
+      },
+      {
+        "slug": "agent-usage",
+        "title": "Agent Usage Analysis — Purview Audit Logs",
+        "summary": "Analyze Copilot agent and extension usage patterns from Microsoft Purview audit logs to understand which Copilot features and agents are being used, by whom, and how usage trends over time.",
+        "page_url": "/frontier-analytics-prompt-agent-usage/",
+        "source_card": "purview-augmentation/agent-usage-analysis.md",
+        "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/purview-augmentation/agent-usage-analysis.md",
+        "badges": {
+          "data_source": "Purview audit log",
+          "min_data": "4+ weeks",
+          "language": "R or Python",
+          "output": "HTML report / notebook",
+          "difficulty": "Intermediate",
+          "est_time": "~30 min"
+        },
+        "quick_prompt": "Help me produce an exploratory report on Copilot agent and extension usage from Microsoft Purview audit logs for program, security, and analytics stakeholders.\nStart by loading the actual file and printing row count, column names, data types, date range, and sample records so you can inspect the real schema before analyzing anything.\nDo not assume exact Purview field names, and ask me for the file path or confirmation of the user, timestamp, operation, workload, or AuditData fields if the mapping is ambiguous.\nUse a broad first-pass filter for Copilot-related operations and workloads, show what matched, and refine the logic based on the values actually present in the data.\nIf AuditData exists, inspect it carefully before extracting agent or extension details, and skip that section with a clear note if those fields are unavailable.\nUse static charts in a standalone HTML or notebook output, protect privacy by avoiding raw email addresses or other direct identifiers in printed output, and sample only for exploration if the dataset is very large.\nCall out system-generated events, duplicates, or other schema quirks that could distort the analysis.\nEnd by listing any assumptions you made about field mappings, Copilot filters, or agent identification."
+      }
+    ]
+  }
+]

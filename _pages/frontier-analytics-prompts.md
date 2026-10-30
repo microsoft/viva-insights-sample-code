@@ -3,18 +3,19 @@ layout: page
 title: "Frontier — Prompt Library"
 eyebrow: "Frontier"
 permalink: /frontier-analytics-prompts/
+css: /assets/css/prompt-catalogue.css
 ---
 # Prompt Card Library
 
 This page contains **prompt cards** — ready-to-use prompts that you can paste directly into a coding agent (such as [GitHub Copilot](https://github.com/features/copilot), [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview), or similar tools) to generate analytics outputs from Viva Insights data.
 
-Each prompt card includes the purpose, required inputs, assumptions, the full prompt text, adaptation notes, and common failure modes.
+Each card opens a copyable quick prompt. The full prompt cards retain the detailed instructions, required inputs, assumptions, adaptation notes, and common failure modes.
 
 ## How to use a prompt card
 
 1. **Prepare your data.** Export the required query from the Viva Insights Analyst portal.
 2. **Open your coding agent.** Launch GitHub Copilot, Claude Code, or your preferred AI assistant.
-3. **Copy the prompt.** Find the relevant card below and copy the full text from the **Prompt** section.
+3. **Choose a starting point.** Copy the quick prompt from a catalogue dialog, or open the full prompt card for detailed instructions.
 4. **Paste and run.** Paste the prompt into the agent. Point it at your data file.
 5. **Review and adapt.** Check the output against the **Common failure modes** section. Use the **Adaptation notes** to customize.
 
@@ -26,33 +27,9 @@ Each prompt card includes the purpose, required inputs, assumptions, the full pr
 
 ## Available prompts
 
-### Copilot Adoption
+Start with the existing R reports and let an agent guide the next step. These journeys work with a pasted prompt or the optional dashboard Skill.
 
-| Prompt Card | Description |
-|---|---|
-| [Dashboard Overview]({{ site.baseurl }}/frontier-analytics-prompt-dashboard/) | Generate a comprehensive static HTML dashboard showing Copilot adoption trends, usage patterns, and organizational breakdowns. |
-| [Executive Summary]({{ site.baseurl }}/frontier-analytics-prompt-executive-summary/) | Produce a concise executive memo summarizing Copilot adoption metrics for VP/C-suite audiences. |
-| [Segmentation & Churn]({{ site.baseurl }}/frontier-analytics-prompt-segmentation/) | Classify users into usage segments, track transitions, and calculate churn rates. |
-| [ROI Estimation]({{ site.baseurl }}/frontier-analytics-prompt-roi/) | Estimate return on investment for Copilot by quantifying time savings and license costs. |
-| [Executive PowerPoint Deck]({{ site.baseurl }}/frontier-analytics-prompt-powerpoint/) | Generate an exec-ready 10–15 page PowerPoint deck with editable native charts. |
-| [Copilot Causal Toolkit]({{ site.baseurl }}/frontier-analytics-prompt-causal-toolkit/) | Run a causal inference analysis using the Copilot Causal Toolkit, then interpret results for senior leadership. Two prompts: one to run the analysis, one to interpret outputs. |
-
-### Query dashboards
-
-Start with the existing R reports and let an agent guide the next step. These
-journeys work with a pasted prompt or the optional dashboard skill.
-
-| Prompt Card | Description |
-|---|---|
-| [Consumption Dashboard]({{ site.baseurl }}/frontier-analytics-prompt-consumption-dashboard/) | Reproduce the synthetic demo or build a scoped credits report from documented exports. |
-| [Developer Experience Dashboard]({{ site.baseurl }}/frontier-analytics-prompt-developer-experience-dashboard/) | Reproduce/customise the demo or assess real GitHub input readiness; no verified real adapter in v1. |
-
-### Purview Augmentation
-
-| Prompt Card | Description |
-|---|---|
-| [Agent Usage Analysis]({{ site.baseurl }}/frontier-analytics-prompt-agent-usage/) | Analyze Copilot agent and extension usage patterns from Purview audit logs. |
-| [Audit Log Parsing]({{ site.baseurl }}/frontier-analytics-prompt-audit-parsing/) | Parse and clean raw Purview audit log exports into analysis-ready flat tables. |
+{% include prompt-catalogue.html %}
 
 ---
 
@@ -72,3 +49,5 @@ journeys work with a pasted prompt or the optional dashboard skill.
 - [Schema Documentation]({{ site.baseurl }}/frontier-analytics-schemas/)
 - [vivainsights R package](https://microsoft.github.io/vivainsights/)
 - [vivainsights Python package](https://microsoft.github.io/vivainsights-py/)
+
+<script src="{{ '/assets/js/prompt-dialog.js' | relative_url }}"></script>

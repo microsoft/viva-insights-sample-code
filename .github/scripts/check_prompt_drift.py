@@ -28,6 +28,7 @@ Exit code 1: at least one hard-fail condition found.
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -35,6 +36,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PROMPTS_DIR = REPO_ROOT / "frontier-analytics" / "prompts"
 PAGES_DIR = REPO_ROOT / "_pages"
+SOURCE_URL = "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/"
 
 # Map each prompt card (relative to frontier-analytics/prompts/) to its
 # site-page mirror (relative to _pages/). Add new cards here when they are
@@ -89,6 +91,26 @@ def headings(text: str) -> list[str]:
 def main() -> int:
     hard_failures: list[str] = []
     warnings: list[str] = []
+    catalogue_path = REPO_ROOT / "_data" / "prompts.json"
+    catalogue_cards: dict[str, dict[str, object]] = {}
+    if not catalogue_path.exists():
+        hard_failures.append("Prompt catalogue data is missing: _data/prompts.json")
+    else:
+        try:
+            groups = json.loads(catalogue_path.read_text(encoding="utf-8"))
+            raw_cards = [
+                prompt
+                for group in groups
+                for prompt in group["prompts"]
+            ]
+            catalogue_cards = {
+                prompt["source_card"]: prompt
+                for prompt in raw_cards
+            }
+            if len(catalogue_cards) != len(raw_cards):
+                hard_failures.append("Prompt catalogue data contains duplicate source_card entries.")
+        except (json.JSONDecodeError, KeyError, TypeError) as error:
+            hard_failures.append(f"Prompt catalogue data is invalid: {error}")
 
     card_files = sorted(
         p.relative_to(PROMPTS_DIR).as_posix()
@@ -126,6 +148,22 @@ def main() -> int:
 
         card_text = card_path.read_text(encoding="utf-8")
         page_text = page_path.read_text(encoding="utf-8")
+        catalogue_prompt = catalogue_cards.pop(card_rel, None)
+        if catalogue_prompt is None:
+            hard_failures.append(f"{card_rel}: prompt is missing from _data/prompts.json.")
+        else:
+            quick_match = re.search(
+                r"```[^\n]*\n(.*?)\n```",
+                section_text(card_text, "Quick prompt (short version)") or "",
+                re.S,
+            )
+            if quick_match and catalogue_prompt.get("quick_prompt") != quick_match.group(1):
+                hard_failures.append(f"{card_rel}: catalogue quick prompt differs from the canonical prompt card.")
+            if catalogue_prompt.get("source_url") != SOURCE_URL + card_rel:
+                hard_failures.append(f"{card_rel}: catalogue source link does not match the canonical prompt card.")
+            page_permalink = re.search(r"^permalink:\s*(\S+)\s*$", page_text, re.M)
+            if page_permalink and catalogue_prompt.get("page_url") != page_permalink.group(1):
+                hard_failures.append(f"{card_rel}: catalogue page link does not match the prompt page.")
 
         pair_label = f"frontier-analytics/prompts/{card_rel} <-> _pages/{page_name}"
 
@@ -175,6 +213,9 @@ def main() -> int:
             body_page = section_text(page_text, heading)
             if body_card is not None and body_page is not None and body_card != body_page:
                 warnings.append(f"{pair_label}: section '{heading}' differs between the two copies.")
+
+    for orphan in sorted(catalogue_cards):
+        hard_failures.append(f"{orphan}: prompt is present in _data/prompts.json but not in the site-page mapping.")
 
     if warnings:
         print("Warnings (not blocking, but worth a look):")
