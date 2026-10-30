@@ -1,0 +1,112 @@
+{%- comment -%}
+  Agent Skills catalogue. Renders one card per Skill followed by one inline
+  details section per Skill, so the page works without JavaScript and search
+  indexes the content once. assets/js/skill-dialog.js moves each details
+  section into a modal dialog and removes the inline wrapper before the
+  floating TOC is built. Content lives in _data/agent_skills.yml.
+{%- endcomment -%}
+{%- assign skills = site.data.agent_skills -%}
+<div class="skill-catalogue">
+  <div class="skill-grid">
+    {%- for skill in skills %}
+    <article class="skill-card" aria-labelledby="skill-card-{{ skill.slug }}">
+      <p class="skill-badge{% if skill.requires %} skill-badge-addon{% endif %}">{{ skill.badge }}</p>
+      <h3 class="skill-card-title" id="skill-card-{{ skill.slug }}">{{ skill.name }}</h3>
+      <p class="skill-card-summary">{{ skill.summary }}</p>
+      <p class="skill-card-note">{{ skill.card_note }}</p>
+      <a class="skill-start" href="#skill-{{ skill.slug }}" data-skill-open="{{ skill.slug }}">Start using<span class="vi-sr-only"> {{ skill.name }}</span></a>
+    </article>
+    {%- endfor %}
+  </div>
+
+  <div class="skill-details-list" data-skill-details>
+    <h2 id="skill-setup-details">Setup details</h2>
+    {%- for skill in skills %}
+    {%- assign base = 'skill-' | append: skill.slug %}
+    <section class="skill-details" id="{{ base }}" data-skill-panel="{{ skill.slug }}" aria-labelledby="{{ base }}-title">
+      <header class="skill-details-header">
+        <p class="skill-badge{% if skill.requires %} skill-badge-addon{% endif %}">{{ skill.badge }}</p>
+        <h3 class="skill-details-title" id="{{ base }}-title" tabindex="-1">{{ skill.name }}</h3>
+        <p class="skill-details-summary">{{ skill.summary }}</p>
+        {%- if skill.requires %}
+        {%- assign companion = skills | where: 'slug', skill.requires | first %}
+        <p class="skill-details-requires">Requires <a href="#skill-{{ companion.slug }}" data-skill-open="{{ companion.slug }}">{{ companion.name }}</a> from the same revision. The steps below install both.</p>
+        {%- endif %}
+        <p class="skill-details-links"><a href="{{ skill.source }}">View the Skill on GitHub</a></p>
+      </header>
+
+      {%- comment -%} A <div> rather than <nav>: search.json splits page content at the last nav closing tag. {%- endcomment -%}
+      <div class="skill-jump" role="navigation" aria-label="{{ skill.name }} sections">
+        <a href="#{{ base }}-start" data-skill-jump>Start using</a>
+        <a href="#{{ base }}-overview" data-skill-jump>Overview</a>
+        <a href="#{{ base }}-results" data-skill-jump>Results</a>
+      </div>
+
+      <div class="skill-section" id="{{ base }}-start">
+        <h4>Start using</h4>
+        <ol class="skill-steps">
+          {%- for step in skill.steps %}
+          <li class="skill-step">
+            <h5>{{ step.title }}</h5>
+            <div class="skill-step-text">{{ step.text | markdownify }}</div>
+            {%- if step.command %}
+            {%- assign command_lines = step.command | newline_to_br %}
+            <div class="skill-copyable">
+              <pre class="skill-code" id="{{ base }}-cmd-{{ forloop.index }}"><code>{{ step.command | escape }}</code></pre>
+              <button type="button" class="skill-copy" data-copy-target="{{ base }}-cmd-{{ forloop.index }}" hidden>{% if command_lines contains '<br' %}Copy commands{% else %}Copy command{% endif %}</button>
+            </div>
+            {%- endif %}
+          </li>
+          {%- endfor %}
+          <li class="skill-step">
+            <h5>Try a starter prompt</h5>
+            <div class="skill-copyable">
+              <pre class="skill-code skill-prompt" id="{{ base }}-prompt"><code>{{ skill.prompt | escape }}</code></pre>
+              <button type="button" class="skill-copy" data-copy-target="{{ base }}-prompt" hidden>Copy starter prompt</button>
+            </div>
+            <p class="skill-step-note">{{ skill.prompt_note }}</p>
+          </li>
+        </ol>
+        <p class="skill-fallback">If <code>gh skill</code> is not available, or you use a different agent, follow the <a href="https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/skills/README.md#installing-a-skill">manual installation guide</a>. Skills are not verified by GitHub, so review the installed files before use.</p>
+      </div>
+
+      <div class="skill-section" id="{{ base }}-overview">
+        <h4>Overview</h4>
+        <p>Questions this Skill helps you answer:</p>
+        <ul class="skill-questions">
+          {%- for question in skill.questions %}
+          <li>{{ question }}</li>
+          {%- endfor %}
+        </ul>
+      </div>
+
+      <div class="skill-section" id="{{ base }}-results">
+        <h4>Results</h4>
+        <p>What you can expect back:</p>
+        <ul class="skill-outputs">
+          {%- for output in skill.outputs %}
+          <li>{{ output }}</li>
+          {%- endfor %}
+        </ul>
+        {%- if skill.previews %}
+        <div class="skill-previews">
+          {%- for preview in skill.previews %}
+          <figure class="skill-preview">
+            <a href="{{ preview.src | relative_url }}"><img src="{{ preview.src | relative_url }}" alt="{{ preview.alt }}" loading="lazy"></a>
+            <figcaption>{{ preview.caption }} <span class="skill-synthetic">Synthetic data</span></figcaption>
+          </figure>
+          {%- endfor %}
+        </div>
+        <p class="skill-step-note">{{ skill.preview_note }}</p>
+        {%- endif %}
+        <h5 class="skill-limits-title">Limits to keep in mind</h5>
+        <ul class="skill-limits">
+          {%- for limit in skill.limitations %}
+          <li>{{ limit }}</li>
+          {%- endfor %}
+        </ul>
+      </div>
+    </section>
+    {%- endfor %}
+  </div>
+</div>

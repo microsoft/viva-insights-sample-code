@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Agent Skills catalogue on the Frontier Skills page. Each Skill opens a
+  details panel with tested `gh skill install` steps, a copyable starter prompt,
+  the questions it helps answer and the results to expect, including labelled
+  synthetic dashboard previews. Content stays readable inline without
+  JavaScript. The Skills README now documents `gh skill install`.
 - Product query icons and exact Viva Insights descriptions in the join tutorial,
   with schema jump cards and matching icons on query section headings.
 - Native query join tutorial under Advanced > Data enrichment, with Person,
