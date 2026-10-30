@@ -50,42 +50,31 @@ Use the detailed prompt below for a reproducible, exact-structure output. Use th
 ## Prompt
 
 ```
-You are a senior people analytics consultant. Your task is to generate a polished executive summary
-memo about Microsoft Copilot adoption, based on a Viva Insights person query export. The memo must
-be suitable for a VP or C-suite audience — concise, insight-driven, and action-oriented.
+You are a senior people analytics consultant. Your task is to generate a polished executive summary memo about Microsoft Copilot adoption, based on a Viva Insights person query export. The memo must be suitable for a VP or C-suite audience — concise, insight-driven, and action-oriented.
+
+LANGUAGE CHOICE
+Choose R or Python based on what is already installed in your environment to minimize setup.
 
 DATA LOADING AND PREPARATION
-1. Load the person query CSV into a DataFrame. Parse MetricDate as a date. Treat PersonId as a string.
-2. Auto-detect Copilot metric columns (columns starting with "Copilot_"). Print the detected columns
-   and the date range for verification.
-3. Classify each person-week row:
-   - "Licensed": if an enabled-days column is present (for example `Total_Copilot_enabled_days`),
-     that column is greater than zero for the week. Otherwise, at least one non-null, non-zero
-     Copilot metric value.
-   - "Active": is licensed AND has Copilot_Actions > 0 (or the primary activity metric).
-   - "Unlicensed": the enabled-days column equals zero when available. Otherwise, all Copilot
-     metric values are null or zero.
-4. If any HR attribute columns (Organization, FunctionType, LevelDesignation) are missing, note which
-   ones are unavailable and proceed with what is present.
+1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python). This handles variable name cleaning and type parsing automatically.
+2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity metric. Print the detected columns and the date range for verification.
+3. Identify HR / organizational attribute columns with `extract_hr(df, return = "names")` in R or `vi.extract_hr(df, return_type="suggestion")` in Python. Use the returned names for all organizational breakdowns instead of hard-coding column names.
+4. Classify each person-week row:
+   - "Licensed": if an enabled-days column is present (for example `Total_Copilot_enabled_days`), that column is greater than zero for the week. Otherwise, at least one non-null, non-zero Copilot metric value.
+   - "Active": is licensed AND has Total_Copilot_actions_taken > 0 (the primary activity metric).
+   - "Unlicensed": the enabled-days column equals zero when available. Otherwise, all Copilot metric values are null or zero.
+5. If any expected HR attribute columns are not found by `extract_hr()`, note which ones are unavailable and proceed with what is present.
 
 HEADLINE METRICS (compute these for the memo)
-5. Current adoption rate: In the most recent complete week, what percentage of licensed users were
-   active? Report as "X% of licensed users actively used Copilot in the week of [date]."
-6. Adoption trend: Compare the average weekly adoption rate over the last 4 complete weeks to the
-   prior 4 weeks. Calculate the percentage-point change. Classify as "improving", "stable" (within
-   ±2pp), or "declining".
-7. Usage intensity: Average Copilot_Actions per active user per week over the last 4 weeks.
-   Compare to the prior 4-week period. Report the direction and magnitude of change.
-8. Breadth of adoption: Total unique users who have been active at least once in the last 4 weeks
-   as a percentage of all licensed users in that period.
-9. Top 3 organizations by adoption rate (latest 4-week average). Bottom 3 organizations by adoption
-   rate. Only include organizations with at least 10 licensed users.
-10. Copilot_Assisted_Hours: Average weekly assisted hours per active user (last 4 weeks). Convert
-    to a relatable figure (e.g., "X minutes per user per week").
+5. Current adoption rate: In the most recent complete week, what percentage of licensed users were active? Report as "X% of licensed users actively used Copilot in the week of [date]."
+6. Adoption trend: Compare the average weekly adoption rate over the last 4 complete weeks to the prior 4 weeks. Calculate the percentage-point change. Classify as "improving", "stable" (within ±2pp), or "declining".
+7. Usage intensity: Average Total_Copilot_actions_taken per active user per week over the last 4 weeks. Compare to the prior 4-week period. Report the direction and magnitude of change.
+8. Breadth of adoption: Total unique users who have been active at least once in the last 4 weeks as a percentage of all licensed users in that period.
+9. Top 3 organizations by adoption rate (latest 4-week average). Bottom 3 organizations by adoption rate. Only include organizations with at least 10 licensed users.
+10. Copilot_Assisted_Hours: Average weekly assisted hours per active user (last 4 weeks). Convert to a relatable figure (e.g., "X minutes per user per week").
 
 KEY FINDINGS (synthesize the metrics into 3-5 bullet points)
-11. Identify the most important story in the data. Is adoption growing? Plateauing? Declining?
-    Which groups are leading and which are lagging?
+11. Identify the most important story in the data. Is adoption growing? Plateauing? Declining? Which groups are leading and which are lagging?
 12. Look for notable patterns:
     - Is there a gap between license deployment and actual usage?
     - Are certain functions or levels adopting faster than others?
@@ -97,9 +86,7 @@ RECOMMENDATIONS (generate 2-4 actionable recommendations)
     - "Target [specific org] for enablement workshops, as their adoption rate is X pp below average."
     - "Investigate why [function type] has low adoption despite high license deployment."
     - "Celebrate and share practices from [top org], which has achieved X% adoption."
-    - "Consider a re-engagement campaign for the estimated N users who were active in weeks 1-4
-       but inactive in the most recent 4 weeks."
-    Recommendations should reference specific numbers from the data.
+    - "Consider a re-engagement campaign for the estimated N users who were active in weeks 1-4 but inactive in the most recent 4 weeks." Recommendations should reference specific numbers from the data.
 
 AREAS OF CONCERN (flag 1-3 risks or issues)
 14. Flag potential concerns:
@@ -109,8 +96,10 @@ AREAS OF CONCERN (flag 1-3 risks or issues)
     - Data quality issues (e.g., missing weeks, unexpected nulls)
 
 MEMO GENERATION
-15. Generate the executive summary as a well-formatted HTML file (or Markdown if specified). Use
-    the following structure:
+15. Create the executive summary as an intermediary document first, then export to HTML:
+    - R: Create an RMarkdown file (.Rmd), then knit to a self-contained HTML file (output: html_document, self_contained: true).
+    - Python: Create a Jupyter notebook (.ipynb), then export to a self-contained HTML file (e.g., `jupyter nbconvert --to html`). Keep the intermediary .Rmd or .ipynb file alongside the HTML output — it makes troubleshooting and iteration easier.
+    - Fallback: if you cannot create or execute a notebook/RMarkdown in this environment (e.g., the toolchain is unavailable), generate a single self-contained **HTML or Markdown report directly** instead — write the computed numbers into a plain `.html` or `.md` file. A direct report is preferable to failing; just note in the output that the intermediary notebook step was skipped. Use the following structure:
 
     HEADER:
     - Title: "Copilot Adoption: Executive Summary"
@@ -133,9 +122,7 @@ MEMO GENERATION
     SECTION 5: "Areas of Concern" (1-3 flagged items)
 
     SECTION 6: "Methodology" (brief paragraph)
-    - Explain: data source (Viva Insights person query), how "licensed" and "active" are defined,
-      the time period used for trend calculations, and any caveats (correlation ≠ causation,
-      missing data handling).
+    - Explain: data source (Viva Insights person query), how "licensed" and "active" are defined, the time period used for trend calculations, and any caveats (correlation ≠ causation, missing data handling).
 
 16. Style guidelines for the memo:
     - Use professional, executive-friendly language. Avoid jargon.
@@ -149,10 +136,8 @@ MEMO GENERATION
 
 IMPORTANT NOTES
 - Do NOT fabricate numbers. Every statistic must be computed directly from the data.
-- Handle missing data gracefully: if Copilot metric columns are null for a user-week, that user
-  is unlicensed for that week — do not treat nulls as zeros.
-- If the dataset has fewer than 8 weeks, note this limitation and adjust trend calculations
-  accordingly (e.g., compare last 2 weeks to prior 2 weeks).
+- Handle missing data gracefully: if Copilot metric columns are null for a user-week, that user is unlicensed for that week — do not treat nulls as zeros.
+- If the dataset has fewer than 8 weeks, note this limitation and adjust trend calculations accordingly (e.g., compare last 2 weeks to prior 2 weeks).
 - Suppress any organizational segment with fewer than 5 people to protect employee privacy.
 - The tone should be balanced — highlight successes but do not oversell. Flag genuine concerns.
 ```

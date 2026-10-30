@@ -8,6 +8,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Agent Skills catalogue on the Frontier Skills page. Each Skill opens a
+  details panel with tested `gh skill install` steps, a copyable starter prompt,
+  the questions it helps answer and the results to expect, including labelled
+  synthetic dashboard previews. Content stays readable inline without
+  JavaScript. The Skills README now documents `gh skill install`.
+- Prompt Library catalogue cards with responsive details dialogs, copyable quick
+  prompts generated from canonical Markdown cards, and direct links to the full
+  prompt pages. The cards remain readable inline without JavaScript.
+- Prompt catalogue source checks now cover all generated fields and full prompt
+  blocks. Segmentation guidance separates weekly inactivity from rolling usage
+  segments, and dialog section links retain browser history and keyboard focus.
+- Synced the detailed prompt blocks in the canonical prompt Markdown files with
+  their published prompt pages. The dashboard prompts were already in sync.
 - Product query icons and exact Viva Insights descriptions in the join tutorial,
   with schema jump cards and matching icons on query section headings.
 - Native query join tutorial under Advanced > Data enrichment, with Person,

@@ -40,6 +40,7 @@ After at least 8–12 weeks of person query data have been collected, when you n
 
 - Person query CSV with Copilot metrics and HR attributes
 - At least 8 weeks of data (12+ weeks recommended for meaningful churn analysis)
+- A Copilot enabled-days field or another confirmed source of weekly licence status
 - HR attributes for segmentation breakdowns
 
 ## Assumptions
@@ -47,7 +48,7 @@ After at least 8–12 weeks of person query data have been collected, when you n
 - Data is at person-week granularity
 - `PersonId` is a consistent anonymized identifier
 - `MetricDate` is a date field representing the start of each week
-- Rows with missing Copilot metric values likely represent unlicensed users
+- Licence status can be established for the person-weeks included in the analysis
 - The `vivainsights` R or Python package is available in the environment
 
 ## Recommended output
@@ -62,9 +63,12 @@ Use this shorter prompt for a fast first pass that adapts to your data.
 Help me create a segmentation and churn analysis for Copilot usage that classifies licensed users, tracks movement between segments over time, and highlights at-risk groups.
 Start by loading the actual CSV and printing row count, column names, data types, date range, and unique people so you can map the real activity and HR fields.
 Do not assume exact column names, and ask me for the file path, the main activity metric, or any unclear field mapping before you continue.
-Exclude unlicensed users from denominators, then use `identify_usage_segments()` (vivainsights) to compute weekly usage segments when available. If you cannot use it, fall back to percentile-based thresholds and print the thresholds you used.
+Use enabled-days or other confirmed licence data to exclude unlicensed users from denominators; do not infer licence status from zero or missing activity alone.
+Use `identify_usage_segments()` (vivainsights) to compute the five weekly usage segments. If it is unavailable, clearly label any alternative segmentation and print its thresholds.
 Include both week-level segment trends and a stable user segment for group breakdowns, then build a week-to-week transition matrix only for users present in consecutive weeks.
-Use the stated churn logic unless I tell you otherwise, flag if the time span is too short for reliable churn analysis, and identify currently at-risk users separately from fully churned users.
+Independently of the rolling segments, define weekly activity from the observed action count. Churn means at least two consecutive active weeks followed by at least two consecutive inactive weeks; date it to the first inactive week once the second confirms it.
+Identify currently at-risk users separately: they have one inactive week immediately after at least two active weeks and have not yet met the churn definition. Do not treat unknown or unlicensed weeks as inactive.
+Flag if the time span is too short for reliable churn analysis.
 Suppress group views below about 5 people for privacy, and note any missing HR attributes or holiday-related caveats that affect interpretation.
 End by listing any assumptions you made about thresholds, churn rules, or field mappings.
 ```
@@ -82,65 +86,66 @@ Choose R or Python based on what is already installed in your environment to min
 DATA LOADING AND PREPARATION
 1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python). This handles variable name cleaning and type parsing automatically.
 2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity metric. Print detected columns and the date range.
-3. Run `extract_hr(df)` from the `vivainsights` library to identify available HR / organizational attribute columns. Use the returned list for all segmentation breakdowns instead of hard-coding column names.
+3. Identify HR / organizational attribute columns with `extract_hr(df, return = "names")` in R or `vi.extract_hr(df, return_type="suggestion")` in Python. Use the returned names for all segmentation breakdowns instead of hard-coding column names.
 4. Classify each person-week:
-   - "Licensed": if an enabled-days column is present (for example `Total_Copilot_enabled_days`), that column is greater than zero for the week. Otherwise, at least one non-null, non-zero Copilot metric value.
-   - "Unlicensed": the enabled-days column equals zero when available. Otherwise, all Copilot metrics are null or zero.
-5. Filter to only licensed person-weeks for the segmentation analysis.
-6. Fill any remaining NaN values in Copilot metric columns with 0 for licensed users (a licensed user with a null action count in one metric likely had zero usage of that specific feature).
+   - "Licensed": an enabled-days column (for example `Total_Copilot_enabled_days`) is greater than zero for the week, or another confirmed licence source establishes coverage.
+   - "Unlicensed": the enabled-days column equals zero or another confirmed licence source establishes no licence.
+   - "Unknown": licence status cannot be established. Zero or missing activity alone does not establish that a user is unlicensed.
+5. Restrict segment and churn denominators to confirmed licensed person-weeks. Report the count with unknown licence status.
+6. Align each person to a weekly calendar and derive a separate activity flag from the primary action metric: positive is active, zero is inactive, and missing is unknown unless the query's documented schema establishes that it represents zero. An unlicensed week, or a week with unknown activity or licence status, is not inactive and breaks an activity or inactivity streak.
 
 USER SEGMENTATION
-6. Use `identify_usage_segments()` from the `vivainsights` library to classify users into segments. This function uses `Total_Copilot_actions_taken` and classifies users based on both usage volume and consistency (habit formation over 12 weeks), producing the canonical **mutually-exclusive** ladder — Power Users → Habitual Users → Novice Users → Low Users → Non-users (see the [Copilot Usage Segments definitions]({{ site.baseurl }}/copilot-usage-segments/#formal-definitions)). It is preferred over manual percentile-based segmentation. Use these exact segment names consistently throughout the report.
+6. Use `identify_usage_segments()` from the `vivainsights` library to classify users into segments. This function uses `Total_Copilot_actions_taken` and classifies users based on both usage volume and consistency (habit formation over 12 weeks), producing the canonical **mutually-exclusive** ladder — Power Users → Habitual Users → Novice Users → Low Users → Non-users (see the [Copilot Usage Segments definitions](https://microsoft.github.io/viva-insights-sample-code/copilot-usage-segments/#formal-definitions)). It is preferred over manual percentile-based segmentation. Use these exact segment names consistently throughout the report. Do not use the rolling segment as the weekly activity flag. Mark a segment unavailable where the required window contains unknown activity or licence status; do not recode unknown activity as zero.
 
 7. Also compute a "stable segment" for each user based on their most frequent weekly segment over the entire period (mode). This gives a single label per person.
 
 SEGMENT DISTRIBUTION OVER TIME
 8. For each week, count the number of users in each segment. Create:
-   a. A stacked area chart showing the four segments over time (absolute counts).
-   b. A stacked area chart showing the four segments as percentages of total licensed users.
+   a. A stacked area chart showing the five segments over time (absolute counts).
+   b. A stacked area chart showing the five segments as percentages of licensed users with an available segment. Report how many licensed users could not be classified.
    c. A summary table of the latest week's segment distribution.
 
 SEGMENT BREAKDOWN BY HR ATTRIBUTES
-9. For each HR attribute (Organization, FunctionType, LevelDesignation), compute the segment distribution using the "stable segment" label. Create:
+9. For each available HR attribute, compute the segment distribution using the "stable segment" label. Create:
    a. A stacked bar chart showing segment proportions by each HR attribute value.
    b. Only include HR attribute values with at least 5 licensed users.
-10. Identify groups with the highest proportion of Power Users and groups with the highest proportion of Inactive users. Flag these as "leading" and "at-risk" groups respectively.
+10. Identify groups with the highest proportions of Power Users and Non-users. Label these as segment distributions, not as the separate at-risk churn definition below.
 
 TRANSITION ANALYSIS
 11. Build a week-over-week transition matrix. For each consecutive pair of weeks, count how many users moved from each segment to every other segment. Aggregate across all week transitions.
 12. Normalize the matrix to show transition probabilities: given a user is in segment X this week, what is the probability they are in segment Y next week?
 13. Visualize the transition matrix as a heatmap with annotations showing the probabilities.
 14. Highlight key transitions of interest:
-    - "Activation": Inactive → any active segment
-    - "Churning": any active segment → Inactive
+    - "Entering use": Non-user → any higher segment
+    - "Returning to non-use": any higher segment → Non-user
     - "Deepening": a move up the ladder, e.g. Low User → Novice User, Novice User → Habitual User, or Habitual User → Power User
     - "Declining": a move down the ladder, e.g. Power User → Habitual User, Habitual User → Novice User, or Novice User → Low User
 
 CHURN ANALYSIS
-15. Define "churn" as: a user who was active (in any active segment) for at least 2 consecutive weeks, then became Inactive for 2 or more consecutive weeks. The churn date is the first week of inactivity.
+15. Define "churn" from the weekly activity flag, independently of the rolling segment: at least 2 consecutive active weeks immediately followed by at least 2 consecutive inactive weeks. The churn date is the first inactive week, confirmed only after the second. Unknown, missing or unlicensed weeks break the streak. A user may churn again after reactivation.
 16. For each week, calculate:
-    a. The number of users who churned that week.
-    b. The churn rate: churned users / active users in the prior week.
+    a. The number of users whose confirmed churn began that week.
+    b. The churn rate: confirmed churn onsets / users with at least 2 consecutive active weeks immediately before that week who are licensed and have known activity in both that week and the following week. Do not report a rate for a week without the following week's observation.
 17. Create a line chart of weekly churn rate over time.
 18. Build a "time to churn" distribution: for users who churned, how many weeks were they active before churning? Show as a histogram.
 19. Compute overall churn statistics:
     a. Total users who ever churned
     b. Percentage of ever-active users who churned
     c. Median active weeks before churn
-    d. Re-activation rate: of those who churned, what percentage became active again later?
+    d. Re-activation rate: among those who churned and have subsequent known licensed weeks, what percentage became active again later? Note incomplete follow-up.
 
 AT-RISK USER IDENTIFICATION
-20. Identify currently at-risk users: licensed users who were active 4+ weeks ago but have been Inactive for the last 2 consecutive weeks (not yet meeting the full churn definition).
+20. Identify currently at-risk users: licensed users with exactly 1 inactive week immediately after at least 2 consecutive active weeks. They have not yet met the churn definition.
 21. Summarize at-risk users by HR attribute: which organizations, functions, or levels have the highest concentration of at-risk users?
-22. Create a table of at-risk user counts by Organization and FunctionType.
+22. Create a table of at-risk user counts by available HR attributes.
 
 REPORT GENERATION
 23. Compile all outputs into an intermediary document first, then export to HTML:
     - R: Create an RMarkdown file (.Rmd), then knit to a self-contained HTML file.
     - Python: Create a Jupyter notebook (.ipynb), then export to a self-contained HTML file. Keep the intermediary file alongside the HTML output for troubleshooting. The report should contain these sections:
-    a. "Segment Definitions" — explain the four segments and thresholds used.
+    a. "Segment Definitions" — explain the five segments and thresholds used.
     b. "Segment Distribution" — charts from step 8 and summary table.
-    c. "Segment Breakdown by Group" — charts from step 9, with leading/at-risk group callouts.
+    c. "Segment Breakdown by Group" — charts and segment-distribution callouts from steps 9 and 10.
     d. "Transition Analysis" — heatmap from step 13, key transition highlights from step 14.
     e. "Churn Analysis" — churn rate trend, time-to-churn histogram, summary statistics.
     f. "At-Risk Users" — summary table from step 22.
@@ -152,15 +157,15 @@ REPORT GENERATION
 
 IMPORTANT NOTES
 - Segments are assigned by `identify_usage_segments()` based on both usage volume and consistency (habit formation over 12 weeks). Print the segment definitions used so the reader can interpret them.
-- Do NOT count unlicensed users in any denominator. They are excluded from the analysis entirely.
+- Do NOT count unlicensed or unknown-licence users in licensed denominators.
 - Suppress any HR attribute segment with fewer than 5 users in the visualizations.
 - The transition matrix should only include users who appear in both consecutive weeks.
-- If the dataset has fewer than 8 weeks, note that churn analysis may not be reliable and adjust the churn definition (e.g., reduce the "2 consecutive inactive weeks" requirement).
+- If the dataset has fewer than 8 weeks, note that churn analysis may not be reliable; do not silently change the churn definition.
 ```
 
 ## Adaptation notes
 
-- The `identify_usage_segments()` function provides sensible default thresholds. If the segments do not produce meaningful groupings for your data, consult the function documentation for available parameters to customize segmentation criteria.
+- The `identify_usage_segments()` function provides default thresholds. If the segments do not produce meaningful groupings for your data, consult its documentation for customization parameters and report any changes.
 - If your organization has a specific definition of "churn" (e.g., 4 weeks of inactivity instead of 2), modify the churn definition in step 15.
 - For organizations with multiple Copilot products, consider segmenting by product (e.g., Copilot in Teams vs. Copilot in Word) by using product-specific metrics.
 - Add a "New User" segment by tracking each user's first active week and analyzing the onboarding trajectory separately.
@@ -168,8 +173,8 @@ IMPORTANT NOTES
 
 ## Common failure modes
 
-- **Agent uses absolute thresholds instead of percentiles.** The prompt specifies percentile-based thresholds, but an agent may default to arbitrary cutoffs. Verify that it calculates and prints the actual thresholds.
-- **Agent counts unlicensed users as "Inactive."** The Inactive segment should only include licensed users with zero activity — not unlicensed users. Verify the filtering step.
+- **Agent uses rolling segments as weekly activity.** A user may remain Habitual after two inactive weeks. Compute the churn flag from observed weekly activity instead.
+- **Agent treats missing or unlicensed weeks as inactive.** Only a confirmed licensed week with known zero activity is inactive for churn.
 - **Transition matrix includes users who appear in only one week.** Ensure the matrix only counts users present in both the "from" and "to" weeks.
 - **Agent conflates week-level segments with user-level segments.** The report uses both: per-week segments for trends and a "stable segment" (mode) for HR attribute breakdowns. Ensure both are present.
 - **Churn definition is too aggressive.** Two weeks of inactivity may include holidays or vacation. Consider extending to 3–4 weeks for more conservative churn estimates.

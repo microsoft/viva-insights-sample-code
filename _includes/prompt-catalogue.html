@@ -1,0 +1,68 @@
+{%- comment -%}
+  Prompt catalogue cards and progressive-enhancement details.
+  The quick prompt is generated from the canonical Markdown card under
+  frontier-analytics/prompts/ by scripts/generate_prompt_catalogue.py.
+{%- endcomment -%}
+{%- assign groups = site.data.prompts -%}
+<div class="prompt-catalogue" data-prompt-catalogue>
+  {%- for group in groups %}
+  {%- assign group_id = group.title | slugify %}
+  <section class="prompt-group" aria-labelledby="{{ group_id }}">
+    <h3 class="prompt-group-title" id="{{ group_id }}">{{ group.title }}</h3>
+    <div class="prompt-grid">
+      {%- for prompt in group.prompts %}
+      <article class="prompt-card" aria-labelledby="prompt-card-{{ prompt.slug }}">
+        <p class="prompt-card-category">{{ group.title }}</p>
+        <h4 class="prompt-card-title" id="prompt-card-{{ prompt.slug }}">{{ prompt.title }}</h4>
+        <p class="prompt-card-summary">{{ prompt.summary | escape }}</p>
+        {%- if prompt.badges.data_source %}
+        <p class="prompt-card-note">{{ prompt.badges.data_source }}{% if prompt.badges.output %} · {{ prompt.badges.output }}{% endif %}</p>
+        {%- endif %}
+        <a class="prompt-open" href="#prompt-{{ prompt.slug }}" data-prompt-open="{{ prompt.slug }}">View quick prompt<span class="vi-sr-only"> for {{ prompt.title }}</span></a>
+      </article>
+      {%- endfor %}
+    </div>
+  </section>
+  {%- endfor %}
+
+  <div class="prompt-details-list" data-prompt-details>
+    <h2 id="prompt-details-heading">Quick prompts</h2>
+    {%- for group in groups %}
+    {%- for prompt in group.prompts %}
+    {%- assign base = 'prompt-' | append: prompt.slug %}
+    <section class="prompt-details" id="{{ base }}" data-prompt-panel="{{ prompt.slug }}" aria-labelledby="{{ base }}-title">
+      <header class="prompt-details-header">
+        <p class="prompt-card-category">{{ group.title }}</p>
+        <h3 class="prompt-details-title" id="{{ base }}-title" tabindex="-1">{{ prompt.title }}</h3>
+        <p class="prompt-details-summary">{{ prompt.summary | escape }}</p>
+      </header>
+
+      {%- if prompt.badges.size > 0 %}
+      <dl class="prompt-metadata" aria-label="Prompt requirements">
+        {%- if prompt.badges.data_source %}<div><dt>Data</dt><dd>{{ prompt.badges.data_source }}</dd></div>{% endif %}
+        {%- if prompt.badges.min_data %}<div><dt>Minimum</dt><dd>{{ prompt.badges.min_data }}</dd></div>{% endif %}
+        {%- if prompt.badges.language %}<div><dt>Language</dt><dd>{{ prompt.badges.language }}</dd></div>{% endif %}
+        {%- if prompt.badges.output %}<div><dt>Output</dt><dd>{{ prompt.badges.output }}</dd></div>{% endif %}
+        {%- if prompt.badges.difficulty %}<div><dt>Level</dt><dd>{{ prompt.badges.difficulty }}</dd></div>{% endif %}
+        {%- if prompt.badges.est_time %}<div><dt>Time</dt><dd>{{ prompt.badges.est_time }}</dd></div>{% endif %}
+      </dl>
+      {%- endif %}
+
+      <div class="prompt-quick-section">
+        <h4>Quick prompt</h4>
+        <p>Copy this shorter starting point, or open the full prompt card for detailed instructions and adaptation notes.</p>
+        <div class="prompt-copyable">
+          <pre class="prompt-code" id="{{ base }}-quick" tabindex="0" role="region" aria-label="Quick prompt for {{ prompt.title | escape }}"><code>{{ prompt.quick_prompt | escape }}</code></pre>
+          <button type="button" class="prompt-copy" data-copy-target="{{ base }}-quick" hidden>Copy quick prompt</button>
+        </div>
+      </div>
+
+      <div class="prompt-details-links">
+        <a class="prompt-full-link" href="{{ prompt.page_url | relative_url }}">Open full prompt card</a>
+        <a href="{{ prompt.source_url }}">View canonical Markdown source</a>
+      </div>
+    </section>
+    {%- endfor %}
+    {%- endfor %}
+  </div>
+</div>

@@ -82,7 +82,7 @@ Choose R or Python based on what is already installed in your environment to min
 DATA LOADING AND VALIDATION
 1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python). This handles variable name cleaning and type parsing automatically.
 2. Ensure PersonId is treated as a string and MetricDate is parsed as a date type.
-3. Run `extract_hr(df)` from the `vivainsights` library to identify the available HR / organizational attribute columns in the data. Use the returned list of HR attributes for all segmentation breakdowns instead of hard-coding column names like Organization, FunctionType, or LevelDesignation.
+3. Identify HR / organizational attribute columns with `extract_hr(df, return = "names")` in R or `vi.extract_hr(df, return_type="suggestion")` in Python. Use the returned names for all segmentation breakdowns instead of hard-coding column names.
 4. Verify the panel structure: each row should represent a unique PersonId × MetricDate combination. If there are duplicates, report their count and stop for an explicit resolution rule.
 5. Print the shape of the data, the date range covered, and the number of unique persons.
 6. List all column names so I can verify the Copilot metric columns and HR attribute columns match what is expected. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity proxy **if it is present** — validate it against the taxonomy first, as it may not capture every Copilot surface or app.

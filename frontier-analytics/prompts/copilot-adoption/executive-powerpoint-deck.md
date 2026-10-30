@@ -51,21 +51,19 @@ Use the detailed prompt below for a reproducible, exact-structure output. Use th
 ## Prompt
 
 ```
-You are a senior people analytics consultant. Your task is to generate a polished, exec-ready PowerPoint deck (.pptx) summarizing Microsoft Copilot adoption from a Viva Insights person query export. The deck must use editable native PowerPoint charts, not pasted images, so that recipients can modify charts and data as needed.
+You are a senior people analytics consultant. Your task is to generate a polished, exec-ready PowerPoint deck (.pptx) summarizing Microsoft Copilot adoption from a Viva Insights person query export. The deck must use editable native PowerPoint charts — NOT pasted images — so that recipients can modify charts and data as needed.
 
 LANGUAGE CHOICE
 Choose R or Python based on what is already installed in your environment to minimize setup.
 - R: Use the `officer` and `mschart` packages for native PowerPoint chart generation.
-- Python: Use the `python-pptx` package. Note that native chart support in python-pptx is more limited. If advanced chart types are needed, R with `mschart` is recommended.
+- Python: Use the `python-pptx` package. Note that native chart support in python-pptx is more limited — if advanced chart types are needed, R with `mschart` is recommended.
 
 DATA LOADING AND PREPARATION
 1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python). This handles variable name cleaning and type parsing automatically.
 2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity metric.
-3. Run `extract_hr(df)` from the `vivainsights` library to identify available HR / organizational attribute columns.
+3. Identify HR / organizational attribute columns with `extract_hr(df, return = "names")` in R or `vi.extract_hr(df, return_type="suggestion")` in Python.
 4. Classify each person-week:
-   - "Licensed": if an enabled-days column is present (for example `Total_Copilot_enabled_days`),
-     that column is greater than zero for the week. Otherwise, at least one non-null, non-zero
-     Copilot metric value.
+   - "Licensed": if an enabled-days column is present (for example `Total_Copilot_enabled_days`), that column is greater than zero for the week. Otherwise, at least one non-null, non-zero Copilot metric value.
    - "Active": licensed AND Total_Copilot_actions_taken > 0.
 5. Print: date range, total persons, licensed persons, active persons.
 
@@ -92,7 +90,7 @@ METRIC CALCULATIONS
    k. Annualized estimated value (using $75/hour default, configurable)
 
 SLIDE DECK GENERATION
-7. Create a PowerPoint deck with the following slides. Prefer R (mschart/officer) for the charts: it produces genuinely native, editable PowerPoint chart objects across the full range of chart types used here. If you must use Python (python-pptx), be aware its native-chart support is more limited. Restrict yourself to the chart types python-pptx supports as native charts (for example clustered/stacked bar and column, line, and pie charts) and avoid combo charts, secondary axes, or annotations it cannot render natively. For any chart type that python-pptx cannot create natively, either simplify it to a supported type or fall back to a high-resolution embedded image, and note in the output which slides use images rather than editable charts.
+7. Create a PowerPoint deck with the following slides. **Prefer R (mschart/officer)** for the charts: it produces genuinely native, editable PowerPoint chart objects across the full range of chart types used here. If you must use Python (python-pptx), be aware its native-chart support is more limited — restrict yourself to the chart types python-pptx supports as native charts (e.g., clustered/stacked bar and column, line, and pie charts) and avoid combo charts, secondary axes, or annotations it cannot render natively. For any chart type that python-pptx cannot create natively, either simplify it to a supported type or fall back to a high-resolution embedded image, and note in the output which slides use images rather than editable charts.
 
    SLIDE 1: Title slide
    - Title: "Copilot Adoption Review"
@@ -104,10 +102,10 @@ SLIDE DECK GENERATION
    - Lead with the headline adoption rate and trend direction
    - Use bold text for key numbers
 
-   SLIDE 3: At a Glance KPI cards
+   SLIDE 3: At a Glance — KPI cards
    - Layout showing key metrics: adoption rate, trend, active users, avg actions/user, avg assisted hours/user
-   - Use directional indicators for trends
-   - Use text boxes with large numbers. These do not need to be charts
+   - Use directional indicators (▲ ▼ ►) for trends
+   - Use text boxes with large numbers — these do not need to be charts
 
    SLIDE 4: Adoption trend over time
    - Native line chart: weekly adoption rate over the full period
@@ -153,7 +151,7 @@ SLIDE DECK GENERATION
    SLIDE 14: Methodology
    - Brief description of data source, definitions (licensed, active), time period
    - Privacy note on minimum group size suppression
-   - Caveat that association is not the same as causation
+   - Caveat: correlation ≠ causation
 
    SLIDE 15: Appendix (optional)
    - Full segmentation tables with numbers
@@ -163,20 +161,20 @@ SLIDE DECK GENERATION
    Adjust the slide count as needed. Aim for 10-15 slides total. Skip slides where data is unavailable rather than leaving them blank.
 
 8. Design guidelines:
-   - Use a clean, professional layout with consistent fonts (for example Calibri or Segoe UI)
+   - Use a clean, professional layout with consistent fonts (e.g., Calibri or Segoe UI)
    - Use a consistent color palette across all charts
-   - Keep text concise. Use bullet points, not paragraphs
+   - Keep text concise — use bullet points, not paragraphs
    - Every chart must have a clear title and takeaway annotation
    - Number all slides
 
 9. Save the deck as "copilot_adoption_deck_YYYYMMDD.pptx".
 
 IMPORTANT NOTES
-- All charts must be native editable PowerPoint chart objects, not static images. This is the primary requirement, since recipients need to be able to modify charts and update data.
-- Do not use RMarkdown or Jupyter notebook as an intermediary for this output. Generate the .pptx file directly using the appropriate PowerPoint package.
-- Handle missing values correctly: null in Copilot columns means unlicensed, 0 means licensed but inactive.
+- All charts MUST be native editable PowerPoint chart objects, not static images. This is the primary requirement — recipients need to be able to modify charts and update data.
+- Do NOT use RMarkdown or Jupyter notebook as an intermediary for this output. Generate the .pptx file directly using the appropriate PowerPoint package.
+- Handle missing values correctly: null in Copilot columns = unlicensed, 0 = licensed but inactive.
 - Suppress segments with fewer than 5 users to protect privacy.
-- Do not fabricate numbers. Every statistic must be computed from the data.
+- Do NOT fabricate numbers. Every statistic must be computed from the data.
 - If a chart type is not supported natively by the PowerPoint library, use the closest available chart type and note the limitation.
 ```
 

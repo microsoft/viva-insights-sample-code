@@ -28,6 +28,7 @@ Exit code 1: at least one hard-fail condition found.
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -35,6 +36,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PROMPTS_DIR = REPO_ROOT / "frontier-analytics" / "prompts"
 PAGES_DIR = REPO_ROOT / "_pages"
+SOURCE_URL = "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/"
 
 # Map each prompt card (relative to frontier-analytics/prompts/) to its
 # site-page mirror (relative to _pages/). Add new cards here when they are
@@ -86,9 +88,71 @@ def headings(text: str) -> list[str]:
     return HEADING_RE.findall(text)
 
 
+def quick_prompt(section: str | None) -> str | None:
+    if section is None:
+        return None
+    match = re.search(r"^```[^\n]*\n(.*?)\n```[ \t]*$", section, re.S | re.M)
+    return match.group(1) if match else None
+
+
+def full_prompt_blocks(text: str) -> list[str]:
+    """Extract fenced blocks under each full Prompt heading, preserving order."""
+    blocks: list[str] = []
+    current: list[str] = []
+    in_fence = False
+    in_prompt = False
+    section_blocks = 0
+    found_section = False
+    for line in text.splitlines():
+        if not in_fence and line.startswith("## "):
+            if in_prompt and not section_blocks:
+                raise ValueError("A full Prompt section has no fenced prompt")
+            in_prompt = bool(re.match(r"^## Prompt(?:\s|$)", line))
+            if in_prompt:
+                found_section = True
+                section_blocks = 0
+        if not in_fence and line.startswith("```"):
+            in_fence = True
+            current = []
+        elif in_fence and re.fullmatch(r"```[ \t]*", line):
+            if in_prompt:
+                blocks.append("\n".join(current))
+                section_blocks += 1
+            in_fence = False
+        elif in_fence and in_prompt:
+            current.append(line)
+    if in_fence and in_prompt:
+        raise ValueError("A full Prompt section has an unclosed fence")
+    if in_prompt and not section_blocks:
+        raise ValueError("A full Prompt section has no fenced prompt")
+    if not found_section:
+        raise ValueError("No full Prompt section found")
+    return blocks
+
+
 def main() -> int:
     hard_failures: list[str] = []
     warnings: list[str] = []
+    catalogue_path = REPO_ROOT / "_data" / "prompts.json"
+    catalogue_cards: dict[str, dict[str, object]] = {}
+    if not catalogue_path.exists():
+        hard_failures.append("Prompt catalogue data is missing: _data/prompts.json")
+    else:
+        try:
+            groups = json.loads(catalogue_path.read_text(encoding="utf-8"))
+            raw_cards = [
+                prompt
+                for group in groups
+                for prompt in group["prompts"]
+            ]
+            catalogue_cards = {
+                prompt["source_card"]: prompt
+                for prompt in raw_cards
+            }
+            if len(catalogue_cards) != len(raw_cards):
+                hard_failures.append("Prompt catalogue data contains duplicate source_card entries.")
+        except (json.JSONDecodeError, KeyError, TypeError) as error:
+            hard_failures.append(f"Prompt catalogue data is invalid: {error}")
 
     card_files = sorted(
         p.relative_to(PROMPTS_DIR).as_posix()
@@ -126,6 +190,18 @@ def main() -> int:
 
         card_text = card_path.read_text(encoding="utf-8")
         page_text = page_path.read_text(encoding="utf-8")
+        catalogue_prompt = catalogue_cards.pop(card_rel, None)
+        if catalogue_prompt is None:
+            hard_failures.append(f"{card_rel}: prompt is missing from _data/prompts.json.")
+        else:
+            card_quick = quick_prompt(section_text(card_text, "Quick prompt (short version)"))
+            if card_quick is not None and catalogue_prompt.get("quick_prompt") != card_quick:
+                hard_failures.append(f"{card_rel}: catalogue quick prompt differs from the canonical prompt card.")
+            if catalogue_prompt.get("source_url") != SOURCE_URL + card_rel:
+                hard_failures.append(f"{card_rel}: catalogue source link does not match the canonical prompt card.")
+            page_permalink = re.search(r"^permalink:\s*(\S+)\s*$", page_text, re.M)
+            if page_permalink and catalogue_prompt.get("page_url") != page_permalink.group(1):
+                hard_failures.append(f"{card_rel}: catalogue page link does not match the prompt page.")
 
         pair_label = f"frontier-analytics/prompts/{card_rel} <-> _pages/{page_name}"
 
@@ -141,14 +217,20 @@ def main() -> int:
                 f"{pair_label}: 'Quick prompt (short version)' content differs "
                 "between the prompt card and the site page. They must match exactly."
             )
+        if quick_card is not None and quick_prompt(quick_card) is None:
+            hard_failures.append(f"{pair_label}: the prompt card's quick prompt has no complete fenced block.")
+        if quick_page is not None and quick_prompt(quick_page) is None:
+            hard_failures.append(f"{pair_label}: the site page's quick prompt has no complete fenced block.")
 
-        # New dashboard journeys share one workflow; their full entry prompts
-        # must not drift even though resource links differ on GitHub and Pages.
-        if card_rel.startswith("copilot-dashboards/"):
-            prompt_card = section_text(card_text, "Prompt")
-            prompt_page = section_text(page_text, "Prompt")
-            if not prompt_card or prompt_card != prompt_page:
-                hard_failures.append(f"{pair_label}: full Prompt sections must match exactly.")
+        try:
+            card_blocks = full_prompt_blocks(card_text)
+            page_blocks = full_prompt_blocks(page_text)
+            if card_blocks != page_blocks:
+                hard_failures.append(
+                    f"{pair_label}: full prompt code blocks differ between the prompt card and site page."
+                )
+        except ValueError as error:
+            hard_failures.append(f"{pair_label}: {error}.")
 
         for keyword in PARITY_KEYWORDS:
             in_card = keyword in card_text
@@ -175,6 +257,9 @@ def main() -> int:
             body_page = section_text(page_text, heading)
             if body_card is not None and body_page is not None and body_card != body_page:
                 warnings.append(f"{pair_label}: section '{heading}' differs between the two copies.")
+
+    for orphan in sorted(catalogue_cards):
+        hard_failures.append(f"{orphan}: prompt is present in _data/prompts.json but not in the site-page mapping.")
 
     if warnings:
         print("Warnings (not blocking, but worth a look):")
