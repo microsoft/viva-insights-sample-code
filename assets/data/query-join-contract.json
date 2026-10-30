@@ -1,6 +1,6 @@
 {
   "contract_id": "viva-insights-query-join",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "date": "2026-10-28",
   "status": "reference",
   "scope": "Joining weekly Viva Insights Person Query exports with Consumption, GitHub and Agent query exports into one person-week panel",
@@ -46,6 +46,8 @@
       "id": "person_query",
       "name": "Person query",
       "role": "spine",
+      "icon": "/assets/images/queries/person-query.svg",
+      "product_description": "Analyse collaboration trends across the company",
       "recommended_path": [
         "Create analysis",
         "Customized query",
@@ -103,6 +105,8 @@
       "id": "consumption_query",
       "name": "Consumption query",
       "role": "fact",
+      "icon": "/assets/images/queries/consumption-query.svg",
+      "product_description": "Analyse credit usage across services, users, groups, and spending policies.",
       "recommended_path": [
         "Create analysis",
         "Customized query",
@@ -291,6 +295,8 @@
       "id": "github_query",
       "name": "GitHub query",
       "role": "fact",
+      "icon": "/assets/images/queries/github-query.svg",
+      "product_description": "Analyse GitHub Copilot usage to understand developer activity and coding trends.",
       "recommended_path": [
         "Create analysis",
         "Customized query",
@@ -537,6 +543,8 @@
       "id": "agent_query",
       "name": "Agent query",
       "role": "fact",
+      "icon": "/assets/images/queries/agent-query.svg",
+      "product_description": "Analyse agent adoption trends across the company",
       "recommended_path": [
         "Create analysis",
         "Customized query",

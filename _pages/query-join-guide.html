@@ -16,6 +16,8 @@ lang: en-GB
 <p>All four queries are available under <strong>Create analysis &gt; Customized query</strong> in <a href="https://analysis.insights.cloud.microsoft/">Viva Insights</a>, where you can adjust parameters such as date grouping and population filters. We recommend this route because it offers more customisation parameters than dashboard exports.</p>
 <p>We recommend exporting <strong>all selected queries grouped by Week</strong>, with the same week start. Consumption and GitHub default to Day, so change their grouping at setup. Weekly exports avoid daily-to-weekly aggregation and sparse-day handling, although service, spending-policy and agent rules still apply. If you need daily detail or must align different week starts, export those queries by Day and aggregate to the Person Query weeks.</p>
 <p>Record the configured grouping for every query before validating its dates. Sparse observed dates alone cannot distinguish daily from weekly or monthly data.</p>
+<p>The cards below use the query icons and descriptions shown in Viva Insights. Select a query to jump to its schema.</p>
+<nav class="query-product-grid" aria-label="Viva Insights query types"><a class="query-product-card" href="#person_query"><img class="query-logo" src="{{ '/assets/images/queries/person-query.svg' | relative_url }}" alt="" width="52" height="52" decoding="async"><span class="query-product-copy"><strong class="query-product-name">Person query</strong><span class="query-product-description">Analyse collaboration trends across the company</span></span></a><a class="query-product-card" href="#consumption_query"><img class="query-logo" src="{{ '/assets/images/queries/consumption-query.svg' | relative_url }}" alt="" width="52" height="52" decoding="async"><span class="query-product-copy"><strong class="query-product-name">Consumption query</strong><span class="query-product-description">Analyse credit usage across services, users, groups, and spending policies.</span></span></a><a class="query-product-card" href="#github_query"><img class="query-logo" src="{{ '/assets/images/queries/github-query.svg' | relative_url }}" alt="" width="52" height="52" decoding="async"><span class="query-product-copy"><strong class="query-product-name">GitHub query</strong><span class="query-product-description">Analyse GitHub Copilot usage to understand developer activity and coding trends.</span></span></a><a class="query-product-card" href="#agent_query"><img class="query-logo" src="{{ '/assets/images/queries/agent-query.svg' | relative_url }}" alt="" width="52" height="52" decoding="async"><span class="query-product-copy"><strong class="query-product-name">Agent query</strong><span class="query-product-description">Analyse agent adoption trends across the company</span></span></a></nav>
 <div class="table-wrap"><table id="query-summary" class="fixed"><caption>The four queries</caption><colgroup><col style="width:18%"><col style="width:40%"><col style="width:22%"><col style="width:20%"></colgroup><thead><tr><th scope="col">Query</th><th scope="col">Files</th><th scope="col">Period</th><th scope="col">Role</th></tr></thead><tbody><tr><td><a href="#person_query">Person query</a></td><td>1 CSV file<br><a href="#person_query.person"><code>Person_&lt;username&gt;_&lt;date&gt;_&lt;time&gt;Hours.csv</code></a></td><td>Week (Recommended)</td><td>Spine (left side of every join)</td></tr><tr><td><a href="#consumption_query">Consumption query</a></td><td>4 CSV files<br><a href="#consumption.m365_credits"><code>PersonM365CreditsMetrics.csv</code></a>, <a href="#consumption.github_credits"><code>PersonGitHubCreditsMetrics.csv</code></a>, <a href="#consumption.people_metadata"><code>PeopleMetaData.csv</code></a>, <a href="#consumption.policy_metadata"><code>M365SpendingPolicyMetaData.csv</code></a></td><td>Week (Recommended), Day (default)</td><td>Joined onto the spine</td></tr><tr><td><a href="#github_query">GitHub query</a></td><td>5 CSV files<br><a href="#github.activity"><code>PersonGitHubActivityMetrics.csv</code></a>, <a href="#github.by_feature"><code>GitHubActivityBreakdownByFeatureMetrics.csv</code></a>, <a href="#github.by_language_feature"><code>GitHubActivityBreakdownByLanguageFeatureMetrics.csv</code></a>, <a href="#github.by_language_model"><code>GitHubActivityBreakdownByLanguageModelMetrics.csv</code></a>, <a href="#github.by_model_feature"><code>GitHubActivityBreakdownByModelFeatureMetrics.csv</code></a></td><td>Week (Recommended), Day (default)</td><td>Joined onto the spine</td></tr><tr><td><a href="#agent_query">Agent query</a></td><td>2 CSV files<br><a href="#agent.activity"><code>PersonAgentActivityMetrics.csv</code></a>, <a href="#agent.metadata"><code>AgentMetadata.csv</code></a> (optional)</td><td>Week (Recommended)</td><td>Joined onto the spine</td></tr></tbody></table></div>
 
 <h2 id="architecture">Join architecture</h2>
@@ -67,7 +69,7 @@ lang: en-GB
 
 <h2 id="queries">Query schemas</h2>
 <p>Export layouts vary between tenants and over time, so check each supplied export against the schemas below. For all four queries, we recommend the Create analysis route because it offers more customisation parameters than dashboard exports.</p>
-<section id="person_query" class="query-section"><h3 id="person_query-heading">Person query</h3>
+<section id="person_query" class="query-section"><div class="query-section-heading"><img class="query-logo" src="{{ '/assets/images/queries/person-query.svg' | relative_url }}" alt="" width="52" height="52" decoding="async"><h3 id="person_query-heading">Person query</h3></div>
 <p class="query-access">Recommended route: <strong>Create analysis</strong> &gt; <strong>Customized query</strong> &gt; <strong>Person query</strong>.</p>
 <p>The Person query is available only through this route. It gives you access to the full Person query metric list, including behavioural metrics such as <code>Email hours</code>, <code>Meeting hours</code> and <code>Internal network size</code>. Select the metrics you need when setting up the query.</p>
 <p>Weekly. Daily or monthly groupings are outside this contract.</p>
@@ -75,7 +77,7 @@ lang: en-GB
 <h4 id="person_query.metric_families">Metric families</h4>
 <p>Metric columns are chosen when the query is set up, so each list is representative rather than complete, and wording or capitalisation can vary by query version. Headers are listed in their raw export form, with spaces. The vivainsights R and Python packages replace spaces with underscores when they import a query, so <code>Collaboration hours</code> becomes Collaboration_hours. Treat the two forms as the same column. This applies to headers only, never to identifier values. See the <a href="https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics">metric definitions on Microsoft Learn</a> for meanings.</p>
 <div class="table-wrap"><table class="fixed"><caption>Person Query metric families</caption><colgroup><col style="width:18%"><col style="width:14%"><col style="width:68%"></colgroup><thead><tr><th scope="col">Family</th><th scope="col">Kind</th><th scope="col">Headers</th></tr></thead><tbody><tr><td>Collaboration</td><td>weekly total</td><td><code>Collaboration hours</code>, <code>External collaboration hours</code>, <code>Meeting hours</code>, <code>Email hours</code>, <code>Chat hours</code>, <code>After hours collaboration hours</code></td></tr><tr><td>Focus</td><td>weekly total</td><td><code>Available to focus hours</code>, <code>Uninterrupted hours</code></td></tr><tr><td>Network</td><td>stock</td><td><code>Internal network size</code>, <code>External network size</code>, <code>Strong ties</code>, <code>Diverse ties</code>, <code>Network outside organization</code></td></tr><tr><td>Copilot eligibility</td><td>day count</td><td><code>Total Copilot enabled days</code></td></tr><tr><td>Copilot activity, totals</td><td>weekly total or day count</td><td><code>Total Copilot actions taken</code>, <code>Total Copilot active days</code></td></tr><tr><td>Copilot activity, by surface</td><td>weekly total or day count</td><td><code>Copilot actions taken in Copilot Chat</code>, <code>Copilot actions taken in Microsoft 365 Copilot app</code>, <code>Days of active Copilot Chat usage</code>, <code>Days of active Copilot Chat (legacy web) usage</code>, <code>Days of active Copilot usage in Excel</code>, <code>Days of active Copilot usage in Loop</code>, <code>Days of active Copilot usage in OneNote</code>, <code>Days of active Copilot usage in Outlook</code>, <code>Days of active Copilot usage in Powerpoint</code>, <code>Days of active Copilot usage in Teams</code>, <code>Days of active Copilot usage in Word</code></td></tr><tr><td>Cowork</td><td>weekly total or day count</td><td><code>Cowork tasks submitted</code>, <code>User-initiated Cowork tasks submitted</code>, <code>Days of active Cowork usage</code></td></tr><tr><td>Unlicensed Copilot Chat</td><td>weekly total or day count</td><td><span class="none">Inspect the export</span><br><span class="meta">A separate metric family for Copilot Chat use without a Microsoft 365 Copilot licence. Inspect the export for its headers and keep it separate from licensed Copilot metrics.</span></td></tr></tbody></table></div>
-</section><section id="consumption_query" class="query-section"><h3 id="consumption_query-heading">Consumption query</h3>
+</section><section id="consumption_query" class="query-section"><div class="query-section-heading"><img class="query-logo" src="{{ '/assets/images/queries/consumption-query.svg' | relative_url }}" alt="" width="52" height="52" decoding="async"><h3 id="consumption_query-heading">Consumption query</h3></div>
 <p class="query-access">Recommended route: <strong>Create analysis</strong> &gt; <strong>Customized query</strong> &gt; <strong>Consumption query</strong>.</p>
 <p>You can also use the <strong>Export data</strong> button in the Consumption dashboard.</p>
 <p>Daily by default, or weekly when grouped by week at setup. Facts plus metadata files.</p>
@@ -83,14 +85,14 @@ lang: en-GB
 <h4 id="consumption.github_credits"><code>PersonGitHubCreditsMetrics.csv</code></h4><p class="meta"><strong>Grain:</strong> One row per person and period with billable GitHub usage (sparse). <strong>Native key:</strong> <code>PersonId</code>, <code>MetricDate</code>.</p><div class="table-wrap"><table class="fixed"><caption>Columns in PersonGitHubCreditsMetrics.csv</caption><colgroup><col style="width:38%"><col style="width:12%"><col style="width:13%"><col style="width:37%"></colgroup><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Role</th><th scope="col">Notes</th></tr></thead><tbody><tr><td><code>PersonId</code></td><td>string</td><td>Key</td><td></td></tr><tr><td><code>MetricDate</code></td><td>date</td><td>Key</td><td>Day or week start, as set at query setup.</td></tr><tr><td><code>Total GitHub AI Credits used</code></td><td>number</td><td>Measure</td><td></td></tr><tr><td><code>PeopleHistoricalId</code></td><td>string</td><td>Join key</td><td>Links to <code>PeopleMetaData.csv</code>.</td></tr></tbody></table></div>
 <h4 id="consumption.people_metadata"><code>PeopleMetaData.csv</code></h4><p class="meta"><strong>Grain:</strong> One row per historical person record. <strong>Native key:</strong> <code>PeopleHistoricalId</code>. Carries no HR attributes. Take organisational attributes from the Person Query.</p><div class="table-wrap"><table class="fixed"><caption>Columns in PeopleMetaData.csv</caption><colgroup><col style="width:38%"><col style="width:12%"><col style="width:13%"><col style="width:37%"></colgroup><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Role</th><th scope="col">Notes</th></tr></thead><tbody><tr><td><code>PeopleHistoricalId</code></td><td>string</td><td>Key</td><td>No <code>PersonId</code> in this file.</td></tr><tr><td><code>IsCopilotLicensed</code></td><td>boolean-like text</td><td>Attribute</td><td>Historical Microsoft 365 Copilot licence evidence only. Not evidence of GitHub Copilot provisioning.</td></tr></tbody></table></div>
 <h4 id="consumption.policy_metadata"><code>M365SpendingPolicyMetaData.csv</code> <span class="tag">outside the core panel</span></h4><p class="meta"><strong>Grain:</strong> One row per spending policy. <strong>Native key:</strong> <code>SpendingPolicyId</code>.</p><div class="table-wrap"><table class="fixed"><caption>Columns in M365SpendingPolicyMetaData.csv</caption><colgroup><col style="width:38%"><col style="width:12%"><col style="width:13%"><col style="width:37%"></colgroup><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Role</th><th scope="col">Notes</th></tr></thead><tbody><tr><td><code>SpendingPolicyId</code></td><td>string</td><td>Key</td><td></td></tr><tr><td><em>Policy attributes</em></td><td>varies</td><td>Column group</td><td>Descriptive policy fields. Inspect the headers in each export.</td></tr></tbody></table></div>
-</section><section id="github_query" class="query-section"><h3 id="github_query-heading">GitHub query</h3>
+</section><section id="github_query" class="query-section"><div class="query-section-heading"><img class="query-logo" src="{{ '/assets/images/queries/github-query.svg' | relative_url }}" alt="" width="52" height="52" decoding="async"><h3 id="github_query-heading">GitHub query</h3></div>
 <p class="query-access">Recommended route: <strong>Create analysis</strong> &gt; <strong>Customized query</strong> &gt; <strong>GitHub query</strong>.</p>
 <p>Daily by default, or weekly when grouped by week at setup. Activity facts plus dimensional breakdowns.</p>
 <h4 id="github.activity"><code>PersonGitHubActivityMetrics.csv</code></h4><p class="meta"><strong>Grain:</strong> One row per person and period. <strong>Native key:</strong> <code>PersonId</code>, <code>MetricDate</code>.</p><div class="table-wrap"><table class="fixed"><caption>Columns in PersonGitHubActivityMetrics.csv</caption><colgroup><col style="width:38%"><col style="width:12%"><col style="width:13%"><col style="width:37%"></colgroup><thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Role</th><th scope="col">Notes</th></tr></thead><tbody><tr><td><code>PersonId</code></td><td>string</td><td>Key</td><td></td></tr><tr><td><code>MetricDate</code></td><td>date</td><td>Key</td><td>Day or week start, as set at query setup.</td></tr><tr><td><code>Agent adoption</code></td><td>number</td><td>Indicator</td><td>Adoption indicator or percentage. Excludes code review.</td></tr><tr><td><code>Code completions accepted</code></td><td>number</td><td>Measure</td><td></td></tr><tr><td><code>Code completions suggested</code></td><td>number</td><td>Measure</td><td></td></tr><tr><td><code>User-initiated chat requests</code></td><td>number</td><td>Measure</td><td></td></tr></tbody></table></div>
 <h4 id="github.breakdowns">Breakdown files <span class="tag">part of the export, outside the core panel</span></h4>
 <p class="meta">Each adds one or two dimensions to the person-period grain, so the four files do not share a grain with each other or with the activity file. Keep them as linked detail (<a href="#G11">G11</a>).</p>
 <div class="table-wrap"><table class="fixed"><caption>GitHub breakdown files</caption><colgroup><col style="width:42%"><col style="width:33%"><col style="width:25%"></colgroup><thead><tr><th scope="col">File</th><th scope="col">Native key</th><th scope="col">Measure</th></tr></thead><tbody><tr><td><span id="github.by_feature"><code>GitHubActivityBreakdownByFeatureMetrics.csv</code></span></td><td><code>PersonId</code>, <code>MetricDate</code>, <code>Feature</code></td><td><code>Feature Usage Count</code></td></tr><tr><td><span id="github.by_language_feature"><code>GitHubActivityBreakdownByLanguageFeatureMetrics.csv</code></span></td><td><code>PersonId</code>, <code>MetricDate</code>, <code>Language</code>, <code>Feature</code></td><td><code>Usage count by language and feature</code></td></tr><tr><td><span id="github.by_language_model"><code>GitHubActivityBreakdownByLanguageModelMetrics.csv</code></span></td><td><code>PersonId</code>, <code>MetricDate</code>, <code>Language</code>, <code>Model</code></td><td><code>Usage count by language and model</code></td></tr><tr><td><span id="github.by_model_feature"><code>GitHubActivityBreakdownByModelFeatureMetrics.csv</code></span></td><td><code>PersonId</code>, <code>MetricDate</code>, <code>Model</code>, <code>Feature</code></td><td><code>Usage count by model and feature</code></td></tr></tbody></table></div>
-</section><section id="agent_query" class="query-section"><h3 id="agent_query-heading">Agent query</h3>
+</section><section id="agent_query" class="query-section"><div class="query-section-heading"><img class="query-logo" src="{{ '/assets/images/queries/agent-query.svg' | relative_url }}" alt="" width="52" height="52" decoding="async"><h3 id="agent_query-heading">Agent query</h3></div>
 <p class="query-access">Recommended route: <strong>Create analysis</strong> &gt; <strong>Customized query</strong> &gt; <strong>Agent query</strong>.</p>
 <p>You can also use the <strong>Export data</strong> button in the Agent Dashboard.</p>
 <p>Weekly facts with an optional metadata file.</p>
@@ -154,7 +156,7 @@ lang: en-GB
 <p><a href="{{ '/assets/data/query-join-contract.json' | relative_url }}">Download the JSON contract</a>.</p>
 <details><summary>Show the JSON contract</summary><pre>{
   &quot;contract_id&quot;: &quot;viva-insights-query-join&quot;,
-  &quot;version&quot;: &quot;0.6.0&quot;,
+  &quot;version&quot;: &quot;0.7.0&quot;,
   &quot;date&quot;: &quot;2026-10-28&quot;,
   &quot;status&quot;: &quot;reference&quot;,
   &quot;scope&quot;: &quot;Joining weekly Viva Insights Person Query exports with Consumption, GitHub and Agent query exports into one person-week panel&quot;,
@@ -200,6 +202,8 @@ lang: en-GB
       &quot;id&quot;: &quot;person_query&quot;,
       &quot;name&quot;: &quot;Person query&quot;,
       &quot;role&quot;: &quot;spine&quot;,
+      &quot;icon&quot;: &quot;/assets/images/queries/person-query.svg&quot;,
+      &quot;product_description&quot;: &quot;Analyse collaboration trends across the company&quot;,
       &quot;recommended_path&quot;: [
         &quot;Create analysis&quot;,
         &quot;Customized query&quot;,
@@ -257,6 +261,8 @@ lang: en-GB
       &quot;id&quot;: &quot;consumption_query&quot;,
       &quot;name&quot;: &quot;Consumption query&quot;,
       &quot;role&quot;: &quot;fact&quot;,
+      &quot;icon&quot;: &quot;/assets/images/queries/consumption-query.svg&quot;,
+      &quot;product_description&quot;: &quot;Analyse credit usage across services, users, groups, and spending policies.&quot;,
       &quot;recommended_path&quot;: [
         &quot;Create analysis&quot;,
         &quot;Customized query&quot;,
@@ -445,6 +451,8 @@ lang: en-GB
       &quot;id&quot;: &quot;github_query&quot;,
       &quot;name&quot;: &quot;GitHub query&quot;,
       &quot;role&quot;: &quot;fact&quot;,
+      &quot;icon&quot;: &quot;/assets/images/queries/github-query.svg&quot;,
+      &quot;product_description&quot;: &quot;Analyse GitHub Copilot usage to understand developer activity and coding trends.&quot;,
       &quot;recommended_path&quot;: [
         &quot;Create analysis&quot;,
         &quot;Customized query&quot;,
@@ -691,6 +699,8 @@ lang: en-GB
       &quot;id&quot;: &quot;agent_query&quot;,
       &quot;name&quot;: &quot;Agent query&quot;,
       &quot;role&quot;: &quot;fact&quot;,
+      &quot;icon&quot;: &quot;/assets/images/queries/agent-query.svg&quot;,
+      &quot;product_description&quot;: &quot;Analyse agent adoption trends across the company&quot;,
       &quot;recommended_path&quot;: [
         &quot;Create analysis&quot;,
         &quot;Customized query&quot;,
@@ -1327,7 +1337,7 @@ lang: en-GB
 <script type="application/json" id="join-contract">
 {
   "contract_id": "viva-insights-query-join",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "date": "2026-10-28",
   "status": "reference",
   "scope": "Joining weekly Viva Insights Person Query exports with Consumption, GitHub and Agent query exports into one person-week panel",
@@ -1373,6 +1383,8 @@ lang: en-GB
       "id": "person_query",
       "name": "Person query",
       "role": "spine",
+      "icon": "/assets/images/queries/person-query.svg",
+      "product_description": "Analyse collaboration trends across the company",
       "recommended_path": [
         "Create analysis",
         "Customized query",
@@ -1430,6 +1442,8 @@ lang: en-GB
       "id": "consumption_query",
       "name": "Consumption query",
       "role": "fact",
+      "icon": "/assets/images/queries/consumption-query.svg",
+      "product_description": "Analyse credit usage across services, users, groups, and spending policies.",
       "recommended_path": [
         "Create analysis",
         "Customized query",
@@ -1618,6 +1632,8 @@ lang: en-GB
       "id": "github_query",
       "name": "GitHub query",
       "role": "fact",
+      "icon": "/assets/images/queries/github-query.svg",
+      "product_description": "Analyse GitHub Copilot usage to understand developer activity and coding trends.",
       "recommended_path": [
         "Create analysis",
         "Customized query",
@@ -1864,6 +1880,8 @@ lang: en-GB
       "id": "agent_query",
       "name": "Agent query",
       "role": "fact",
+      "icon": "/assets/images/queries/agent-query.svg",
+      "product_description": "Analyse agent adoption trends across the company",
       "recommended_path": [
         "Create analysis",
         "Customized query",
@@ -2500,6 +2518,6 @@ lang: en-GB
 </script>
 
 <footer>
-<p>Sources: <a href="https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics">Viva Insights metric definitions</a>, <a href="https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query">Consumption query documentation</a>, and the query contracts and synthetic sample exports in <a href="https://github.com/microsoft/viva-insights-sample-code">microsoft/viva-insights-sample-code</a>. Contract version 0.6.0, 28 October 2026.</p>
+<p>Sources: <a href="https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics">Viva Insights metric definitions</a>, <a href="https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query">Consumption query documentation</a>, and the query contracts and synthetic sample exports in <a href="https://github.com/microsoft/viva-insights-sample-code">microsoft/viva-insights-sample-code</a>. Contract version 0.7.0, 28 October 2026.</p>
 </footer>
 </div>

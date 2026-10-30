@@ -18,8 +18,17 @@
 .query-join-guide h4 { font-size: 16px; margin: 22px 0 6px; }
 .query-join-guide p { margin: 8px 0; }
 .query-join-guide code { font-family: Consolas, "Cascadia Mono", monospace; font-size: .88em; color: #1b2a3a; background: #f6f8fa; overflow-wrap: anywhere; }
+.query-join-guide .query-product-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 16px 0 24px; }
+.query-join-guide .query-product-card { display: flex; align-items: flex-start; gap: 14px; padding: 18px; border: 1px solid #dde4ec; border-left: 3px solid var(--query-accent); border-radius: 8px; background: #fff; color: inherit; text-decoration: none; }
+.query-join-guide .query-product-card:hover { border-color: var(--query-accent); text-decoration: none; }
+.query-join-guide .query-product-card:focus-visible { outline: 3px solid var(--query-accent); outline-offset: 3px; }
+.query-join-guide .query-product-copy { min-width: 0; }
+.query-join-guide .query-product-name { display: block; margin-bottom: 6px; font-size: 16px; }
+.query-join-guide .query-product-description { display: block; color: #536578; font-size: 14px; line-height: 1.5; }
+.query-join-guide img.query-logo { display: block; flex: 0 0 52px; width: 52px; height: 52px; max-width: none; margin: 0; object-fit: contain; }
 .query-join-guide .query-section { border: 1px solid #dde4ec; border-left: 3px solid var(--query-accent); border-radius: 8px; background: #fff; padding: 20px 22px; margin: 28px 0; min-width: 0; }
-.query-join-guide .query-section > h3 { margin: 0 0 10px; border-left: 0; padding-left: 0; }
+.query-join-guide .query-section-heading { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.query-join-guide .query-section-heading > h3 { margin: 0; border-left: 0; padding-left: 0; }
 .query-join-guide [id] { scroll-margin-top: calc(var(--sticky-offset, 56px) + 20px); }
 .query-join-guide #query-summary td:first-child a::before,
 #floating-toc a[href$="_query-heading"]::before { content: ""; display: inline-block; width: 7px; height: 10px; border-radius: 2px; background: var(--query-accent); margin-right: 8px; }
@@ -49,6 +58,7 @@
 .query-join-guide pre { background: #f6f8fa; border: 1px solid #dde4ec; border-radius: 6px; padding: 14px; overflow: auto; font-size: 12.5px; max-height: 520px; white-space: pre; }
 .query-join-guide footer { margin-top: 48px; color: #536578; font-size: 13px; }
 @media (max-width: 600px) {
+  .query-join-guide .query-product-grid { grid-template-columns: minmax(0, 1fr); }
   .query-join-guide table { min-width: 760px; }
   .query-join-guide .query-section { padding: 16px 12px; }
 }

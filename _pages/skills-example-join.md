@@ -7,6 +7,12 @@ permalink: /skills-data-join/
 ---
 Use this tutorial to join [People Skills](https://learn.microsoft.com/en-us/copilot/microsoft-365/people-skills-overview) data with [Viva Insights](https://learn.microsoft.com/en-us/viva/insights/introduction) exports, then explore common organisational questions with R or Python.
 
+<a class="vi-card" href="https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/templates/skills-landscape">
+  <span class="vi-card-icon"><img src="{{ '/assets/images/queries/skills-landscape.svg' | relative_url }}" alt="" width="52" height="52" decoding="async"></span>
+  <span class="vi-card-title">Skills landscape</span>
+  <span class="vi-card-desc">Discover the skills people in your organisation are using, powered by People Skills.</span>
+</a>
+
 <p><strong>Demo-data note:</strong> Scenarios 4 and 5 use randomly generated collaboration-hours and Copilot-action values, not real employee activity. Their results demonstrate code only. Add actual outcome metrics to your Person Query before drawing conclusions.</p>
 
 ## What You'll Learn

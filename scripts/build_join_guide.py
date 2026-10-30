@@ -53,7 +53,7 @@ SURFACE_DAY_HEADERS = [h for h in SURFACE_HEADERS if h.startswith("Days of activ
 
 CONTRACT = {
     "contract_id": "viva-insights-query-join",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "date": "2026-10-28",
     "status": "reference",
     "scope": "Joining weekly Viva Insights Person Query exports with Consumption, GitHub and Agent query exports into one person-week panel",
@@ -88,6 +88,8 @@ CONTRACT = {
     "queries": [
         {
             "id": "person_query", "name": "Person query", "role": "spine",
+            "icon": "/assets/images/queries/person-query.svg",
+            "product_description": "Analyse collaboration trends across the company",
             "recommended_path": ["Create analysis", "Customized query", "Person query"],
             "access_context": "The Person query is available only through this route. It gives you access to the full Person query metric list, including behavioural metrics such as Email hours, Meeting hours and Internal network size. Select the metrics you need when setting up the query.",
             "cadence": "Weekly. Daily or monthly groupings are outside this contract.",
@@ -104,6 +106,8 @@ CONTRACT = {
         },
         {
             "id": "consumption_query", "name": "Consumption query", "role": "fact",
+            "icon": "/assets/images/queries/consumption-query.svg",
+            "product_description": "Analyse credit usage across services, users, groups, and spending policies.",
             "recommended_path": ["Create analysis", "Customized query", "Consumption query"],
             "alternative_path": ["Consumption dashboard", "Export data"],
             "cadence": "Daily by default, or weekly when grouped by week at setup. Facts plus metadata files.",
@@ -135,6 +139,8 @@ CONTRACT = {
         },
         {
             "id": "github_query", "name": "GitHub query", "role": "fact",
+            "icon": "/assets/images/queries/github-query.svg",
+            "product_description": "Analyse GitHub Copilot usage to understand developer activity and coding trends.",
             "recommended_path": ["Create analysis", "Customized query", "GitHub query"],
             "cadence": "Daily by default, or weekly when grouped by week at setup. Activity facts plus dimensional breakdowns.",
             "period_options": ["day", "week"], "default_period": "day",
@@ -166,6 +172,8 @@ CONTRACT = {
         },
         {
             "id": "agent_query", "name": "Agent query", "role": "fact",
+            "icon": "/assets/images/queries/agent-query.svg",
+            "product_description": "Analyse agent adoption trends across the company",
             "recommended_path": ["Create analysis", "Customized query", "Agent query"],
             "alternative_path": ["Agent Dashboard", "Export data"],
             "cadence": "Weekly facts with an optional metadata file.",
@@ -504,6 +512,17 @@ def build_html() -> str:
     def period_cell(q):
         return "Week (Recommended)" + (", Day (default)" if q["default_period"] == "day" else "")
 
+    def query_logo(q):
+        src = "{{ '" + e(q["icon"]) + "' | relative_url }}"
+        return f'<img class="query-logo" src="{src}" alt="" width="52" height="52" decoding="async">'
+
+    product_cards = "".join(
+        f'<a class="query-product-card" href="#{q["id"]}">{query_logo(q)}'
+        f'<span class="query-product-copy"><strong class="query-product-name">{e(q["name"])}</strong>'
+        f'<span class="query-product-description">{e(q["product_description"])}</span></span></a>'
+        for q in c["queries"]
+    )
+
     query_rows = [[f'<a href="#{q["id"]}">{e(q["name"])}</a>', files_cell(q), e(period_cell(q)),
                    e({"spine": "Spine (left side of every join)", "fact": "Joined onto the spine"}[q["role"]])]
                   for q in c["queries"]]
@@ -511,7 +530,9 @@ def build_html() -> str:
     sections = []
     for q in c["queries"]:
         path = " &gt; ".join(f"<strong>{e(part)}</strong>" for part in q["recommended_path"])
-        block = [f'<section id="{q["id"]}" class="query-section"><h3 id="{q["id"]}-heading">{e(q["name"])}</h3>',
+        block = [f'<section id="{q["id"]}" class="query-section">'
+                 f'<div class="query-section-heading">{query_logo(q)}'
+                 f'<h3 id="{q["id"]}-heading">{e(q["name"])}</h3></div>',
                  f'<p class="query-access">Recommended route: {path}.</p>']
         if q.get("access_context"):
             block.append(f'<p>{rich(backtick(q["access_context"], names))}</p>')
@@ -607,6 +628,8 @@ lang: en-GB
 <p>All four queries are available under <strong>Create analysis &gt; Customized query</strong> in <a href="https://analysis.insights.cloud.microsoft/">Viva Insights</a>, where you can adjust parameters such as date grouping and population filters. We recommend this route because it offers more customisation parameters than dashboard exports.</p>
 <p>We recommend exporting <strong>all selected queries grouped by Week</strong>, with the same week start. Consumption and GitHub default to Day, so change their grouping at setup. Weekly exports avoid daily-to-weekly aggregation and sparse-day handling, although service, spending-policy and agent rules still apply. If you need daily detail or must align different week starts, export those queries by Day and aggregate to the Person Query weeks.</p>
 <p>Record the configured grouping for every query before validating its dates. Sparse observed dates alone cannot distinguish daily from weekly or monthly data.</p>
+<p>The cards below use the query icons and descriptions shown in Viva Insights. Select a query to jump to its schema.</p>
+<nav class="query-product-grid" aria-label="Viva Insights query types">{product_cards}</nav>
 {table("The four queries", ["Query", "Files", "Period", "Role"], query_rows, "query-summary", widths=[18, 40, 22, 20])}
 
 <h2 id="architecture">Join architecture</h2>
