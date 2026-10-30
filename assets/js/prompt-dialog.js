@@ -10,7 +10,6 @@
   var dialogs = {};
   var current = null;
   var returnFocus = null;
-  var pushedHash = false;
 
   function slugFromHash() {
     var match = window.location.hash.match(/^#prompt-([a-z0-9-]+)$/);
@@ -111,14 +110,15 @@
     });
 
     dialog.addEventListener('close', function () {
-      if (current !== dialog) return;
+      if (current !== dialog || dialog.open) return;
       current = null;
       document.documentElement.classList.remove('prompt-dialog-open');
-      if (pushedHash && slugFromHash() === slug) {
-        pushedHash = false;
-        window.history.back();
-      } else if (slugFromHash() === slug) {
-        window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search);
+      if (slugFromHash() === slug) {
+        if (window.history.state && window.history.state.__viPromptDialog === slug) {
+          window.history.back();
+        } else {
+          window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search);
+        }
       }
       var trigger = returnFocus || catalogue.querySelector('[data-prompt-open="' + slug + '"]');
       returnFocus = null;
@@ -147,9 +147,8 @@
   function syncHash() {
     var slug = slugFromHash();
     if (slug && dialogs[slug]) {
-      if (current !== dialogs[slug]) open(slug);
+      if (current !== dialogs[slug] || !dialogs[slug].open) open(slug);
     } else if (current) {
-      pushedHash = false;
       current.close();
     }
   }
@@ -162,8 +161,11 @@
     var slug = opener.getAttribute('data-prompt-open');
     if (!dialogs[slug]) return;
     event.preventDefault();
-    pushedHash = window.location.hash !== '#prompt-' + slug;
-    if (pushedHash) window.history.pushState(window.history.state, '', '#prompt-' + slug);
+    if (window.location.hash !== '#prompt-' + slug) {
+      var state = Object.assign({}, window.history.state);
+      state.__viPromptDialog = slug;
+      window.history.pushState(state, '', '#prompt-' + slug);
+    }
     open(slug, opener);
   });
 

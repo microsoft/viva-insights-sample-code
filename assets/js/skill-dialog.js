@@ -86,7 +86,6 @@
   var dialogs = {};
   var current = null;
   var returnFocus = null;
-  var returnUrl = null;
 
   Array.prototype.forEach.call(catalogue.querySelectorAll('[data-skill-panel]'), function (panel) {
     var slug = panel.getAttribute('data-skill-panel');
@@ -192,15 +191,20 @@
   }
 
   function onClose(dialog, slug) {
-    if (current !== dialog) return;
+    if (current !== dialog || dialog.open) return;
     current = null;
     document.documentElement.classList.remove('skill-dialog-open');
 
     var found = locate(window.location.hash);
     if (found && found.dialog === dialog) {
-      history.replaceState(history.state, '', returnUrl || window.location.pathname + window.location.search);
+      var state = history.state;
+      var entry = state && state.__viSkillDialog;
+      if (entry && typeof entry.returnUrl === 'string') {
+        history.replaceState(entry.previousState, '', entry.returnUrl);
+      } else {
+        history.replaceState(state, '', window.location.pathname + window.location.search);
+      }
     }
-    returnUrl = null;
 
     var target = returnFocus && document.body.contains(returnFocus) ? returnFocus : cardTrigger(slug);
     returnFocus = null;
@@ -240,14 +244,15 @@
     event.preventDefault();
 
     var fromDialog = !!(current && current.contains(opener));
-    if (!fromDialog) {
-      returnUrl = window.location.pathname + window.location.search + window.location.hash;
-    }
+    var previousUrl = window.location.pathname + window.location.search + window.location.hash;
     open(slug, { trigger: fromDialog ? null : opener, keepReturn: fromDialog });
     if (fromDialog) {
       history.replaceState(history.state, '', hashFor(slug));
     } else if (window.location.hash !== hashFor(slug)) {
-      history.pushState(history.state, '', hashFor(slug));
+      var previousState = history.state;
+      var state = Object.assign({}, previousState);
+      state.__viSkillDialog = { returnUrl: previousUrl, previousState: previousState };
+      history.pushState(state, '', hashFor(slug));
     }
   });
 

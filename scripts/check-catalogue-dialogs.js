@@ -57,6 +57,7 @@ const server = http.createServer(async (request, response) => {
     await context.route('**/*', (route) =>
       new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
     const page = await context.newPage();
+    page.setDefaultTimeout(10000);
     const pageErrors = [];
     page.on('pageerror', (error) => pageErrors.push(error.message));
 
@@ -88,8 +89,21 @@ const server = http.createServer(async (request, response) => {
     });
     assert.deepEqual(reopened, { scrollTop: 0, focused: true, visible: true });
 
+    await page.goto(base + 'frontier-analytics-prompts/#query-dashboards', { waitUntil: 'load' });
+    await page.evaluate(() => history.replaceState({ existing: 'prompt' }, '', location.href));
+    await prompt.click();
+    await page.evaluate(() => history.back());
+    await page.waitForFunction(() => location.hash === '#query-dashboards' && !document.querySelector('.prompt-dialog[open]'));
+    await page.evaluate(() => history.forward());
+    await page.waitForFunction(() => location.hash === '#prompt-segmentation' && !!document.querySelector('.prompt-dialog[open]'));
+    await promptDialog.locator('.prompt-dialog-close').click();
+    await page.waitForFunction(() => location.hash === '#query-dashboards' && !document.querySelector('.prompt-dialog[open]'));
+    assert.deepEqual(await page.evaluate(() => history.state), { existing: 'prompt' });
+
     await page.goto(base + 'frontier-analytics-prompts/#prompt-segmentation', { waitUntil: 'load' });
     await page.waitForSelector('.prompt-dialog[open] [data-prompt-panel="segmentation"]');
+    await promptDialog.locator('.prompt-dialog-close').click();
+    await page.waitForFunction(() => !document.querySelector('.prompt-dialog[open]') && !location.hash);
     const noScript = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 320, height: 720 } });
     await noScript.route('**/*', (route) =>
       new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
@@ -106,8 +120,17 @@ const server = http.createServer(async (request, response) => {
     assert.equal(await page.locator('.skill-dialog[open]').count(), 0);
     const opener = page.locator('[data-skill-open]').first();
     const slug = await opener.getAttribute('data-skill-open');
+    await page.evaluate(() => history.replaceState({ existing: 'skill' }, '', location.href));
     await opener.click();
     const skillDialog = page.locator('.skill-dialog[open]');
+    await page.evaluate(() => history.back());
+    await page.waitForFunction(() => location.hash === '#get-started' && !document.querySelector('.skill-dialog[open]'));
+    await page.evaluate(() => history.forward());
+    await page.waitForFunction((id) => location.hash === '#skill-' + id && !!document.querySelector('.skill-dialog[open]'), slug);
+    await skillDialog.locator('.skill-dialog-close').click();
+    await page.waitForFunction(() => !document.querySelector('.skill-dialog[open]') && location.hash === '#get-started');
+    assert.deepEqual(await page.evaluate(() => history.state), { existing: 'skill' });
+    await opener.click();
     const overview = `#skill-${slug}-overview`;
     const results = `#skill-${slug}-results`;
     await skillDialog.locator(`[href="${overview}"]`).focus();
