@@ -16,6 +16,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Prompt Library catalogue cards with responsive details dialogs, copyable quick
   prompts generated from canonical Markdown cards, and direct links to the full
   prompt pages. The cards remain readable inline without JavaScript.
+- Prompt catalogue source checks now cover all generated fields and full prompt
+  blocks. Segmentation guidance separates weekly inactivity from rolling usage
+  segments, and dialog section links retain browser history and keyboard focus.
 - Synced the detailed prompt blocks in the canonical prompt Markdown files with
   their published prompt pages. The dashboard prompts were already in sync.
 - Product query icons and exact Viva Insights descriptions in the join tutorial,

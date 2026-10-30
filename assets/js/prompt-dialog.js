@@ -136,7 +136,10 @@
     if (current && current !== dialog) current.close();
     current = dialog;
     returnFocus = trigger || catalogue.querySelector('[data-prompt-open="' + slug + '"]');
-    if (!dialog.open) dialog.showModal();
+    if (!dialog.open) {
+      dialog.showModal();
+      dialog.scrollTop = 0;
+    }
     document.documentElement.classList.add('prompt-dialog-open');
     dialog.querySelector('.prompt-details-title').focus({ preventScroll: true });
   }

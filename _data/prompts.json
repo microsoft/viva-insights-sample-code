@@ -68,7 +68,7 @@
           "difficulty": "Intermediate",
           "est_time": "~30 min"
         },
-        "quick_prompt": "Help me create a segmentation and churn analysis for Copilot usage that classifies licensed users, tracks movement between segments over time, and highlights at-risk groups.\nStart by loading the actual CSV and printing row count, column names, data types, date range, and unique people so you can map the real activity and HR fields.\nDo not assume exact column names, and ask me for the file path, the main activity metric, or any unclear field mapping before you continue.\nExclude unlicensed users from denominators, then use `identify_usage_segments()` (vivainsights) to compute weekly usage segments when available. If you cannot use it, fall back to percentile-based thresholds and print the thresholds you used.\nInclude both week-level segment trends and a stable user segment for group breakdowns, then build a week-to-week transition matrix only for users present in consecutive weeks.\nUse the stated churn logic unless I tell you otherwise, flag if the time span is too short for reliable churn analysis, and identify currently at-risk users separately from fully churned users.\nSuppress group views below about 5 people for privacy, and note any missing HR attributes or holiday-related caveats that affect interpretation.\nEnd by listing any assumptions you made about thresholds, churn rules, or field mappings."
+        "quick_prompt": "Help me create a segmentation and churn analysis for Copilot usage that classifies licensed users, tracks movement between segments over time, and highlights at-risk groups.\nStart by loading the actual CSV and printing row count, column names, data types, date range, and unique people so you can map the real activity and HR fields.\nDo not assume exact column names, and ask me for the file path, the main activity metric, or any unclear field mapping before you continue.\nUse enabled-days or other confirmed licence data to exclude unlicensed users from denominators; do not infer licence status from zero or missing activity alone.\nUse `identify_usage_segments()` (vivainsights) to compute the five weekly usage segments. If it is unavailable, clearly label any alternative segmentation and print its thresholds.\nInclude both week-level segment trends and a stable user segment for group breakdowns, then build a week-to-week transition matrix only for users present in consecutive weeks.\nIndependently of the rolling segments, define weekly activity from the observed action count. Churn means at least two consecutive active weeks followed by at least two consecutive inactive weeks; date it to the first inactive week once the second confirms it.\nIdentify currently at-risk users separately: they have one inactive week immediately after at least two active weeks and have not yet met the churn definition. Do not treat unknown or unlicensed weeks as inactive.\nFlag if the time span is too short for reliable churn analysis.\nSuppress group views below about 5 people for privacy, and note any missing HR attributes or holiday-related caveats that affect interpretation.\nEnd by listing any assumptions you made about thresholds, churn rules, or field mappings."
       },
       {
         "slug": "powerpoint",
@@ -112,7 +112,7 @@
       {
         "slug": "consumption-dashboard",
         "title": "Build with AI: Consumption and Ways of Working",
-        "summary": "Reproduce the synthetic seven-page R demo, then customise it or build a narrower\ncredits dashboard from documented Consumption exports without starting over.",
+        "summary": "Reproduce the synthetic seven-page R demo, then customise it or build a narrower credits dashboard from documented Consumption exports without starting over.",
         "page_url": "/frontier-analytics-prompt-consumption-dashboard/",
         "source_card": "copilot-dashboards/consumption-dashboard.md",
         "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/copilot-dashboards/consumption-dashboard.md",
@@ -122,7 +122,7 @@
       {
         "slug": "developer-experience-dashboard",
         "title": "Build with AI: Developer Experience and Copilot",
-        "summary": "Reproduce and customise the synthetic developer dashboard with its existing R\nimplementation, and assess real GitHub query inputs without guessing their contract.",
+        "summary": "Reproduce and customise the synthetic developer dashboard with its existing R implementation, and assess real GitHub query inputs without guessing their contract.",
         "page_url": "/frontier-analytics-prompt-developer-experience-dashboard/",
         "source_card": "copilot-dashboards/developer-experience-dashboard.md",
         "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/copilot-dashboards/developer-experience-dashboard.md",
@@ -137,7 +137,7 @@
       {
         "slug": "audit-parsing",
         "title": "Audit Log Parsing — Purview Audit Logs",
-        "summary": "Parse and clean raw Microsoft Purview audit log exports into a flat, analysis-ready dataset. This is a data engineering prompt that prepares audit log data for downstream analytics (such as the [Agent Usage Analysis](../purview-augmentation/agent-usage-analysis.md) prompt).",
+        "summary": "Parse and clean raw Microsoft Purview audit log exports into a flat, analysis-ready dataset. This is a data engineering prompt that prepares audit log data for downstream analytics (such as the Agent Usage Analysis prompt).",
         "page_url": "/frontier-analytics-prompt-audit-parsing/",
         "source_card": "purview-augmentation/audit-log-parsing.md",
         "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/purview-augmentation/audit-log-parsing.md",

@@ -12,6 +12,9 @@ on:
     paths:
       - 'frontier-analytics/prompts/**'
       - '_pages/frontier-analytics-prompt-*.md'
+      - '_data/prompts.json'
+      - 'scripts/generate_prompt_catalogue.py'
+      - 'scripts/test_prompt_catalogue.py'
       - '.github/scripts/check_prompt_drift.py'
       - '.github/workflows/prompt-drift-check.yml'
   pull_request:
@@ -19,6 +22,9 @@ on:
     paths:
       - 'frontier-analytics/prompts/**'
       - '_pages/frontier-analytics-prompt-*.md'
+      - '_data/prompts.json'
+      - 'scripts/generate_prompt_catalogue.py'
+      - 'scripts/test_prompt_catalogue.py'
       - '.github/scripts/check_prompt_drift.py'
       - '.github/workflows/prompt-drift-check.yml'
 
@@ -41,3 +47,9 @@ jobs:
 
       - name: Check prompt card / site page drift
         run: python .github/scripts/check_prompt_drift.py
+
+      - name: Check generated prompt catalogue
+        run: python scripts/generate_prompt_catalogue.py --check
+
+      - name: Test prompt catalogue checks
+        run: python -m unittest discover -s scripts -p test_prompt_catalogue.py

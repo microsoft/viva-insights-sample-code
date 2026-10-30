@@ -126,6 +126,8 @@ a.skill-start:hover { background: var(--primary-h); text-decoration: none; }
 .skill-details .skill-limits-title { margin-top: 20px; }
 .skill-details h4:focus,
 .skill-details h5:focus { outline: none; }
+.skill-details h4:focus-visible,
+.skill-details h5:focus-visible { box-shadow: var(--focus-ring); border-radius: 4px; }
 
 .skill-steps {
   list-style: none;

@@ -14,7 +14,7 @@
       <article class="prompt-card" aria-labelledby="prompt-card-{{ prompt.slug }}">
         <p class="prompt-card-category">{{ group.title }}</p>
         <h4 class="prompt-card-title" id="prompt-card-{{ prompt.slug }}">{{ prompt.title }}</h4>
-        <p class="prompt-card-summary">{{ prompt.summary | markdownify | remove: '<p>' | remove: '</p>' | strip }}</p>
+        <p class="prompt-card-summary">{{ prompt.summary | escape }}</p>
         {%- if prompt.badges.data_source %}
         <p class="prompt-card-note">{{ prompt.badges.data_source }}{% if prompt.badges.output %} · {{ prompt.badges.output }}{% endif %}</p>
         {%- endif %}
@@ -34,7 +34,7 @@
       <header class="prompt-details-header">
         <p class="prompt-card-category">{{ group.title }}</p>
         <h3 class="prompt-details-title" id="{{ base }}-title" tabindex="-1">{{ prompt.title }}</h3>
-        <p class="prompt-details-summary">{{ prompt.summary | markdownify | remove: '<p>' | remove: '</p>' | strip }}</p>
+        <p class="prompt-details-summary">{{ prompt.summary | escape }}</p>
       </header>
 
       {%- if prompt.badges.size > 0 %}

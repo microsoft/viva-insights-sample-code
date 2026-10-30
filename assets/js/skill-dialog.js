@@ -86,7 +86,7 @@
   var dialogs = {};
   var current = null;
   var returnFocus = null;
-  var pushedEntry = false;
+  var returnUrl = null;
 
   Array.prototype.forEach.call(catalogue.querySelectorAll('[data-skill-panel]'), function (panel) {
     var slug = panel.getAttribute('data-skill-panel');
@@ -179,7 +179,6 @@
     }
     if (!dialog.open) {
       dialog.showModal();
-      dialog.scrollTop = 0;
     }
     current = dialog;
     document.documentElement.classList.add('skill-dialog-open');
@@ -187,6 +186,7 @@
     if (options.target) {
       focusSection(options.target);
     } else {
+      dialog.scrollTop = 0;
       dialog.querySelector('.skill-details-title').focus({ preventScroll: true });
     }
   }
@@ -198,14 +198,9 @@
 
     var found = locate(window.location.hash);
     if (found && found.dialog === dialog) {
-      if (pushedEntry) {
-        pushedEntry = false;
-        history.back();
-      } else {
-        history.replaceState(history.state, '', window.location.pathname + window.location.search);
-      }
+      history.replaceState(history.state, '', returnUrl || window.location.pathname + window.location.search);
     }
-    pushedEntry = false;
+    returnUrl = null;
 
     var target = returnFocus && document.body.contains(returnFocus) ? returnFocus : cardTrigger(slug);
     returnFocus = null;
@@ -215,11 +210,8 @@
   function syncWithHash() {
     var found = locate(window.location.hash);
     if (found) {
-      if (current !== found.dialog || found.target) {
-        open(found.slug, { target: found.target, keepReturn: !!current });
-      }
+      open(found.slug, { target: found.target, keepReturn: !!current });
     } else if (current) {
-      pushedEntry = false;
       current.close();
     }
   }
@@ -233,6 +225,9 @@
       var section = document.getElementById(jump.getAttribute('href').slice(1));
       if (section) {
         event.preventDefault();
+        if (window.location.hash !== jump.getAttribute('href')) {
+          history.pushState(history.state, '', jump.getAttribute('href'));
+        }
         focusSection(section);
       }
       return;
@@ -245,12 +240,14 @@
     event.preventDefault();
 
     var fromDialog = !!(current && current.contains(opener));
+    if (!fromDialog) {
+      returnUrl = window.location.pathname + window.location.search + window.location.hash;
+    }
     open(slug, { trigger: fromDialog ? null : opener, keepReturn: fromDialog });
     if (fromDialog) {
       history.replaceState(history.state, '', hashFor(slug));
     } else if (window.location.hash !== hashFor(slug)) {
       history.pushState(history.state, '', hashFor(slug));
-      pushedEntry = true;
     }
   });
 

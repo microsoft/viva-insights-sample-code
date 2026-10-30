@@ -19,6 +19,8 @@ Select **Start using** on a card for setup steps, a starter prompt, the question
 
 {% include skill-catalogue.html %}
 
+<span id="get-started" aria-hidden="true"></span>
+
 ## Before you begin
 
 Installing a Skill does not install R, Python or their packages. For the full list of files and manual installation steps for any agent, see the [Skills guide on GitHub](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/skills/README.md). Review the agent's proposed approach and check its results against your actual export.
