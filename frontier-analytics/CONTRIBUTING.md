@@ -59,6 +59,8 @@ synthetic runs, explicit-read agent evaluations, automatic discovery and real-da
 The pinned recipe environment uses Python 3.12. Documentation-only environments
 may skip optional package smoke tests, but both CI workflows install the recipe
 requirements and verify the installed version so those checks execute.
+The documentation-contract workflow also runs the matched R segmentation
+fixture on pull requests with R 4.6.2 and `vivainsights` 0.7.2.
 
 ## Adding a new starter kit
 

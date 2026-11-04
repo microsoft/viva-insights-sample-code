@@ -51,3 +51,28 @@ jobs:
 
       - name: Test documentation contracts
         run: python -B -m unittest discover -s scripts -p 'test_*.py'
+
+  r-segmentation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05 # v2
+        with:
+          r-version: '4.6.2'
+          use-public-rspm: true
+
+      - name: Install supported segmentation dependencies
+        uses: r-lib/actions/setup-r-dependencies@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05 # v2
+        with:
+          packages: |
+            cran::vivainsights@0.7.2
+            any::slider
+          dependencies: 'NA'
+
+      - name: Check R segmentation eligibility and history
+        run: |
+          Rscript --vanilla -e 'stopifnot(as.character(utils::packageVersion("vivainsights")) == "0.7.2")'
+          Rscript --vanilla scripts/test_segmentation.R

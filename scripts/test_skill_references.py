@@ -20,6 +20,13 @@ def mandatory_references(skill):
 
 
 class InstalledReferencesTests(unittest.TestCase):
+    def test_matched_R_segmentation_fixture_is_a_PR_gate(self):
+        workflow = (ROOT / ".github" / "workflows" / "prompt-drift-check.yml").read_text(encoding="utf-8")
+        self.assertIn("  pull_request:", workflow)
+        self.assertIn("  r-segmentation:", workflow)
+        self.assertIn("cran::vivainsights@0.7.2", workflow)
+        self.assertIn("Rscript --vanilla scripts/test_segmentation.R", workflow)
+
     def test_core_standalone_and_companion_installations(self):
         for names in [(NAMES[0],), NAMES]:
             with self.subTest(skills=names), tempfile.TemporaryDirectory() as temp:
