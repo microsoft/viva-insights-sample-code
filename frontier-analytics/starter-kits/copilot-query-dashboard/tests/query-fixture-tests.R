@@ -15,6 +15,26 @@ test("all nine synthetic exports have independently specified ordered headers", 
   stopifnot(length(query_export_headers) == 9L)
   validate_query_bundle(bundle)
 })
+test("current-layout Agent exports and Person query Copilot columns keep their contract", {
+  agent_bundle <- lapply(names(agent_query_headers), function(path)
+    read.csv(file.path(utility, "_data", path), check.names = FALSE,
+             stringsAsFactors = FALSE))
+  names(agent_bundle) <- names(agent_query_headers)
+  validate_query_bundle(agent_bundle, agent_query_headers)
+  activity <- agent_bundle[["agent-query/PersonAgentActivityMetrics.csv"]]
+  person_query <- bundle[["person-query/PersonQuery.csv"]]
+  dates <- as.Date(person_query$MetricDate)
+  window <- dates >= min(as.Date(activity$MetricDate))
+  actions <- person_query$Total_Copilot_actions_taken
+  stopifnot(!anyDuplicated(activity[c("PersonId", "AgentId", "MetricDate")]),
+            all(format(as.Date(activity$MetricDate), "%w") == "0"),
+            all(activity$`Conversational agent sessions` >= 1),
+            sum(!unique(activity$PersonId) %in% person_query$PersonId) == 3L,
+            all(is.na(actions[!window])),
+            any(is.na(actions[window])),
+            all(actions[window & person_query$Total_Copilot_enabled_days == 0] == 0,
+                na.rm = TRUE))
+})
 test("super panel joins all product files without multiplying person-weeks", {
   joined <- super_helpers$build_copilot_super_panel(file.path(utility, "_data"))
   panel <- joined$panel

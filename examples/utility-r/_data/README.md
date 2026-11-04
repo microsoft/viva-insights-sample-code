@@ -17,9 +17,10 @@ configured scope. The fixture-specific coverage logic below remains unchanged.
 
 | Query | Folder | Files | Grain | What it measures |
 |---|---|---|---|---|
-| **Person** | `person-query/` | 1 | Person × week | Collaboration, focus, after-hours and network metrics, plus Copilot eligibility |
+| **Person** | `person-query/` | 1 | Person × week | Collaboration, focus, after-hours and network metrics, Copilot eligibility, and Copilot and Cowork activity |
 | **Consumption** | `consumption-query/` | 3 | Person × day, plus a person-level metadata file | M365 Copilot credits and sessions by service, GitHub AI credits, and HR attributes |
 | **GitHub Copilot** | `github-query/` | 5 | Person × day, plus dimensional breakdowns | Code completions, chat requests and agent adoption, split by feature, language and model |
+| **Agent** (current layout) | `agent-query/` | 2 | Person × agent × week, plus an agent metadata file | Conversational agent sessions and returning Agent 365 user indicators |
 | **Agent** (historical fixture layout) | `github/agent-query/` | 3 | Person × agent × week, plus an agent metadata file | Agent responses, agent credits and returning-user indicators |
 
 A standalone teaching dataset, `Top_Performers_Dataset_v2.csv`, also sits at the
@@ -40,6 +41,9 @@ _data/
     GitHubActivityBreakdownByLanguageFeatureMetrics.csv
     GitHubActivityBreakdownByLanguageModelMetrics.csv
     GitHubActivityBreakdownByModelFeatureMetrics.csv
+  agent-query/
+    AgentMetadata.csv
+    PersonAgentActivityMetrics.csv
   github/
     agent-query/
       AgentMetadata.csv
@@ -58,7 +62,7 @@ Three identifier keys connect these fixtures.
 |---|---|---|
 | `PersonId` | Person query, both Consumption activity files, all GitHub files, both Agent fact files | The person dimension across every query |
 | `PeopleHistoricalId` | `PeopleMetaData.csv` and both Consumption activity files | Consumption activity to its HR attribute metadata |
-| `AgentId` | `AgentMetadata.csv` and both Agent fact files | Agent facts to agent descriptive fields, many-to-one |
+| `AgentId` | Both `AgentMetadata.csv` files and the Agent fact files in each layout | Agent facts to agent descriptive fields, many-to-one |
 
 `MetricDate` aligns them in time. The Person query and the Agent query are both
 weekly with a Sunday week start, while the Consumption and GitHub feeds are
@@ -77,13 +81,15 @@ Four things are worth knowing before you write the join.
    wide on `PersonId` and `MetricDate` multiplies rows. Keep the breakdowns as
    separate fact tables, or aggregate each one to a single row per person-period
    before joining.
-3. **Both Agent fact files sit at person × agent × week**, so confirm uniqueness
+3. **Agent fact files sit at person × agent × week**, so confirm uniqueness
    at that grain before combining them, or aggregate each one separately.
-4. **The Agent sample uses its own `PersonId` namespace**, with values such as
-   `synthetic-person-00000` over a different date window, so it will not join to
-   the other folders here. Only the Person, Consumption and GitHub folders
-   describe one shared population, being 480 people of whom 360 are developers
-   across six teams of 60.
+4. **The historical Agent sample uses its own `PersonId` namespace**, with
+   values such as `synthetic-person-00000` over a different date window, so it
+   will not join to the other folders here. The Person, Consumption, GitHub and
+   current-layout Agent folders describe one shared population, being 480
+   people of whom 360 are developers across six teams of 60. The current Agent
+   export also holds three agent users who are absent from the Person query, so
+   a Person-query spine drops them and coverage should report them.
 
 Bear in mind too that M365 Copilot credits and GitHub AI credits have no
 verified common unit. Do not add them together, calculate cross-product shares,
@@ -114,6 +120,7 @@ covering 26 Sunday-start weeks from `2026-01-04` to `2026-07-04`.
 | After hours and weekend | `After_hours_collaboration_hours`, `After_hours_meeting_hours`, `After_hours_email_hours`, `After_hours_chat_hours`, `Weekend_collaboration_hours`, `Collaboration_span` |
 | Network | `Internal_network_size`, `External_network_size`, `Strong_ties`, `Diverse_ties`, `Network_outside_organization` |
 | Copilot eligibility | `Total_Copilot_enabled_days` |
+| Copilot and Cowork activity | `Total_Copilot_actions_taken`, `Total_Copilot_active_days`, `Cowork_tasks_submitted`, `Days_of_active_Cowork_usage` |
 | HR attributes | `Organization`, `FunctionType`, `LevelDesignation`, `IsManager`, `Team`, `Role`, `Seniority`, `Tenure`, `IsDeveloper` |
 
 **Joins with:** any Consumption or GitHub file on `PersonId`, once the daily
@@ -128,6 +135,18 @@ the working-hours time left after meetings and scheduled calls, partitioned by
 availability rather than coding or psychological flow. The three
 meeting-characteristic metrics overlap each other and must not be stacked
 additively.
+
+Headers here use the underscore form that the vivainsights R and Python
+packages produce on import. In a raw export the same columns use spaces, for
+example `Total Copilot actions taken`.
+
+The four Copilot and Cowork activity columns cover the 13-week product window
+only, matching the Consumption and GitHub feeds. They are empty in earlier
+weeks, and about 0.6% of licensed person-weeks inside the window are also empty.
+Treat an empty cell as unknown rather than zero. Unlicensed people show zero
+actions, because these metrics count licensed Microsoft 365 Copilot activity.
+Unlicensed Copilot Chat is a separate metric family and is not simulated,
+because its export headers are not yet confirmed.
 
 ## Consumption query
 
@@ -259,6 +278,41 @@ establish a useful demo shape, but identifiers, units, aggregation periods,
 eligibility and coverage should all be checked against the actual customer
 export before a report is refreshed against real data.
 
+## Agent query (current layout)
+
+Source: [Agent query section of the join guide](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/#agent_query).
+
+`agent-query/` follows the current guide layout. It covers the same 13
+Sunday-start product weeks as the Consumption and GitHub feeds and the same
+`PersonId` population as the Person query, apart from three out-of-spine agent
+users.
+
+### `agent-query/AgentMetadata.csv`
+
+One row per `AgentId`, covering 8 invented agents.
+
+`AgentId, AgentName, CreatorType, PublishingSource`
+
+The guide leaves agent attribute headers to the export, so these follow the
+historical sample's vocabulary. One agent deliberately has fewer than ten users
+so that reports have to withhold it.
+
+### `agent-query/PersonAgentActivityMetrics.csv`
+
+One row per `PersonId` × `AgentId` × `MetricDate`, where `MetricDate` is the
+Sunday start of the week. Rows exist only for active person-agent-weeks, so an
+omitted row inside the export's scope means zero sessions.
+
+`PersonId, AgentId, MetricDate, Conversational agent sessions, Returning Agent 365 user (most recent and prior 7 days), Returning Agent 365 user (most recent and prior 28 days)`
+
+The two returning-user columns are `0` or `1` rolling-window indicators. In this
+simulation they are person-level, meaning any agent in the current and earlier
+window, and repeated on each of that person's agent rows. Take the maximum per
+person-week rather than summing them, and never sum them across weeks.
+
+**Joins with:** `agent-query/AgentMetadata.csv` on `AgentId`, and the Person
+query on `PersonId` and `MetricDate` after summing sessions to person-week.
+
 ## Agent query
 
 This historical fixture follows a preview-era Agent schema. For the current
@@ -342,8 +396,9 @@ files.
 
 ### Regenerating the fixtures
 
-The Person, Consumption and GitHub fixtures are generated. The Agent sample is
-not, and it is checked in as supplied.
+The Person, Consumption, GitHub and current-layout Agent fixtures are
+generated. The historical Agent sample under `github/agent-query/` is not, and
+it is checked in as supplied.
 
 ```bash
 cd examples/utility-r
@@ -352,8 +407,12 @@ Rscript simulate-query-exports.R
 
 The script is deterministic, seeded at `20260916`, and it fails rather than
 writing output if any ordered fixture schema or synthetic allocation invariant
-breaks. Header vectors in `query-export-contracts.R` specify the nine generated
-exports. Seven have a fully fixed header, while `PeopleMetaData.csv` and
+breaks. Header vectors in `query-export-contracts.R` specify the nine original
+generated exports in `query_export_headers` and the two current-layout Agent
+exports in `agent_query_headers`. The Copilot, Cowork and Agent additions draw
+from a second seeded stream after every original draw, so adding them left the
+values of the original columns unchanged. Of the nine original exports, seven
+have a fully fixed header, while `PeopleMetaData.csv` and
 `PersonQuery.csv` are driven by the selected HR attributes and the custom Person
 query recipe. Changing the selected custom metrics or HR attributes requires an
 explicit update to that contract.

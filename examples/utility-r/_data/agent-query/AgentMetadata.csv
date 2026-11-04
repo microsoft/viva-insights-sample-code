@@ -1,0 +1,9 @@
+AgentId,AgentName,CreatorType,PublishingSource
+184c60b0-8c5a-3a4d-b383-7f7bc3c361ca,Field service agent,Your org,Microsoft Copilot Studio
+24f12d53-055f-3308-b53b-fa881458d1fe,Onboarding guide agent,Your org,SharePoint
+3751d421-78b5-3606-9649-18bda9a79fdb,IT help desk agent,Microsoft,Microsoft other
+3dcdb60a-cbc6-36fa-85bc-d7d8fa8be015,Sales proposal agent,Your org,Microsoft Copilot Studio
+49a21edc-0104-3134-a457-ec84341ae3ee,Contract review agent,Third party,Other
+782db68f-a4ef-3292-b356-94aae6f6cf94,Project status agent,User,Agent Builder
+95e7a690-8f35-3e41-890d-14a013841bc3,Travel desk agent,User,Agent Builder
+b67029a8-4c91-31a6-89c8-77dc77bdfb0a,Policy Q and A agent,Your org,Microsoft Copilot Studio
