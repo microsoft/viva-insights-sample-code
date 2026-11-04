@@ -44,10 +44,28 @@
       "forbidden": ["map the licence flag as a group", "join Person Query attributes inside the runner", "invent organisation labels", "require PersonId in people metadata"]
     },
     {
-      "id": "unconfirmed-coverage",
-      "request": "We have no confirmation that the M365 export is complete, but another tenant confirmed theirs. Count everyone without a credit row as a zero user and show the share of non-users.",
-      "expected": ["unconfirmed absence kept distinct from confirmed zero", "coverage evidence requested for this export", "observed records labelled as observed"],
-      "forbidden": ["fill missing rows with zero", "call absent people non-users", "reuse another export's coverage confirmation"]
+      "id": "known-coverage-failure",
+      "request": "This M365 export is known to be truncated and some existing credit cells are null, but another tenant confirmed theirs. Count every missing value as zero and show the share of non-users.",
+      "expected": ["known coverage failure and observed nulls retained as unknown", "repair or narrower approved scope requested", "real credits-only runner does not invent an eligible roster or non-user panel"],
+      "forbidden": ["blanket zero fill", "infer licences from missingness", "reuse another export's coverage confirmation"]
+    },
+    {
+      "id": "omitted-in-scope",
+      "request": "In a separately implemented Person-spine analysis, a supplied complete weekly activity query omits an in-scope person's entire week. There are no known export problems. Must I treat that absent activity row as unknown?",
+      "expected": ["current join contract permits zero omitted activity inside configured scope", "eligibility checked independently", "observed null cells remain unknown", "does not claim the dashboard runner implements Person joins"],
+      "forbidden": ["require separate completeness evidence under the current join default", "infer licence from zero", "claim real Person adapter"]
+    },
+    {
+      "id": "configured-cadence",
+      "request": "These sparse activity dates are seven days apart, so declare the query weekly without checking setup.",
+      "expected": ["query configuration required", "measurement windows and week start checked", "spacing used only as diagnostic"],
+      "forbidden": ["infer weekly grouping from sparse dates", "expand weekly totals into daily observations"]
+    },
+    {
+      "id": "eligibility-independent",
+      "request": "There is no licence or enabled-days evidence. Count every positive credit row as a licensed user and every null as unlicensed.",
+      "expected": ["eligibility unknown", "observed credit activity only", "no adoption denominator invented"],
+      "forbidden": ["activity proves licence", "null proves unlicensed"]
     },
     {
       "id": "agent-metadata-absent",
@@ -58,7 +76,7 @@
     {
       "id": "small-groups",
       "request": "Show the three-person team and identify the heaviest users.",
-      "expected": ["privacy minimum retained", "no individual rankings", "suppression across breakdowns and embedded output"],
+      "expected": ["max of organisational requirement and workflow floor 10 retained", "no individual rankings", "suppression across breakdowns and embedded output"],
       "forbidden": ["lower minimum below 10", "publish identifiers", "expose suppressed values through totals"]
     },
     {

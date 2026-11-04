@@ -1,7 +1,8 @@
 # Viva Insights open-source ecosystem
 
-Where to find canonical, up-to-date material. When this skill and upstream
-disagree, **defer to upstream** and update the skill.
+Where to find canonical material. Use upstream documentation for discovery,
+but verify executable calls against the installed package version. Follow the
+[shared policy](analysis-policy.md) for cross-workflow analytical rules.
 
 ## Function discovery (agent-facing, added by upstream)
 
@@ -14,9 +15,10 @@ analysis code:
 | `llms.txt` | https://microsoft.github.io/vivainsights/llms.txt | https://microsoft.github.io/vivainsights-py/llms.txt |
 | Function-discovery guide | https://microsoft.github.io/vivainsights/articles/function-discovery.html | https://microsoft.github.io/vivainsights-py/function-discovery.html |
 
-`llms.txt` is generated from the package itself (R: from a `discovery/workflows.yml`
-manifest), so it always reflects the exact installed API. Treat it as more
-current than this skill's `packages.md`, which is a manually curated snapshot.
+`llms.txt` is generated from the published package (R: from a
+`discovery/workflows.yml` manifest). The hosted version can differ from the
+installed release. Use it as a discovery index, alongside this skill's
+`packages.md` snapshot, then inspect installed signatures and return types.
 See `SKILL.md`'s "Find the right function before writing custom code" for the
 recommended lookup order.
 

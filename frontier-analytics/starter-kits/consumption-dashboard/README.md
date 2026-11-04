@@ -17,3 +17,7 @@ works without installing a skill. For repeated work, use the
 The [shared runner](../copilot-query-dashboard/README.md) is the sole runtime
 and configuration reference. This kit does not duplicate the report or data.
 No benchmarked token or time reduction is claimed.
+
+The [shared policy](../../skills/viva-insights-analysis/reference/analysis-policy.md)
+and [workflow support table](../../skills/viva-insights-analysis/reference/workflow-support.md)
+own common rules and capability summaries.

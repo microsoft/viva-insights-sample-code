@@ -16,8 +16,8 @@ Authoritative starting points:
 Person Query supports daily, weekly and monthly grouping. Do not assume all
 exports are weekly, that a week always starts on Monday, or that export cadence
 equals a metric's measurement frequency. Record the source contract and revision
-or access date. Check the distribution of dates across people and query settings,
-not only the first two date gaps.
+or access date. Configured grouping and measurement windows are required;
+date distributions diagnose alignment/coverage, not cadence by themselves.
 
 Keep opaque IDs as strings. Validate stability across exports. Join external
 outcomes only with an authorised identity bridge and a verified time key or
@@ -48,6 +48,12 @@ Some metric families distinguish licensed Copilot activity from unlicensed
 Copilot Chat. Verify the selected metric's scope before calling someone
 "untreated". An enabled-days field can establish eligibility for its documented
 product, but does not establish complete telemetry capture by itself.
+
+Apply the paired core skill's shared policy: in a supplied complete query's
+configured scope, absent activity rows contribute zero. Existing null cells,
+unavailable sources, out-of-scope periods, partial boundary weeks and known
+export problems remain unknown with reasons. A zero is not licence evidence,
+and zero activity alone does not establish a causal control group.
 
 ## Variable suitability
 

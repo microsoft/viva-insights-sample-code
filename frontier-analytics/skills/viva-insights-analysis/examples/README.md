@@ -44,8 +44,10 @@ Prerequisites: `pip install vivainsights` (Python) or
    `keymetrics_scan` across several metrics. Plots are written to the system
    temp directory, so the skill folder stays clean.
 3. **Copilot segmentation.** Builds a total-actions metric from the per-app
-   action columns, fills NaNs with 0, then `identify_usage_segments`. Shows the
-   full-panel segment mix. Filter to one week for a point-in-time report.
+   action columns with complete observed cells, then `identify_usage_segments`.
+   Stops rather than filling observed nulls. Shows the full-panel sample activity
+   mix, not an eligibility denominator. Use explicit eligibility and one week
+   for a point-in-time adoption report.
 4. **Meeting quality.** The generalised meeting quality filter plus a per-rule
    attrition table. The sample Meeting Query is synthetic, so few rows survive.
    The lesson is the filter mechanics rather than the surviving counts.

@@ -46,6 +46,11 @@ Read frontier-analytics/skills/viva-insights-copilot-dashboards/SKILL.md in that
 Use its Consumption manifest and the shared R runner; do not regenerate the dashboard from scratch.
 For real exports, inspect locally, show supported and excluded panels, and get my approval before building.
 Do not invent tokens, licensing, coverage, identity mappings or causal conclusions.
+Use max(the organisational requirement, 10 distinct people) for all published
+and embedded data, protect complementary cells and never publish individual rankings.
+Read configured grouping and measurement windows, not date spacing. Within a supplied
+complete query's configured scope, absent activity contributes zero; observed nulls,
+unavailable sources, out-of-scope periods and known coverage failures remain unknown.
 ```
 
 ## Prompt
@@ -65,6 +70,11 @@ For demo mode, reproduce the reference using copied synthetic fixtures in a new 
 workspace. Keep the fixed seed/window and synthetic labels. Do not alter canonical source files.
 For real mode, inspect the extracted CSVs locally and return bounded schema summaries,
 not rows or identifiers. Verify keys, grain, units and historical metadata joins.
+Read configured grouping and measurement windows; date spacing is diagnostic only.
+Apply the current join contract's zero rule only to absent activity within a supplied
+complete query's configured scope. Observed nulls, unavailable sources, out-of-scope
+periods and known coverage failures remain unknown. The credits-only runner reports
+observed records, not an invented eligible roster or non-user panel.
 Present supported/excluded panels and mapping evidence; wait for my approval to build.
 Build only the supported M365 credits panels in real v1; sessions, Person Query
 associations and GitHub panels require separate verified adapters. Do not generate
@@ -72,9 +82,21 @@ synthetic replacements, infer licences from activity, or sum policy limits.
 
 Use the existing R code. Check dependencies before requesting installation. Do not read
 the generated HTML or whole CSVs into model context. No individual rankings or unsupported
-productivity, ROI, quality, burnout or causal claims. Suppress small groups in every output.
+productivity, ROI, quality, burnout or causal claims. Apply max(the organisational
+requirement, 10 distinct people) in every output, including embedded data and
+complementary-cell disclosure checks.
 After two unsuccessful repairs of the same failure, stop with the specific blocker.
 Return the local report, rerun command, config/provenance and limitations. Do not publish.
+
+<!-- analysis-policy:start -->
+Use explicit product-specific eligibility evidence independently of activity; otherwise retain unknown and omit adoption rates with unknown denominators.
+Absent activity inside a supplied complete query's configured scope contributes zero; observed nulls, unavailable sources, out-of-scope periods and known coverage failures remain unknown with reasons.
+Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
+Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
+Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.
+Choose a supported identifying design before causal claims and compatible estimators; default to association, retain unavailable checks and label synthetic evidence.
+Inspect installed package versions, signatures and return types; separate executed evidence from expected behaviour and do not silently fork upstream bugs.
+<!-- analysis-policy:end -->
 ```
 
 ## Adaptation notes

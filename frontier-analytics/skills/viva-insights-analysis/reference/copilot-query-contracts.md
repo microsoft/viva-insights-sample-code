@@ -9,6 +9,10 @@ complete within each query's configured population, date window and product
 filters, with omitted inactive person-days contributing zero activity.
 This does not establish product eligibility or turn unavailable queries into zeros.
 
+The [shared policy](analysis-policy.md) owns common analytical rules and
+[workflow support](workflow-support.md) distinguishes guidance from executable
+adapters. The dated sections below do not override those current scope defaults.
+
 This reference retains historical layouts, synthetic-demo assumptions and
 additional analytical context. Use the dated sections to reproduce earlier
 examples or explain a layout difference, rather than silently adapting the

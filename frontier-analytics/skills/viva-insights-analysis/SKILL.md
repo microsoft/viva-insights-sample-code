@@ -84,13 +84,14 @@ visualisation logic:
 | `llms.txt` (machine-readable, task -> function -> privacy note) | https://microsoft.github.io/vivainsights/llms.txt | https://microsoft.github.io/vivainsights-py/llms.txt |
 | Function-discovery guide (human-readable task index) | https://microsoft.github.io/vivainsights/articles/function-discovery.html | https://microsoft.github.io/vivainsights-py/function-discovery.html |
 
-**Preference order when looking for a function:** fetch the relevant `llms.txt`
-first. It is generated from the installed package and reflects the exact
-current API surface. Fall back to `reference/packages.md` (this skill's
+**Preference order when looking for a function:** use the relevant `llms.txt`
+for discovery, then inspect the installed package version, signature and return
+type. The hosted index may describe a newer release, not the installed package.
+Fall back to `reference/packages.md` (this skill's
 hand-curated, grouped inventory, which adds context `llms.txt` doesn't carry:
 the R-only metric-family wrapper suffixes, sample-dataset shapes, export/theming
 helpers, and the runtime-introspection snippets to confirm a signature). If they
-disagree, `llms.txt` wins, since it is closer to the source of truth.
+disagree, the installed API governs executable calls. Record version differences.
 
 ## How to use the reference files
 
@@ -99,6 +100,8 @@ everything:
 
 | File | Read it when you need |
 |---|---|
+| `reference/analysis-policy.md` | Before any analysis: shared eligibility, missingness, configured cadence, aggregation, privacy and causal-claim rules. |
+| `reference/workflow-support.md` | To distinguish implemented, guided, synthetic-only, inspect-only and unsupported workflows without conflating test evidence with support. |
 | [Joining Viva Insights queries](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/) | Current Person, Consumption, GitHub and Agent integration. This guide and its downloadable JSON take precedence over older references. Recommend weekly exports and use its complete-data and omitted-inactivity defaults within each supplied query's scope. |
 | `reference/packages.md` | The function inventory, grouped by purpose, with R/Python parity and verified signatures. A curated complement to the live `llms.txt` (see above). |
 | `reference/query-schemas.md` | The shape of each query type (grain, key columns, raw vs imported column names) and the meeting quality filter. |
@@ -146,10 +149,11 @@ real customer data: `pq_data`, `mt_data`, `p2p_data`, `g2g_data` (R), and the
 
 - **Never embed customer data or identifiers** in scripts, examples, or committed
   files. Use the built-in sample datasets for illustration.
-- **Respect privacy thresholds.** Do not report groups below the minimum
-  aggregation size (default 5). See `reference/data-pitfalls.md`.
-- **Prefer association over causation** in written claims unless a designed
-  experiment supports otherwise. See `reference/analysis-conventions.md`.
+- **Read `reference/analysis-policy.md` first.** Apply the stricter of the
+  organisation requirement and workflow floor (generic 5; joined, dashboard
+  and causal 10 distinct people). Never publish individual rankings.
+- **Prefer association over causation** unless a supported identifying design
+  and explicit assumptions justify otherwise. See `reference/analysis-conventions.md`.
 - **Prefer an existing package function over new code.** Check the relevant
   `llms.txt` / function-discovery guide (see "Find the right function before
   writing custom code" above) or `reference/packages.md` before writing custom

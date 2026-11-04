@@ -5,8 +5,8 @@
 # Low / Non-user) with identify_usage_segments.
 #
 # Convention reminders (see reference/analysis-conventions.md):
-# - Fill the metric NAs with 0 before segmenting, or the rolling window leaves
-#   people unclassified.
+# - Preserve observed nulls. This built-in fixture has complete action cells;
+#   unknown real histories must not be forced into segments with zero-fill.
 # - Define the licensed population by enabled days for a snapshot rather than by
 #   action presence.
 
@@ -17,7 +17,10 @@ pq <- pq_data
 # 1. Build a total Copilot actions metric from the per-app action columns.
 action_cols <- grep("^Copilot_actions_taken_in_", names(pq), value = TRUE)
 cat("Per-app action columns:", paste(action_cols, collapse = ", "), "\n")
-pq$Total_Copilot_actions <- rowSums(pq[, action_cols], na.rm = TRUE)  # NA -> 0
+stopifnot(length(action_cols) > 0, !anyNA(pq[, action_cols]))
+pq$Total_Copilot_actions <- rowSums(pq[, action_cols], na.rm = FALSE)
+
+# This demonstrates observed sample activity, not a licensed adoption denominator.
 
 # 2. Classify into 12-week usage segments.
 seg <- identify_usage_segments(pq, metric = "Total_Copilot_actions",

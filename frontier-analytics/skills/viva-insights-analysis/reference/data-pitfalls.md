@@ -4,6 +4,9 @@ The recurring traps when loading and aggregating Viva Insights exports. Each has
 a symptom, a cause, and a fix. Most produce silent wrong answers rather than
 errors, so check for them proactively.
 
+The [shared analysis policy](analysis-policy.md) owns eligibility, missingness,
+cadence and publication rules across workflows.
+
 ## 1. `IsManager` arrives as "Yes"/"No" text rather than a boolean
 
 **Symptom:** manager filters match nothing, or every row goes NA.
@@ -78,12 +81,17 @@ works across locales rather than for a single language.
 reproducible against the portal, which suppresses small groups.
 **Cause:** Viva Insights enforces a minimum aggregation group size (commonly 5).
 Below it, a group should not be reported.
-**Fix:** respect `mingroup` (default 5) in every `create_*` / scan call, and
-audit groups explicitly.
+**Fix:** use the stricter of the organisation requirement and workflow floor:
+5 distinct people for generic analysis, 10 for joined-query, dashboard and
+causal outputs. Pass the applicable value as `mingroup` in supported package
+calls, and audit all published groups and complementary cells explicitly.
 
 ```r
-identify_privacythreshold(pq, hrvar = "Organization", mingroup = 5, return = "table")
-create_rank(pq, metric = "Collaboration_hours", hrvar = "Organization", mingroup = 5)
+org_minimum <- 5L  # replace with the organisation's actual requirement
+workflow_floor <- 5L  # 10L for joined-query, dashboard or causal outputs
+min_group <- max(org_minimum, workflow_floor)
+identify_privacythreshold(pq, hrvar = "Organization", mingroup = min_group, return = "table")
+create_rank(pq, metric = "Collaboration_hours", hrvar = "Organization", mingroup = min_group)
 ```
 
 Never lower `mingroup` below the organisation's agreed threshold to "get a
@@ -100,26 +108,50 @@ window slides. This is how the metric is defined. It is not an error.
 cross-period comparison, pool over multi-month windows or normalise per person,
 and avoid week-on-week deltas on these metrics.
 
-## 6. Holiday weeks shrink the active population
+## 6. Low-activity weeks need interpretation
 
 **Symptom:** population means shift around late December, regional new-year
 periods, and summer, with no real behaviour change.
-**Cause:** during holidays 20-25% of people go inactive, and the remaining
-"active" set skews toward different roles, so the mean moves on composition
-alone.
-**Fix:** flag and, where appropriate, exclude holiday/low-activity weeks.
+**Cause:** holidays, missing coverage or changing composition can change observed
+activity. A statistical flag alone cannot distinguish them.
+**Fix:** retain flags for review before any documented exclusion. Confirm
+holidays with approved calendar evidence rather than a universal inactivity
+percentage. Inspect the installed package API first.
 
 ```r
-pq <- identify_holidayweeks(pq)     # flags low-activity weeks
-pq <- identify_inactiveweeks(pq)    # per-person inactive weeks
+pq <- identify_holidayweeks(pq, return = "data")
+pq <- identify_inactiveweeks(pq, return = "data")
 ```
 ```python
-pq = vi.identify_holidayweeks(pq)
-pq = vi.identify_inactiveweeks(pq)
+pq = vi.identify_holidayweeks(pq.copy(), return_type="labelled_data")
+assert isinstance(pq, pd.DataFrame) and "holidayweek" in pq
+pq = vi.identify_inactiveweeks(pq, return_type="data")
+assert isinstance(pq, pd.DataFrame) and "inactiveweek" in pq
 ```
 
-Prefer comparing matched calendar periods, and state when holidays fall inside a
-compared window.
+R `vivainsights` 0.7.2 uses `return = "data"` for both labelled datasets.
+The Python recipe assumes `import pandas as pd` and `import vivainsights as vi`.
+Verified with Python `vivainsights` 0.4.3: both defaults return **text**, not a
+DataFrame. Holiday `"labelled_data"` and inactive `"data"` retain rows and add
+flags. The inactive helper in this release falls back to its lowest z-score
+quantile when the SD rule flags nothing, so its label is not always an SD breach.
+Do not silently remove those candidates. See `scripts/test_analysis_recipes.py`
+in a full checkout for the executable synthetic smoke test.
+
+Prefer matched calendar periods and state when verified holidays fall inside
+a comparison window.
+
+### `identify_nkw` is a heuristic with an upstream cardinality caveat
+
+Low average collaboration does not establish a job classification. In Python
+`vivainsights` 0.4.3, `identify_nkw` groups by `PersonId, Organization` but joins
+flags back on `PersonId` alone. People who transfer organisations can multiply
+rows in `"data_with_flag"` and cleaned modes; summaries count person/organisation
+records, not necessarily distinct people. Missing organisations also need review.
+Inspect the installed version/source and assert original person-period keys,
+row counts and distinct-person totals before using any affected output. Stop
+on expansion rather than silently deduplicating. This repository does not fix
+or fork the package helper, and no fixed upstream release is claimed here.
 
 ## 7. Load only the columns you need
 
@@ -200,7 +232,7 @@ pq |>
 - [ ] Locale/encoding handled if headers are accented?
 - [ ] `mingroup` >= agreed privacy threshold everywhere?
 - [ ] Trailing-window plateaus not misread as change?
-- [ ] Holiday / inactive weeks flagged before period comparison?
+- [ ] Low-activity candidates reviewed, with calendar evidence before holiday claims?
 - [ ] Grain confirmed before aggregation?
 - [ ] Additivity checked separately from key uniqueness (multiple positive policy rows)?
 - [ ] Network stocks averaged rather than summed, with boundary-month windows checked?

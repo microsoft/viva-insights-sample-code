@@ -25,6 +25,12 @@ The Skill format used here follows the convention introduced by Anthropic's Clau
 | [viva-insights-copilot-dashboards/](viva-insights-copilot-dashboards/) | Optional, R-first workflow for the Consumption and Developer Experience reference dashboards: reproduce, inspect/adapt and customise. Uses shared analysis contracts rather than duplicating them. |
 | [viva-insights-causal-analysis/](viva-insights-causal-analysis/) | Optional Person Query design and diagnostic workflow for a selected exposure and metric or organisational outcome. Checks actual outcome frequency before panel analysis, with matched synthetic R/Python demonstrations. |
 
+The core skill's [analysis policy](viva-insights-analysis/reference/analysis-policy.md)
+owns shared rules, and its [support table](viva-insights-analysis/reference/workflow-support.md)
+owns capability summaries. Installed core analysis remains self-contained;
+optional dashboard and causal workflows require the paired references described
+below, and dashboard execution also needs its retained runner checkout.
+
 ## Installing a skill
 
 Copy the skill's folder (for example `viva-insights-analysis/`, including its `reference/` and `examples/` subfolders) into the skills directory your agent reads from. Consult your agent's documentation for the exact location, since this varies by tool.

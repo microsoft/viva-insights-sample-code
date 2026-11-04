@@ -45,7 +45,8 @@ Include both week-level segment trends and a stable user segment for group break
 Independently of the rolling segments, define weekly activity from the observed action count. Churn means at least two consecutive active weeks followed by at least two consecutive inactive weeks; date it to the first inactive week once the second confirms it.
 Identify currently at-risk users separately: they have one inactive week immediately after at least two active weeks and have not yet met the churn definition. Do not treat unknown or unlicensed weeks as inactive.
 Flag if the time span is too short for reliable churn analysis.
-Suppress group views below about 5 people for privacy, and note any missing HR attributes or holiday-related caveats that affect interpretation.
+Suppress below max(the organisational requirement, 5 distinct people), using floor 10 for dashboard/joined outputs. Protect complementary cells and embedded data, and never publish individual rankings.
+Read configured weekly grouping and measurement windows, not date spacing. Within a supplied complete query's configured scope, absent activity rows contribute zero; observed nulls, out-of-scope periods and known coverage failures remain unknown.
 End by listing any assumptions you made about thresholds, churn rules, or field mappings.
 ```
 
@@ -68,7 +69,7 @@ DATA LOADING AND PREPARATION
    - "Unlicensed": the enabled-days column equals zero or another confirmed licence source establishes no licence.
    - "Unknown": licence status cannot be established. Zero or missing activity alone does not establish that a user is unlicensed.
 5. Restrict segment and churn denominators to confirmed licensed person-weeks. Report the count with unknown licence status.
-6. Align each person to a weekly calendar and derive a separate activity flag from the primary action metric: positive is active, zero is inactive, and missing is unknown unless the query's documented schema establishes that it represents zero. An unlicensed week, or a week with unknown activity or licence status, is not inactive and breaks an activity or inactivity streak.
+6. Confirm configured weekly grouping, week start and measurement windows before calendar alignment; date spacing alone does not establish cadence. Derive a separate activity flag: positive is active, zero is inactive. An absent activity row within a supplied complete query's configured scope contributes zero. An observed null cell, unavailable source, out-of-scope period or known coverage failure stays unknown with its reason. An unlicensed week, or a week with unknown activity or licence status, is not inactive and breaks a streak.
 
 USER SEGMENTATION
 6. Use `identify_usage_segments()` from the `vivainsights` library to classify users into segments. This function uses `Total_Copilot_actions_taken` and classifies users based on both usage volume and consistency (habit formation over 12 weeks), producing the canonical **mutually-exclusive** ladder — Power Users → Habitual Users → Novice Users → Low Users → Non-users (see the [Copilot Usage Segments definitions](https://microsoft.github.io/viva-insights-sample-code/copilot-usage-segments/#formal-definitions)). It is preferred over manual percentile-based segmentation. Use these exact segment names consistently throughout the report. Do not use the rolling segment as the weekly activity flag. Mark a segment unavailable where the required window contains unknown activity or licence status; do not recode unknown activity as zero.
@@ -84,7 +85,7 @@ SEGMENT DISTRIBUTION OVER TIME
 SEGMENT BREAKDOWN BY HR ATTRIBUTES
 9. For each available HR attribute, compute the segment distribution using the "stable segment" label. Create:
    a. A stacked bar chart showing segment proportions by each HR attribute value.
-   b. Only include HR attribute values with at least 5 licensed users.
+   b. Only publish groups with max(the organisational requirement, 5 distinct licensed people), using floor 10 for dashboard/joined outputs. Protect complementary cells and embedded data, and never publish individual rankings.
 10. Identify groups with the highest proportions of Power Users and Non-users. Label these as segment distributions, not as the separate at-risk churn definition below.
 
 TRANSITION ANALYSIS
@@ -134,9 +135,22 @@ REPORT GENERATION
 IMPORTANT NOTES
 - Segments are assigned by `identify_usage_segments()` based on both usage volume and consistency (habit formation over 12 weeks). Print the segment definitions used so the reader can interpret them.
 - Do NOT count unlicensed or unknown-licence users in licensed denominators.
-- Suppress any HR attribute segment with fewer than 5 users in the visualizations.
+- Apply max(the organisational requirement, 5 distinct people), using floor 10
+  for dashboard/joined outputs, including complementary cells and embedded data.
+- Low-activity flags need review; they do not establish verified holidays,
+  employment status or job classifications.
 - The transition matrix should only include users who appear in both consecutive weeks.
 - If the dataset has fewer than 8 weeks, note that churn analysis may not be reliable; do not silently change the churn definition.
+
+<!-- analysis-policy:start -->
+Use explicit product-specific eligibility evidence independently of activity; otherwise retain unknown and omit adoption rates with unknown denominators.
+Absent activity inside a supplied complete query's configured scope contributes zero; observed nulls, unavailable sources, out-of-scope periods and known coverage failures remain unknown with reasons.
+Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
+Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
+Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.
+Choose a supported identifying design before causal claims and compatible estimators; default to association, retain unavailable checks and label synthetic evidence.
+Inspect installed package versions, signatures and return types; separate executed evidence from expected behaviour and do not silently fork upstream bugs.
+<!-- analysis-policy:end -->
 ```
 
 ## Adaptation notes

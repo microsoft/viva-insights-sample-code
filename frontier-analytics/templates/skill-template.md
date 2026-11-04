@@ -78,6 +78,12 @@ skill, for example privacy thresholds, data handling, or preferring
 association over causation in written claims.]
 ```
 
+Use the core skill's [shared analysis policy](../skills/viva-insights-analysis/reference/analysis-policy.md)
+for common rules. Preserve installed self-containment: bundle required local
+references or document a paired installation and fail clearly if it is absent.
+Describe implemented versus guided/synthetic/inspect-only paths explicitly;
+expected evaluation behaviours are not executed test results.
+
 ## Checklist before submitting
 
 - Every section above is filled in and no organization-specific detail remains.

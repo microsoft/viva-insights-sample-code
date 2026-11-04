@@ -4,6 +4,9 @@ This document catalogs the most common data quality issues, analytical mistakes,
 
 > **For coding agents:** If you are processing Viva Insights data, review this list before starting your analysis. Many of these pitfalls are subtle and can invalidate results silently.
 
+The [shared analysis policy](../skills/viva-insights-analysis/reference/analysis-policy.md)
+owns the common rules; the examples below illustrate them.
+
 ---
 
 ## 1. Panel structure misunderstanding
@@ -27,10 +30,10 @@ print(f"{rows} rows, {persons} unique persons → {rows/persons:.1f} periods per
 **How to fix:** Always aggregate to the appropriate level before analysis. For cross-sectional summaries, compute per-person averages first, then summarize across persons:
 
 ```python
-# Wrong: mean across all rows (mixes within-person and between-person variation)
-wrong_avg = df['Collaboration_Hours'].mean()
+# Person-period-weighted estimand (weights longer histories more heavily)
+person_period_avg = df['Collaboration_Hours'].mean()
 
-# Right: person-level mean first, then grand mean
+# Person-weighted estimand (equal weight per person)
 person_avg = df.groupby('PersonId')['Collaboration_Hours'].mean()
 correct_avg = person_avg.mean()
 ```
@@ -41,14 +44,15 @@ correct_avg = person_avg.mean()
 
 **The mistake:** Treating `NA`/`null` values in Copilot metric columns as zero.
 
-**Why it matters:** In Viva Insights person query data:
-- `NA` / `null` in a Copilot column → the user was **not licensed** for Copilot that period
-- `0` in a Copilot column → the user **was licensed but did not use** Copilot that period
+**Why it matters:** An observed null is unknown; a recorded zero is zero activity.
+Neither establishes eligibility. Use documented product-specific enabled days
+or licence records for the relevant period. Without them eligibility remains
+unknown and an adoption denominator is unavailable.
 
-Replacing `NA` with `0` conflates unlicensed users with inactive licensed users, which:
-- Inflates the denominator for adoption rate calculations
-- Makes "average usage per user" appear artificially low
-- Produces misleading trends (e.g., "usage is declining" when actually licenses were just revoked)
+Within the current join contract's supplied complete query scope (configured
+population, dates and product filters), absent activity rows contribute zero.
+This is different from an existing null cell, unavailable source, out-of-scope
+period or known export problem. Preserve those reasons and do not blanket-fill.
 
 **How to detect:**
 
@@ -60,15 +64,25 @@ for col in copilot_cols:
     print(f"{col}: {null_count} nulls, {zero_count} zeros")
 ```
 
-**How to fix:** Never use `fillna(0)` on Copilot columns. Instead, create explicit flags:
+**How to fix:** Use explicit evidence and retain nullable flags:
 
 ```python
-df['is_licensed'] = df[copilot_cols].notna().any(axis=1)
-df['is_active'] = df['is_licensed'] & (df['Copilot_Actions'] > 0)
+# This field's documented definition must establish eligibility for the week.
+enabled = pd.to_numeric(df['Total_Copilot_enabled_days'], errors='raise').astype('Float64')
+df['is_licensed'] = enabled.gt(0)
+actions = pd.to_numeric(df['Copilot_Actions'], errors='raise').astype('Float64')
+df['is_active'] = df['is_licensed'] & actions.gt(0)
 
-# Compute adoption rate correctly
-adoption = df[df['is_licensed']].groupby('MetricDate')['is_active'].mean()
+# Unknown activity in an eligible period must not silently disappear from a mean.
+# Report it separately and withhold that period's rate until resolved.
+eligible = df[df['is_licensed'].fillna(False)]
+known = eligible.groupby('MetricDate')['is_active'].agg(lambda s: s.notna().all())
+adoption = eligible.groupby('MetricDate')['is_active'].mean().where(known)
 ```
+
+If the enabled-days field is absent, use another verified eligibility source
+or report observed activity only. Count distinct people per period and verify
+person-period key uniqueness before this calculation.
 
 ---
 
@@ -77,7 +91,7 @@ adoption = df[df['is_licensed']].groupby('MetricDate')['is_active'].mean()
 **The mistake:** Assuming the same set of people appears in every time period.
 
 **Why it matters:** People leave the organization, go on extended leave, or join during the analysis window. If you only look at people present at the end of the period, you miss:
-- People who churned (left the org or lost their Copilot license)
+- People absent from the source for unresolved reasons, or with documented entry/exit or licence changes
 - People who were hired or onboarded mid-period
 - Seasonal patterns driven by workforce changes, not behavior changes
 
@@ -125,16 +139,22 @@ for attr in ['Organization', 'FunctionType', 'LevelDesignation']:
 **How to fix:** Suppress or aggregate small groups:
 
 ```python
-MIN_GROUP_SIZE = 10  # or your org's threshold
+ORG_MINIMUM = 5  # replace with the organisation's actual requirement
+WORKFLOW_FLOOR = 5  # use 10 for joined-query, dashboard or causal outputs
+MIN_GROUP_SIZE = max(ORG_MINIMUM, WORKFLOW_FLOOR)
 
 def suppress_small_groups(summary_df, group_col, count_col, threshold=MIN_GROUP_SIZE):
-    """Replace values with NaN for groups below the privacy threshold."""
+    """Illustrative primary suppression; audit complementary cells separately."""
     mask = summary_df[count_col] < threshold
     suppressed = summary_df.copy()
-    metric_cols = [c for c in suppressed.columns if c not in [group_col, count_col]]
+    metric_cols = [c for c in suppressed.columns if c != group_col]
     suppressed.loc[mask, metric_cols] = float('nan')
     return suppressed
 ```
+
+Counts are sensitive too. Suppress complementary cells or entire breakdowns
+when totals disclose a small group. Apply the same rules to embedded chart data
+and downloads, and do not publish individual rankings.
 
 ---
 
@@ -316,7 +336,7 @@ Run through this checklist at the start of any Viva Insights analysis:
 
 ### Structure validation
 - [ ] **Panel structure confirmed:** Each `(PersonId, MetricDate)` pair is unique
-- [ ] **Granularity identified:** Weekly (7-day gaps) or daily (1-day gaps)
+- [ ] **Configured cadence confirmed:** Query grouping, week start and measurement windows recorded; gaps used only as diagnostics
 - [ ] **Date range reasonable:** Start and end dates match expected export period
 - [ ] **Row count makes sense:** Approximately `n_persons × n_periods`
 
@@ -327,13 +347,13 @@ Run through this checklist at the start of any Viva Insights analysis:
 - [ ] **Column names documented:** Printed and verified against expected schema
 
 ### Data quality
-- [ ] **Missing values understood:** Nulls in Copilot columns represent unlicensed users, not zero usage
+- [ ] **Missingness reasons preserved:** Null cells are unknown; absent in-scope activity differs from unavailable sources and out-of-scope periods
 - [ ] **Panel completeness assessed:** What percentage of persons appear in all periods?
 - [ ] **Small groups identified:** Segments with < minimum group size flagged for suppression
 - [ ] **No unexpected duplicates:** No duplicate `(PersonId, MetricDate)` rows
 
 ### Analysis setup
-- [ ] **Licensed vs. unlicensed flagged:** `is_licensed` column created based on Copilot metric presence
+- [ ] **Eligibility independently established:** Explicit enabled-days/licence evidence or unknown; never metric presence
 - [ ] **Active vs. inactive flagged:** `is_active` column created based on `Copilot_Actions > 0`
 - [ ] **Time zone assumptions documented:** Noted whether analysis assumes tenant TZ or individual TZ
 - [ ] **Privacy threshold applied:** Minimum group size set and enforced in all outputs

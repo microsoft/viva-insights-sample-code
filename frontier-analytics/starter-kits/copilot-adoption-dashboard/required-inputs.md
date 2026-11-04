@@ -11,11 +11,12 @@ The primary input is a **person query export** from the Viva Insights Analyst po
 | Column | Type | Description | Required? |
 |---|---|---|---|
 | `PersonId` | String | Anonymized unique identifier for each person. Consistent across weeks. | **Yes** |
-| `MetricDate` | Date | Start date of the measurement period (usually the Monday of each week). Format: `YYYY-MM-DD`. | **Yes** |
-| `Copilot_Actions` | Numeric | Total number of Copilot actions taken by the user in that week. `NA`/null for unlicensed users. | **Yes** |
-| `Copilot_Assisted_Hours` | Numeric | Hours of work where Copilot provided assistance. `NA`/null for unlicensed users. | Recommended |
-| `Copilot_Chat_Queries` | Numeric | Number of queries sent to Copilot Chat (Business Chat). `NA`/null for unlicensed users. | Recommended |
-| `Copilot_Summarized_Hours` | Numeric | Hours spent on content that Copilot summarized. `NA`/null for unlicensed users. | Optional |
+| `MetricDate` | Date | Start of the configured measurement period; confirm week start rather than assuming Monday. Format: `YYYY-MM-DD`. | **Yes** |
+| `Copilot_Actions` | Numeric | Verified weekly actions, mapped to the actual primary metric such as `Total_Copilot_actions_taken`. Null is unknown, not licence evidence. | **Yes** |
+| Enabled-days or dated licence evidence | Numeric/Boolean | Explicit product-specific eligibility for each person-week, independently of activity. | For adoption denominators |
+| `Copilot_Assisted_Hours` | Numeric | Verified assisted time, not measured time saved. Null is unknown. | Recommended |
+| `Copilot_Chat_Queries` | Numeric | Verified queries sent to Copilot Chat. Null is unknown. | Recommended |
+| `Copilot_Summarized_Hours` | Numeric | Verified summarised time, not automatically additive with assisted time. Null is unknown. | Optional |
 | `Organization` | String | HR attribute indicating the person's organizational unit (e.g., department or division). | **Yes** |
 | `FunctionType` | String | HR attribute indicating the person's job function (e.g., Engineering, Sales, Finance). | Recommended |
 | `LevelDesignation` | String | HR attribute indicating the person's seniority level (e.g., IC, Manager, Director). | Recommended |
@@ -47,7 +48,7 @@ The prompts will ignore columns they don't need, so including extra columns is h
 | **Copilot metrics** | 1 (e.g., `Copilot_Actions`) | 3+ |
 
 - **Time span**: Fewer than 4 weeks makes trend analysis unreliable. 12+ weeks is ideal for detecting meaningful adoption trajectories.
-- **Licensed users**: With fewer than 50 users, segmentation and organizational breakdowns will have very small group sizes. Consider applying privacy thresholds.
+- **Licensed users**: Small populations limit useful breakdowns. Always enforce the dashboard floor of 10 distinct people or the stricter organisational requirement.
 - **HR attributes**: More attributes enable richer slicing. At minimum, you need one organizational grouping.
 
 ## How to export from Viva Insights
@@ -56,7 +57,7 @@ The prompts will ignore columns they don't need, so including extra columns is h
 2. Navigate to **Analysis** > **Custom queries** > **Person query**.
 3. Configure the query:
    - **Time period**: Select a range covering at least 8 weeks.
-   - **Granularity**: Weekly (recommended) or Daily.
+   - **Granularity**: Weekly for these prompts. Record configured grouping, week start and metric measurement windows; spacing is not cadence evidence.
    - **Metrics**: Add all available `Copilot_*` metrics.
    - **Organizational data**: Include `Organization`, `FunctionType`, `LevelDesignation`, and any other HR attributes you want to analyze.
 4. Run the query and wait for it to complete.
@@ -69,7 +70,7 @@ For detailed guidance, see the [Microsoft documentation on person queries](https
 - **Encoding**: CSV files should be UTF-8 encoded. If you encounter character issues, re-save as UTF-8 in Excel or a text editor.
 - **Date format**: `MetricDate` should be in `YYYY-MM-DD` format (e.g., `2024-09-02`). If your export uses a different format (e.g., `MM/DD/YYYY`), tell the coding agent so it can parse correctly.
 - **Decimal separator**: Use a period (`.`) as the decimal separator. Comma-separated decimals (common in some European locales) will cause parsing errors — convert before loading or tell the agent.
-- **Missing values**: Unlicensed users will have `NA`, `null`, or empty cells for Copilot metric columns. This is expected and the prompts handle it automatically.
+- **Missing values**: Existing null cells remain unknown and do not establish licensing. Absent activity within a supplied complete query's configured scope contributes zero; unavailable sources, out-of-scope periods and known coverage failures remain distinct. See the [shared policy](../../skills/viva-insights-analysis/reference/analysis-policy.md).
 - **File size**: Person query exports can range from a few MB to several hundred MB depending on the population size and time span. Files over 100 MB may require chunked processing — mention the file size to the agent.
 
 ## Schema reference

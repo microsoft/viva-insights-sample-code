@@ -123,7 +123,7 @@ When loading this data, a coding agent should:
 | Transformation | When needed | How to implement |
 |----------------|-------------|------------------|
 | [e.g., "Aggregate day to week"] | [e.g., "When export is at person-day granularity"] | [e.g., "Group by PersonId and week-start date, sum metric columns, take first value of HR attributes"] |
-| [e.g., "Flag licensed users"] | [e.g., "Before computing adoption metrics"] | [e.g., "Create boolean column: True if any Copilot metric is non-null and non-zero"] |
+| [e.g., "Establish eligibility"] | [e.g., "Before computing adoption metrics"] | [e.g., "Use explicit product-specific enabled-days/licence evidence for the period; otherwise retain unknown, independently of activity"] |
 | [e.g., "Normalize column names"] | [e.g., "When column names contain spaces or special characters"] | [e.g., "Strip whitespace, replace spaces with underscores, convert to snake_case"] |
 
 ### Recommended packages

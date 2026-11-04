@@ -14,7 +14,7 @@ Gather these files and resources before starting. Items marked **required** are 
 | File / Resource | Description | Why it helps |
 |---|---|---|
 | **Data dictionary** | Reference documentation describing each column in the person query export — data types, expected values, and definitions. | Helps you verify that your export matches what the prompts expect. Speeds up troubleshooting when column names differ. Available in the [schemas directory](../../schemas/). |
-| **License assignment data** | A list of users who have been assigned a Copilot license, with assignment dates. Typically sourced from Microsoft 365 Admin Center or Microsoft Entra. | The prompts infer licensing from non-null metric values, which is a reasonable approximation. Explicit license data gives more accurate adoption rates, especially for recently assigned users who haven't yet appeared in metrics. |
+| **License assignment data** | Product-specific licence evidence with effective dates, from an approved source. | Required for adoption denominators when no documented enabled-days field exists. Never infer licensing from non-null, positive, zero or absent activity. Without evidence report eligibility as unknown. |
 | **Organizational hierarchy file** | A CSV or Excel file mapping people to custom organizational groupings (e.g., business units, cost centers, or project teams) not captured in standard HR attributes. | Enables custom breakdowns beyond the default `Organization` and `FunctionType` columns. Useful if your standard HR attributes are too broad or too granular. |
 
 ## Optional

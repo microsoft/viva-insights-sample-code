@@ -4,6 +4,12 @@ This document describes how to join different Viva Insights data sources togethe
 
 > **Prerequisite reading:** Familiarize yourself with the [Person Query Data Dictionary](viva-person-query-data-dictionary.md) and [Purview Audit Data Dictionary](purview-audit-data-dictionary.md) before attempting cross-source joins.
 
+Use the [shared policy](../skills/viva-insights-analysis/reference/analysis-policy.md):
+configured cadence, explicit eligibility, reason-preserving missingness,
+validated cardinality and a joined-output floor of 10 distinct people or the
+stricter organisational requirement. These are guided examples, not packaged
+adapters for every source; see [workflow support](../skills/viva-insights-analysis/reference/workflow-support.md).
+
 ---
 
 ## Overview of join scenarios
@@ -264,18 +270,24 @@ person_query['is_licensed_by_assignment'] = person_query.apply(
 
 ### Validation
 
-Cross-check the license data against the Copilot metric columns:
+Audit licence evidence alongside observed activity without treating them as
+equivalent classifications:
 
 ```python
-# Users flagged as licensed by assignment data vs. by Copilot metric presence
+# This is a coverage diagnostic, not an alternative licence definition.
 copilot_cols = [c for c in df.columns if c.startswith('Copilot_')]
 df['has_copilot_data'] = df[copilot_cols].notna().any(axis=1)
 
-mismatch = df[df['is_licensed_by_assignment'] != df['has_copilot_data']]
-print(f"Mismatches: {len(mismatch)} rows ({len(mismatch)/len(df):.1%})")
+diagnostic = df.groupby(
+    ['is_licensed_by_assignment', 'has_copilot_data'], dropna=False
+).size()
+# Keep unsuppressed operational diagnostics local, not in published reports.
+print(diagnostic)
 ```
 
-Small mismatches are expected (license activation delays, mid-week changes). Large mismatches indicate a mapping or data issue.
+An eligible person may have no activity. Product scope, effective dates,
+activation delays or coverage can also explain these categories. Investigate
+without inferring licensing from metric presence or absence.
 
 ---
 
@@ -283,7 +295,7 @@ Small mismatches are expected (license activation delays, mid-week changes). Lar
 
 | Data Source | Granularity | Time Key | Week Start |
 |---|---|---|---|
-| Person query | Weekly (or daily) | `MetricDate` | Detect from the export |
+| Person query | Configured daily, weekly or monthly | `MetricDate` | Read configuration; validate observed dates |
 | Purview audit logs | Event-level | `CreationTime` | N/A (aggregate to match) |
 | HR data | Snapshot or versioned | `EffectiveDate` (if available) | N/A |
 | License data | Event-level (assign/remove) | `LicenseAssignedDate` | N/A |
@@ -302,4 +314,4 @@ Before executing any join:
 - [ ] Align time granularity: aggregate event-level data to the target period before joining.
 - [ ] Check join match rate: what percentage of left-side rows matched? Low match rates indicate key problems.
 - [ ] Verify row count: the output should not have significantly more rows than the left table (for left joins).
-- [ ] Handle nulls: unmatched rows will have `NaN` in joined columns — decide whether to fill, flag, or drop.
+- [ ] Preserve missingness reasons: absent activity inside a supplied complete query's configured scope contributes zero; observed nulls, out-of-scope periods, unavailable sources and known coverage failures remain unknown.

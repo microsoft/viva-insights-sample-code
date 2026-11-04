@@ -16,3 +16,7 @@ without skill installation, or install the
 
 The [shared runner](../copilot-query-dashboard/README.md) owns commands and
 config. No benchmarked token or time reduction is claimed.
+
+The [shared policy](../../skills/viva-insights-analysis/reference/analysis-policy.md)
+and [workflow support table](../../skills/viva-insights-analysis/reference/workflow-support.md)
+own common rules and capability summaries.

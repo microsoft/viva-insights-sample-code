@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Deterministic generation of prompt site pages and catalogue from canonical
+  prompt cards, with shared routing metadata, preserved URLs/anchors and literal
+  fenced prompts. Shared policy and workflow-support references also generate
+  site pages and Skill catalogue limits, with bundled offline prompt guardrails.
+- Regression gates for generation, rendered links/code at a non-root base URL,
+  installed Skill references and synthetic installed-package recipe checks.
+
 - Agent Skills catalogue on the Frontier Skills page. Each Skill opens a
   details panel with tested `gh skill install` steps, a copyable starter prompt,
   the questions it helps answer and the results to expect, including labelled
@@ -75,6 +82,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - A "Quick prompt (short version)" on every prompt card: a short, general prompt that asks the agent to inspect the actual data and adapt column names, positioned as a faster first pass before the existing detailed, step-by-step prompt.
 - A "Don't have a coding agent yet?" section on the Frontier Analytics overview (site page and repo README), pointing to GitHub Copilot and Claude Code setup for people who have not started using a coding agent at all.
 - `reference/deliverables.md` in the `viva-insights-analysis` skill, distilling the same dashboard, executive summary, ROI, and segmentation conventions used in the prompt cards, so a Skill-driven session can produce those deliverables without a prompt card being pasted.
+
+### Fixed
+
+- Eligibility is explicit evidence, independent of activity. Observed nulls stay
+  unknown while absent activity within a supplied complete query scope can be
+  zero. Configured cadence and measurement windows govern aggregation.
+- Publication guidance applies the organisation requirement and workflow floor,
+  removes individual leaderboards, and distinguishes heuristic flags from
+  verified holidays or workforce classifications. Causal methods require a
+  supported design; ROI remains an assumption-based scenario.
+- Python holiday/inactive recipes request DataFrame return modes. The installed
+  package's transfer-cardinality limitation is documented, not patched here.
 
 ### Changed
 

@@ -16,6 +16,50 @@ Thank you for your interest in improving Frontier Analytics. This guide covers h
 4. Test the prompt with at least one coding agent (GitHub Copilot, Claude Code, or similar) using realistic data before submitting.
 5. Update the prompt library's [README](prompts/README.md) to include your new card.
 
+### Generated website content
+
+Prompt cards in `prompts/` are the authored source. Do not edit their generated
+`_pages/frontier-analytics-prompt-*.md` mirrors or `_data/prompts.json`.
+Site-only titles, badges, preserved routes, navigation, heading aliases and
+explicit link mappings live in `scripts/prompt_pages.json`. Register a new card
+there, or list it under `repo_only` when it intentionally has no site page.
+
+From the repository root, run:
+
+```shell
+python -m pip install -r scripts/requirements-doc-tests.txt -r scripts/requirements-recipes.txt
+python scripts/generate_prompt_catalogue.py
+python scripts/generate_prompt_catalogue.py --check
+python -B -m unittest discover -s scripts -p 'test_*.py'
+bundle exec jekyll build --baseurl /viva-insights-sample-code
+python scripts/check_rendered_prompts.py --baseurl /viva-insights-sample-code
+```
+
+The generation command also publishes the core Skill's
+`reference/analysis-policy.md` and `reference/workflow-support.md` as site pages.
+Catalogue capability limits come from marked bullet blocks in the support
+reference, not the presentation metadata in `_data/agent_skills.yml`.
+Keep genuinely workflow-specific instructions with their owner. Prompts must
+remain copyable offline, and installed Skills must retain their required
+references without a source checkout. The optional dashboard workflow still
+requires the explicitly documented runtime checkout.
+
+The marked summary in `reference/analysis-policy.md` is also bundled into full
+copyable Person Query, dashboard and adoption prompts by the same command.
+Edit the canonical policy block, not generated blocks inside prompt fences.
+Quick prompts keep their task-specific short-form instructions.
+
+Check mode never writes files. Regeneration must be deterministic and clean on
+a second run. Fenced prompts/code are retained literally, including multiple
+prompt blocks. Relative links outside fences require explicit site mappings.
+Historical `last_validated` metadata is not evidence that a changed prompt has
+been rerun. Record actual commands and observed results separately, distinguishing
+synthetic runs, explicit-read agent evaluations, automatic discovery and real-data trials.
+
+The pinned recipe environment uses Python 3.12. Documentation-only environments
+may skip optional package smoke tests, but both CI workflows install the recipe
+requirements and verify the installed version so those checks execute.
+
 ## Adding a new starter kit
 
 1. Copy the starter kit template from [templates/](templates/).

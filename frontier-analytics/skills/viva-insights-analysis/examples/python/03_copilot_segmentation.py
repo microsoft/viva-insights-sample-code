@@ -6,8 +6,8 @@ classifies the population into usage segments (Power / Habitual / Novice /
 Low / Non-user) with identify_usage_segments.
 
 Convention reminders (see reference/analysis-conventions.md):
-- Fill the metric NaNs with 0 before segmenting, or the rolling window leaves
-  people unclassified.
+- Preserve observed nulls. This built-in fixture has complete action cells;
+  real unknown histories must not be forced into segments with zero-fill.
 - Define the licensed population by enabled days for a snapshot rather than by
   action presence.
 """
@@ -18,10 +18,11 @@ pq = vi.load_pq_data()
 # 1. Build a total Copilot actions metric from the per-app action columns.
 action_cols = [c for c in pq.columns if c.startswith("Copilot_actions_taken_in_")]
 print("Per-app action columns:", action_cols)
-pq["Total_Copilot_actions"] = pq[action_cols].sum(axis=1)
+if not action_cols or pq[action_cols].isna().any().any():
+    raise ValueError("This sample recipe requires complete verified action columns")
+pq["Total_Copilot_actions"] = pq[action_cols].sum(axis=1, skipna=False)
 
-# 2. Fill NaNs with 0 so the rolling window does not propagate them.
-pq["Total_Copilot_actions"] = pq["Total_Copilot_actions"].fillna(0)
+# This demonstrates observed sample activity, not a licensed adoption denominator.
 
 # 3. Classify into 12-week usage segments.
 seg = vi.identify_usage_segments(pq, metric="Total_Copilot_actions",

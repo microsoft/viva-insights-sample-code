@@ -27,6 +27,9 @@ versions rather than assuming live package documentation matches them.
 
 If installing, install this skill alongside `viva-insights-analysis` from the
 same checkout. Prompt-only use reads these files in place; no installation is needed.
+Read the sibling core skill's
+[analysis policy](../viva-insights-analysis/reference/analysis-policy.md) and
+[workflow support](../viva-insights-analysis/reference/workflow-support.md).
 For current export schemas and cross-query integration, read
 [Joining Viva Insights queries](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/)
 and its downloadable JSON. It takes precedence over older join guidance and
@@ -82,5 +85,7 @@ or publication without explicit approval.
   the approved aggregate data and compare it before/after.
 - After two unsuccessful repairs of the same failure, stop with the cause,
   evidence and next required input; do not regenerate the whole project.
-- Keep synthetic and real paths separate. All analytical and privacy rules
-  come from the shared contract, including the minimum group size of 10.
+- Keep synthetic and real paths separate. Apply max(the organisation requirement,
+  this workflow's floor of 10 distinct people) across published and embedded
+  outputs. A real Consumption build is scoped to credits; real GitHub is
+  inspect-only, and Person/Agent build adapters are not implemented.

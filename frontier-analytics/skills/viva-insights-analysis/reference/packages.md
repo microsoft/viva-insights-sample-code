@@ -3,7 +3,8 @@
 > **Live, machine-readable equivalent:** both packages now publish an
 > auto-generated `llms.txt` (R: https://microsoft.github.io/vivainsights/llms.txt,
 > Python: https://microsoft.github.io/vivainsights-py/llms.txt) that reflects the
-> exact installed API and is more current than this file. Check it first. Use
+> published API, which may differ from the installed release. Use it for
+> discovery, then inspect the installed version, signature and return type. Use
 > this file for the grouped context (wrapper families, sample-dataset shapes,
 > export/theming) it doesn't cover. See `ecosystem.md`.
 
@@ -40,7 +41,7 @@ non-English exports see `data-pitfalls.md`.
 | Habitual-use flag | `identify_habit(data, metric, threshold = 1, width, max_window, hrvar, return = "plot")` | `identify_habit(data, metric, threshold=1, width=1, max_window=4, return_type='plot')` |
 | Holiday weeks (low-activity weeks) | `identify_holidayweeks(data, ...)` | `identify_holidayweeks(data, ...)` |
 | Inactive weeks | `identify_inactiveweeks(data, ...)` | `identify_inactiveweeks(data, ...)` |
-| Non-knowledge-worker / low-signal | `identify_nkw(data, ...)` | `identify_nkw(data, ...)` |
+| Low-collaboration review candidate (not a verified job class) | `identify_nkw(data, ...)` | `identify_nkw(data, ...)` |
 | Statistical outliers | `identify_outlier(data, ...)` | `identify_outlier(data, ...)` |
 | Tenure from a hire-date column | `identify_tenure(data, ...)` | `identify_tenure(data, ...)` |
 | Churn between two periods | N/A | `identify_churn()` |
@@ -50,6 +51,15 @@ non-English exports see `data-pitfalls.md`.
 The `identify_usage_segments()` classifier (Power / Habitual / Novice / Low /
 Non-user) is central to Copilot adoption work. See `analysis-conventions.md` for
 the segment definitions and the correct licensed-population denominator.
+
+Holiday/inactive labels are heuristic review candidates, not verified leave.
+Python 0.4.3 defaults return text: use `return_type="labelled_data"` for
+`identify_holidayweeks` and `return_type="data"` for `identify_inactiveweeks`
+to retain rows with flags. R 0.7.2 uses `return="data"` for both.
+Python 0.4.3 `identify_nkw` may expand transfer histories because it groups by
+person/organisation and merges on person alone. See
+[data pitfalls](data-pitfalls.md#identify_nkw-is-a-heuristic-with-an-upstream-cardinality-caveat)
+for the version/cardinality limitation; no upstream fixed release is claimed.
 
 ## 3. Metric-family wrappers (R)
 

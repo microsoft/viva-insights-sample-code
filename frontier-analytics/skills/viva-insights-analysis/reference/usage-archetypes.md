@@ -117,6 +117,15 @@ however unevenly their effort is divided.
 Classify everyone into a named state before assigning labels. Never drop a
 person silently or force a label.
 
+The states below preserve rule v1's explicit coverage input for synthetic
+reproduction and older inputs. For current supplied Viva Insights queries,
+apply [analysis policy](analysis-policy.md): default complete coverage only
+inside configured scope, absent activity contributes zero, observed nulls and
+known coverage problems remain unknown. Record that scoped assumption as the
+coverage basis; no separate completeness attestation is required. Eligibility
+and policy additivity remain independent. Do not copy a synthetic demo's
+unconfirmed state onto every current export, or invent an eligibility flag.
+
 Assign states in this order. The first matching check wins.
 
 1. Not selected by the cohort rule: **Outside the analysis cohort**.
