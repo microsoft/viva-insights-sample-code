@@ -13,6 +13,10 @@ An agent Skill is a folder containing a `SKILL.md` file and supporting reference
 
 For a single task without installation, use the [Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/). Check your agent's documentation for Skill support and installation locations.
 
+Read the [analysis policy]({{ site.baseurl }}/frontier-analytics-policy/) and
+[workflow capability map]({{ site.baseurl }}/frontier-analytics-support/) for the
+shared rules, supported inputs, runtime requirements and evidence boundaries.
+
 ## Choose a Skill
 
 Select **Start using** on a card for setup steps, a starter prompt, the questions each Skill helps answer and the results to expect. The two optional Skills read references from the shared analysis Skill, so their steps install both.

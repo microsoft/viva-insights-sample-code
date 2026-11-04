@@ -2,6 +2,8 @@
 # Each Skill is rendered once inline by _includes/skill-catalogue.html and
 # enhanced into a pop-up by assets/js/skill-dialog.js. Text fields accept
 # Markdown. Keep installation facts in step with frontier-analytics/skills/README.md.
+# Capability limitations are generated from the core Skill's workflow-support.md
+# into _data/workflow_support.json, not authored in this presentation metadata.
 
 - slug: viva-insights-analysis
   name: Viva Insights analysis
@@ -30,10 +32,6 @@
     - R or Python code that uses existing vivainsights functions before writing custom logic.
     - A validation summary that flags common export pitfalls, such as text-coded flags, literal "#N/A" values, holiday weeks and groups below the privacy threshold.
     - Standard visualisations and common deliverables, such as an adoption dashboard, an executive summary memo or an ROI estimate.
-  limitations:
-    - Written claims describe associations unless a designed experiment supports a causal reading.
-    - Groups below the minimum aggregation size (5 by default) are not reported.
-    - Installing the Skill does not install R, Python or their packages.
 
 - slug: viva-insights-copilot-dashboards
   name: Copilot query dashboards
@@ -84,10 +82,6 @@
       alt: Network page of the Developer Experience reference dashboard, built from synthetic data.
       caption: Developer Experience network
   preview_note: These previews use the synthetic demo data that ships with the starter kit.
-  limitations:
-    - Real Consumption data is supported only for the documented credit fields.
-    - Real GitHub query exports can be inspected, but a GitHub adapter has not yet been verified.
-    - A successful render does not validate the business meaning of the results.
 
 - slug: viva-insights-causal-analysis
   name: Person Query causal analysis
@@ -119,8 +113,3 @@
     - A readiness assessment that states whether the data can support the question and what is missing, without fitting models.
     - After a supported analysis, reproducible scripts, audit and results records, and a self-contained HTML report.
     - Model-labelled results with visible caveats and plain-language definitions.
-  limitations:
-    - The R and Python examples use fabricated data and are not a general real-data modelling engine.
-    - Published groups need at least 10 people, or a stricter requirement where one applies.
-    - Collaboration activity is not translated directly into productivity, performance or ROI.
-    - For the Copilot Causal Toolkit notebooks, use the existing toolkit prompt instead.
