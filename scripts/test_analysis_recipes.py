@@ -12,7 +12,9 @@ import io
 import inspect
 from pathlib import Path
 import re
+import runpy
 import unittest
+from unittest import mock
 
 import pandas as pd
 import vivainsights as vi
@@ -206,6 +208,60 @@ class AnalysisRecipeTests(unittest.TestCase):
         self.assertEqual(len(output), len(panel))
         flags = output.groupby("PersonId")["flag_nkw"].first().to_dict()
         self.assertEqual(flags, {"below": "nkw", "at": "kw", "above": "kw"})
+
+    def run_segmentation_example(self, panel):
+        script = ROOT / "frontier-analytics" / "skills" / "viva-insights-analysis" / "examples" / "python" / "03_copilot_segmentation.py"
+        with mock.patch.object(vi, "load_pq_data", return_value=panel.copy()):
+            with contextlib.redirect_stdout(io.StringIO()):
+                return runpy.run_path(str(script))["seg"]
+
+    def segmentation_panel(self):
+        return pd.DataFrame({
+            "PersonId": ["synthetic"] * 30,
+            "MetricDate": pd.date_range("2026-01-05", periods=30, freq="7D"),
+            "Total_Copilot_enabled_days": [5.0] * 30,
+            "Copilot_actions_taken_in_Teams": [10.0] * 30,
+        })
+
+    def test_segmentation_example_withholds_affected_eligibility_and_null_windows(self):
+        for column, invalid in [
+            ("Total_Copilot_enabled_days", 0),
+            ("Total_Copilot_enabled_days", None),
+        ]:
+            with self.subTest(column=column, invalid=invalid):
+                panel = self.segmentation_panel()
+                panel.loc[12, column] = invalid
+                result = self.run_segmentation_example(panel).reset_index(drop=True)
+                self.assertEqual(len(result), len(panel))
+                for width in (4, 12):
+                    columns = [f"UsageSegments_{width}w", f"IsHabit{width}w", f"target_metric_l{width}w"]
+                    self.assertTrue(result.loc[:width - 2, columns].isna().all().all())
+                    self.assertTrue(result.loc[12:12 + width - 1, columns].isna().all().all())
+                    self.assertTrue(result.loc[12 + width:, columns].notna().all().all())
+                    self.assertTrue(result.loc[11, columns].notna().all())
+
+    def test_segmentation_example_stops_on_unknown_activity(self):
+        panel = self.segmentation_panel()
+        panel.loc[12, "Copilot_actions_taken_in_Teams"] = None
+        with self.assertRaisesRegex(ValueError, "Unknown activity"):
+            self.run_segmentation_example(panel)
+
+    def test_segmentation_example_keeps_gaps_and_restores_only_full_windows(self):
+        panel = self.segmentation_panel().drop(index=12).sample(frac=1, random_state=4)
+        result = self.run_segmentation_example(panel).set_index("MetricDate")
+        for width in (4, 12):
+            blocked = pd.date_range("2026-01-05", periods=30, freq="7D")[13:12 + width]
+            restored = pd.date_range("2026-01-05", periods=30, freq="7D")[12 + width]
+            self.assertTrue(result.loc[blocked, f"UsageSegments_{width}w"].isna().all())
+            self.assertTrue(pd.notna(result.loc[restored, f"UsageSegments_{width}w"]))
+        self.assertEqual(len(result), 29)
+
+    def test_segmentation_example_known_eligible_zero_is_non_user(self):
+        panel = self.segmentation_panel()
+        panel["Copilot_actions_taken_in_Teams"] = 0.0
+        result = self.run_segmentation_example(panel).reset_index(drop=True)
+        self.assertEqual(result.loc[11:, "UsageSegments_12w"].unique().tolist(), ["Non-user"])
+        self.assertTrue(result.loc[:10, "UsageSegments_12w"].isna().all())
 
 
 if __name__ == "__main__":
