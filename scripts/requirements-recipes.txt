@@ -1,0 +1,14 @@
+# Python 3.12 recipe smoke environment; vivainsights 0.4.3 only.
+# Install with: python -m pip install -r scripts/requirements-recipes.txt
+vivainsights==0.4.3
+pandas==3.0.5
+numpy==2.5.1
+scipy==1.18.0
+matplotlib==3.11.1
+seaborn==0.13.2
+matplotlib-inline==0.2.2
+igraph==1.0.0
+plotly==6.9.0
+scikit-learn==1.9.0
+setuptools==83.0.0
+adjustText==1.4.0
