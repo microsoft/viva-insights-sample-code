@@ -53,7 +53,8 @@ call `read_business_leaders_data(data_dir)` without `scenario = TRUE`.
 **Interpretation:** overall AI reach is a distinct-person union of positive
 activity, not the sum of product user counts. Known processing gaps remain
 unresolved. Counts are labelled as lower bounds where necessary, and full
-M365 adoption is unavailable when licensed activity is incomplete. Native
+M365 adoption is unavailable when licensed activity is incomplete or when
+licence or activity counts are withheld for disclosure protection. Native
 licensed-only M365 null semantics do not turn deliberately missing synthetic
 activity into a licence signal. GitHub row presence is not provisioning.
 Incomplete activity rates are labelled as lower bounds. GitHub acceptance is
@@ -83,9 +84,10 @@ may reflect roles, teams or other work patterns rather than an AI effect.
 Credit units are not pooled or converted into currency. Satisfaction, completion
 outcomes, forecasts, monetary costs and unlicensed Copilot Chat are not supplied.
 Out-of-roster agent users are excluded and flagged without exposing small counts.
-Contributor and complementary suppression is applied before aggregate data is
-embedded in the HTML. This is a synthetic demonstration, not an approved
-real-export adapter or a disclosure guarantee for arbitrary linked reports.
+Contributor and complementary suppression is applied across the selectable
+windows and linked aggregates before data is embedded in the HTML. This is a
+synthetic demonstration, not an approved real-export adapter or a disclosure
+guarantee for arbitrary linked reports.
 
 ## Which queries each report needs
 

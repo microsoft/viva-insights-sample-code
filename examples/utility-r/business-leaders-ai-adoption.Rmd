@@ -158,7 +158,7 @@ details{margin-top:14px}summary{cursor:pointer;color:#115ea3;padding:4px 0}dl{ma
 <dl>
 <dt>Observed AI users</dt><dd>A distinct person with positive M365 Copilot actions or active days, Cowork tasks or active days, agent sessions, metered M365 sessions or credits, or GitHub activity or credits during the window. A person using multiple services is counted once. A positive observation remains positive even if another source is unresolved.</dd>
 <dt>Recorded activity per person per week</dt><dd>Recorded actions, tasks, sessions, feature uses or credits divided by all roster person-weeks in the selected period: headcount multiplied by weeks. Non-users, unlicensed people and person-weeks with activity gaps stay in the denominator. Only received activity contributes to the numerator; rates are recorded lower bounds where coverage is incomplete, not estimates of missing usage. Group rates use that group's full roster; agent, feature and service breakdowns use the full organisation roster, not only that category's users. Raw totals remain in audit details.</dd>
-<dt>M365 Copilot access and adoption</dt><dd>Access uses positive Total Copilot enabled days in the latest week, not activity. Licensed zeros remain in the denominator. The latest-week adoption rate is published only when activity is known for every licensed person. Native licensed-only M365 nulls mean unlicensed under Microsoft's documented rules, but these historical fixtures deliberately contain processing gaps in licensed activity. Those gaps remain unresolved. Their unlicensed zeros are fixture conventions, not the native-export null convention.</dd>
+<dt>M365 Copilot access and adoption</dt><dd>Access uses positive Total Copilot enabled days in the latest week, not activity. Licensed zeros remain in the denominator. The latest-week adoption rate is published only when activity is known for every licensed person and the licence and activity counts meet disclosure thresholds. Native licensed-only M365 nulls mean unlicensed under Microsoft's documented rules, but these historical fixtures deliberately contain processing gaps in licensed activity. Those gaps remain unresolved. Their unlicensed zeros are fixture conventions, not the native-export null convention.</dd>
 <dt>GitHub use and acceptance</dt><dd>Recorded use includes positive suggested or accepted completions, user-initiated chats, the Agent adoption indicator, or GitHub AI credits. A missing activity row is not a licence record or proof of non-use. Acceptance is total accepted completions divided by total suggested completions over the received records, not an average of person-level percentages. Zero suggestions produce no rate.</dd>
 <dt>Returning agent users</dt><dd>The share of distinct active agent users in the latest week whose exported seven-day returning indicator is one. Repeated person-level indicators are deduplicated across agents. They are never added across weeks. This is not retention across all AI services.</dd>
 <dt>Credit volume</dt><dd>M365 Copilot credits and GitHub AI credits retain separate units. Credits per roster person-week divide recorded credits by all roster person-weeks in the selected window, including people with no activity or no licence. Daily records are aggregated to Sunday-start weeks before joining to the roster. Feature and agent facts remain separate so they cannot multiply the person-week panel. No currency conversion, licence fees, policy-limit totals or savings are inferred.</dd>
@@ -296,7 +296,7 @@ function renderCollaboration(data) {
     byId("collab-comparison").replaceChildren();
     byId("collab-comparison-note").textContent=status==="incomplete"?
       "Credit groups are unavailable because credit observations are incomplete.":
-      "Credit groups are withheld because a group or its complement is below the disclosure threshold.";
+      "Credit groups or linked totals are withheld to meet the disclosure threshold.";
     table("collab-band-table",[],[]);
   }
   lineChart("collab-credit-trend",scope.Trend,[{key:creditKey,label:creditLabel,colour:"#5b72e8",
@@ -364,7 +364,7 @@ function render() {
   byId("period").textContent=`${data.start} to ${data.end} \u00b7 ${number(data.population)} people in roster`;
   byId("kpis").replaceChildren(
     kpi("People with recorded AI use",observed(data.users,data.lower_bound),"Distinct people across the selected period. Services overlap."),
-    kpi("M365 Copilot access",number(data.licensed),"Licensed people in the latest week. "+(data.adoption===null?"Adoption unavailable: activity gaps.":"Latest-week adoption: "+percent(data.adoption)+".")),
+    kpi("M365 Copilot access",number(data.licensed),"Licensed people in the latest week. "+(data.adoption===null?"Adoption unavailable or withheld.":"Latest-week adoption: "+percent(data.adoption)+".")),
     kpi("M365 credits / person / week",number(data.m365_credits_per_person_week,1,1),"Across all roster people, including non-users. Not currency."),
     kpi("GitHub credits / person / week",number(data.github_credits_per_person_week,1,1),"Across all roster people. Separate credit unit."));
   const series=Object.keys(colours).map(key=>({key,label:labels[key],colour:colours[key]}));
@@ -385,15 +385,15 @@ function render() {
   }));
   table("agent-table",["Agent","Users","Sessions / person / week"],data.agents.rows.map(r=>[r.Category,number(r.Users),number(r.PerPersonWeek,2)]),
     "Distinct users per agent. User counts overlap.");
-  byId("agent-note").textContent=data.agents.withheld?"Some categories and a complementary category are withheld to protect small contributor groups.":"All displayed agents meet the contributor threshold.";
+  byId("agent-note").textContent=data.agents.withheld?"Some values or categories are withheld to protect small contributor groups and related totals.":"All displayed agents meet the contributor threshold.";
   const featureNames={code_completion:"Code completions",chat_inline:"Inline chat",chat_panel_ask_mode:"Chat: ask mode",chat_panel_edit_mode:"Chat: edit mode",chat_panel_agent_mode:"Chat: agent mode",chat_panel_plan_mode:"Chat: plan mode",chat_panel_custom_mode:"Chat: custom mode",chat_panel_unknown_mode:"Chat: unspecified mode",agent_edit:"Agent edits",copilot_cli:"Copilot CLI",copilot_app:"Copilot app"};
   table("feature-table",["Feature","Users","Uses / person / week"],data.features.rows.map(r=>[featureNames[r.Category]||r.Category,observed(r.Users,data.features.lower_bound),observed(r.PerPersonWeek,data.features.lower_bound,2)]),
-    (data.features.withheld?"Some categories withheld for disclosure protection.":"Selected-period feature activity.")+(data.features.lower_bound?" At least marks incomplete GitHub observations.":""));
+    (data.features.withheld?"Some values or categories are withheld for disclosure protection.":"Selected-period feature activity.")+(data.features.lower_bound?" At least marks incomplete GitHub observations.":""));
   byId("returning-note").textContent=`Returning agent users: ${percent(data.agent_returning)} of active agent users in the week starting ${data.returning_week} also used agents in the prior seven days. This is the exported agent indicator, deduplicated across agents, not an all-AI retention rate.`;
   lineChart("m365-credit-trend",data.credit_trend,[{key:"M365PerPerson",label:"M365 credits / person / week",colour:"#5b72e8"}],"Weekly M365 credits per person");
   lineChart("github-credit-trend",data.credit_trend,[{key:"GitHubPerPerson",label:"GitHub credits / person / week",colour:"#8551bc"}],"Weekly GitHub credits per person");
   table("credit-table",["Service","Contributors","M365 credits / person / week"],data.services.rows.map(r=>[r.Category,number(r.Users),number(r.PerPersonWeek,2)]),
-    data.services.withheld?"Some service categories withheld.":"Recorded M365 credits by service, across the full roster.");
+    data.services.withheld?"Some service values or categories are withheld.":"Recorded M365 credits by service, across the full roster.");
   byId("audit-denominator").textContent=`Denominator: ${number(data.population)} people \u00d7 ${data.lookback} weeks = ${number(data.person_weeks)} person-weeks. Different credit units are never added.`;
   table("audit-totals",["Metric","Recorded total","Unit"],
     [...data.products.map(p=>[p.Product,observed(p.Volume,p.VolumeLowerBound),p.Unit]),

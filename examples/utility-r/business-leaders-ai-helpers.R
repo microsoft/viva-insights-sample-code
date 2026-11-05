@@ -230,6 +230,39 @@ business_group_summary <- function(panel, attribute, minimum) {
   rows
 }
 
+business_temporal_mask <- function(values, minimum, unsafe = NULL) {
+  available <- which(!is.na(values))
+  best <- integer()
+  best_weight <- -1
+  for (bits in 0:(2 ^ length(available) - 1)) {
+    selected <- available[bitwAnd(bits, 2 ^ (seq_along(available) - 1)) != 0]
+    differences <- abs(outer(values[selected], values[selected], "-"))
+    if (any(differences > 0 & differences < minimum) ||
+        (!is.null(unsafe) && any(unsafe[selected, selected, drop = FALSE]))) next
+    weight <- sum(2 ^ (selected - 1))
+    if (length(selected) > length(best) ||
+        (length(selected) == length(best) && weight > best_weight)) {
+      best <- selected
+      best_weight <- weight
+    }
+  }
+  seq_along(values) %in% setdiff(available, best)
+}
+
+business_interval_risk <- function(observations, metric, windows, minimum) {
+  starts <- as.Date(vapply(windows, `[[`, character(1), "start"))
+  risks <- matrix(FALSE, length(windows), length(windows))
+  for (i in seq_along(windows)) for (j in seq_along(windows)) {
+    if (i >= j) next
+    interval <- observations$MetricDate >= min(starts[i], starts[j]) &
+      observations$MetricDate < max(starts[i], starts[j])
+    values <- observations[[metric]]
+    contributors <- n_distinct(observations$PersonId[interval & !is.na(values) & values > 0])
+    risks[i, j] <- risks[j, i] <- contributors > 0 && contributors < minimum
+  }
+  risks
+}
+
 business_credit_band_people <- function(panel, minimum) {
   people <- panel |>
     arrange(MetricDate) |>
@@ -263,28 +296,70 @@ business_credit_band_people <- function(panel, minimum) {
   list(people = people, status = status)
 }
 
-# Keep at least two suppressed cells in any released row or column margin.
+business_cross_window_noncredit <- function(data, lookbacks, minimum) {
+  states <- setNames(lapply(lookbacks, function(n) {
+    panel <- data$panel[data$panel$MetricDate %in% tail(data$weeks, n), ]
+    list(active = business_people(panel),
+         bands = business_credit_band_people(panel, minimum)$people)
+  }), as.character(lookbacks))
+  attributes <- c("All", "Organization", "FunctionType", "Team")
+  result <- setNames(vector("list", length(states)), names(states))
+  for (window in names(states)) for (product in names(business_collaboration_credits)) {
+    bands <- states[[window]]$bands
+    for (attribute in attributes) {
+      groups <- if (attribute == "All") "All people" else sort(unique(bands[[attribute]]))
+      risks <- setNames(rep(FALSE, length(groups)), groups)
+      for (group in groups) {
+        members <- if (attribute == "All") bands else bands[bands[[attribute]] == group, ]
+        band <- members[[paste0("band_", product)]]
+        if (anyNA(band)) next
+        positive <- members$PersonId[band != "none"]
+        for (other in states) {
+          active <- other$active
+          if (attribute != "All") active <- active[active[[attribute]] == group, ]
+          observed <- active$PersonId[active$any_active %in% TRUE]
+          difference <- length(observed) - length(positive)
+          if (!length(setdiff(positive, observed)) &&
+              difference > 0 && difference < minimum) risks[[group]] <- TRUE
+        }
+      }
+      result[[window]][[product]][[attribute]] <- risks
+    }
+  }
+  result
+}
+
+# Protect every suppressed cell against reconstruction from released margins.
 business_complementary_mask <- function(counts, primary, protect_columns = rep(TRUE, ncol(counts))) {
+  recoverable <- function(mask) {
+    cells <- which(mask, arr.ind = TRUE)
+    if (!nrow(cells)) return(logical())
+    columns <- which(protect_columns)
+    equations <- matrix(0, nrow(counts) + length(columns), nrow(cells))
+    for (i in seq_len(nrow(cells))) {
+      equations[cells[i, 1], i] <- 1
+      column <- match(cells[i, 2], columns)
+      if (!is.na(column)) equations[nrow(counts) + column, i] <- 1
+    }
+    rank <- qr(equations)$rank
+    vapply(seq_len(ncol(equations)), function(i) {
+      rest <- equations[, -i, drop = FALSE]
+      rank > if (ncol(rest)) qr(rest)$rank else 0L
+    }, logical(1))
+  }
   mask <- primary
   repeat {
-    changed <- FALSE
-    for (i in seq_len(nrow(counts))) {
-      if (sum(mask[i, ]) != 1L) next
-      candidates <- which(counts[i, ] > 0 & !mask[i, ])
-      if (!length(candidates)) return(NULL)
-      j <- candidates[which.min(counts[i, candidates])]
-      mask[i, j] <- TRUE
-      changed <- TRUE
-    }
-    for (j in which(protect_columns)) {
-      if (sum(mask[, j]) != 1L) next
-      candidates <- which(counts[, j] > 0 & !mask[, j])
-      if (!length(candidates)) return(NULL)
-      i <- candidates[which.min(counts[candidates, j])]
-      mask[i, j] <- TRUE
-      changed <- TRUE
-    }
-    if (!changed) return(mask)
+    if (!any(recoverable(mask))) return(mask)
+    candidates <- which(counts > 0 & !mask, arr.ind = TRUE)
+    if (!nrow(candidates)) return(NULL)
+    scores <- vapply(seq_len(nrow(candidates)), function(i) {
+      candidate <- mask
+      candidate[candidates[i, 1], candidates[i, 2]] <- TRUE
+      sum(recoverable(candidate))
+    }, numeric(1))
+    best <- which(scores == min(scores))
+    chosen <- best[which.min(counts[candidates[best, , drop = FALSE]])]
+    mask[candidates[chosen, 1], candidates[chosen, 2]] <- TRUE
   }
 }
 
@@ -302,7 +377,7 @@ business_collaboration_rates <- function(part, population, minimum) {
     numeric(1))
 }
 
-business_collaboration_window <- function(panel, minimum) {
+business_collaboration_window <- function(panel, minimum, linked_noncredit = NULL) {
   assert_unique_key(panel, c("PersonId", "MetricDate"), "Collaboration person-week")
   business_check_numbers(panel, business_collaboration_measures, "Collaboration panel", TRUE)
   if (any(vapply(panel[business_collaboration_measures],
@@ -315,6 +390,22 @@ business_collaboration_window <- function(panel, minimum) {
   people <- people_result$people
   status <- people_result$status
   attributes <- c("Organization", "FunctionType", "Team")
+  if ("any_active" %in% names(panel)) {
+    active <- panel |>
+      group_by(PersonId) |>
+      summarise(any_active = any(any_active), .groups = "drop")
+    people$any_active <- active$any_active[match(people$PersonId, active$PersonId)]
+  }
+  noncredit_users <- function(members, product) {
+    if (!"any_active" %in% names(members)) return(0L)
+    band <- members[[paste0("band_", product)]]
+    positive <- !is.na(band) & band != "none"
+    if (any(positive & !(members$any_active %in% TRUE)))
+      stop("Positive credit observations must be included in recorded AI users.")
+    sum(members$any_active %in% TRUE) - sum(positive)
+  }
+  linked_risk <- function(product, attribute, group)
+    isTRUE(linked_noncredit[[product]][[attribute]][[group]])
 
   make_scope <- function(members) {
     part <- panel[panel$PersonId %in% members$PersonId, ]
@@ -357,17 +448,43 @@ business_collaboration_window <- function(panel, minimum) {
     }
   }
 
+  withhold_product <- function(scopes, product) {
+    for (attribute in names(scopes)) for (group in names(scopes[[attribute]]))
+      scopes[[attribute]][[group]][[product]] <- NULL
+    scopes
+  }
   for (product in names(business_collaboration_credits)) {
     if (status[[product]] != "ready") next
     fields <- c("Credit", business_collaboration_fields)
     all_bands <- scopes$All[[1]][[product]]
     all_counts <- matrix(all_bands$People, nrow = 1)
+    primary_count <- matrix(FALSE, nrow = 1, ncol = length(business_credit_bands))
+    noncredit <- noncredit_users(people, product)
+    primary_count[1, 1] <- (noncredit > 0 && noncredit < minimum) ||
+      linked_risk(product, "All", "All people")
+    count_mask <- business_complementary_mask(all_counts, primary_count,
+                                                rep(FALSE, length(business_credit_bands)))
+    if (is.null(count_mask)) {
+      status[[product]] <- "privacy"
+      scopes <- withhold_product(scopes, product)
+      next
+    }
+    all_bands[count_mask[1, ], c("People", fields, "Gap")] <- NA
+    unsafe_product <- FALSE
     for (field in fields) {
-      primary <- matrix(is.na(all_bands[[field]]) & all_bands$People > 0, nrow = 1)
+      primary <- matrix(is.na(all_bands[[field]]) & all_counts[1, ] > 0, nrow = 1)
       mask <- business_complementary_mask(all_counts, primary,
                                            rep(FALSE, length(business_credit_bands)))
-      if (is.null(mask)) mask <- all_counts > 0
+      if (is.null(mask)) {
+        unsafe_product <- TRUE
+        break
+      }
       all_bands[[field]][mask[1, ]] <- NA_real_
+    }
+    if (unsafe_product) {
+      status[[product]] <- "privacy"
+      scopes <- withhold_product(scopes, product)
+      next
     }
     scopes$All[[1]][[product]] <- all_bands
 
@@ -379,8 +496,21 @@ business_collaboration_window <- function(panel, minimum) {
       for (i in seq_len(nrow(counts))) for (j in seq_len(ncol(counts)))
         primary[i, j] <- is.na(business_public_count(counts[i, j], parts[[i]]$People,
                                                        minimum))
-      base_mask <- business_complementary_mask(counts, primary)
-      if (is.null(base_mask)) base_mask <- counts > 0
+      globally_hidden_count <- is.na(all_bands$People) & all_counts[1, ] > 0
+      if (any(globally_hidden_count))
+        primary[, globally_hidden_count] <- counts[, globally_hidden_count, drop = FALSE] > 0
+      for (i in seq_along(parts)) {
+        members <- people[people[[attribute]] == names(parts)[i], ]
+        noncredit <- noncredit_users(members, product)
+        if ((noncredit > 0 && noncredit < minimum) ||
+            linked_risk(product, attribute, names(parts)[i])) primary[i, 1] <- TRUE
+      }
+      base_mask <- business_complementary_mask(counts, primary, !globally_hidden_count)
+      if (is.null(base_mask)) {
+        for (i in seq_along(parts)) parts[[i]][[product]] <- NULL
+        scopes[[attribute]] <- parts
+        next
+      }
       for (i in seq_along(parts)) {
         hidden <- base_mask[i, ]
         parts[[i]][[product]]$People[hidden] <- NA_real_
@@ -393,7 +523,10 @@ business_collaboration_window <- function(panel, minimum) {
         if (any(globally_hidden))
           primary[, globally_hidden] <- counts[, globally_hidden, drop = FALSE] > 0
         mask <- business_complementary_mask(counts, primary, !globally_hidden)
-        if (is.null(mask)) mask <- counts > 0
+        if (is.null(mask)) {
+          for (i in seq_along(parts)) parts[[i]][[product]] <- NULL
+          break
+        }
         for (i in seq_along(parts)) parts[[i]][[product]][[field]][mask[i, ]] <- NA_real_
       }
       scopes[[attribute]] <- parts
@@ -419,7 +552,7 @@ business_collaboration_window <- function(panel, minimum) {
   list(status = status, scopes = scopes)
 }
 
-business_window_summary <- function(data, lookback, minimum = 10L) {
+business_window_summary <- function(data, lookback, minimum = 10L, linked_noncredit = NULL) {
   weeks <- tail(data$weeks, lookback)
   panel <- data$panel |> filter(MetricDate %in% weeks)
   people <- business_people(panel)
@@ -434,11 +567,13 @@ business_window_summary <- function(data, lookback, minimum = 10L) {
   latest <- panel |> filter(MetricDate == max(weeks))
   latest_agents <- latest |> filter(agents_active)
   returning_population <- nrow(latest_agents)
-  returning_n <- business_public_count(sum(latest_agents$returning_7),
-                                       returning_population, minimum)
+  returning_denominator <- business_public_count(returning_population, population, minimum)
+  returning_n <- if (!is.na(returning_denominator))
+    business_public_count(sum(latest_agents$returning_7), returning_population, minimum) else
+    NA_real_
   licensed <- business_public_count(sum(latest$licensed), population, minimum)
   eligible <- latest |> filter(licensed)
-  adoption <- if (!anyNA(eligible$copilot_active) && nrow(eligible) > 0)
+  adoption <- if (!is.na(licensed) && !anyNA(eligible$copilot_active) && nrow(eligible) > 0)
     safe_divide(business_public_count(sum(eligible$copilot_active), nrow(eligible),
                                      minimum), nrow(eligible)) else NA_real_
   m365 <- data$m365 |> filter(MetricDate >= min(weeks), MetricDate <= max(weeks) + 6L)
@@ -479,7 +614,7 @@ business_window_summary <- function(data, lookback, minimum = 10L) {
     accepted = accepted, suggested = suggested,
     accepted_per_person_week = safe_divide(accepted, nrow(panel)),
     acceptance = safe_divide(accepted, suggested),
-    agent_returning = safe_divide(returning_n, returning_population),
+    agent_returning = safe_divide(returning_n, returning_denominator),
     returning_week = as.character(max(weeks)),
     products = products, trend = trend,
     credit_trend = panel |>
@@ -492,7 +627,354 @@ business_window_summary <- function(data, lookback, minimum = 10L) {
       business_group_summary(panel, attribute, minimum)),
       c("Organization", "FunctionType", "Team")),
     agents = agent_breakdown, services = credit_breakdown, features = feature_breakdown,
-    collaboration = business_collaboration_window(panel, minimum))
+    collaboration = business_collaboration_window(panel, minimum, linked_noncredit))
+}
+
+business_temporal_disclosure <- function(windows, minimum, data) {
+  attributes <- c("Organization", "FunctionType", "Team")
+  products <- c("M365 Copilot" = "copilot_active", "Cowork" = "cowork_active",
+                "Agents" = "agents_active", "GitHub Copilot" = "github_active",
+                "Metered M365 services" = "metered_active")
+  product_metrics <- c("M365 Copilot" = "Total_Copilot_actions_taken",
+                       "Cowork" = "Cowork_tasks_submitted", "Agents" = "agent_sessions",
+                       "GitHub Copilot" = "github_chat_requests",
+                       "Metered M365 services" = "m365_sessions")
+  people <- business_people(data$panel)
+  window_people <- lapply(windows, function(window) {
+    panel <- data$panel[data$panel$MetricDate %in% tail(data$weeks, window$lookback), ]
+    business_people(panel)
+  })
+  union_ids <- lapply(window_people, function(members)
+    members$PersonId[members$any_active %in% TRUE])
+  suppressed <- setNames(vector("list", length(products) + 1L),
+                         c("any_active", unname(products)))
+  totals <- vapply(windows, `[[`, numeric(1), "users")
+  hidden_totals <- business_temporal_mask(totals, minimum)
+  suppressed$any_active <- totals[hidden_totals]
+  for (i in which(hidden_totals)) windows[[i]]$users <- NA_real_
+
+  for (attribute in attributes) {
+    groups <- unique(unlist(lapply(windows, function(window)
+      window$groups[[attribute]]$Group), use.names = FALSE))
+    for (group in groups) {
+      position <- vapply(windows, function(window)
+        match(group, window$groups[[attribute]]$Group), integer(1))
+      values <- function(field) vapply(seq_along(windows), function(i) {
+        if (is.na(position[i])) return(NA_real_)
+        windows[[i]]$groups[[attribute]][[field]][position[i]]
+      }, numeric(1))
+      headcounts <- values("People")
+      users <- values("Users")
+      actions <- values("Actions") * headcounts *
+        vapply(windows, `[[`, numeric(1), "lookback")
+      ids <- people$PersonId[people[[attribute]] == group]
+      part <- data$panel[data$panel$PersonId %in% ids, ]
+      action_risk <- business_interval_risk(part, "Total_Copilot_actions_taken",
+                                             windows, minimum)
+      hide_people <- business_temporal_mask(headcounts, minimum)
+      hide_users <- business_temporal_mask(users, minimum)
+      hide_actions <- business_temporal_mask(actions, minimum, action_risk)
+      for (i in which(hide_people | hide_users | hide_actions)) {
+        row <- position[i]
+        if (hide_people[i])
+          windows[[i]]$groups[[attribute]][row, c("People", "Users", "Reach", "Actions")] <- NA
+        if (hide_users[i])
+          windows[[i]]$groups[[attribute]][row, c("Users", "Reach", "Actions")] <- NA
+        if (hide_actions[i]) windows[[i]]$groups[[attribute]]$Actions[row] <- NA_real_
+      }
+    }
+  }
+
+  for (i in seq_along(windows)) for (attribute in attributes) {
+    rows <- windows[[i]]$groups[[attribute]]
+    if (nrow(rows) == 1L && is.na(rows$Users[1])) windows[[i]]$users <- NA_real_
+  }
+  hidden_totals <- is.na(vapply(windows, `[[`, numeric(1), "users"))
+  suppressed$any_active <- totals[hidden_totals & !is.na(totals)]
+
+  for (product in names(products)) {
+    position <- vapply(windows, function(window)
+      match(product, window$products$Product), integer(1))
+    users <- vapply(seq_along(windows), function(i)
+      windows[[i]]$products$Users[position[i]], numeric(1))
+    volume <- vapply(seq_along(windows), function(i)
+      windows[[i]]$products$Volume[position[i]], numeric(1))
+    hide_users <- business_temporal_mask(users, minimum) |
+      (hidden_totals & !is.na(users) & !is.na(totals) & users == totals)
+    product_ids <- lapply(window_people, function(members)
+      members$PersonId[members[[products[[product]]]] %in% TRUE])
+    for (i in which(!is.na(users))) for (j in seq_along(windows)) {
+      if (length(setdiff(product_ids[[i]], union_ids[[j]]))) next
+      difference <- length(union_ids[[j]]) - length(product_ids[[i]])
+      if ((!is.na(windows[[j]]$users) && difference > 0 && difference < minimum) ||
+          (is.na(windows[[j]]$users) && difference == 0))
+        hide_users[i] <- TRUE
+    }
+    risk <- business_interval_risk(data$panel, product_metrics[[product]], windows, minimum)
+    hide_volume <- business_temporal_mask(volume, minimum, risk) |
+      (hide_users & !is.na(volume) & volume == users)
+    hide_users <- hide_users | (hide_volume & !is.na(users) & users == volume)
+    suppressed[[products[[product]]]] <- users[hide_users]
+    for (i in which(hide_users | hide_volume)) {
+      row <- position[i]
+      if (hide_users[i]) windows[[i]]$products$Users[row] <- NA_real_
+      if (hide_volume[i])
+        windows[[i]]$products[row, c("Volume", "PerPersonWeek")] <- NA
+    }
+  }
+
+  for (metric in c("m365_credits", "github_credits", "accepted", "suggested")) {
+    source <- switch(metric, accepted = "github_code_acceptances",
+                     suggested = "github_code_suggestions", metric)
+    values <- vapply(windows, `[[`, numeric(1), metric)
+    risk <- business_interval_risk(data$panel, source, windows, minimum)
+    hide <- business_temporal_mask(values, minimum, risk)
+    for (i in which(hide)) {
+      windows[[i]][[metric]] <- NA_real_
+      rate <- switch(metric, m365_credits = "m365_credits_per_person_week",
+                     github_credits = "github_credits_per_person_week",
+                     accepted = "accepted_per_person_week", suggested = NULL)
+      if (!is.null(rate)) windows[[i]][[rate]] <- NA_real_
+      if (metric %in% c("accepted", "suggested")) windows[[i]]$acceptance <- NA_real_
+    }
+  }
+
+  for (section in c("agents", "services", "features")) {
+    source <- switch(section, agents = data$agents, services = data$m365,
+                     features = data$feature)
+    category_field <- switch(section, agents = "AgentName", services = "ServiceName",
+                             features = "Feature")
+    metric <- switch(section, agents = "Conversational agent sessions",
+                     services = "Total Copilot Credits used", features = "Feature Usage Count")
+    parent <- switch(section, agents = "Agents", services = "Metered M365 services",
+                     features = "GitHub Copilot")
+    parent_flag <- products[[parent]]
+    parent_ids <- lapply(window_people, function(members) {
+      members$PersonId[members[[parent_flag]] %in% TRUE]
+    })
+    parent_users <- vapply(windows, function(window)
+      window$products$Users[match(parent, window$products$Product)], numeric(1))
+    categories <- unique(unlist(lapply(windows, function(window)
+      window[[section]]$rows$Category), use.names = FALSE))
+    for (category in categories) {
+      position <- vapply(windows, function(window)
+        match(category, window[[section]]$rows$Category), integer(1))
+      values <- function(field) vapply(seq_along(windows), function(i) {
+        if (is.na(position[i])) return(NA_real_)
+        windows[[i]][[section]]$rows[[field]][position[i]]
+      }, numeric(1))
+      users <- values("Users")
+      volume <- values("Volume")
+      hide_users <- business_temporal_mask(users, minimum)
+      category_source <- source[source[[category_field]] == category, ]
+      for (i in which(!is.na(users))) {
+        start <- as.Date(windows[[i]]$start)
+        end <- as.Date(windows[[i]]$end)
+        eligible <- category_source$MetricDate >= start & category_source$MetricDate <= end &
+          category_source[[metric]] > 0
+        ids <- unique(category_source$PersonId[eligible])
+        for (j in seq_along(windows)) {
+          if (length(setdiff(ids, parent_ids[[j]]))) next
+          difference <- length(parent_ids[[j]]) - length(ids)
+          if ((!is.na(parent_users[j]) && difference > 0 && difference < minimum) ||
+              (is.na(parent_users[j]) && difference == 0))
+            hide_users[i] <- TRUE
+        }
+      }
+      hide_volume <- hide_users & !is.na(volume) & volume == users
+      risk <- business_interval_risk(category_source, metric, windows, minimum)
+      hide_volume <- hide_volume | business_temporal_mask(volume, minimum, risk)
+      hide_users <- hide_users | (hide_volume & !is.na(users) & users == volume)
+      for (i in which(hide_users | hide_volume)) {
+        row <- position[i]
+        if (hide_users[i]) windows[[i]][[section]]$rows$Users[row] <- NA_real_
+        if (hide_volume[i])
+          windows[[i]][[section]]$rows[row, c("Volume", "PerPersonWeek")] <- NA
+        windows[[i]][[section]]$withheld <- TRUE
+      }
+    }
+    for (i in seq_along(windows)) {
+      rows <- windows[[i]][[section]]$rows
+      start <- as.Date(windows[[i]]$start)
+      end <- as.Date(windows[[i]]$end)
+      in_window <- source$MetricDate >= start & source$MetricDate <= end &
+        source[[metric]] > 0
+      categories_in_window <- unique(source[[category_field]][in_window])
+      if (section == "features") {
+        code <- match("code_completion", rows$Category)
+        accepted <- sum(data$panel$github_code_acceptances[
+          data$panel$MetricDate >= start & data$panel$MetricDate <= end], na.rm = TRUE)
+        code_volume <- sum(source[[metric]][in_window &
+          source[[category_field]] == "code_completion"])
+        if ("code_completion" %in% categories_in_window && code_volume == accepted) {
+          if (is.na(windows[[i]]$accepted) && !is.na(code))
+            rows[code, c("Volume", "PerPersonWeek")] <- NA
+          if (is.na(code) || is.na(rows$Volume[code])) {
+            windows[[i]]$accepted <- NA_real_
+            windows[[i]]$accepted_per_person_week <- NA_real_
+            windows[[i]]$acceptance <- NA_real_
+          }
+          if (!is.na(code) && is.na(rows$Volume[code]) &&
+              !is.na(rows$Users[code]) && rows$Users[code] == code_volume)
+            rows$Users[code] <- NA_real_
+        }
+        categories_in_window <- setdiff(categories_in_window, "code_completion")
+      }
+      parent_hidden <- if (section == "services") is.na(windows[[i]]$m365_credits) else
+        is.na(windows[[i]]$products$Volume[match(parent, windows[[i]]$products$Product)])
+      additive_rows <- which(rows$Category %in% categories_in_window)
+      missing_categories <- length(setdiff(categories_in_window, rows$Category))
+      hidden <- missing_categories + sum(is.na(rows$Volume[additive_rows]))
+      target <- if (hidden > 0L || parent_hidden) min(2L, length(categories_in_window)) else 0L
+      while (hidden < target) {
+        candidates <- additive_rows[!is.na(rows$Volume[additive_rows])]
+        chosen <- candidates[which.min(rows$Volume[candidates])]
+        if (!is.na(rows$Users[chosen]) && rows$Users[chosen] == rows$Volume[chosen])
+          rows$Users[chosen] <- NA_real_
+        rows[chosen, c("Volume", "PerPersonWeek")] <- NA
+        hidden <- hidden + 1L
+      }
+      if (anyNA(rows$Volume) || anyNA(rows$Users))
+        windows[[i]][[section]]$withheld <- TRUE
+      windows[[i]][[section]]$rows <- rows
+    }
+  }
+
+  for (product in names(business_collaboration_credits)) {
+    total <- if (product == "M365") "m365_credits" else "github_credits"
+    period_rate <- paste0(total, "_per_person_week")
+    weekly <- if (product == "M365") "M365" else "GitHub"
+    per_person <- paste0(weekly, "PerPerson")
+    hidden_dates <- unique(do.call(c, lapply(windows, function(window)
+      window$credit_trend$MetricDate[is.na(window$credit_trend[[weekly]])])))
+    # A released period total can reconstruct the sum of withheld weeks.
+    repeat {
+      previous <- length(hidden_dates)
+      previous_totals <- vapply(windows, function(window) is.na(window[[total]]), logical(1))
+      for (i in seq_along(windows)) {
+        window <- windows[[i]]
+        trend <- window$credit_trend
+        hidden <- trend$MetricDate %in% hidden_dates
+        if (is.na(window[[total]]) && !any(hidden)) {
+          candidates <- which(!hidden & !is.na(trend[[weekly]]))
+          if (length(candidates)) {
+            chosen <- candidates[which.min(trend[[weekly]][candidates])]
+            hidden_dates <- c(hidden_dates, trend$MetricDate[chosen])
+          }
+        }
+      }
+      hidden_dates <- unique(hidden_dates)
+      for (i in seq_along(windows)) {
+        if (any(windows[[i]]$credit_trend$MetricDate %in% hidden_dates)) {
+          windows[[i]][[total]] <- NA_real_
+          windows[[i]][[period_rate]] <- NA_real_
+        }
+      }
+      current_totals <- vapply(windows, function(window) is.na(window[[total]]), logical(1))
+      if (length(hidden_dates) == previous && identical(previous_totals, current_totals)) break
+    }
+    for (i in seq_along(windows)) {
+      window <- windows[[i]]
+      hidden <- window$credit_trend$MetricDate %in% hidden_dates
+      window$credit_trend[hidden, c(weekly, per_person)] <- NA
+      if (product == "M365" && is.na(window[[total]])) {
+        if (nrow(window$services$rows))
+          window$services$rows[, c("Users", "Volume", "PerPersonWeek")] <- NA
+        window$services$withheld <- TRUE
+      }
+      for (attribute in names(window$collaboration$scopes)) {
+        scopes <- window$collaboration$scopes[[attribute]]
+        for (group in names(scopes)) {
+          scope <- scopes[[group]]
+          scope$Trend[[total]][hidden] <- NA_real_
+          rows <- scope[[product]]
+          if (is.na(window[[total]]) && !is.null(rows)) {
+            rows$Credit <- NA_real_
+            scope[[product]] <- rows
+          }
+          scopes[[group]] <- scope
+        }
+        window$collaboration$scopes[[attribute]] <- scopes
+      }
+      windows[[i]] <- window
+    }
+  }
+
+  complement <- function(rows, field, dependent, force = FALSE) {
+    target <- if (force || anyNA(rows[[field]])) min(2L, nrow(rows)) else 0L
+    while (sum(is.na(rows[[field]])) < target) {
+      candidates <- which(!is.na(rows[[field]]))
+      sizes <- rows$People[candidates]
+      sizes[is.na(sizes)] <- Inf
+      chosen <- candidates[which.min(sizes)]
+      rows[chosen, dependent] <- NA
+    }
+    rows
+  }
+  for (i in seq_along(windows)) {
+    for (attribute in attributes) {
+      rows <- windows[[i]]$groups[[attribute]]
+      rows <- complement(rows, "People", c("People", "Users", "Reach", "Actions"))
+      rows <- complement(rows, "Users", c("Users", "Reach", "Actions"),
+                         is.na(windows[[i]]$users))
+      m365 <- match("M365 Copilot", windows[[i]]$products$Product)
+      rows <- complement(rows, "Actions", "Actions",
+                         is.na(windows[[i]]$products$Volume[m365]))
+      windows[[i]]$groups[[attribute]] <- rows
+      scopes <- windows[[i]]$collaboration$scopes[[attribute]]
+      scopes[intersect(names(scopes), rows$Group[is.na(rows$People)])] <- NULL
+      windows[[i]]$collaboration$scopes[[attribute]] <- scopes
+    }
+    for (metric in names(suppressed)) {
+      values <- suppressed[[metric]]
+      if (length(values))
+        windows[[i]]$trend[[metric]][windows[[i]]$trend[[metric]] %in% values] <- NA_real_
+    }
+    trend <- windows[[i]]$trend
+    for (row in seq_len(nrow(trend))) {
+      week <- data$panel[data$panel$MetricDate == trend$MetricDate[row], ]
+      union <- sum(week$any_active %in% TRUE)
+      for (metric in unname(products)) {
+        count <- sum(week[[metric]] %in% TRUE)
+        if ((!is.na(trend$any_active[row]) && union - count > 0 &&
+             union - count < minimum) ||
+            (is.na(trend$any_active[row]) && union == count))
+          trend[[metric]][row] <- NA_real_
+      }
+    }
+    windows[[i]]$trend <- trend
+  }
+  for (metric in names(suppressed)) {
+    hidden_dates <- as.Date(character())
+    for (i in seq_along(windows)) {
+      window <- windows[[i]]
+      total <- if (metric == "any_active") window$users else
+        window$products$Users[match(names(products)[match(metric, products)],
+                                    window$products$Product)]
+      window_count <- sum(window_people[[i]][[metric]] %in% TRUE)
+      for (row in seq_len(nrow(window$trend))) {
+        date <- window$trend$MetricDate[row]
+        weekly_count <- sum(data$panel[[metric]][data$panel$MetricDate == date] %in% TRUE)
+        difference <- window_count - weekly_count
+        if ((!is.na(total) && difference > 0 && difference < minimum) ||
+            (is.na(total) && difference == 0))
+          hidden_dates <- c(hidden_dates, date)
+        if (is.na(window$trend[[metric]][row])) hidden_dates <- c(hidden_dates, date)
+      }
+    }
+    for (i in seq_along(windows))
+      windows[[i]]$trend[[metric]][windows[[i]]$trend$MetricDate %in% hidden_dates] <- NA_real_
+  }
+  latest <- max(data$weeks)
+  for (metric in c("copilot_active", "agents_active")) {
+    hidden <- any(vapply(windows, function(window)
+      is.na(window$trend[[metric]][match(latest, window$trend$MetricDate)]), logical(1)))
+    if (hidden) for (i in seq_along(windows)) {
+      field <- if (metric == "copilot_active") "adoption" else "agent_returning"
+      windows[[i]][[field]] <- NA_real_
+    }
+  }
+  windows
 }
 
 business_dashboard_payload <- function(data, minimum = 10L) {
@@ -500,11 +982,15 @@ business_dashboard_payload <- function(data, minimum = 10L) {
     stop("The dashboard privacy minimum must be an integer of at least ten.")
   if (n_distinct(data$panel$PersonId) < minimum)
     stop("The roster is below the dashboard privacy minimum.")
+  lookbacks <- c(4L, 8L, 13L)
+  linked_noncredit <- business_cross_window_noncredit(data, lookbacks, minimum)
+  windows <- setNames(lapply(lookbacks, function(n)
+    business_window_summary(data, n, minimum, linked_noncredit[[as.character(n)]])),
+    as.character(lookbacks))
   list(synthetic = TRUE, scenario = data$scenario,
        minimum = minimum, outside_agents = data$outside_agents,
        generated = format(Sys.time(), "%Y-%m-%d %H:%M UTC", tz = "UTC"),
-       windows = setNames(lapply(c(4L, 8L, 13L), function(n)
-         business_window_summary(data, n, minimum)), c("4", "8", "13")))
+       windows = business_temporal_disclosure(windows, minimum, data))
 }
 
 business_payload_json <- function(payload) {

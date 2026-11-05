@@ -40,13 +40,17 @@ test("window users are distinct people rather than person-weeks or service sums"
     panel <- business_data$panel |>
       dplyr::filter(MetricDate %in% tail(business_data$weeks, n))
     expected <- dplyr::n_distinct(panel$PersonId[panel$any_active %in% TRUE])
-    stopifnot(summary$population == 480, summary$users == expected,
-              nrow(summary$trend) == n,
-              summary$users < sum(summary$products$Users, na.rm = TRUE))
+    people <- business$business_people(panel)
+    product_users <- sum(vapply(people[c("copilot_active", "cowork_active",
+      "agents_active", "github_active", "metered_active")],
+      function(x) sum(x, na.rm = TRUE), numeric(1)))
+    stopifnot(summary$population == 480,
+              is.na(summary$users) || summary$users == expected,
+              nrow(summary$trend) == n, expected < product_users)
     for (week in unique(panel$MetricDate)) {
       expected_week <- sum(panel$any_active[panel$MetricDate == week], na.rm = TRUE)
       actual <- summary$trend$any_active[summary$trend$MetricDate == week]
-      stopifnot(actual == business$business_public_count(expected_week, 480))
+      stopifnot(is.na(actual) || actual == business$business_public_count(expected_week, 480))
     }
   }
 })
@@ -60,6 +64,32 @@ test("weekly licence denominator includes licensed zeros and withholds genuine u
   data$panel$copilot_active[which(latest)[1]] <- NA
   unresolved <- business$business_window_summary(data, 4)
   stopifnot(is.na(unresolved$adoption))
+})
+test("adoption and returning ratios cannot reveal withheld denominators", {
+  data <- business_data
+  latest <- which(data$panel$MetricDate == max(data$weeks))
+  index <- seq_along(latest)
+  data$panel$licensed[latest] <- index <= 475
+  data$panel$copilot_active[latest] <- index <= 300
+  data$panel$agents_active[latest] <- index <= 475
+  data$panel$returning_7[latest] <- as.numeric(index <= 300)
+  withheld <- business$business_window_summary(data, 4)
+  stopifnot(is.na(withheld$licensed), is.na(withheld$adoption),
+            is.na(withheld$agent_returning),
+            tail(withheld$trend$copilot_active, 1) == 300)
+  encoded <- jsonlite::fromJSON(business$business_payload_json(list(windows = list("4" = withheld))))
+  stopifnot(is.null(encoded$windows[["4"]]$licensed),
+            is.null(encoded$windows[["4"]]$adoption),
+            is.null(encoded$windows[["4"]]$agent_returning))
+  data$panel$licensed[latest] <- index <= 470
+  data$panel$agents_active[latest] <- index <= 470
+  safe <- business$business_window_summary(data, 4)
+  stopifnot(safe$licensed == 470, safe$adoption == 300 / 470,
+            safe$agent_returning == 300 / 470)
+  data$panel$licensed[latest] <- TRUE
+  data$panel$copilot_active[latest] <- index <= 475
+  inactive_complement <- business$business_window_summary(data, 4)
+  stopifnot(inactive_complement$licensed == 480, is.na(inactive_complement$adoption))
 })
 test("recorded action intensity retains inactive and unresolved people in the roster", {
   panel <- business_data$panel
@@ -121,12 +151,52 @@ test("privacy counts distinct contributors and protects small complements", {
             is.na(business$business_public_count(0, 9)))
   expect_error(business$business_dashboard_payload(business_data, 9), "at least ten")
 })
+test("temporal suppression retains the most comparable safe windows", {
+  stopifnot(identical(business$business_temporal_mask(c(429, 433, 433), 10),
+                      c(TRUE, FALSE, FALSE)),
+            identical(business$business_temporal_mask(c(100, 105, 110), 10),
+                      c(FALSE, TRUE, FALSE)),
+            identical(business$business_temporal_mask(c(100, NA, 105), 10),
+                      c(TRUE, FALSE, FALSE)),
+            !any(business$business_temporal_mask(c(100, 100, 110), 10)))
+})
+test("complementary suppression protects bridge cells in linked margins", {
+  counts <- matrix(c(5, 5, 25, 15, 5, 5, 5, 15,
+                     20, 15, 5, 5, 20, 15, 5, 5), nrow = 4, byrow = TRUE)
+  primary <- counts > 0 & counts < 10
+  has_alternate_path <- function(mask, row, column) {
+    edges <- which(mask, arr.ind = TRUE)
+    edges <- edges[!(edges[, 1] == row & edges[, 2] == column), , drop = FALSE]
+    seen <- rep(FALSE, nrow(mask) + ncol(mask))
+    queue <- row
+    seen[row] <- TRUE
+    while (length(queue)) {
+      vertex <- queue[1]
+      queue <- queue[-1]
+      adjacent <- if (vertex <= nrow(mask)) nrow(mask) + edges[edges[, 1] == vertex, 2] else
+        edges[edges[, 2] == vertex - nrow(mask), 1]
+      adjacent <- adjacent[!seen[adjacent]]
+      seen[adjacent] <- TRUE
+      queue <- c(queue, adjacent)
+    }
+    seen[nrow(mask) + column]
+  }
+  stopifnot(all(rowSums(primary) >= 2), all(colSums(primary) >= 2),
+            !has_alternate_path(primary, 2, 3))
+  mask <- business$business_complementary_mask(counts, primary)
+  hidden <- which(mask, arr.ind = TRUE)
+  stopifnot(!is.null(mask), all(mask[primary]), any(mask & !primary),
+            all(vapply(seq_len(nrow(hidden)), function(i)
+              has_alternate_path(mask, hidden[i, 1], hidden[i, 2]), logical(1))))
+  stopifnot(is.null(business$business_complementary_mask(
+    matrix(c(5, 0), nrow = 1), matrix(c(TRUE, FALSE), nrow = 1))))
+})
 test("small Agent categories and a complementary category are absent from payload", {
   for (window in business_payload$windows) {
     stopifnot(window$agents$withheld,
               !"Field service agent" %in% window$agents$rows$Category,
-              all(window$agents$rows$Users >= 10),
-              sum(window$agents$rows$Volume) <
+              all(is.na(window$agents$rows$Users) | window$agents$rows$Users >= 10),
+              sum(window$agents$rows$Volume, na.rm = TRUE) <
                 sum(business_data$agents$`Conversational agent sessions`[
                   business_data$agents$MetricDate >= as.Date(window$start)]))
   }
@@ -157,6 +227,240 @@ rng_before_scenario <- get0(".Random.seed", envir = .GlobalEnv, inherits = FALSE
 business_scenario <- business$read_business_leaders_data(file.path(utility, "_data"),
                                                          scenario = TRUE)
 scenario_payload <- business$business_dashboard_payload(business_scenario)
+test("selectable windows cannot reveal small earlier-only user groups", {
+  windows <- jsonlite::fromJSON(business$business_payload_json(scenario_payload))$windows
+  stopifnot(is.null(windows[["4"]]$users), windows[["13"]]$users == 433)
+  agent <- function(window) window$products$Users[window$products$Product == "Agents"]
+  stopifnot(is.na(agent(windows[["4"]])), agent(windows[["8"]]) == 182,
+            agent(windows[["13"]]) == 182)
+  unit <- function(window) window$groups$Organization[
+    window$groups$Organization$Group == "Business Unit C", ]
+  stopifnot(is.na(unit(windows[["4"]])$Users), is.na(unit(windows[["4"]])$Reach),
+            unit(windows[["8"]])$Users == 83)
+  for (attribute in c("Organization", "FunctionType", "Team")) {
+    groups <- windows[["4"]]$groups[[attribute]]
+    stopifnot(sum(is.na(groups$Users)) >= min(2L, nrow(groups)),
+              all(is.na(groups$Reach[is.na(groups$Users)])))
+  }
+  safe <- function(values) {
+    values <- values[!is.na(values)]
+    difference <- abs(outer(values, values, "-"))
+    !any(difference > 0 & difference < 10)
+  }
+  stopifnot(safe(vapply(windows, function(window)
+    if (is.null(window$users)) NA_real_ else window$users, numeric(1))))
+  for (product in windows[["13"]]$products$Product) {
+    values <- vapply(windows, function(window)
+      window$products$Users[window$products$Product == product], numeric(1))
+    stopifnot(safe(values))
+  }
+  for (attribute in c("Organization", "FunctionType", "Team")) {
+    for (group in windows[["13"]]$groups[[attribute]]$Group) {
+      values <- vapply(windows, function(window)
+        window$groups[[attribute]]$Users[window$groups[[attribute]]$Group == group],
+        numeric(1))
+      stopifnot(safe(values))
+    }
+  }
+  for (section in c("agents", "services", "features")) {
+    categories <- unique(unlist(lapply(windows, function(window)
+      window[[section]]$rows$Category), use.names = FALSE))
+    for (category in categories) {
+      values <- vapply(windows, function(window) {
+        rows <- window[[section]]$rows
+        index <- match(category, rows$Category)
+        if (is.na(index)) NA_real_ else rows$Users[index]
+      }, numeric(1))
+      stopifnot(safe(values))
+    }
+  }
+  agent_rows <- windows[["4"]]$agents$rows
+  stopifnot(any(is.na(agent_rows$Users) & !is.na(agent_rows$PerPersonWeek)))
+})
+test("feature and credit-band subsets do not reveal small linked cohorts", {
+  for (n in c(4, 8, 13)) {
+    window <- scenario_payload$windows[[as.character(n)]]
+    parent <- window$products$Users[window$products$Product == "GitHub Copilot"]
+    feature <- window$features$rows
+    for (name in c("code_completion", "chat_panel_ask_mode")) {
+      rows <- business_scenario$feature
+      selected <- rows$Feature == name & rows$MetricDate >= as.Date(window$start) &
+        rows$MetricDate <= as.Date(window$end) & rows$`Feature Usage Count` > 0
+      users <- dplyr::n_distinct(rows$PersonId[selected])
+      stopifnot(parent - users > 0, parent - users < 10,
+                is.na(feature$Users[match(name, feature$Category)]))
+    }
+    sales <- window$groups$FunctionType
+    sales <- sales[sales$Group == "Sales", ]
+    bands <- window$collaboration$scopes$FunctionType$Sales$M365
+    stopifnot(sales$People == 44, sales$Users == 32,
+              is.na(bands$People[bands$Band == "none"]),
+              sum(is.na(bands$People)) >= 2L,
+              all(is.na(bands$Credit[is.na(bands$People)])))
+  }
+})
+test("small interval contributors cannot be exposed by additive totals or aliases", {
+  data <- business_scenario
+  panel <- data$panel
+  panel$Cowork_tasks_submitted <- panel$m365_credits <- 0
+  latest <- which(panel$MetricDate == tail(data$weeks, 1))[1:40]
+  earlier <- which(panel$MetricDate == data$weeks[6])[41]
+  oldest <- which(panel$MetricDate == data$weeks[1])[1:10]
+  panel$Cowork_tasks_submitted[c(latest, earlier, oldest)] <- c(1:40, 100, rep(1, 10))
+  panel$m365_credits <- panel$Cowork_tasks_submitted
+  panel$metered_active <- panel$m365_credits > 0 | panel$m365_sessions > 0
+  panel$any_active <- business$business_active_union(
+    panel$copilot_active, panel$cowork_active, panel$agents_active,
+    panel$metered_active, panel$github_active)
+  data$panel <- panel
+  records <- panel[panel$m365_credits > 0, c("PersonId", "MetricDate", "m365_credits")]
+  data$m365 <- data.frame(PersonId = records$PersonId, MetricDate = records$MetricDate,
+    ServiceName = "Synthetic service", check.names = FALSE,
+    "Total Copilot Credits used" = records$m365_credits)
+  windows <- business$business_dashboard_payload(data)$windows
+  product <- function(window, field)
+    window$products[[field]][window$products$Product == "Cowork"]
+  stopifnot(any(vapply(windows[c("4", "8")], function(w)
+    is.na(product(w, "Volume")), logical(1))),
+    any(vapply(windows[c("4", "8")], function(w)
+      is.na(w$m365_credits), logical(1))),
+    product(windows[["13"]], "Volume") == 930,
+    is.na(windows[["13"]]$m365_credits))
+  for (window in windows) {
+    if (is.na(product(window, "Volume")))
+      stopifnot(is.na(product(window, "PerPersonWeek")))
+    if (is.na(window$m365_credits)) {
+      stopifnot(is.na(window$m365_credits_per_person_week),
+                all(is.na(window$services$rows$Volume)))
+      bands <- window$collaboration$scopes$All[[1]]$M365
+      stopifnot(!is.null(bands), all(is.na(bands$Credit)))
+    }
+    hidden <- is.na(window$credit_trend$M365)
+    stopifnot(is.na(window$m365_credits) == any(hidden))
+    for (scopes in window$collaboration$scopes) for (scope in scopes)
+      stopifnot(all(is.na(scope$Trend$m365_credits[hidden])))
+  }
+})
+disclosure_fixture <- function(kind) {
+  ids <- sprintf("fixture-person-%02d", 1:40)
+  weeks <- seq(as.Date("2026-04-05"), by = "week", length.out = 13)
+  panel <- expand.grid(PersonId = ids, MetricDate = weeks,
+                       KEEP.OUT.ATTRS = FALSE, stringsAsFactors = FALSE)
+  id <- match(panel$PersonId, ids)
+  week <- match(panel$MetricDate, weeks)
+  panel$Organization <- panel$FunctionType <- panel$Team <- "Sales"
+  panel$licensed <- TRUE
+  panel$Total_Copilot_enabled_days <- 7
+  panel$github_observed_days <- 5
+  panel$github_active <- panel$cowork_active <- panel$agents_active <- FALSE
+  panel$copilot_active <- FALSE
+  panel$agent_sessions <- panel$m365_credits <- panel$m365_sessions <- panel$github_credits <- 0
+  panel$returning_7 <- NA_real_
+  panel$Cowork_tasks_submitted <- panel$Days_of_active_Cowork_usage <- 0
+  panel$github_chat_requests <- panel$github_code_acceptances <- panel$github_code_suggestions <- 0
+  panel$Emails_sent <- panel$Chats_sent <- panel$Meetings <- panel$Collaboration_hours <- 1
+  if (kind == "weekly")
+    panel$copilot_active <- id <= 29 | (id == 30 & week == 12)
+  if (kind == "sales") {
+    panel$m365_credits <- panel$m365_sessions <- as.numeric(id <= 20 & week == 13)
+    panel$copilot_active <- (id <= 20 & week == 13) | (id >= 21 & id <= 25 & week == 6)
+  }
+  if (kind == "volume") {
+    panel$m365_credits <- panel$m365_sessions <- as.numeric(
+      (id <= 20 & week == 13) | (id == 21 & week == 11))
+    panel$copilot_active <- panel$m365_credits > 0
+  }
+  if (kind == "ratio") {
+    panel$agents_active <- (id <= 20 & week == 13) |
+      (id <= 10 & week == 12) | (id == 21 & week == 6)
+    panel$agent_sessions <- as.numeric(panel$agents_active)
+    panel$returning_7 <- ifelse(week == 13 & id <= 20, as.numeric(id <= 10),
+                                ifelse(panel$agents_active, 0, NA_real_))
+  }
+  panel$Total_Copilot_actions_taken <- panel$Total_Copilot_active_days <-
+    as.numeric(panel$copilot_active)
+  panel$metered_active <- panel$m365_credits > 0
+  panel$any_active <- business$business_active_union(
+    panel$copilot_active, panel$cowork_active, panel$agents_active,
+    panel$github_active, panel$metered_active)
+  credit <- panel[panel$m365_credits > 0, ]
+  m365 <- data.frame(PersonId = credit$PersonId, MetricDate = credit$MetricDate + 1,
+                     ServiceName = rep("Fixture", nrow(credit)), check.names = FALSE)
+  m365[["Session count"]] <- credit$m365_sessions
+  m365[["Total Copilot Credits used"]] <- credit$m365_credits
+  agents <- panel[panel$agents_active, c("PersonId", "MetricDate"), drop = FALSE]
+  agents$AgentName <- rep("Fixture agent", nrow(agents))
+  agents[["Conversational agent sessions"]] <- rep(1, nrow(agents))
+  feature <- data.frame(PersonId = character(), MetricDate = as.Date(character()),
+                        Feature = character(), check.names = FALSE)
+  feature[["Feature Usage Count"]] <- numeric()
+  list(panel = panel, weeks = weeks, m365 = m365, agents = agents,
+       feature = feature, outside_agents = FALSE, scenario = FALSE)
+}
+disclosure_fixture_payload <- function(kind) {
+  jsonlite::fromJSON(business$business_payload_json(
+    business$business_dashboard_payload(disclosure_fixture(kind))), simplifyVector = FALSE)$windows
+}
+test("weekly counts and latest-week ratios do not expose hidden window complements", {
+  windows <- disclosure_fixture_payload("weekly")
+  stopifnot(windows[["13"]]$users == 30)
+  for (window in windows) {
+    latest <- tail(window$trend, 1)[[1]]
+    stopifnot(is.null(latest$any_active), is.null(latest$copilot_active),
+              is.null(window$adoption))
+  }
+  windows <- disclosure_fixture_payload("ratio")
+  agents <- Filter(function(product) product$Product == "Agents", windows[["8"]]$products)[[1]]
+  stopifnot(agents$Users == 21)
+  for (window in windows)
+    stopifnot(is.null(tail(window$trend, 1)[[1]]$agents_active),
+              is.null(window$agent_returning))
+})
+test("credit bands cannot expose cross-window no-credit user complements", {
+  windows <- disclosure_fixture_payload("sales")
+  sales <- windows[["13"]]$groups$FunctionType[[1]]
+  bands <- windows[["4"]]$collaboration$scopes$FunctionType$Sales$M365
+  stopifnot(sales$People == 40, sales$Users == 25,
+            is.null(bands) || is.null(bands[[1]][[1]]))
+})
+test("withheld weekly credits cannot be reconstructed from period aliases", {
+  windows <- disclosure_fixture_payload("volume")
+  for (window in windows) {
+    hidden <- vapply(window$credit_trend, function(week) is.null(week$M365), logical(1))
+    if (!any(hidden)) next
+    stopifnot(is.null(window$m365_credits),
+              is.null(window$m365_credits_per_person_week))
+    for (service in window$services$rows)
+      stopifnot(is.null(service$Volume), is.null(service$PerPersonWeek))
+    for (scopes in window$collaboration$scopes) for (scope in scopes) {
+      if (length(scope$M365))
+        stopifnot(all(vapply(scope$M365, function(band) is.null(band[[2]]), logical(1))))
+      stopifnot(all(vapply(scope$Trend[hidden], function(week)
+        is.null(week[[5]]), logical(1))))
+    }
+  }
+})
+test("product users cannot reveal a small complement of observed AI users", {
+  data <- business_scenario
+  panel <- data$panel
+  ids <- unique(panel$PersonId)
+  index <- match(panel$PersonId, ids)
+  panel$copilot_active <- index <= 445
+  panel$cowork_active <- index > 445 & index <= 450
+  panel$agents_active <- panel$github_active <- panel$metered_active <- FALSE
+  panel$any_active <- business$business_active_union(
+    panel$copilot_active, panel$cowork_active, panel$agents_active,
+    panel$github_active, panel$metered_active)
+  panel$m365_credits <- panel$github_credits <- 0
+  data$panel <- panel
+  windows <- business$business_dashboard_payload(data)$windows
+  for (window in windows) {
+    copilot <- window$products$Product == "M365 Copilot"
+    stopifnot(window$users == 450, is.na(window$products$Users[copilot]),
+              all(window$trend$any_active == 450),
+              all(is.na(window$trend$copilot_active)))
+  }
+})
 test("rollout simulation is reproducible without changing fixtures or caller RNG", {
   stopifnot(identical(rng_before_scenario,
                       get0(".Random.seed", envir = .GlobalEnv, inherits = FALSE)),
@@ -266,7 +570,8 @@ test("all windows and groupings use full-roster recorded intensity", {
     }
     for (name in c("agents", "services", "features")) {
       rows <- window[[name]]$rows
-      stopifnot(all(rows$PerPersonWeek == rows$Volume / (480 * n)))
+      stopifnot(identical(is.na(rows$PerPersonWeek), is.na(rows$Volume)),
+                all(rows$PerPersonWeek == rows$Volume / (480 * n), na.rm = TRUE))
     }
   }
 })
