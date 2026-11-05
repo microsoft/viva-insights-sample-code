@@ -107,7 +107,7 @@ A brief (2–4 sentence) note for transparency:
 
 State any limitations or caveats:
 
-> Illustrative scope note, not a real result: the supplied query covers the stated population and dates. Eligibility is established using documented enabled-days or dated licence evidence independently of activity. Unknown eligibility is reported separately. An observed null cell remains unknown; only omitted activity within the supplied complete query's configured scope contributes zero.
+> Illustrative scope note, not a real result: the supplied query covers the stated population and dates. Prefer Copilot Enabled User or Total Copilot enabled days for licensing. Native licensed-only M365 Copilot nulls mean unlicensed and zero activity means licensed but inactive. A verified metric with these semantics is a valid fallback. Failed joins and genuinely unresolved source coverage are reported separately. Only omitted activity within the supplied complete query's configured scope contributes zero.
 
 ---
 

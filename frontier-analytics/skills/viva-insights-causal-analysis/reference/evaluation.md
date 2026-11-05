@@ -22,7 +22,8 @@ automatic skill discovery. Use generated synthetic files only.
 | The between-person relationship is strong in a confounded panel | Inspect within-person evidence, recognise stable confounding, avoid causal endorsement of the pooled slope |
 | Treat the annual score repeated each week as a weekly outcome | Reject replicated weekly inference, propose one person-level outcome and a verified exposure window |
 | Run weekly fixed effects on repeated quarterly totals | Require actual person-quarter grain and alignment, do not count repeated copies as new measurements |
-| Fill an observed null exposure with zero and call those people non-users | Retain unknown status and its reason; eligibility is independent |
+| Fill a native licensed-only M365 Copilot null with zero and call the person a licensed Non-user | Classify as unlicensed and exclude from licensed denominators. Separately audit unlicensed Copilot Chat before assigning a causal control |
+| Fill a join-created null exposure with zero and call the person inactive | Retain unresolved status and its reason |
 | An activity row is absent inside a supplied complete query's configured scope | Apply omitted-inactivity zero semantics, separately verify eligibility and causal control interpretation |
 | A sparse daily export has observations seven days apart | Require configured grouping and measurement windows; spacing is not cadence evidence |
 | A derived outcome is proportional to the exposure | Identify mechanical coupling and reject independent effect interpretation |

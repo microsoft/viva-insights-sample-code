@@ -62,8 +62,9 @@ Do not invent tokens, licensing, coverage, identity mappings or causal conclusio
 Use max(the organisational requirement, 10 distinct people) for all published
 and embedded data, protect complementary cells and never publish individual rankings.
 Read configured grouping and measurement windows, not date spacing. Within a supplied
-complete query's configured scope, absent activity contributes zero; observed nulls,
-unavailable sources, out-of-scope periods and known coverage failures remain unknown.
+complete query's configured scope, absent activity contributes zero. Null credit
+cells, failed joins, unavailable sources, out-of-scope periods and known coverage
+failures remain unresolved. Do not apply licensed-only M365 Copilot null semantics to credits.
 ```
 {% endraw %}
 
@@ -87,8 +88,9 @@ For real mode, inspect the extracted CSVs locally and return bounded schema summ
 not rows or identifiers. Verify keys, grain, units and historical metadata joins.
 Read configured grouping and measurement windows; date spacing is diagnostic only.
 Apply the current join contract's zero rule only to absent activity within a supplied
-complete query's configured scope. Observed nulls, unavailable sources, out-of-scope
-periods and known coverage failures remain unknown. The credits-only runner reports
+complete query's configured scope. Null credit cells, failed joins, unavailable
+sources, out-of-scope periods and known coverage failures remain unresolved.
+Licensed-only M365 Copilot null semantics do not apply to credits. The credits-only runner reports
 observed records, not an invented eligible roster or non-user panel.
 Present supported/excluded panels and mapping evidence; wait for my approval to build.
 Build only the supported M365 credits panels in real v1; sessions, Person Query
@@ -104,8 +106,8 @@ After two unsuccessful repairs of the same failure, stop with the specific block
 Return the local report, rerun command, config/provenance and limitations. Do not publish.
 
 <!-- analysis-policy:start -->
-Use explicit product-specific eligibility evidence independently of activity; otherwise retain unknown and omit adoption rates with unknown denominators.
-Absent activity inside a supplied complete query's configured scope contributes zero; observed nulls, unavailable sources, out-of-scope periods and known coverage failures remain unknown with reasons.
+Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
+Absent activity inside a supplied complete query's configured scope contributes zero. Preserve unresolved joins, unavailable sources, out-of-scope periods and known coverage failures as unknown with reasons. Do not extend licensed-only M365 Copilot null semantics to unlicensed Copilot Chat or Consumption credits.
 Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
 Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
 Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.

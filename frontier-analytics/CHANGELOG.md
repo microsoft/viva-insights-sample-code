@@ -85,9 +85,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
-- Eligibility is explicit evidence, independent of activity. Observed nulls stay
-  unknown while absent activity within a supplied complete query scope can be
-  zero. Configured cadence and measurement windows govern aggregation.
+- M365 Copilot licensing follows Microsoft's documented native null/zero
+  semantics, with Copilot Enabled User or Total Copilot enabled days preferred.
+  Native licensed-only nulls mean unlicensed, while zero activity means licensed
+  but inactive. Failed joins and known coverage failures remain unresolved.
+  Unlicensed Copilot Chat and Consumption credits retain separate contracts.
+  Absent in-scope activity can be zero. Configured cadence and metric windows
+  govern aggregation.
+- Adoption examples retain licensed zero-activity people and exclude native
+  unlicensed nulls. Paired segmentation recipes withhold affected rolling windows
+  without aborting other people's valid histories.
 - Publication guidance applies the organisation requirement and workflow floor,
   removes individual leaderboards, and distinguishes heuristic flags from
   verified holidays or workforce classifications. Causal methods require a

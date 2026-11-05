@@ -59,11 +59,14 @@ Inspect actual headers and bounded aggregate summaries locally. Do not print
 employee rows. Confirm PersonId/MetricDate mappings, daily/weekly/monthly grain,
 metric rules, eligibility, missing-versus-zero semantics, joins and privacy.
 Require configured grouping and actual measurement windows; date spacing is
-diagnostic only. Eligibility requires explicit product-specific licence or
-enabled-days evidence independently of activity. Within a supplied complete
-query's configured scope, absent activity rows contribute zero; observed nulls,
-unavailable sources, out-of-scope periods and known coverage failures remain
-unknown with reasons. A zero alone does not establish a causal control group.
+diagnostic only. Prefer Copilot Enabled User or Total Copilot enabled days for
+licensing. Native licensed-only M365 Copilot nulls mean unlicensed and zero
+activity means licensed but inactive. A verified metric with these semantics is
+a valid fallback. Check unlicensed Copilot Chat separately before assigning causal
+controls. Within a supplied complete query's configured scope, absent activity
+rows contribute zero. Failed joins, unavailable sources, out-of-scope periods and
+known coverage failures remain unresolved with reasons. Zero activity alone does
+not establish a causal control group.
 For a custom organisational outcome, ask when it was measured, what period it
 describes, and whether repeated values are new measurements or copied attributes.
 Do not treat an annual score or quarterly total repeated on weekly rows as a
@@ -90,8 +93,8 @@ offline report, verify the numbers and UI separately, and compare with any
 prior analysis without assuming its conclusions are correct.
 
 <!-- analysis-policy:start -->
-Use explicit product-specific eligibility evidence independently of activity; otherwise retain unknown and omit adoption rates with unknown denominators.
-Absent activity inside a supplied complete query's configured scope contributes zero; observed nulls, unavailable sources, out-of-scope periods and known coverage failures remain unknown with reasons.
+Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
+Absent activity inside a supplied complete query's configured scope contributes zero. Preserve unresolved joins, unavailable sources, out-of-scope periods and known coverage failures as unknown with reasons. Do not extend licensed-only M365 Copilot null semantics to unlicensed Copilot Chat or Consumption credits.
 Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
 Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
 Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.

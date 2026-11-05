@@ -103,19 +103,86 @@ class AnalysisRecipeTests(unittest.TestCase):
 
     def test_explicit_eligibility_is_independent_of_activity(self):
         panel = pd.DataFrame({
-            "PersonId": ["positive_unknown", "zero_eligible", "positive_ineligible", "null_eligible"],
+            "PersonId": ["native_unlicensed", "zero_eligible", "zero_enabled", "null_eligible"],
             "MetricDate": pd.to_datetime(["2026-01-05"] * 4),
             "Total_Copilot_enabled_days": [None, 5, 0, 5],
-            "Copilot_Actions": [4, 0, 7, None],
+            "Copilot_Actions": [None, 0, 0, None],
         })
         result = execute_documented(PITFALLS, "enabled = pd.to_numeric", df=panel, pd=pd)
         output = result["df"].set_index("PersonId")
-        self.assertTrue(pd.isna(output.loc["positive_unknown", "is_licensed"]))
+        self.assertFalse(output.loc["native_unlicensed", "is_licensed"])
+        self.assertFalse(output.loc["native_unlicensed", "is_active"])
         self.assertTrue(output.loc["zero_eligible", "is_licensed"])
         self.assertFalse(output.loc["zero_eligible", "is_active"])
-        self.assertFalse(output.loc["positive_ineligible", "is_licensed"])
+        self.assertFalse(output.loc["zero_enabled", "is_licensed"])
         self.assertTrue(pd.isna(output.loc["null_eligible", "is_active"]))
         self.assertTrue(result["adoption"].isna().all())
+
+    def adoption_panel(self):
+        return pd.DataFrame({
+            "PersonId": [f"P{i:02d}" for i in range(11)],
+            "MetricDate": pd.to_datetime(["2026-01-05"] * 11),
+            "Total_Copilot_enabled_days": [7.0] * 10 + [None],
+            "Copilot_Actions": [1.0] * 10 + [None],
+        })
+
+    def notebook_adoption(self, panel):
+        blocks = re.findall(r"```python\n(.*?)```", NOTEBOOK.read_text(encoding="utf-8"), re.S)
+        validation = next(block for block in blocks if "CONFIGURED_GROUPING" in block)
+        # Set the required query configuration exactly as an analyst would.
+        validation = validation.replace("CONFIGURED_GROUPING = None", "CONFIGURED_GROUPING = 'week'")
+        api = mock.Mock()
+        api.extract_hr.return_value = []
+        namespace = {"df": panel.copy(), "pd": pd, "vi": api}
+        with contextlib.redirect_stdout(io.StringIO()):
+            exec(compile(validation, str(NOTEBOOK), "exec"), namespace)
+        plot = mock.Mock()
+        plot.subplots.return_value = (mock.Mock(), mock.Mock())
+        return execute_documented(
+            NOTEBOOK, "weekly = eligible", df=namespace["df"], pd=pd,
+            PRIVACY_THRESHOLD=10, plt=plot
+        )["weekly"].iloc[0]
+
+    def test_adoption_rates_distinguish_native_nulls_inactivity_and_failed_joins(self):
+        for scenario, expected in (("native_null", 1.0), ("licensed_zero", 10 / 11), ("failed_join", None)):
+            with self.subTest(scenario=scenario):
+                panel = self.adoption_panel()
+                if scenario == "licensed_zero":
+                    panel.loc[10, ["Total_Copilot_enabled_days", "Copilot_Actions"]] = [7, 0]
+                elif scenario == "failed_join":
+                    panel["licence_source_matched"] = [True] * 10 + [False]
+                pitfalls = execute_documented(
+                    PITFALLS, "enabled = pd.to_numeric", df=panel.copy(), pd=pd
+                )
+                notebook = self.notebook_adoption(panel)
+                for rate in (pitfalls["adoption"].iloc[0], notebook["adoption_rate"]):
+                    if expected is None:
+                        self.assertTrue(pd.isna(rate))
+                    else:
+                        self.assertAlmostEqual(rate, expected)
+                self.assertEqual(notebook["licensed"], 11 if scenario == "licensed_zero" else 10)
+
+    def test_adoption_prefers_enabled_user_and_allows_licensed_only_metric_fallback(self):
+        for licence_field in ("Copilot_Enabled_User", None):
+            with self.subTest(licence_field=licence_field):
+                panel = self.adoption_panel().drop(columns="Total_Copilot_enabled_days")
+                panel.loc[9, "Copilot_Actions"] = 0
+                if licence_field:
+                    panel[licence_field] = [1.0] * 10 + [None]
+                output = execute_documented(
+                    PITFALLS, "enabled = pd.to_numeric", df=panel.copy(), pd=pd
+                )
+                self.assertAlmostEqual(output["adoption"].iloc[0], 0.9)
+                self.assertAlmostEqual(self.notebook_adoption(panel)["adoption_rate"], 0.9)
+                self.assertFalse(output["df"].loc[10, "is_licensed"])
+
+    def test_conflicting_native_licence_and_positive_activity_requires_resolution(self):
+        panel = self.adoption_panel()
+        panel.loc[10, "Copilot_Actions"] = 2
+        with self.assertRaisesRegex(ValueError, "conflicting licence"):
+            execute_documented(PITFALLS, "enabled = pd.to_numeric", df=panel.copy(), pd=pd)
+        with self.assertRaisesRegex(ValueError, "conflicting licence"):
+            self.notebook_adoption(panel)
 
     def test_absent_in_scope_activity_becomes_zero_not_recorded_null(self):
         panel = pd.DataFrame({
@@ -139,7 +206,7 @@ class AnalysisRecipeTests(unittest.TestCase):
             def identify_usage_segments(self, *args, **kwargs):
                 raise AssertionError("Unknown history must fail before the package call")
 
-        for reason in ("observed_null", "source_unavailable", "out_of_scope", "known_coverage_failure"):
+        for reason in ("unexpected_null", "source_unavailable", "out_of_scope", "known_coverage_failure"):
             with self.subTest(reason=reason):
                 panel = pd.DataFrame({
                     "Total_Copilot_enabled_days": [5],
@@ -240,11 +307,35 @@ class AnalysisRecipeTests(unittest.TestCase):
                     self.assertTrue(result.loc[12 + width:, columns].notna().all().all())
                     self.assertTrue(result.loc[11, columns].notna().all())
 
-    def test_segmentation_example_stops_on_unknown_activity(self):
+    def test_segmentation_example_withholds_only_unknown_activity_windows(self):
         panel = self.segmentation_panel()
         panel.loc[12, "Copilot_actions_taken_in_Teams"] = None
-        with self.assertRaisesRegex(ValueError, "Unknown activity"):
-            self.run_segmentation_example(panel)
+        result = self.run_segmentation_example(panel).reset_index(drop=True)
+        for width in (4, 12):
+            self.assertTrue(result.loc[12:12 + width - 1, f"UsageSegments_{width}w"].isna().all())
+            self.assertTrue(result.loc[12 + width:, f"UsageSegments_{width}w"].notna().all())
+
+    def test_native_unlicensed_nulls_do_not_abort_other_peoples_segmentation(self):
+        licensed = self.segmentation_panel()
+        unlicensed = licensed.copy()
+        unlicensed["PersonId"] = "unlicensed"
+        unlicensed[["Total_Copilot_enabled_days", "Copilot_actions_taken_in_Teams"]] = float("nan")
+        result = self.run_segmentation_example(pd.concat([licensed, unlicensed], ignore_index=True))
+        excluded = result[result["PersonId"] == "unlicensed"]
+        self.assertFalse(excluded["is_licensed"].any())
+        self.assertTrue(excluded[["UsageSegments_4w", "UsageSegments_12w"]].isna().all().all())
+        retained = result[result["PersonId"] == "synthetic"].reset_index(drop=True)
+        self.assertTrue(retained.loc[11:, "UsageSegments_12w"].notna().all())
+
+    def test_failed_licence_join_withholds_only_affected_segmentation_windows(self):
+        panel = self.segmentation_panel()
+        panel["licence_source_matched"] = True
+        panel.loc[12, "licence_source_matched"] = False
+        result = self.run_segmentation_example(panel).reset_index(drop=True)
+        self.assertTrue(pd.isna(result.loc[12, "is_licensed"]))
+        for width in (4, 12):
+            self.assertTrue(result.loc[12:12 + width - 1, f"UsageSegments_{width}w"].isna().all())
+            self.assertTrue(result.loc[12 + width:, f"UsageSegments_{width}w"].notna().all())
 
     def test_segmentation_example_keeps_gaps_and_restores_only_full_windows(self):
         panel = self.segmentation_panel().drop(index=12).sample(frac=1, random_state=4)

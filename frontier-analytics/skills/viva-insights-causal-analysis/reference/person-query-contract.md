@@ -42,18 +42,21 @@ Restricting to active people can change the estimand and select on consequences
 of exposure. Flag inactivity and holidays first rather than automatically
 deleting those rows. A balanced panel is not automatically more representative.
 
-Copilot licences, engagement and record availability are distinct. Do not infer
-licensing from a substring in the header or a non-null action count alone.
-Some metric families distinguish licensed Copilot activity from unlicensed
-Copilot Chat. Verify the selected metric's scope before calling someone
-"untreated". An enabled-days field can establish eligibility for its documented
-product, but does not establish complete telemetry capture by itself.
+Copilot licences, engagement and record availability are distinct. Prefer
+Copilot Enabled User or Total Copilot enabled days. Native nulls in licensed-only
+M365 Copilot metrics mean unlicensed, while zero activity means licensed but
+inactive under Microsoft's documented rules. Do not extend these semantics to
+unlicensed Copilot Chat or other products. Verify all relevant activity before
+calling someone "untreated", because no M365 Copilot licence does not imply
+no exposure to unlicensed Copilot Chat. Licence evidence alone does not establish
+complete telemetry capture.
 
 Apply the paired core skill's shared policy: in a supplied complete query's
-configured scope, absent activity rows contribute zero. Existing null cells,
-unavailable sources, out-of-scope periods, partial boundary weeks and known
-export problems remain unknown with reasons. A zero is not licence evidence,
-and zero activity alone does not establish a causal control group.
+configured scope, absent activity rows contribute zero. Native licensed-only
+Copilot nulls retain their unlicensed meaning. Failed joins, unavailable sources,
+out-of-scope periods, partial boundary weeks and known export problems remain
+unresolved with reasons. Zero activity alone does not establish a causal control
+group, even when it establishes licensed inactivity for the selected metric.
 
 ## Variable suitability
 

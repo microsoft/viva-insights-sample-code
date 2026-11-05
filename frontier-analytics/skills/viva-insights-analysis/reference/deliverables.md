@@ -16,20 +16,24 @@ user wants a faster first pass.
 
 ## Licensed, active, and unlicensed (used by every Copilot deliverable below)
 
-- **Licensed:** use a documented enabled-days column such as
-  `Total_Copilot_enabled_days > 0`, or explicit licence records for the period.
+- **Licensed:** prefer Copilot Enabled User, positive Total Copilot enabled days
+  or dated licence records. A verified native licensed-only M365 Copilot metric
+  with documented null/zero semantics is a valid fallback.
 - **Active:** positive observed activity in the selected, verified metric.
   Report adoption rates only when the eligible/licensed denominator is known.
-- **Unlicensed:** explicit licence evidence, not missing or zero activity.
+- **Unlicensed:** native licensed-only M365 Copilot nulls, native null or zero
+  enabled days, or explicit negative licence evidence.
 - **Unknown:** retain unresolved eligibility and incomplete coverage separately.
 
-Do not infer licensing from activity. For current cross-query integration, follow
+Do not extend licensed-only M365 Copilot semantics to unlicensed Copilot Chat,
+Consumption credits or arbitrary columns containing "Copilot".
+For current cross-query integration, follow
 [Joining Viva Insights queries](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/).
 Recommend weekly exports and assume supplied Viva Insights queries are complete
 within their configured population, date window and product filters. Omitted
 inactive activity rows contribute zero without separate completeness evidence.
-Keep unavailable queries, out-of-scope periods, null cells and known export
-problems separate. Eligibility still needs product-specific evidence for adoption
+Keep failed joins, unavailable queries, out-of-scope periods and known export
+problems separate from native unlicensed nulls. Use product-specific licence semantics for adoption
 denominators. [copilot-query-contracts.md](copilot-query-contracts.md) retains
 historical layouts and analytical context, rather than overriding the current guide.
 

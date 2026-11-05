@@ -226,8 +226,8 @@ td { padding: 8px 12px; border-bottom: 1px solid #eee; }
     <footer id="methodology">
         <h2>Methodology</h2>
         <p><strong>Data source:</strong> Viva Insights person query export (person-week granularity).</p>
-        <p><strong>Definitions:</strong> Eligibility uses explicit product-specific enabled-days or licence evidence for the period, independently of activity. Unknown eligibility remains unknown; adoption rates require a known denominator.</p>
-        <p><strong>Missingness:</strong> Absent activity within the supplied complete query's configured scope contributes zero. Observed nulls, unavailable sources, out-of-scope periods and known coverage failures remain unknown.</p>
+        <p><strong>Definitions:</strong> Prefer Copilot Enabled User or Total Copilot enabled days for licensing. Native licensed-only M365 Copilot nulls mean unlicensed and zero activity means licensed but inactive. A verified metric with these semantics is a valid fallback. Adoption rates include licensed zero-activity people and exclude unlicensed people.</p>
+        <p><strong>Missingness:</strong> Absent in-scope activity contributes zero. Failed joins, unavailable sources, out-of-scope periods and known coverage failures remain unresolved. Do not extend licensed-only M365 Copilot licence semantics to unlicensed Copilot Chat or Consumption credits.</p>
         <p><strong>Privacy:</strong> Use max(organisation requirement, 10 distinct people), including complementary cells and embedded data. No individual rankings.</p>
     </footer>
 </body>
@@ -257,10 +257,12 @@ Use matplotlib or ggplot2 for charts. Convert to base64 PNG for embedding.
 Use import_query() from the vivainsights package to load CSV data.
 Use extract_hr() to identify organizational attribute columns.
 Style with a clean, professional design (Segoe UI font, blue/gray palette).
-Confirm configured cadence and measurement windows, not date spacing. Use explicit
-eligibility evidence independently of activity; omit adoption rates if unknown.
+Confirm configured cadence and measurement windows, not date spacing. Prefer
+Copilot Enabled User or Total Copilot enabled days for licensing. Apply documented
+native licensed-only M365 Copilot null/zero semantics, with a verified licensed-only
+metric as a fallback. Exclude native unlicensed nulls from licensed denominators.
 Absent activity inside the supplied complete query's configured scope contributes
-zero, but observed nulls and out-of-scope/coverage failures remain unknown.
+zero. Failed joins and out-of-scope/coverage failures remain unresolved.
 Target file size under 5 MB. Use max(the organisational requirement, 10 distinct
 people) per published group, with complementary-cell and embedded-data checks.
 Do not publish individual rankings.

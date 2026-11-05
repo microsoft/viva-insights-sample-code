@@ -49,7 +49,7 @@ Keep the required two-part flow from this card, which means run and validate the
 Do not change the treatment variable from Total_Copilot_actions_taken, do not edit shared helper modules, and warn me if the dataset is shorter than about 12 weeks.
 When choosing or configuring the notebook, adapt subgroup, collaboration, and outcome variables to the columns that actually exist in my data.
 Before fitting, verify the notebook's actual grain, exposure/outcome windows, pre-exposure controls, overlap and identifying assumptions. DML is not itself an identifying design. If unresolved, return readiness or an agreed association rather than a causal claim; do not run every estimator.
-Use explicit eligibility independently of activity. Read configured cadence, not date spacing. Within a supplied complete query's configured scope, absent activity rows contribute zero; observed nulls, out-of-scope periods and known coverage failures remain unknown.
+Prefer Copilot Enabled User or Total Copilot enabled days for licensing. Native licensed-only M365 Copilot nulls mean unlicensed and zero activity means licensed but inactive. A verified metric with these semantics is a valid fallback. Read configured cadence, not date spacing. Absent in-scope activity contributes zero, while failed joins and known coverage failures remain unresolved. Check unlicensed Copilot Chat separately before assigning causal controls.
 Publish only groups meeting max(the organisational requirement, 10 distinct people), protect complementary cells and embedded data, and never publish individual rankings.
 When interpreting results, explain the ATE direction in business terms, include the sensitivity analysis, and avoid overstating causation or borderline significance.
 Finish each phase by listing any assumptions you made about notebook choice, variable mappings, or output interpretation.
@@ -91,11 +91,14 @@ history alone guarantees identification. Select compatible diagnostics, not
 every estimator. If unresolved, return readiness or an explicitly agreed
 observational association rather than a causal claim.
 
-Read configured grouping and metric windows, not date spacing. Use explicit
-product-specific eligibility evidence independently of activity. In a supplied
-complete query's configured scope, absent activity contributes zero; observed
-nulls, unavailable sources, out-of-scope periods and known coverage failures
-remain unknown with reasons. Do not silently zero-fill notebook inputs.
+Read configured grouping and metric windows, not date spacing. Prefer Copilot
+Enabled User or Total Copilot enabled days for licensing. Native licensed-only
+M365 Copilot nulls mean unlicensed and zero activity means licensed but inactive.
+A verified metric with these semantics is a valid fallback. Unlicensed Copilot
+Chat requires separate checks before assigning causal controls. In a supplied
+complete query's configured scope, absent activity contributes zero. Failed joins,
+unavailable sources, out-of-scope periods and known coverage failures remain
+unresolved with reasons. Do not silently zero-fill notebook inputs.
 
   For Person Query (PQ) data:
   - CI-DML_ExtCollabHours_PQ.ipynb → Seller Productivity scenario (Outcome: External_collaboration_hours)
@@ -163,8 +166,8 @@ IMPORTANT NOTES
 - Low-activity flags are review candidates, not verified holidays or job classes.
 
 <!-- analysis-policy:start -->
-Use explicit product-specific eligibility evidence independently of activity; otherwise retain unknown and omit adoption rates with unknown denominators.
-Absent activity inside a supplied complete query's configured scope contributes zero; observed nulls, unavailable sources, out-of-scope periods and known coverage failures remain unknown with reasons.
+Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
+Absent activity inside a supplied complete query's configured scope contributes zero. Preserve unresolved joins, unavailable sources, out-of-scope periods and known coverage failures as unknown with reasons. Do not extend licensed-only M365 Copilot null semantics to unlicensed Copilot Chat or Consumption credits.
 Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
 Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
 Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.
@@ -263,8 +266,8 @@ IMPORTANT NOTES
 - If no significant effects are found, this is still a valid and useful result — frame it constructively (e.g., "The data does not yet show a measurable effect, which may indicate the need for a longer observation period or targeted enablement strategies").
 
 <!-- analysis-policy:start -->
-Use explicit product-specific eligibility evidence independently of activity; otherwise retain unknown and omit adoption rates with unknown denominators.
-Absent activity inside a supplied complete query's configured scope contributes zero; observed nulls, unavailable sources, out-of-scope periods and known coverage failures remain unknown with reasons.
+Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
+Absent activity inside a supplied complete query's configured scope contributes zero. Preserve unresolved joins, unavailable sources, out-of-scope periods and known coverage failures as unknown with reasons. Do not extend licensed-only M365 Copilot null semantics to unlicensed Copilot Chat or Consumption credits.
 Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
 Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
 Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.

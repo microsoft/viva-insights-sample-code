@@ -28,11 +28,37 @@ for (column in "Total_Copilot_enabled_days") {
                 !anyNA(result[(13L + width):30, columns]),
                 !anyNA(result[12, columns]))
     }
-    input <- panel()
-    input$Copilot_actions_taken_in_Teams[13] <- NA
-    error <- tryCatch({ run(input); NULL }, error = identity)
-    stopifnot(inherits(error, "error"), grepl("Unknown activity", conditionMessage(error)))
   }
+}
+input <- panel()
+input$Copilot_actions_taken_in_Teams[13] <- NA
+result <- run(input)
+for (width in c(4L, 12L)) {
+  column <- paste0("UsageSegments_", width, "w")
+  stopifnot(all(is.na(result[13:(12L + width), column])),
+            !anyNA(result[(13L + width):30, column]))
+}
+licensed <- panel()
+unlicensed <- panel()
+unlicensed$PersonId <- "unlicensed"
+unlicensed$Total_Copilot_enabled_days <- NA_real_
+unlicensed$Copilot_actions_taken_in_Teams <- NA_real_
+result <- run(rbind(licensed, unlicensed))
+excluded <- result[result$PersonId == "unlicensed", ]
+retained <- result[result$PersonId == "synthetic", ]
+stopifnot(!any(excluded$is_licensed),
+          all(is.na(excluded$UsageSegments_4w)),
+          all(is.na(excluded$UsageSegments_12w)),
+          !anyNA(retained$UsageSegments_12w[12:30]))
+input <- panel()
+input$licence_source_matched <- TRUE
+input$licence_source_matched[13] <- FALSE
+result <- run(input)
+stopifnot(is.na(result$is_licensed[13]))
+for (width in c(4L, 12L)) {
+  column <- paste0("UsageSegments_", width, "w")
+  stopifnot(all(is.na(result[13:(12L + width), column])),
+            !anyNA(result[(13L + width):30, column]))
 }
 input <- panel()[-13, ]
 result <- run(input[rev(seq_len(nrow(input))), ])

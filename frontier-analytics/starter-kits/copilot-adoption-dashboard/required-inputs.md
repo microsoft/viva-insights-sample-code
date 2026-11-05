@@ -12,11 +12,11 @@ The primary input is a **person query export** from the Viva Insights Analyst po
 |---|---|---|---|
 | `PersonId` | String | Anonymized unique identifier for each person. Consistent across weeks. | **Yes** |
 | `MetricDate` | Date | Start of the configured measurement period; confirm week start rather than assuming Monday. Format: `YYYY-MM-DD`. | **Yes** |
-| `Copilot_Actions` | Numeric | Verified weekly actions, mapped to the actual primary metric such as `Total_Copilot_actions_taken`. Null is unknown, not licence evidence. | **Yes** |
-| Enabled-days or dated licence evidence | Numeric/Boolean | Explicit product-specific eligibility for each person-week, independently of activity. | For adoption denominators |
-| `Copilot_Assisted_Hours` | Numeric | Verified assisted time, not measured time saved. Null is unknown. | Recommended |
-| `Copilot_Chat_Queries` | Numeric | Verified queries sent to Copilot Chat. Null is unknown. | Recommended |
-| `Copilot_Summarized_Hours` | Numeric | Verified summarised time, not automatically additive with assisted time. Null is unknown. | Optional |
+| `Copilot_Actions` | Numeric | Verified weekly actions, mapped to a licensed-only metric such as Total Copilot actions taken. Native null means unlicensed. Zero means licensed but inactive. | **Yes** |
+| Copilot Enabled User or Total Copilot enabled days | Numeric/Boolean | Preferred person-period licence evidence. Native null enabled days mean unlicensed. Dated licence records are an alternative. | Preferred for adoption denominators |
+| `Copilot_Assisted_Hours` | Numeric | Verified assisted time, not measured time saved. Apply the documented native licensed-only null semantics. | Recommended |
+| `Copilot_Chat_Queries` | Numeric | Verify whether this alias maps to licensed or unlicensed Copilot Chat before interpreting nulls or licences. | Recommended |
+| `Copilot_Summarized_Hours` | Numeric | Verified summarised time, not automatically additive with assisted time. Apply the source metric's documented null semantics. | Optional |
 | `Organization` | String | HR attribute indicating the person's organizational unit (e.g., department or division). | **Yes** |
 | `FunctionType` | String | HR attribute indicating the person's job function (e.g., Engineering, Sales, Finance). | Recommended |
 | `LevelDesignation` | String | HR attribute indicating the person's seniority level (e.g., IC, Manager, Director). | Recommended |
@@ -70,7 +70,7 @@ For detailed guidance, see the [Microsoft documentation on person queries](https
 - **Encoding**: CSV files should be UTF-8 encoded. If you encounter character issues, re-save as UTF-8 in Excel or a text editor.
 - **Date format**: `MetricDate` should be in `YYYY-MM-DD` format (e.g., `2024-09-02`). If your export uses a different format (e.g., `MM/DD/YYYY`), tell the coding agent so it can parse correctly.
 - **Decimal separator**: Use a period (`.`) as the decimal separator. Comma-separated decimals (common in some European locales) will cause parsing errors — convert before loading or tell the agent.
-- **Missing values**: Existing null cells remain unknown and do not establish licensing. Absent activity within a supplied complete query's configured scope contributes zero; unavailable sources, out-of-scope periods and known coverage failures remain distinct. See the [shared policy](../../skills/viva-insights-analysis/reference/analysis-policy.md).
+- **Missing values**: Native licensed-only M365 Copilot nulls mean unlicensed. Failed joins, unavailable sources, out-of-scope periods and known coverage failures remain unresolved. Absent in-scope activity contributes zero, independently of licensing. See the [shared policy](../../skills/viva-insights-analysis/reference/analysis-policy.md).
 - **File size**: Person query exports can range from a few MB to several hundred MB depending on the population size and time span. Files over 100 MB may require chunked processing — mention the file size to the agent.
 
 ## Schema reference

@@ -33,7 +33,7 @@ In your coding agent, type a brief context line and then paste the prompt:
 My person query CSV is at ./data/person-query.csv.
 The date column is MetricDate and the primary org column is Organization.
 The query is configured weekly with [week start] and scope [population/dates/products].
-Eligibility evidence is [enabled-days field or dated licence file]; do not infer it from activity.
+Licence evidence is [Copilot Enabled User, Total Copilot enabled days, verified native licensed-only metric or dated licence file].
 Use max(our organisational requirement, 10 distinct people) for every published group.
 Use Python with matplotlib for static charts embedded in self-contained HTML.
 
@@ -45,7 +45,7 @@ Use Python with matplotlib for static charts embedded in self-contained HTML.
 The agent will:
 1. Load and validate your CSV
 2. Detect Copilot metric columns
-3. Use explicit eligibility independently of activity; omit adoption rates if unknown
+3. Apply documented licence semantics, excluding native unlicensed nulls while preserving unresolved joins
 4. Compute weekly metrics
 5. Generate charts and a summary panel
 6. Output a self-contained HTML file

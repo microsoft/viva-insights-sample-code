@@ -241,9 +241,10 @@ completion or monetary cost.
 4. **Missingness:** follow the current join guide for supplied Viva Insights
    exports. Assume completeness within the configured query scope and treat
    omitted inactive activity rows as zero. Keep unavailable sources, out-of-scope
-   people or periods, null cells and known export problems separate. Licence
-   eligibility remains a separate attribute and needs product-specific evidence
-   for adoption denominators. Historical synthetic demos retain their own
+   people or periods and known export problems separate. Native licensed-only
+   M365 Copilot nulls mean unlicensed under the shared policy. Failed joins and
+   unresolved null credit/GitHub/Agent fields do not inherit that meaning. Use
+   product-specific licence semantics for adoption denominators. Historical synthetic demos retain their own
    coverage logic and are not real-data adapters.
 5. **Populations:** preserve the developer roster for working-condition
    baselines; do not select only Copilot users. Joint-product categories

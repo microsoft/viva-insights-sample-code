@@ -40,7 +40,7 @@ These marked plain-text lists are authored here for generated skill cards.
 <!-- catalogue:viva-insights-analysis:start -->
 - Agent-guided local R/Python analysis, not a universal export adapter or live-product/MCP connector.
 - Verify installed APIs and generated outputs. Built-in and synthetic examples are not real-export validation.
-- Eligibility needs explicit product-specific evidence. Null cells remain unknown; omitted activity is zero only within a supplied complete query's configured scope.
+- Prefer enabled-user/enabled-days fields. Documented native licensed-only M365 Copilot nulls mean unlicensed. Failed joins remain unresolved. These licence semantics do not apply to unlicensed Copilot Chat or Consumption credits.
 - Use max(organisation requirement, workflow floor): generic 5, joined-query/dashboard/causal 10 distinct people. Protect complementary cells and never publish individual rankings.
 <!-- catalogue:viva-insights-analysis:end -->
 

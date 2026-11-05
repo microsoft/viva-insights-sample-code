@@ -3,7 +3,7 @@
 This document describes what the finished dashboard looks like, how it's structured, and how to share it.
 
 The [starter README](README.md) owns scope and policy. Omit adoption rates
-without explicit eligibility evidence and unsupported metrics rather than
+without resolved licence evidence and unsupported metrics rather than
 filling panels with guessed values. Apply the dashboard privacy minimum to every
 panel, filter, embedded dataset and download.
 

@@ -35,14 +35,16 @@ demonstrated effect read as an empirical finding.
 Two rules prevent the most common misclassification:
 
 1. **Resolve missingness before calling it.** Fill only absent activity rows
-   within a supplied complete query's configured scope with zero. Observed null
-   cells, out-of-scope periods and known coverage failures remain unknown.
+   within a supplied complete query's configured scope with zero. Native
+   licensed-only M365 Copilot nulls mean unlicensed. Failed joins, out-of-scope
+   periods and known coverage failures remain unresolved.
    A rolling window can propagate unknown values; report affected segments as
    unavailable rather than replacing those values to force classification.
-2. **Define the licensed population by enabled days rather than by action presence.**
-   Use an enabled-days-positive filter (for example `Total_Copilot_enabled_days > 0`)
-   as the denominator for a target-week snapshot. Counting only rows where an
-   action metric is non-null understates the Non-user group.
+2. **Include licensed people with zero activity.** Prefer Copilot Enabled User
+   or Total Copilot enabled days for the period. Native null enabled days mean
+   unlicensed. Without those fields, a verified native licensed-only metric
+   can establish licensing through its documented null/zero semantics.
+   Filtering to positive actions would exclude licensed Non-users.
 
 Segment definitions (12-week version, `power_thres` default 15):
 
@@ -55,10 +57,12 @@ Segment definitions (12-week version, `power_thres` default 15):
 | Non-user | 12w rolling mean == 0 |
 
 ```python
-# df has a verified weekly calendar and the full required history window.
+# df is a deliberately selected continuously licensed cohort with a full weekly calendar.
 enabled = df["Total_Copilot_enabled_days"].astype("Float64")
 if not enabled.gt(0).fillna(False).all():
     raise ValueError("This minimal recipe requires eligibility throughout the window")
+if "licence_source_matched" in df and not df["licence_source_matched"].fillna(False).all():
+    raise ValueError("Unresolved licence join: affected rolling segments are unavailable")
 df_lic = df.copy()
 omitted = df_lic["activity_state"].eq("omitted_in_scope")
 df_lic.loc[omitted, "Total_Copilot_actions_taken"] = 0
@@ -73,11 +77,13 @@ seg = vi.identify_usage_segments(df_lic, metric="Total_Copilot_actions_taken",
 while aligning each person to the full configured calendar. Use
 `"omitted_in_scope"` for person-periods the supplied complete query left out
 within its configured scope, `"observed"` for rows with a recorded value, and a
-specific reason such as `"observed_null"`, `"source_unavailable"`,
+specific reason such as `"native_unlicensed"`, `"unexpected_null"`, `"source_unavailable"`,
 `"out_of_scope"` or `"known_coverage_failure"` for everything else.
-This minimal recipe stops on unresolved histories; a fuller workflow can mark
-only the affected rolling segments unavailable. It must not drop unknown weeks
-and treat the remaining observations as consecutive history.
+This minimal recipe requires an explicitly selected continuously licensed cohort.
+For a mixed population, use the paired Python/R segmentation examples, which keep
+unlicensed weeks in the calendar and withhold only affected rolling segments.
+They do not abort because another person has native unlicensed nulls. Never drop
+unlicensed or unknown weeks and treat the remaining rows as consecutive history.
 
 If segments come back all Non-user or all None, check: metric renamed correctly?
 missingness resolved? correct population filter and required calendar history applied?

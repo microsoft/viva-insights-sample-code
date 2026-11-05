@@ -48,8 +48,8 @@
 - [Data granularity assumption, e.g., "Data is at person-week granularity"]
 - [Key column assumptions, e.g., "`PersonId` is a consistent anonymized identifier"]
 - [Date handling, e.g., "`MetricDate` is a date field representing the start of each week"]
-- [Missingness: observed nulls are unknown; absent activity within a supplied complete query's configured scope contributes zero; unavailable sources and out-of-scope periods remain separate]
-- [Eligibility: explicit product-specific enabled-days/licence evidence, independently of activity; otherwise unknown]
+- [Missingness: native licensed-only M365 Copilot nulls mean unlicensed. Failed joins and unavailable/out-of-scope sources remain unresolved. Absent in-scope activity contributes zero]
+- [Licensing: prefer Copilot Enabled User or Total Copilot enabled days. Documented native licensed-only metric semantics are a fallback. Do not extend these to unlicensed Copilot Chat or Consumption credits]
 - [Package/tool availability, e.g., "The `vivainsights` R or Python package is available in the environment"]
 
 ## Recommended output

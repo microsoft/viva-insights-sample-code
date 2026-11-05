@@ -150,19 +150,31 @@ for col in copilot_cols:
     null_pct = df[col].isna().mean()
     print(f"  {col}: {null_pct:.1%} null")
 
-# Explicit eligibility, independent of activity. Preserve unknown evidence.
-df['is_licensed'] = pd.Series(pd.NA, index=df.index, dtype='boolean')
-if 'Total_Copilot_enabled_days' in df:
-    enabled = pd.to_numeric(df['Total_Copilot_enabled_days'], errors='raise').astype('Float64')
-    df['is_licensed'] = enabled.gt(0)
+# Native M365 Copilot export with Copilot_Actions mapped to a licensed-only metric.
+actions = pd.to_numeric(df['Copilot_Actions'], errors='raise').astype('Float64')
+licence_col = next((c for c in ('Copilot_Enabled_User', 'Total_Copilot_enabled_days') if c in df), None)
+if licence_col is not None:
+    enabled = pd.to_numeric(df[licence_col], errors='raise').astype('Float64')
+    df['is_licensed'] = enabled.fillna(0).gt(0)
+else:
+    df['is_licensed'] = actions.notna().astype('boolean')
+if 'licence_source_matched' in df:
+    df.loc[~df['licence_source_matched'].fillna(False), 'is_licensed'] = pd.NA
+if (df['is_licensed'].eq(False) & actions.gt(0)).any():
+    raise ValueError("Resolve conflicting licence and licensed-only activity evidence")
 print(f"\nKnown eligible person-periods: {df['is_licensed'].sum()}")
 print(f"Unknown eligibility: {df['is_licensed'].isna().sum()}")
 ```
 
-This example assumes the enabled-days definition establishes period eligibility.
-Otherwise map explicit licence evidence or omit adoption rates. An observed
-null cell remains unknown. Only absent activity rows inside a supplied complete
-query's configured scope contribute zero; retain unavailable/out-of-scope reasons.
+This example applies the documented native M365 Copilot null/zero semantics.
+Native nulls mean unlicensed, while zero activity means licensed but inactive.
+Licence fields use imported underscore names for **Copilot Enabled User** and
+**Total Copilot enabled days**. Verify the licensed-only activity metric before
+using it as a fallback. These rules do not apply to unlicensed Copilot Chat or
+Consumption credits. After a licence-source join, retain its match indicator as
+`licence_source_matched` so processing nulls remain unresolved. Investigate
+conflicting licence/activity evidence. Only absent activity rows inside a supplied
+complete query's configured scope contribute zero.
 
 **Follow with a Markdown cell** summarizing the validation findings:
 
@@ -197,13 +209,15 @@ How has Copilot adoption evolved across the reporting period?
 actions = pd.to_numeric(df['Copilot_Actions'], errors='raise').astype('Float64')
 df['is_active'] = df['is_licensed'] & actions.gt(0)
 eligible = df[df['is_licensed'].fillna(False)]
+eligibility_known = df.groupby('MetricDate')['is_licensed'].agg(lambda s: s.notna().all())
 weekly = eligible.groupby('MetricDate').agg(
     licensed=('PersonId', 'nunique'),
     active=('is_active', 'sum'),
     activity_known=('is_active', lambda s: s.notna().all())
 ).reset_index()
 weekly['adoption_rate'] = weekly['active'] / weekly['licensed']
-weekly.loc[~weekly['activity_known'], 'adoption_rate'] = float('nan')
+weekly['eligibility_known'] = weekly['MetricDate'].map(eligibility_known)
+weekly.loc[~(weekly['eligibility_known'] & weekly['activity_known']), 'adoption_rate'] = float('nan')
 weekly.loc[weekly['licensed'] < PRIVACY_THRESHOLD, ['licensed', 'active', 'adoption_rate']] = float('nan')
 
 fig, ax = plt.subplots(figsize=(10, 5))
@@ -272,12 +286,12 @@ Do employees with higher collaboration hours tend to use Copilot more or less?
 
 ```python
 # Good: explains the business logic
-# This field's documented definition establishes eligibility, not activity.
-df['is_licensed'] = df['Total_Copilot_enabled_days'].astype('Float64').gt(0)
+# Native null enabled days mean unlicensed under the documented M365 export rules.
+df['is_licensed'] = df['Total_Copilot_enabled_days'].astype('Float64').fillna(0).gt(0)
 
 # Bad: restates the code
 # Set is_licensed
-df['is_licensed'] = df['Total_Copilot_enabled_days'].astype('Float64').gt(0)
+df['is_licensed'] = df['Total_Copilot_enabled_days'].astype('Float64').fillna(0).gt(0)
 ```
 
 ### Visualizations

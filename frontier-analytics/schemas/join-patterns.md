@@ -316,4 +316,4 @@ Before executing any join:
 - [ ] Align time granularity: aggregate event-level data to the target period before joining.
 - [ ] Check join match rate: what percentage of left-side rows matched? Low match rates indicate key problems.
 - [ ] Verify row count: the output should not have significantly more rows than the left table (for left joins).
-- [ ] Preserve missingness reasons: absent activity inside a supplied complete query's configured scope contributes zero; observed nulls, out-of-scope periods, unavailable sources and known coverage failures remain unknown.
+- [ ] Preserve missingness reasons: native licensed-only M365 Copilot nulls mean unlicensed. Failed joins, out-of-scope periods, unavailable sources and known coverage failures remain unresolved. Absent in-scope activity contributes zero, independently of licensing.

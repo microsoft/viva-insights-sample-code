@@ -9,8 +9,10 @@ You don't need to write code yourself. The kit provides structured **prompt card
 This is an agent-guided starter, not a packaged real-export adapter. See the
 [workflow support table](../../skills/viva-insights-analysis/reference/workflow-support.md)
 and [shared analysis policy](../../skills/viva-insights-analysis/reference/analysis-policy.md).
-Adoption rates need explicit eligibility evidence; otherwise show observed
-activity. Published dashboard groups require at least
+Adoption rates need documented licence evidence. Prefer Copilot Enabled User or
+Total Copilot enabled days, with verified native licensed-only metric null/zero
+semantics as a fallback. Native unlicensed nulls are excluded from licensed
+denominators. Failed joins remain unresolved. Published dashboard groups require at least
 `max(organisation requirement, 10)` distinct people, including embedded data
 and complementary-cell protection.
 

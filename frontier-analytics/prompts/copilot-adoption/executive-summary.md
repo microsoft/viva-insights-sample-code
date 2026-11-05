@@ -23,7 +23,7 @@ When you need to communicate Copilot adoption progress to senior leadership — 
 - Data is at person-week granularity
 - `PersonId` is a consistent anonymized identifier
 - `MetricDate` is a date field representing the start of each week
-- Eligibility requires documented enabled-days or licence evidence; activity and nulls alone are inconclusive
+- Licensing follows documented native M365 Copilot null/zero semantics, with enabled-user or enabled-days evidence preferred
 - The `vivainsights` R or Python package is available in the environment
 
 ## Recommended output
@@ -38,8 +38,8 @@ Use this shorter prompt for a fast first pass that adapts to your data.
 Help me produce a concise executive summary memo for senior leaders that explains Copilot adoption progress, risks, and recommended next actions from a Viva Insights person query export.
 Start by loading the real CSV and printing row count, column names, data types, date range, and unique people so you can map the actual Copilot and HR fields.
 Adapt the column names dynamically rather than assuming the defaults, and ask me for the file path, preferred output format, or any ambiguous field mapping before you proceed.
-Use documented enabled-days or licence evidence per person-week, independently of activity. Keep unknown eligibility separate and omit adoption rates if the denominator is unknown.
-Read configured grouping, week start and metric windows; date spacing is only a diagnostic. In a supplied complete query's configured scope, absent activity rows contribute zero; observed nulls, out-of-scope periods and known coverage failures remain unknown.
+Prefer Copilot Enabled User or Total Copilot enabled days per person-week. Native licensed-only M365 Copilot nulls mean unlicensed and zero activity means licensed but inactive. A verified metric with those semantics is a valid fallback without explicit licence fields. Keep failed joins and genuinely unresolved licence status separate.
+Read configured grouping, week start and metric windows. Date spacing is only a diagnostic. In a supplied complete query's configured scope, absent activity rows contribute zero. Unavailable sources, out-of-scope periods and known coverage failures remain unresolved.
 Calculate every reported number directly from the data, with distinct-person denominators and an explicit person versus person-week estimand.
 Compare recent adoption and usage trends using the amount of history actually available, and call out when the dataset is too short for the preferred comparison window.
 Keep the tone balanced and executive-friendly, include specific numbers in findings and recommendations, and avoid unsupported claims.
@@ -58,16 +58,16 @@ LANGUAGE CHOICE
 Choose R or Python based on what is already installed in your environment to minimize setup.
 
 DATA LOADING AND PREPARATION
-Confirm configured weekly grouping, week start, measurement windows and supplied query scope before aggregation. Date gaps do not establish cadence. In a supplied complete query's configured scope, absent activity rows contribute zero. Observed null cells, unavailable sources, out-of-scope periods and known coverage failures stay unknown with reasons. Do not blanket-fill nulls.
+Confirm configured weekly grouping, week start, measurement windows and supplied query scope before aggregation. Date gaps do not establish cadence. In a supplied complete query's configured scope, absent activity rows contribute zero. Native licensed-only M365 Copilot nulls mean unlicensed. Failed joins, unavailable sources, out-of-scope periods and known coverage failures stay unresolved with reasons. Do not blanket-fill nulls.
 1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python). This handles variable name cleaning and type parsing automatically.
 2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity metric. Print the detected columns and the date range for verification.
 3. Identify HR / organizational attribute columns with `extract_hr(df, return = "names")` in R or `vi.extract_hr(df, return_type="suggestion")` in Python. Use the returned names for all organizational breakdowns instead of hard-coding column names.
 4. Classify each person-week row:
-   - "Licensed": documented enabled days > 0 (for example `Total_Copilot_enabled_days`) or explicit product-specific licence evidence for that week.
+   - "Licensed": positive Copilot Enabled User, positive Total Copilot enabled days or dated licence evidence for that week. Without these fields, a non-null value, including zero, in a verified native licensed-only M365 Copilot metric establishes licensing.
    - "Active": is licensed AND has Total_Copilot_actions_taken > 0 (the primary activity metric).
-   - "Unlicensed": explicit negative licence evidence or zero enabled days where that field's definition establishes ineligibility.
-   - "Unknown": eligibility evidence is absent or unresolved. Activity and missingness do not establish licences. Omit adoption rates when the eligible denominator is unknown; retain unknown activity separately even among licensed people.
-    - If the export has no enabled-days field, ask me for a licence assignment list (for example from the Microsoft 365 admin centre) to join on PersonId. Without one, report active-person counts and activity volumes and leave adoption rates out.
+   - "Unlicensed": native null licensed-only M365 Copilot values, native null or zero enabled days, or explicit negative licence evidence.
+   - "Unknown": failed joins, unavailable sources or genuinely unresolved field semantics. Withhold the affected overall rate if licence status or licensed activity is unresolved. Investigate conflicting evidence.
+   - Ask for an approved dated licence list only if neither explicit fields nor documented native licensed-only metric semantics resolve licensing. Otherwise do not require an external list.
 5. If any expected HR attribute columns are not found by `extract_hr()`, note which ones are unavailable and proceed with what is present.
 
 HEADLINE METRICS (compute these for the memo)
@@ -141,15 +141,15 @@ MEMO GENERATION
 
 IMPORTANT NOTES
 - Do NOT fabricate numbers. Every statistic must be computed directly from the data.
-- Preserve unknown eligibility and observed null activity; neither proves an unlicensed or inactive week. Report coverage exclusions and denominators.
+- Native licensed-only M365 Copilot nulls mean unlicensed. Preserve processing failures as unresolved and report exclusions and denominators.
 - If the dataset has fewer than 8 weeks, note this limitation and adjust trend calculations accordingly (e.g., compare last 2 weeks to prior 2 weeks).
 - Apply max(the organisational requirement, 5 distinct people) to all reported cells, using floor 10 for dashboard/joined outputs. Protect complementary cells and embedded data. Never publish individual rankings.
 - Low-activity flags are review candidates, not verified holidays or employment status. Use approved calendar/HR evidence before asserting those facts.
 - The tone should be balanced — highlight successes but do not oversell. Flag genuine concerns.
 
 <!-- analysis-policy:start -->
-Use explicit product-specific eligibility evidence independently of activity; otherwise retain unknown and omit adoption rates with unknown denominators.
-Absent activity inside a supplied complete query's configured scope contributes zero; observed nulls, unavailable sources, out-of-scope periods and known coverage failures remain unknown with reasons.
+Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
+Absent activity inside a supplied complete query's configured scope contributes zero. Preserve unresolved joins, unavailable sources, out-of-scope periods and known coverage failures as unknown with reasons. Do not extend licensed-only M365 Copilot null semantics to unlicensed Copilot Chat or Consumption credits.
 Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
 Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
 Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.
@@ -171,7 +171,7 @@ Inspect installed package versions, signatures and return types; separate execut
 - **Agent fabricates insights not supported by data.** The prompt instructs the agent to compute every statistic from the data, but always verify headline numbers independently.
 - **Agent uses overly technical language.** The prompt specifies executive-friendly language, but review the output for jargon like "person-week panel structure" and simplify.
 - **Agent double-counts users across weeks for "total active users."** Ensure breadth metrics use distinct `PersonId` counts, not row counts.
-- **Agent flattens missingness.** An observed null remains unknown; in-scope
-  omitted activity differs from unavailable sources and known coverage failures.
-  Verify eligibility independently and never invent an adoption denominator.
+- **Agent flattens missingness.** Native licensed-only M365 Copilot nulls mean
+  unlicensed, rather than licensed inactivity. Failed joins and unavailable
+  sources remain unresolved. Never invent an adoption denominator.
 - **Recommendations are too generic.** If the agent produces vague advice ("increase adoption"), ask it to regenerate with specific org names and numbers from the data.

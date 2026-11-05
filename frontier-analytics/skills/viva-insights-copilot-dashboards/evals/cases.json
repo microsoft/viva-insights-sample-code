@@ -52,7 +52,7 @@
     {
       "id": "omitted-in-scope",
       "request": "In a separately implemented Person-spine analysis, a supplied complete weekly activity query omits an in-scope person's entire week. There are no known export problems. Must I treat that absent activity row as unknown?",
-      "expected": ["current join contract permits zero omitted activity inside configured scope", "eligibility checked independently", "observed null cells remain unknown", "does not claim the dashboard runner implements Person joins"],
+      "expected": ["current join contract permits zero omitted activity inside configured scope", "licensing checked using product-specific source semantics", "native licensed-only M365 Copilot nulls mean unlicensed while join-created nulls remain unresolved", "does not claim the dashboard runner implements Person joins"],
       "forbidden": ["require separate completeness evidence under the current join default", "infer licence from zero", "claim real Person adapter"]
     },
     {
@@ -66,6 +66,18 @@
       "request": "There is no licence or enabled-days evidence. Count every positive credit row as a licensed user and every null as unlicensed.",
       "expected": ["eligibility unknown", "observed credit activity only", "no adoption denominator invented"],
       "forbidden": ["activity proves licence", "null proves unlicensed"]
+    },
+    {
+      "id": "native-m365-unlicensed-nulls",
+      "request": "My native Person Query has ten people with positive Total Copilot enabled days and positive Total Copilot actions taken. Another person has native nulls in both fields. Must I withhold the licensed adoption rate?",
+      "expected": ["native null person classified as unlicensed", "ten licensed active people give 100 percent adoption", "no unnecessary external licence list", "no claim the dashboard runner implements Person builds"],
+      "forbidden": ["treat native unlicensed null as unknown eligibility", "count unlicensed person as a licensed Non-user", "apply these semantics to Consumption credits"]
+    },
+    {
+      "id": "licence-join-failure",
+      "request": "My licence join failed to match one person. Their joined enabled-days field is null. Treat that person as unlicensed and report the full-population adoption rate.",
+      "expected": ["join-created null retained as unresolved", "match indicator preserved", "overall rate withheld until licence status resolved", "native export null semantics not applied to failed join"],
+      "forbidden": ["failed join proves no licence", "blanket zero fill"]
     },
     {
       "id": "agent-metadata-absent",

@@ -79,8 +79,9 @@ candidate variable. Audit its support, within-person variation, denominator,
 derivation and temporal alignment.
 
 **Gate:** do not run weekly within-person outcome models on copied annual scores,
-monthly stock values or quarterly totals. Observed nulls and unresolved coverage
-are not zero. Only absent activity within a supplied complete query's configured
+monthly stock values or quarterly totals. Native licensed-only M365 Copilot nulls
+mean unlicensed, rather than licensed inactivity. Failed joins and unresolved
+coverage are not zero. Only absent activity within a supplied complete query's configured
 scope follows the shared omitted-inactivity zero rule, independently of eligibility.
 Stop an affected analysis when source definitions, joins or timing are unresolved.
 An explicit method rehearsal may proceed with a visible synthetic/unverified label.

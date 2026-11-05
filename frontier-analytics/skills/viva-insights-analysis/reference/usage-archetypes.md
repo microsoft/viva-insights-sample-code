@@ -120,8 +120,9 @@ person silently or force a label.
 The states below preserve rule v1's explicit coverage input for synthetic
 reproduction and older inputs. For current supplied Viva Insights queries,
 apply [analysis policy](analysis-policy.md): default complete coverage only
-inside configured scope, absent activity contributes zero, observed nulls and
-known coverage problems remain unknown. Record that scoped assumption as the
+inside configured scope and absent activity contributes zero. Native licensed-only
+M365 Copilot nulls mean unlicensed. Failed joins, null credits and known coverage
+problems remain unresolved. Record that scoped assumption as the
 coverage basis; no separate completeness attestation is required. Eligibility
 and policy additivity remain independent. Do not copy a synthetic demo's
 unconfirmed state onto every current export, or invent an eligibility flag.

@@ -67,8 +67,9 @@ Do not infer productivity, code quality, burnout, licensing or non-use from acti
 Use max(the organisational requirement, 10 distinct people), protect complementary
 cells and embedded data, and never publish individual rankings. Read configured cadence
 and measurement windows, not date spacing. Within a supplied complete query's configured
-scope, absent activity is zero; observed nulls, out-of-scope periods and known coverage
-failures stay unknown. This does not enable the missing real build adapter.
+scope, absent activity is zero. Unresolved GitHub nulls, failed joins, out-of-scope
+periods and known coverage failures stay unknown. Licensed-only M365 Copilot null
+semantics do not establish GitHub licensing. This does not enable the missing real build adapter.
 ```
 {% endraw %}
 
@@ -90,10 +91,12 @@ In real mode, run bounded local inspection. Identify source grain, join keys, un
 coverage, licence evidence and model/language allocation periods. Headers alone do not
 verify semantics. Return supported observations and missing evidence for a future adapter.
 Read configured grouping and measurement windows; spacing is diagnostic only.
-Eligibility requires explicit product-specific evidence independently of activity.
+GitHub eligibility requires its own product-specific evidence.
 Inside a supplied complete query's configured scope, absent activity contributes zero;
-observed nulls, unavailable sources, out-of-scope periods and known coverage failures
-remain unknown with reasons. The historical synthetic demo retains its own explicit
+unresolved GitHub nulls, failed joins, unavailable sources, out-of-scope periods and
+known coverage failures remain unknown with reasons. For any Person Query companion,
+apply the documented native M365 Copilot licence semantics only to licensed-only
+M365 metrics, never to GitHub fields. The historical synthetic demo retains its own explicit
 coverage states; do not mistake it for a real-data adapter.
 Do not source the synthetic helper on real inputs or bypass the unsupported-build gate.
 
@@ -110,8 +113,8 @@ into model context. After two unsuccessful repairs of one failure, report the bl
 Return the report or readiness assessment, rerun command and limitations; do not publish.
 
 <!-- analysis-policy:start -->
-Use explicit product-specific eligibility evidence independently of activity; otherwise retain unknown and omit adoption rates with unknown denominators.
-Absent activity inside a supplied complete query's configured scope contributes zero; observed nulls, unavailable sources, out-of-scope periods and known coverage failures remain unknown with reasons.
+Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
+Absent activity inside a supplied complete query's configured scope contributes zero. Preserve unresolved joins, unavailable sources, out-of-scope periods and known coverage failures as unknown with reasons. Do not extend licensed-only M365 Copilot null semantics to unlicensed Copilot Chat or Consumption credits.
 Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
 Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
 Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.
@@ -130,7 +133,8 @@ adapter. Do not rename public GitHub API fields into an assumed Viva contract.
 ## Common failure modes
 
 - **Missingness is flattened:** distinguish in-scope omitted activity from
-  observed nulls and known coverage failures; verify eligibility independently.
+  unresolved GitHub nulls and known coverage failures. Verify GitHub eligibility
+  separately from M365 Copilot licensing.
 - **Only Copilot users form the baseline:** retain the full developer population.
 - **Full-window mixes become weekly trends:** preserve their actual period.
 - **Demo runs over customer data:** use distinct modes and output workspaces.
