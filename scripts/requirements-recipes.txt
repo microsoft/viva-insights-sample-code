@@ -10,5 +10,5 @@ matplotlib-inline==0.2.2
 igraph==1.0.0
 plotly==6.9.0
 scikit-learn==1.9.0
-setuptools==83.0.0
+setuptools==84.1.0
 adjustText==1.4.0
