@@ -287,7 +287,9 @@ print(diagnostic)
 
 An eligible person may have no activity. Product scope, effective dates,
 activation delays or coverage can also explain these categories. Investigate
-without inferring licensing from metric presence or absence.
+without inferring licensing from metric presence or absence. A small share of
+people in the mismatched categories is normal. A large share usually points to
+a `PersonId` mapping or data issue worth resolving before the join.
 
 ---
 

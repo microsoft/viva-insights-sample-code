@@ -69,12 +69,12 @@ generate a new dashboard from scratch.
 - **Privacy thresholds.** Always use max(organisation requirement, workflow floor):
   generic 5, joined-query/dashboard/causal 10 distinct people. Protect
   complementary cells and embedded data; no individual rankings.
+- **Language preference.** Prompts default to Python. If you prefer R, add _"Use R instead of Python"_ before the prompt.
+- **Package availability.** Prompts reference the [vivainsights R package](https://microsoft.github.io/vivainsights/) and [vivainsights Python package](https://microsoft.github.io/vivainsights-py/). Install them beforehand if you want the agent to use them.
 
 The [shared analysis policy](../skills/viva-insights-analysis/reference/analysis-policy.md)
 and [workflow support table](../skills/viva-insights-analysis/reference/workflow-support.md)
 own common guidance. Copyable prompts include the rules needed offline.
-- **Language preference.** Prompts default to Python. If you prefer R, add _"Use R instead of Python"_ before the prompt.
-- **Package availability.** Prompts reference the [vivainsights R package](https://microsoft.github.io/vivainsights/) and [vivainsights Python package](https://microsoft.github.io/vivainsights-py/). Install them beforehand if you want the agent to use them.
 
 ## Creating new prompt cards
 

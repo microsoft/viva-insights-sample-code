@@ -2,7 +2,9 @@
 
 Where to find canonical material. Use upstream documentation for discovery,
 but verify executable calls against the installed package version. Follow the
-[shared policy](analysis-policy.md) for cross-workflow analytical rules.
+[shared policy](analysis-policy.md) for cross-workflow analytical rules. When
+this skill and upstream documentation disagree, check the installed package and
+then update the skill.
 
 ## Function discovery (agent-facing, added by upstream)
 

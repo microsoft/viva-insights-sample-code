@@ -90,7 +90,7 @@ CONFIGURABLE ASSUMPTIONS (define as variables at the top of the script so they a
 - ANNUAL_LICENSE_COST = 360  # Annual Copilot license cost per user in USD
 - WEEKS_IN_YEAR = 52
 - ANALYSIS_WEEKS = 4  # Number of recent weeks to use for annualized projections
-- REALISATION_FACTOR = None  # Ask for an approved fraction of assisted time assumed saved; do not silently assume 100%
+- REALISATION_FACTOR = None  # Ask for an approved fraction of assisted time assumed saved; do not silently assume 100%. Propose 0.25, 0.5 and 0.75 as a starting range for me to choose from.
 
 DATA LOADING AND PREPARATION
 Confirm configured weekly grouping, week start, measurement windows and query scope. Date spacing is diagnostic only. Absent activity within a supplied complete query's configured scope contributes zero; observed nulls, omitted sources, out-of-scope periods and known coverage failures remain unknown with reasons.
@@ -102,10 +102,11 @@ Confirm configured weekly grouping, week start, measurement windows and query sc
    - "Active": licensed AND Total_Copilot_actions_taken > 0.
    - "Unlicensed": explicit negative eligibility evidence, including zero enabled days only if its definition establishes ineligibility.
    - "Unknown": no resolved eligibility evidence. Do not infer licences from activity, nulls or zero. Omit licence-dependent rates/costs when their denominator is unknown.
+   - If the export has no enabled-days field, ask me for a licence assignment list (for example from the Microsoft 365 admin centre) to join on PersonId. Without one, report activity and assisted hours for active people and leave licence-dependent figures out.
 5. Print: total persons, licensed persons, active persons (ever active), date range.
 
 TIME SAVINGS ESTIMATION
-5. For each active person-week, extract verified Copilot_Assisted_Hours as assisted time, not measured savings. Potential hours saved = assisted hours × approved REALISATION_FACTOR. If unavailable, propose a documented proxy and conversion for approval or omit the estimate; do not invent hours from actions or credits. Use potential hours saved in the following calculations and label them as scenarios.
+5. For each active person-week, extract verified Copilot_Assisted_Hours as assisted time, not measured savings. Potential hours saved = assisted hours × approved REALISATION_FACTOR. If unavailable, propose a documented proxy and conversion for approval or omit the estimate (Copilot_Summarized_Hours is the closest candidate where present); do not invent hours from actions or credits. Use potential hours saved in the following calculations and label them as scenarios.
 6. Compute scenario potential time savings, keeping observed assisted hours separate:
    a. Mean potential hours saved per active person-week over the last ANALYSIS_WEEKS complete configured weeks.
    b. Median potential hours saved per active person-week.
@@ -191,7 +192,7 @@ REPORT GENERATION
 
 IMPORTANT NOTES
 - Do NOT overstate the ROI. This is an estimation framework, not a proven causal impact. Every section should include appropriate caveats.
-- A null `Copilot_Assisted_Hours` cell remains unknown even for a licensed or active person. Do not infer a licence or assisted-time coverage from other activity. Report missingness and the estimation sample; never substitute zero to complete the ROI scenario.
+- A null `Copilot_Assisted_Hours` cell remains unknown even for a licensed or active person. Do not infer a licence or assisted-time coverage from other activity. Report missingness and the estimation sample; never substitute zero to complete the ROI scenario. If nulls are common among active person-weeks, add a clearly labelled sensitivity scenario that treats them as zero alongside the known-only estimate, so the reader can see how much the gap matters.
 - Break-even is conditional on the approved realisation factor and price assumptions, not proof that observed usage recovers the licence cost.
 - If the ROI is negative, report it honestly and frame recommendations around increasing adoption.
 - Apply the stated privacy minimum to every output and never publish individual rankings. Low activity alone does not establish a holiday, job classification or employment status.
@@ -218,7 +219,7 @@ Inspect installed package versions, signatures and return types; separate execut
 
 ## Common failure modes
 
-- **Agent treats assisted time as measured savings.** Require the approved realisation factor throughout calculations and labels, rather than adding a caveat after a 100% savings assumption.
+- **Agent treats assisted time as measured savings.** Require the approved realisation factor throughout calculations and labels, rather than adding a caveat after a 100% savings assumption. A factor of 0.5 is a common conservative starting point for discussion, but the decision belongs to the person commissioning the analysis.
 - **Agent ignores selection bias in licensed vs. unlicensed comparison.** The prompt includes a causal caveat, but verify it appears prominently in the output.
 - **Agent annualizes from a single week.** The prompt uses the last `ANALYSIS_WEEKS` (4) weeks for stability, but ensure the agent averages across these weeks rather than extrapolating from one.
 - **Agent reports ROI without caveats.** Senior leadership will scrutinize the methodology. Ensure every value estimate is accompanied by its assumptions and limitations.

@@ -123,10 +123,16 @@ dupes = df.duplicated(subset=['PersonId', 'MetricDate'], keep=False).sum()
 print(f"Duplicate person-periods: {dupes}")
 
 # Query configuration is required; sparse daily activity can look weekly.
-CONFIGURED_GROUPING = None  # Set from query configuration, not observed dates.
+# Set this to 'day', 'week' or 'month' to match the query's grouping setting.
+CONFIGURED_GROUPING = None
 if CONFIGURED_GROUPING not in {'day', 'week', 'month'}:
     raise ValueError("Confirm configured query grouping before aggregation")
 print(f"Configured grouping: {CONFIGURED_GROUPING}")
+
+# Diagnostic only: observed date spacing should be consistent with the setting.
+date_gaps = pd.Series(pd.to_datetime(df['MetricDate']).unique()).sort_values().diff().dt.days.dropna()
+if not date_gaps.empty:
+    print(f"Observed date gaps (days): min {date_gaps.min():.0f}, max {date_gaps.max():.0f}")
 
 # Panel completeness
 expected = df['PersonId'].nunique() * df['MetricDate'].nunique()

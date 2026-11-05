@@ -46,6 +46,10 @@ for (width in c(4L, 12L)) {
 seg$.window_ok <- NULL
 
 # 3. Segment distribution across the whole panel of person-weeks.
+#    Expect many NA rows. The first 11 weeks of each person's history lack a
+#    full 12-week window, and any week without known eligibility (for example
+#    zero enabled days) withholds every window that contains it. On the
+#    built-in sample, scattered zero-enabled weeks leave most person-weeks NA.
 #    For a point-in-time adoption report, filter to a single MetricDate first
 #    (for example seg[seg$MetricDate == max(seg$MetricDate), ]).
 cat("\nUsage segment distribution (person-weeks; NA = unavailable history):\n")

@@ -69,6 +69,7 @@ Confirm configured weekly grouping, week start, metric measurement windows and q
    - "Active": licensed AND Total_Copilot_actions_taken > 0.
    - "Unlicensed": explicit negative eligibility evidence for that product/week.
    - "Unknown": unresolved eligibility or activity. Do not infer licences from nulls, zero or positive activity. Omit adoption rates if eligibility denominators are unknown.
+   - If the export has no enabled-days field, ask me for a licence assignment list (for example from the Microsoft 365 admin centre) to join on PersonId. Without one, show active-person counts and activity volumes and skip adoption-rate slides.
 5. Print: date range, total persons, licensed persons, active persons.
 
 METRIC CALCULATIONS

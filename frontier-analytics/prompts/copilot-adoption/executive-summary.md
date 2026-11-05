@@ -67,6 +67,7 @@ Confirm configured weekly grouping, week start, measurement windows and supplied
    - "Active": is licensed AND has Total_Copilot_actions_taken > 0 (the primary activity metric).
    - "Unlicensed": explicit negative licence evidence or zero enabled days where that field's definition establishes ineligibility.
    - "Unknown": eligibility evidence is absent or unresolved. Activity and missingness do not establish licences. Omit adoption rates when the eligible denominator is unknown; retain unknown activity separately even among licensed people.
+    - If the export has no enabled-days field, ask me for a licence assignment list (for example from the Microsoft 365 admin centre) to join on PersonId. Without one, report active-person counts and activity volumes and leave adoption rates out.
 5. If any expected HR attribute columns are not found by `extract_hr()`, note which ones are unavailable and proceed with what is present.
 
 HEADLINE METRICS (compute these for the memo)
@@ -160,7 +161,7 @@ Inspect installed package versions, signatures and return types; separate execut
 ## Adaptation notes
 
 - If your leadership prefers Markdown over HTML, add _"Output as a Markdown file"_ at the start of the prompt.
-- Organisation rankings use at least 10 distinct licensed people or the stricter organisational requirement; increase rather than lower that floor.
+- Organisation rankings use at least 10 distinct licensed people or the stricter organisational requirement; increase rather than lower that floor. For very large organisations, 20 or more keeps rankings comparable.
 - Add company-specific context by prepending: _"Our Copilot deployment started on [date] and currently covers [N] licenses across [divisions]."_
 - If you want the memo to reference specific business goals (e.g., "target 60% adoption by Q3"), include that context before the prompt.
 - Change the trend comparison window (default: 4 weeks vs. prior 4 weeks) to match your reporting cadence.

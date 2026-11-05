@@ -35,7 +35,7 @@ person_period_avg = df['Collaboration_Hours'].mean()
 
 # Person-weighted estimand (equal weight per person)
 person_avg = df.groupby('PersonId')['Collaboration_Hours'].mean()
-correct_avg = person_avg.mean()
+person_weighted_avg = person_avg.mean()
 ```
 
 ---
@@ -53,6 +53,11 @@ Within the current join contract's supplied complete query scope (configured
 population, dates and product filters), absent activity rows contribute zero.
 This is different from an existing null cell, unavailable source, out-of-scope
 period or known export problem. Preserve those reasons and do not blanket-fill.
+
+Blanket-filling nulls with zero causes three distinct problems. It inflates the
+denominator of adoption rates, it makes average usage per user look artificially
+low, and it can produce misleading trends, for example usage appearing to
+decline when licences were simply removed.
 
 **How to detect:**
 

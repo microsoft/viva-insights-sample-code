@@ -69,7 +69,12 @@ seg = vi.identify_usage_segments(df_lic, metric="Total_Copilot_actions_taken",
                                  version="12w", return_type="data")
 ```
 
-`activity_state` records the validated missingness reason before this snippet.
+`activity_state` is a column you create, because no export provides it. Build it
+while aligning each person to the full configured calendar. Use
+`"omitted_in_scope"` for person-periods the supplied complete query left out
+within its configured scope, `"observed"` for rows with a recorded value, and a
+specific reason such as `"observed_null"`, `"source_unavailable"`,
+`"out_of_scope"` or `"known_coverage_failure"` for everything else.
 This minimal recipe stops on unresolved histories; a fuller workflow can mark
 only the affected rolling segments unavailable. It must not drop unknown weeks
 and treat the remaining observations as consecutive history.
@@ -101,6 +106,8 @@ eyeballing a line chart.
 - Do not publish a group smaller than the threshold. Aggregate up instead.
 - Keep individual identifiers and rankings out of aggregate publications.
   Anonymising or pseudonymising rows is not sufficient disclosure protection.
+- When sharing row-level data with other analysts, still pseudonymise
+  identifiers first (`anonymise()` in R).
 
 ## 6. Units and wording precision
 

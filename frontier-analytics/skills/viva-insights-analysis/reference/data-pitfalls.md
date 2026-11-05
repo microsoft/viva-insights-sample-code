@@ -113,7 +113,10 @@ and avoid week-on-week deltas on these metrics.
 **Symptom:** population means shift around late December, regional new-year
 periods, and summer, with no real behaviour change.
 **Cause:** holidays, missing coverage or changing composition can change observed
-activity. A statistical flag alone cannot distinguish them.
+activity. In a holiday week a sizeable share of people may go inactive, and those
+who remain active often skew toward particular roles or regions, so a population
+mean can move on composition alone. A statistical flag alone cannot distinguish
+these causes.
 **Fix:** retain flags for review before any documented exclusion. Confirm
 holidays with approved calendar evidence rather than a universal inactivity
 percentage. Inspect the installed package API first.

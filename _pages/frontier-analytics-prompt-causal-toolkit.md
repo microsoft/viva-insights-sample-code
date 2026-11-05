@@ -178,9 +178,11 @@ STEP 6: VERIFY OUTPUTS
    - significant_subgroups_[timestamp].csv
    - sensitivity_analysis_results_[timestamp].json
    - Subgroup-specific folders with ATE plots, results CSVs, and transition matrices
-2. Record successful fits, failed/unavailable checks and null findings. No
+2. Confirm that the expected subgroup folders were created. If none were, check
+   the run log for failed fits before interpreting anything.
+3. Record successful fits, failed/unavailable checks and null findings. No
    significant subgroup is a valid result, not a reason to alter the sample.
-3. Print a summary of what was generated and where the files are located.
+4. Print a summary of what was generated and where the files are located.
 
 IMPORTANT NOTES
 - Do NOT modify the helper modules in script/modules/ — they are shared across notebooks.
@@ -260,6 +262,11 @@ STEP 2: PRODUCE AN EXECUTIVE INTERPRETATION Write a clear, non-technical summary
 - Inspect the sensitivity statistic's actual definition, scale and applicability
   in the executed notebook before interpreting it. Do not use universal E-value
   cutoffs or compare them to the strength of measured controls without justification.
+- Where an E-value is reported, explain it in plain terms: it is the minimum strength
+  of association an unmeasured confounder would need with both treatment and outcome
+  to explain away the estimate. Values close to 1 indicate a fragile finding, and
+  larger values indicate more robustness, though the threshold that counts as
+  reassuring depends on what plausible confounders exist in this setting.
 - Note any subgroups where effects were NOT statistically significant — absence of evidence is not evidence of absence.
 
 ### 6. Recommendations (2-4 bullets) Based on the results, suggest actionable next steps:
@@ -272,6 +279,8 @@ STEP 2: PRODUCE AN EXECUTIVE INTERPRETATION Write a clear, non-technical summary
 - Causal inference from observational data has limitations — DML reduces but does not eliminate confounding risk.
 - Results apply to the specific time period and population analyzed.
 - The sensitivity analysis indicates robustness but cannot guarantee no unmeasured confounders.
+- Subgroup estimates from small samples are imprecise even when they clear the
+  privacy minimum. Interpret them cautiously and show their interval widths.
 - Suppress groups below max(the organisational requirement, 10 distinct people),
   including complementary cells and embedded data. Never publish individual rankings.
 
