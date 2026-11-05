@@ -1,0 +1,20 @@
+{
+  "viva-insights-analysis": [
+    "Agent-guided local R/Python analysis, not a universal export adapter or live-product/MCP connector.",
+    "Verify installed APIs and generated outputs. Built-in and synthetic examples are not real-export validation.",
+    "Prefer enabled-user/enabled-days fields. Documented native licensed-only M365 Copilot nulls mean unlicensed. Failed joins remain unresolved. These licence semantics do not apply to unlicensed Copilot Chat or Consumption credits.",
+    "Use max(organisation requirement, workflow floor): generic 5, joined-query/dashboard/causal 10 distinct people. Protect complementary cells and never publish individual rankings."
+  ],
+  "viva-insights-copilot-dashboards": [
+    "Requires a retained sample-code checkout and R; reference demo rendering also requires Pandoc. Skill installation does not install dependencies.",
+    "Consumption real builds support scoped credits-only panels. GitHub real data is inspect/readiness only; real Person/Agent dashboard adapters are not implemented.",
+    "Reference reproductions are synthetic. Do not invent missing panels, tokens, currency, productivity, ROI or causal effects from activity.",
+    "Use max(organisation requirement, 10 distinct people) across published and embedded output, protect complementary cells and never publish individual rankings."
+  ],
+  "viva-insights-causal-analysis": [
+    "Guided design/readiness workflow, not a general real-data causal engine. Bundled R/Python runners use fabricated balanced panels and limited linear comparisons.",
+    "Choose a supported identifying design and compatible diagnostics first; readiness-only and unavailable checks are valid. No general PPML, DML, bootstrap or quasi-experimental runner is implemented here.",
+    "The prescribed Copilot Causal Toolkit remains a separate notebook/DML workflow; do not silently substitute treatments or methods.",
+    "Install alongside the core analysis skill. Use max(organisation requirement, 10 distinct people), protect complementary cells and never publish individual rankings or person-specific effects."
+  ]
+}

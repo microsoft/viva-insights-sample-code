@@ -243,7 +243,7 @@ segmentation report."]
 
 ### [Output file 1, e.g., "copilot_adoption_dashboard.html"]
 - **Format**: [e.g., "Self-contained static HTML"]
-- **Contents**: [e.g., "Trend charts, segmentation breakdowns, top users table"]
+- **Contents**: [e.g., "Trend charts, protected group breakdowns and aggregate tables, never individual rankings"]
 - **How to share**: [e.g., "Email as attachment or upload to SharePoint"]
 
 ### [Output file 2]
@@ -253,7 +253,7 @@ segmentation report."]
 
 - [Verification step 1, e.g., "Open the HTML file in a browser and confirm all charts render"]
 - [Verification step 2, e.g., "Check that the adoption rate in the summary matches your manual calculation"]
-- [Verification step 3, e.g., "Verify no group with fewer than 5 users appears in segmentation charts"]
+- [Verification step 3, e.g., "Apply max(organisation requirement, workflow floor), generic 5 or joined-query/dashboard/causal 10 distinct people, including complementary cells and embedded data"]
 
 ## Sample screenshots or descriptions
 [If possible, describe what each output looks like. You may include placeholder

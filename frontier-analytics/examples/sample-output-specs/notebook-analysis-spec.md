@@ -2,6 +2,9 @@
 
 This specification defines the structure, code style, and content expectations for an **exploratory analysis notebook** generated from Viva Insights data. Use this spec as context for coding agents when you want them to produce a well-structured, reproducible notebook suitable for peer review and iterative analysis.
 
+Apply the [shared analysis policy](../../skills/viva-insights-analysis/reference/analysis-policy.md).
+Keep row-level working data local; public reports contain only protected aggregates.
+
 ---
 
 ## Target format
@@ -55,7 +58,9 @@ sns.set_palette('colorblind')
 pd.set_option('display.max_columns', 50)
 pd.set_option('display.float_format', '{:.2f}'.format)
 
-PRIVACY_THRESHOLD = 10  # Minimum group size for reporting
+ORG_MINIMUM = 5  # Replace with the actual organisational requirement.
+WORKFLOW_FLOOR = 5  # Use 10 for joined-query, dashboard or causal publication.
+PRIVACY_THRESHOLD = max(ORG_MINIMUM, WORKFLOW_FLOOR)
 DATA_PATH = './data/person_query.csv'
 ```
 
@@ -68,7 +73,9 @@ library(scales)
 
 theme_set(theme_minimal(base_size = 12))
 
-PRIVACY_THRESHOLD <- 10
+ORG_MINIMUM <- 5  # Replace with the actual organisational requirement.
+WORKFLOW_FLOOR <- 5  # Use 10 for joined-query, dashboard or causal publication.
+PRIVACY_THRESHOLD <- max(ORG_MINIMUM, WORKFLOW_FLOOR)
 DATA_PATH <- "./data/person_query.csv"
 ```
 
@@ -104,7 +111,7 @@ print(names(df))
 Verify the panel structure and data quality before any analysis. This cell should:
 
 1. Check for duplicate `(PersonId, MetricDate)` pairs
-2. Identify the time granularity (weekly vs. daily)
+2. Read configured query grouping, week start and measurement windows; gaps are diagnostics only
 3. Check panel completeness
 4. Summarize missing values in key columns
 5. Identify licensed vs. unlicensed users
@@ -115,10 +122,17 @@ Verify the panel structure and data quality before any analysis. This cell shoul
 dupes = df.duplicated(subset=['PersonId', 'MetricDate'], keep=False).sum()
 print(f"Duplicate person-periods: {dupes}")
 
-# Granularity detection
-dates = sorted(df['MetricDate'].unique())
-gap = (pd.to_datetime(dates[1]) - pd.to_datetime(dates[0])).days
-print(f"Time granularity: {'weekly' if gap >= 7 else 'daily'} ({gap}-day gaps)")
+# Query configuration is required; sparse daily activity can look weekly.
+# Set this to 'day', 'week' or 'month' to match the query's grouping setting.
+CONFIGURED_GROUPING = None
+if CONFIGURED_GROUPING not in {'day', 'week', 'month'}:
+    raise ValueError("Confirm configured query grouping before aggregation")
+print(f"Configured grouping: {CONFIGURED_GROUPING}")
+
+# Diagnostic only: observed date spacing should be consistent with the setting.
+date_gaps = pd.Series(pd.to_datetime(df['MetricDate']).unique()).sort_values().diff().dt.days.dropna()
+if not date_gaps.empty:
+    print(f"Observed date gaps (days): min {date_gaps.min():.0f}, max {date_gaps.max():.0f}")
 
 # Panel completeness
 expected = df['PersonId'].nunique() * df['MetricDate'].nunique()
@@ -136,10 +150,31 @@ for col in copilot_cols:
     null_pct = df[col].isna().mean()
     print(f"  {col}: {null_pct:.1%} null")
 
-# Licensed vs unlicensed
-df['is_licensed'] = df[copilot_cols].notna().any(axis=1)
-print(f"\nLicensed person-weeks: {df['is_licensed'].sum()} ({df['is_licensed'].mean():.1%})")
+# Native M365 Copilot export with Copilot_Actions mapped to a licensed-only metric.
+actions = pd.to_numeric(df['Copilot_Actions'], errors='raise').astype('Float64')
+licence_col = next((c for c in ('Copilot_Enabled_User', 'Total_Copilot_enabled_days') if c in df), None)
+if licence_col is not None:
+    enabled = pd.to_numeric(df[licence_col], errors='raise').astype('Float64')
+    df['is_licensed'] = enabled.fillna(0).gt(0)
+else:
+    df['is_licensed'] = actions.notna().astype('boolean')
+if 'licence_source_matched' in df:
+    df.loc[~df['licence_source_matched'].fillna(False), 'is_licensed'] = pd.NA
+if (df['is_licensed'].eq(False) & actions.gt(0)).any():
+    raise ValueError("Resolve conflicting licence and licensed-only activity evidence")
+print(f"\nKnown eligible person-periods: {df['is_licensed'].sum()}")
+print(f"Unknown eligibility: {df['is_licensed'].isna().sum()}")
 ```
+
+This example applies the documented native M365 Copilot null/zero semantics.
+Native nulls mean unlicensed, while zero activity means licensed but inactive.
+Licence fields use imported underscore names for **Copilot Enabled User** and
+**Total Copilot enabled days**. Verify the licensed-only activity metric before
+using it as a fallback. These rules do not apply to unlicensed Copilot Chat or
+Consumption credits. After a licence-source join, retain its match indicator as
+`licence_source_matched` so processing nulls remain unresolved. Investigate
+conflicting licence/activity evidence. Only absent activity rows inside a supplied
+complete query's configured scope contribute zero.
 
 **Follow with a Markdown cell** summarizing the validation findings:
 
@@ -171,11 +206,19 @@ How has Copilot adoption evolved across the reporting period?
 ```
 
 ```python
-weekly = df[df['is_licensed']].groupby('MetricDate').agg(
+actions = pd.to_numeric(df['Copilot_Actions'], errors='raise').astype('Float64')
+df['is_active'] = df['is_licensed'] & actions.gt(0)
+eligible = df[df['is_licensed'].fillna(False)]
+eligibility_known = df.groupby('MetricDate')['is_licensed'].agg(lambda s: s.notna().all())
+weekly = eligible.groupby('MetricDate').agg(
     licensed=('PersonId', 'nunique'),
-    active=('is_active', 'sum')
+    active=('is_active', 'sum'),
+    activity_known=('is_active', lambda s: s.notna().all())
 ).reset_index()
 weekly['adoption_rate'] = weekly['active'] / weekly['licensed']
+weekly['eligibility_known'] = weekly['MetricDate'].map(eligibility_known)
+weekly.loc[~(weekly['eligibility_known'] & weekly['activity_known']), 'adoption_rate'] = float('nan')
+weekly.loc[weekly['licensed'] < PRIVACY_THRESHOLD, ['licensed', 'active', 'adoption_rate']] = float('nan')
 
 fig, ax = plt.subplots(figsize=(10, 5))
 ax.plot(weekly['MetricDate'], weekly['adoption_rate'] * 100, marker='o')
@@ -243,12 +286,12 @@ Do employees with higher collaboration hours tend to use Copilot more or less?
 
 ```python
 # Good: explains the business logic
-# Licensed = has at least one non-null Copilot metric (null means unlicensed, not inactive)
-df['is_licensed'] = df[copilot_cols].notna().any(axis=1)
+# Native null enabled days mean unlicensed under the documented M365 export rules.
+df['is_licensed'] = df['Total_Copilot_enabled_days'].astype('Float64').fillna(0).gt(0)
 
 # Bad: restates the code
-# Set is_licensed to True if any copilot column is not null
-df['is_licensed'] = df[copilot_cols].notna().any(axis=1)
+# Set is_licensed
+df['is_licensed'] = df['Total_Copilot_enabled_days'].astype('Float64').fillna(0).gt(0)
 ```
 
 ### Visualizations

@@ -101,7 +101,7 @@
         {%- endif %}
         <h5 class="skill-limits-title">Limits to keep in mind</h5>
         <ul class="skill-limits">
-          {%- for limit in skill.limitations %}
+          {%- for limit in site.data.workflow_support[skill.slug] %}
           <li>{{ limit }}</li>
           {%- endfor %}
         </ul>

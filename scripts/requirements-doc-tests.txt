@@ -1,1 +1,2 @@
-pandas>=2.2,<4
+# Includes mandatory executable analytics recipes, not optional skipped checks.
+-r requirements-recipes.txt

@@ -48,6 +48,9 @@ Do not assume exact paths or variables, and ask me for the CSV location, toolkit
 Keep the required two-part flow from this card, which means run and validate the analysis first, then interpret the generated outputs in a separate pass.
 Do not change the treatment variable from Total_Copilot_actions_taken, do not edit shared helper modules, and warn me if the dataset is shorter than about 12 weeks.
 When choosing or configuring the notebook, adapt subgroup, collaboration, and outcome variables to the columns that actually exist in my data.
+Before fitting, verify the notebook's actual grain, exposure/outcome windows, pre-exposure controls, overlap and identifying assumptions. DML is not itself an identifying design. If unresolved, return readiness or an agreed association rather than a causal claim; do not run every estimator.
+Prefer Copilot Enabled User or Total Copilot enabled days for licensing. Native licensed-only M365 Copilot nulls mean unlicensed and zero activity means licensed but inactive. A verified metric with these semantics is a valid fallback. Read configured cadence, not date spacing. Absent in-scope activity contributes zero, while failed joins and known coverage failures remain unresolved. Check unlicensed Copilot Chat separately before assigning causal controls.
+Publish only groups meeting max(the organisational requirement, 10 distinct people), protect complementary cells and embedded data, and never publish individual rankings.
 When interpreting results, explain the ATE direction in business terms, include the sensitivity analysis, and avoid overstating causation or borderline significance.
 Finish each phase by listing any assumptions you made about notebook choice, variable mappings, or output interpretation.
 ```
@@ -78,6 +81,24 @@ STEP 2: DATA INSPECTION
 7. Determine whether the data is a Person Query (has `MetricDate`) or a Super Users Report (has `Date` instead).
 
 STEP 3: NOTEBOOK SELECTION Based on the user's data and goals, recommend the appropriate notebook. The available notebooks are:
+
+Before execution, establish a design gate: inspect the selected notebook's actual
+aggregation, treatment contrast, outcome measurement window, temporal ordering,
+controls and dependence assumptions. DML/cross-fitting does not establish
+unconfoundedness or overlap. Copied annual/quarterly outcomes are not weekly
+measurements, contemporaneous controls may leak outcomes, and no amount of
+history alone guarantees identification. Select compatible diagnostics, not
+every estimator. If unresolved, return readiness or an explicitly agreed
+observational association rather than a causal claim.
+
+Read configured grouping and metric windows, not date spacing. Prefer Copilot
+Enabled User or Total Copilot enabled days for licensing. Native licensed-only
+M365 Copilot nulls mean unlicensed and zero activity means licensed but inactive.
+A verified metric with these semantics is a valid fallback. Unlicensed Copilot
+Chat requires separate checks before assigning causal controls. In a supplied
+complete query's configured scope, absent activity contributes zero. Failed joins,
+unavailable sources, out-of-scope periods and known coverage failures remain
+unresolved with reasons. Do not silently zero-fill notebook inputs.
 
   For Person Query (PQ) data:
   - CI-DML_ExtCollabHours_PQ.ipynb → Seller Productivity scenario (Outcome: External_collaboration_hours)
@@ -129,14 +150,30 @@ STEP 6: VERIFY OUTPUTS
    - significant_subgroups_[timestamp].csv
    - sensitivity_analysis_results_[timestamp].json
    - Subgroup-specific folders with ATE plots, results CSVs, and transition matrices
-2. Confirm that at least one subgroup folder was created with results.
-3. Print a summary of what was generated and where the files are located.
+2. Confirm that the expected subgroup folders were created. If none were, check
+   the run log for failed fits before interpreting anything.
+3. Record successful fits, failed/unavailable checks and null findings. No
+   significant subgroup is a valid result, not a reason to alter the sample.
+4. Print a summary of what was generated and where the files are located.
 
 IMPORTANT NOTES
 - Do NOT modify the helper modules in script/modules/ — they are shared across notebooks.
 - The treatment variable is always `Total_Copilot_actions_taken`. Do not change this.
 - If the user's data has fewer than 12 weeks, warn them that results may be less reliable.
 - Keep explanations accessible — the user may not be a data scientist.
+- Publish only groups with max(the organisational requirement, 10 distinct people).
+  Protect complementary cells and embedded data. No individual rankings.
+- Low-activity flags are review candidates, not verified holidays or job classes.
+
+<!-- analysis-policy:start -->
+Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
+Absent activity inside a supplied complete query's configured scope contributes zero. Preserve unresolved joins, unavailable sources, out-of-scope periods and known coverage failures as unknown with reasons. Do not extend licensed-only M365 Copilot null semantics to unlicensed Copilot Chat or Consumption credits.
+Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
+Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
+Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.
+Choose a supported identifying design before causal claims and compatible estimators; default to association, retain unavailable checks and label synthetic evidence.
+Inspect installed package versions, signatures and return types; separate executed evidence from expected behaviour and do not silently fork upstream bugs.
+<!-- analysis-policy:end -->
 ```
 
 ### Adaptation notes for Prompt 1
@@ -148,12 +185,13 @@ IMPORTANT NOTES
 ## Prompt 2: Interpret the Results
 
 ```
-You are a senior people analytics advisor helping an HR analytics leader understand the results of a causal inference analysis. The analysis was run using the Copilot Causal Toolkit, which uses Double Machine Learning (DML) to estimate whether Copilot usage causes changes in a business outcome.
+You are a senior people analytics advisor helping an HR analytics leader understand Copilot Causal Toolkit results. DML estimates have a causal interpretation only under a supported identifying design, overlap and justified control timing; the method's name does not establish those conditions.
 
 The analysis outputs are located in the output/ directory of the toolkit. Your job is to read these outputs and produce a clear, non-technical interpretation suitable for sharing with senior leadership.
 
 STEP 1: LOCATE AND READ OUTPUTS
-1. Scan the output/ directory for the most recent analysis results.
+1. Confirm the selected run, source revision, sample, model, units and identifying
+   assumptions. Do not combine unrelated runs or treat a file name as evidence.
 2. Read the key output files:
    - significant_subgroups_[timestamp].csv → which employee subgroups show statistically significant effects
    - sensitivity_analysis_results_[timestamp].json → how robust the findings are to potential hidden biases
@@ -170,9 +208,9 @@ STEP 2: PRODUCE AN EXECUTIVE INTERPRETATION Write a clear, non-technical summary
 - Or: "No statistically significant overall effect was found, but specific subgroups showed meaningful effects."
 
 ### 2. What This Analysis Does (3-4 sentences) Explain in accessible language:
-- This is a causal inference analysis, not just a correlation. It uses a method called Double Machine Learning to isolate the effect of Copilot usage from other factors that might influence the outcome.
+- Explain the design and assumptions separately from DML estimation. Default to an adjusted association when causal identification is not established.
 - Explain what the treatment variable is (Copilot actions) and what the outcome variable is.
-- Note that this accounts for confounding factors such as collaboration patterns, network size, and focus time.
+- Name only controls actually used and temporally justified; more contemporaneous metrics do not guarantee confounding control.
 
 ### 3. Key Results Table Present a summary table with:
 - Subgroup name and definition
@@ -180,15 +218,21 @@ STEP 2: PRODUCE AN EXECUTIVE INTERPRETATION Write a clear, non-technical summary
 - Statistical significance (p-value or confidence interval, explained in plain terms)
 - Practical significance (is the effect large enough to matter?)
 
-### 4. Subgroup Insights (3-5 bullets) For each significant subgroup, explain:
+### 4. Subgroup Insights (3-5 bullets) Report predeclared groups, null findings and multiplicity limitations, not only significant results:
 - Which group of employees is this? (e.g., "Managers in Engineering")
 - What is the estimated effect? (e.g., "1.2 fewer after-hours collaboration hours per week")
-- How confident are we? Reference the sensitivity analysis — higher E-values mean the finding is more robust to hidden biases.
-- What does this mean practically? (e.g., "This suggests that Copilot helps managers in Engineering reduce after-hours work by roughly 1 hour per week.")
+- How uncertain is the estimate? State intervals, dependence and sensitivity assumptions without claiming that a p-value is the probability of a true effect.
+- What does this mean for the measured outcome? Reduced after-hours collaboration is not measured burnout reduction; external collaboration is not measured sales.
 
 ### 5. Robustness Assessment Interpret the sensitivity analysis results:
-- E-values above 2.0 suggest the finding is reasonably robust — an unmeasured confounder would need to be at least twice as strong as the measured ones to explain away the result.
-- E-values below 1.5 suggest the finding is more fragile and should be interpreted cautiously.
+- Inspect the sensitivity statistic's actual definition, scale and applicability
+  in the executed notebook before interpreting it. Do not use universal E-value
+  cutoffs or compare them to the strength of measured controls without justification.
+- Where an E-value is reported, explain it in plain terms: it is the minimum strength
+  of association an unmeasured confounder would need with both treatment and outcome
+  to explain away the estimate. Values close to 1 indicate a fragile finding, and
+  larger values indicate more robustness, though the threshold that counts as
+  reassuring depends on what plausible confounders exist in this setting.
 - Note any subgroups where effects were NOT statistically significant — absence of evidence is not evidence of absence.
 
 ### 6. Recommendations (2-4 bullets) Based on the results, suggest actionable next steps:
@@ -201,7 +245,10 @@ STEP 2: PRODUCE AN EXECUTIVE INTERPRETATION Write a clear, non-technical summary
 - Causal inference from observational data has limitations — DML reduces but does not eliminate confounding risk.
 - Results apply to the specific time period and population analyzed.
 - The sensitivity analysis indicates robustness but cannot guarantee no unmeasured confounders.
-- Subgroup results with small sample sizes should be interpreted cautiously.
+- Subgroup estimates from small samples are imprecise even when they clear the
+  privacy minimum. Interpret them cautiously and show their interval widths.
+- Suppress groups below max(the organisational requirement, 10 distinct people),
+  including complementary cells and embedded data. Never publish individual rankings.
 
 FORMATTING
 - Use clear section headers.
@@ -212,9 +259,21 @@ FORMATTING
 
 IMPORTANT NOTES
 - Do NOT overstate findings. If effects are small or borderline significant, say so clearly.
-- Do NOT claim definitive causation — use language like "the analysis suggests" or "the estimated causal effect is."
-- Frame everything in business terms the audience cares about (time saved, wellbeing impact, engagement improvement), not statistical terms.
+- Use "estimated causal effect" only when the design and assumptions support it;
+  otherwise use "adjusted association".
+- Explain measured outcomes in business language without relabelling activity
+  as measured time saved, wellbeing, productivity or realised ROI.
 - If no significant effects are found, this is still a valid and useful result — frame it constructively (e.g., "The data does not yet show a measurable effect, which may indicate the need for a longer observation period or targeted enablement strategies").
+
+<!-- analysis-policy:start -->
+Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
+Absent activity inside a supplied complete query's configured scope contributes zero. Preserve unresolved joins, unavailable sources, out-of-scope periods and known coverage failures as unknown with reasons. Do not extend licensed-only M365 Copilot null semantics to unlicensed Copilot Chat or Consumption credits.
+Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
+Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
+Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.
+Choose a supported identifying design before causal claims and compatible estimators; default to association, retain unavailable checks and label synthetic evidence.
+Inspect installed package versions, signatures and return types; separate executed evidence from expected behaviour and do not silently fork upstream bugs.
+<!-- analysis-policy:end -->
 ```
 
 ### Adaptation notes for Prompt 2
@@ -226,7 +285,9 @@ IMPORTANT NOTES
 ## Common failure modes
 
 - **Agent cannot find the output files.** Ensure the agent is looking in the correct `output/` subdirectory. The exact folder name depends on what was set for `output_base_dir` during configuration.
-- **Agent misinterprets the ATE direction.** A negative ATE for after-hours collaboration is a positive outcome (less burnout). Make sure the agent correctly contextualizes the direction of the effect relative to the business question.
+- **Agent misinterprets the ATE direction.** A negative estimate means less measured after-hours collaboration, not measured burnout reduction. Interpret the exact contrast and uncertainty.
 - **Agent overstates statistical significance.** A p-value of 0.04 is borderline. The agent should present this with appropriate hedging rather than claiming a definitive causal effect.
-- **Agent ignores sensitivity analysis.** The E-values are critical for assessing robustness. If the agent skips this section, prompt it: "Also interpret the sensitivity analysis results from the JSON file."
+- **Agent ignores or overstates sensitivity analysis.** Inspect the statistic
+  actually computed, its assumptions and scale. Explain unavailable checks
+  rather than inventing robustness or using universal cutoffs.
 - **No significant results found.** This is a valid outcome. The agent should not treat it as a failure, but rather frame it constructively with suggestions for next steps (more data, different outcome, qualitative complement).

@@ -4,6 +4,9 @@ This document catalogs the most common data quality issues, analytical mistakes,
 
 > **For coding agents:** If you are processing Viva Insights data, review this list before starting your analysis. Many of these pitfalls are subtle and can invalidate results silently.
 
+The [shared analysis policy](../skills/viva-insights-analysis/reference/analysis-policy.md)
+owns the common rules; the examples below illustrate them.
+
 ---
 
 ## 1. Panel structure misunderstanding
@@ -27,12 +30,12 @@ print(f"{rows} rows, {persons} unique persons → {rows/persons:.1f} periods per
 **How to fix:** Always aggregate to the appropriate level before analysis. For cross-sectional summaries, compute per-person averages first, then summarize across persons:
 
 ```python
-# Wrong: mean across all rows (mixes within-person and between-person variation)
-wrong_avg = df['Collaboration_Hours'].mean()
+# Person-period-weighted estimand (weights longer histories more heavily)
+person_period_avg = df['Collaboration_Hours'].mean()
 
-# Right: person-level mean first, then grand mean
+# Person-weighted estimand (equal weight per person)
 person_avg = df.groupby('PersonId')['Collaboration_Hours'].mean()
-correct_avg = person_avg.mean()
+person_weighted_avg = person_avg.mean()
 ```
 
 ---
@@ -41,14 +44,23 @@ correct_avg = person_avg.mean()
 
 **The mistake:** Treating `NA`/`null` values in Copilot metric columns as zero.
 
-**Why it matters:** In Viva Insights person query data:
-- `NA` / `null` in a Copilot column → the user was **not licensed** for Copilot that period
-- `0` in a Copilot column → the user **was licensed but did not use** Copilot that period
+**Why it matters:** For native licensed-only M365 Copilot metrics,
+[Microsoft documents](https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics#notes-on-copilot-metric-calculations)
+null as unlicensed and zero activity as licensed but inactive. Prefer
+**Copilot Enabled User** or **Total Copilot enabled days** when available.
+Null enabled days in the native export mean unlicensed, not unknown.
+These semantics do not apply to unlicensed Copilot Chat or Consumption credits.
 
-Replacing `NA` with `0` conflates unlicensed users with inactive licensed users, which:
-- Inflates the denominator for adoption rate calculations
-- Makes "average usage per user" appear artificially low
-- Produces misleading trends (e.g., "usage is declining" when actually licenses were just revoked)
+Within the current join contract's supplied complete query scope (configured
+population, dates and product filters), absent activity rows contribute zero.
+This is different from native unlicensed nulls or nulls introduced by a failed
+join, unavailable source, out-of-scope period or known export problem. The latter
+remain unknown. Preserve those reasons and do not blanket-fill.
+
+Blanket-filling nulls with zero causes three distinct problems. It inflates the
+denominator of adoption rates, it makes average usage per user look artificially
+low, and it can produce misleading trends, for example usage appearing to
+decline when licences were simply removed.
 
 **How to detect:**
 
@@ -60,15 +72,38 @@ for col in copilot_cols:
     print(f"{col}: {null_count} nulls, {zero_count} zeros")
 ```
 
-**How to fix:** Never use `fillna(0)` on Copilot columns. Instead, create explicit flags:
+**How to fix:** Classify native export values before any joins:
 
 ```python
-df['is_licensed'] = df[copilot_cols].notna().any(axis=1)
-df['is_active'] = df['is_licensed'] & (df['Copilot_Actions'] > 0)
+actions = pd.to_numeric(df['Copilot_Actions'], errors='raise').astype('Float64')
+# Copilot_Actions is mapped to a verified native licensed-only M365 metric.
+licence_col = next((c for c in ('Copilot_Enabled_User', 'Total_Copilot_enabled_days') if c in df), None)
+if licence_col is not None:
+    enabled = pd.to_numeric(df[licence_col], errors='raise').astype('Float64')
+    df['is_licensed'] = enabled.fillna(0).gt(0)
+else:
+    df['is_licensed'] = actions.notna().astype('boolean')
+# Optional join indicator created by the analyst, not an export column.
+if 'licence_source_matched' in df:
+    df.loc[~df['licence_source_matched'].fillna(False), 'is_licensed'] = pd.NA
+if (df['is_licensed'].eq(False) & actions.gt(0)).any():
+    raise ValueError("Resolve conflicting licence and licensed-only activity evidence")
+df['is_active'] = df['is_licensed'] & actions.gt(0)
 
-# Compute adoption rate correctly
-adoption = df[df['is_licensed']].groupby('MetricDate')['is_active'].mean()
+eligibility_known = df.groupby('MetricDate')['is_licensed'].agg(lambda s: s.notna().all())
+eligible = df[df['is_licensed'].fillna(False)]
+known = eligible.groupby('MetricDate')['is_active'].agg(lambda s: s.notna().all())
+adoption = eligible.groupby('MetricDate')['is_active'].mean().where(known & eligibility_known)
 ```
+
+The licence columns above use the package-imported underscore names for
+**Copilot Enabled User** and **Total Copilot enabled days**. The fallback is valid
+only for a verified native licensed-only metric with the documented null/zero
+semantics. Otherwise use another licence source or report activity without an
+adoption rate. Preserve `licence_source_matched` from a licence-source join so
+unmatched rows remain unknown. Conflicting licence/activity evidence needs
+investigation. Count distinct people per period and verify person-period key
+uniqueness before this calculation.
 
 ---
 
@@ -77,7 +112,7 @@ adoption = df[df['is_licensed']].groupby('MetricDate')['is_active'].mean()
 **The mistake:** Assuming the same set of people appears in every time period.
 
 **Why it matters:** People leave the organization, go on extended leave, or join during the analysis window. If you only look at people present at the end of the period, you miss:
-- People who churned (left the org or lost their Copilot license)
+- People absent from the source for unresolved reasons, or with documented entry/exit or licence changes
 - People who were hired or onboarded mid-period
 - Seasonal patterns driven by workforce changes, not behavior changes
 
@@ -125,16 +160,22 @@ for attr in ['Organization', 'FunctionType', 'LevelDesignation']:
 **How to fix:** Suppress or aggregate small groups:
 
 ```python
-MIN_GROUP_SIZE = 10  # or your org's threshold
+ORG_MINIMUM = 5  # replace with the organisation's actual requirement
+WORKFLOW_FLOOR = 5  # use 10 for joined-query, dashboard or causal outputs
+MIN_GROUP_SIZE = max(ORG_MINIMUM, WORKFLOW_FLOOR)
 
 def suppress_small_groups(summary_df, group_col, count_col, threshold=MIN_GROUP_SIZE):
-    """Replace values with NaN for groups below the privacy threshold."""
+    """Illustrative primary suppression; audit complementary cells separately."""
     mask = summary_df[count_col] < threshold
     suppressed = summary_df.copy()
-    metric_cols = [c for c in suppressed.columns if c not in [group_col, count_col]]
+    metric_cols = [c for c in suppressed.columns if c != group_col]
     suppressed.loc[mask, metric_cols] = float('nan')
     return suppressed
 ```
+
+Counts are sensitive too. Suppress complementary cells or entire breakdowns
+when totals disclose a small group. Apply the same rules to embedded chart data
+and downloads, and do not publish individual rankings.
 
 ---
 
@@ -316,7 +357,7 @@ Run through this checklist at the start of any Viva Insights analysis:
 
 ### Structure validation
 - [ ] **Panel structure confirmed:** Each `(PersonId, MetricDate)` pair is unique
-- [ ] **Granularity identified:** Weekly (7-day gaps) or daily (1-day gaps)
+- [ ] **Configured cadence confirmed:** Query grouping, week start and measurement windows recorded; gaps used only as diagnostics
 - [ ] **Date range reasonable:** Start and end dates match expected export period
 - [ ] **Row count makes sense:** Approximately `n_persons × n_periods`
 
@@ -327,13 +368,13 @@ Run through this checklist at the start of any Viva Insights analysis:
 - [ ] **Column names documented:** Printed and verified against expected schema
 
 ### Data quality
-- [ ] **Missing values understood:** Nulls in Copilot columns represent unlicensed users, not zero usage
+- [ ] **Missingness reasons preserved:** Native licensed-only M365 Copilot nulls mean unlicensed. Join-created nulls and unavailable/out-of-scope sources remain unresolved
 - [ ] **Panel completeness assessed:** What percentage of persons appear in all periods?
 - [ ] **Small groups identified:** Segments with < minimum group size flagged for suppression
 - [ ] **No unexpected duplicates:** No duplicate `(PersonId, MetricDate)` rows
 
 ### Analysis setup
-- [ ] **Licensed vs. unlicensed flagged:** `is_licensed` column created based on Copilot metric presence
+- [ ] **Licensing established:** Enabled-user/enabled-days evidence or documented native licensed-only metric semantics, with processing failures kept unresolved
 - [ ] **Active vs. inactive flagged:** `is_active` column created based on `Copilot_Actions > 0`
 - [ ] **Time zone assumptions documented:** Noted whether analysis assumes tenant TZ or individual TZ
 - [ ] **Privacy threshold applied:** Minimum group size set and enforced in all outputs

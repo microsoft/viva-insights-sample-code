@@ -48,7 +48,8 @@
 - [Data granularity assumption, e.g., "Data is at person-week granularity"]
 - [Key column assumptions, e.g., "`PersonId` is a consistent anonymized identifier"]
 - [Date handling, e.g., "`MetricDate` is a date field representing the start of each week"]
-- [Missing data assumptions, e.g., "Rows with missing Copilot metric values represent unlicensed users"]
+- [Missingness: native licensed-only M365 Copilot nulls mean unlicensed. Failed joins and unavailable/out-of-scope sources remain unresolved. Absent in-scope activity contributes zero]
+- [Licensing: prefer Copilot Enabled User or Total Copilot enabled days. Documented native licensed-only metric semantics are a fallback. Do not extend these to unlicensed Copilot Chat or Consumption credits]
 - [Package/tool availability, e.g., "The `vivainsights` R or Python package is available in the environment"]
 
 ## Recommended output
@@ -69,7 +70,8 @@ additional context. Include specific instructions about:
 - Output format and structure (file type, sections, charts, tables)
 - Error handling for common data issues (missing values, unexpected types, duplicates)
 - Which packages or libraries to use (and fallbacks if unavailable)
-- Privacy thresholds (e.g., suppress groups with fewer than 5 users)
+- Privacy: max(organisation requirement, workflow floor), generic 5 or joined-query/dashboard/causal 10 distinct people, including complementary cells and embedded data; no individual rankings
+- Configured cadence and measurement windows, not inferred from date spacing
 
 Model your prompt after the existing cards in the library. See
 frontier-analytics/prompts/copilot-adoption/dashboard-overview.md for a
@@ -86,7 +88,7 @@ IMPORTANT NOTES
 - [How to modify for different data granularity, e.g., "If your data is person-day, add an instruction to aggregate to person-week first"]
 - [How to adjust for different HR attributes, e.g., "Replace `Organization` with your actual column name"]
 - [How to customize output format, e.g., "For R users, add 'Use R with ggplot2' at the start of the prompt"]
-- [Other common modifications, e.g., "For smaller organizations, increase the privacy threshold from 5 to 10"]
+- [Other common modifications, e.g., "Increase the privacy minimum above the workflow floor when organisational policy requires it"]
 
 ## Common failure modes
 

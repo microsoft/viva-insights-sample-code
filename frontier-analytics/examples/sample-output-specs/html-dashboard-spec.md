@@ -2,6 +2,9 @@
 
 This specification defines the structure, styling, and content expectations for a **self-contained static HTML dashboard** generated from Viva Insights data. Use this spec as context for coding agents when you want them to produce a polished, shareable dashboard.
 
+Apply the [shared analysis policy](../../skills/viva-insights-analysis/reference/analysis-policy.md).
+The numeric examples below are illustrative, not executed results.
+
 ---
 
 ## Target format
@@ -66,13 +69,15 @@ Bar charts or heatmaps showing breakdowns by HR attributes. Include:
 - **Adoption rate by LevelDesignation** (horizontal bar chart, latest 4-week average)
 - **Heatmap: Adoption rate by Organization × Week** (if ≤15 organizations)
 
-Suppress segments with fewer than the minimum group size threshold (default: 5 users).
+Use max(organisation requirement, dashboard floor of 10 distinct people).
+Protect complementary cells, embedded data and downloads.
 
 ### 5. Data tables
 
 HTML tables showing underlying detail. Include:
 - **Weekly summary table** with columns: Week, Licensed Users, Active Users, Adoption Rate, Avg Actions, Avg Assisted Hours
-- **Top users table** (top 20 by total Copilot Actions): PersonId (anonymized), Organization, Total Actions, Active Weeks, Avg Actions/Week
+- **Group summary table**: approved HR group, window, distinct-person n,
+  verified activity metrics, units and estimands. No individual rankings.
 
 Tables should be sortable if JavaScript is used, or sorted by default (descending by the primary metric).
 
@@ -221,8 +226,9 @@ td { padding: 8px 12px; border-bottom: 1px solid #eee; }
     <footer id="methodology">
         <h2>Methodology</h2>
         <p><strong>Data source:</strong> Viva Insights person query export (person-week granularity).</p>
-        <p><strong>Definitions:</strong> "Licensed" = non-null Copilot metric in any column. "Active" = licensed with Total_Copilot_actions_taken &gt; 0.</p>
-        <p><strong>Privacy:</strong> Segments with fewer than 5 users are suppressed.</p>
+        <p><strong>Definitions:</strong> Prefer Copilot Enabled User or Total Copilot enabled days for licensing. Native licensed-only M365 Copilot nulls mean unlicensed and zero activity means licensed but inactive. A verified metric with these semantics is a valid fallback. Adoption rates include licensed zero-activity people and exclude unlicensed people.</p>
+        <p><strong>Missingness:</strong> Absent in-scope activity contributes zero. Failed joins, unavailable sources, out-of-scope periods and known coverage failures remain unresolved. Do not extend licensed-only M365 Copilot licence semantics to unlicensed Copilot Chat or Consumption credits.</p>
+        <p><strong>Privacy:</strong> Use max(organisation requirement, 10 distinct people), including complementary cells and embedded data. No individual rankings.</p>
     </footer>
 </body>
 </html>
@@ -244,13 +250,21 @@ Structure the dashboard as:
 2. Summary metric cards (4-6 key numbers with trend indicators)
 3. Trend charts (line charts for weekly metrics)
 4. Segmentation charts (bar charts by Organization, FunctionType, LevelDesignation)
-5. Data tables (weekly summary, top users)
+5. Protected aggregate tables (weekly summary and HR groups, no person rows)
 6. Methodology footer
 
 Use matplotlib or ggplot2 for charts. Convert to base64 PNG for embedding.
 Use import_query() from the vivainsights package to load CSV data.
 Use extract_hr() to identify organizational attribute columns.
 Style with a clean, professional design (Segoe UI font, blue/gray palette).
-Target file size under 5 MB. Suppress segments with < 5 users.
+Confirm configured cadence and measurement windows, not date spacing. Prefer
+Copilot Enabled User or Total Copilot enabled days for licensing. Apply documented
+native licensed-only M365 Copilot null/zero semantics, with a verified licensed-only
+metric as a fallback. Exclude native unlicensed nulls from licensed denominators.
+Absent activity inside the supplied complete query's configured scope contributes
+zero. Failed joins and out-of-scope/coverage failures remain unresolved.
+Target file size under 5 MB. Use max(the organisational requirement, 10 distinct
+people) per published group, with complementary-cell and embedded-data checks.
+Do not publish individual rankings.
 Save as "copilot_dashboard_YYYYMMDD.html".
 ```

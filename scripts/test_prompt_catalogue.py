@@ -1,156 +1,117 @@
-#!/usr/bin/env python3
-"""Focused regression tests for the generated Prompt Library catalogue."""
+"""Regression gates for canonical prompt pages, metadata and copyable content."""
 
 import contextlib
 import io
-import sys
+import json
 import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
 
-import generate_prompt_catalogue as generator
-import check_prompt_drift as drift
+import generate_prompt_catalogue as catalogue
+import generate_prompt_pages as pages
+import prompt_metadata as metadata
 
 
-class BadgeTests(unittest.TestCase):
-    def test_string_scalar_styles_are_not_silently_dropped(self):
-        page = """---
-badges:
-  data_source: 'Person''s query'
-  language: "R or Python"
-  output: HTML report # a comment
-  min_data: 8–12+ weeks
----
-"""
-        self.assertEqual(generator.badge_values(page), {
-            "data_source": "Person's query",
-            "language": "R or Python",
-            "output": "HTML report",
-            "min_data": "8–12+ weeks",
-        })
+class PromptGenerationTests(unittest.TestCase):
+    def test_all_generated_outputs_are_exact(self):
+        for path, expected in pages.generated_pages().items():
+            with self.subTest(path=path.name):
+                self.assertEqual(path.read_text(encoding="utf-8"), expected)
+        self.assertEqual(catalogue.SITE_DATA.read_text(encoding="utf-8"), catalogue.generated_catalogue())
 
-    def test_unsupported_badge_value_fails_explicitly(self):
-        for value in ("|", "[R, Python]", "true"):
-            with self.subTest(value=value), self.assertRaises(ValueError):
-                generator.badge_values(f"---\nbadges:\n  language: {value}\n---\n")
+    def test_catalogue_does_not_read_generated_pages(self):
+        with mock.patch.object(pages, "PAGES_DIR", Path("nonexistent")):
+            self.assertEqual(catalogue.generated_catalogue(), catalogue.SITE_DATA.read_text(encoding="utf-8"))
 
-    def test_badges_are_optional(self):
-        self.assertEqual(generator.badge_values("---\ntitle: Example\n---\n"), {})
+    def test_fenced_prompt_and_code_bytes_preserved(self):
+        for item in metadata.PAGES:
+            source = (metadata.PROMPTS_DIR / item["source"]).read_text(encoding="utf-8")
+            rendered = pages.render_page(item, source)
+            self.assertEqual(
+                [part for fenced, part in metadata.fenced_parts(source) if fenced],
+                [part for fenced, part in metadata.fenced_parts(rendered) if fenced],
+            )
+            self.assertEqual(metadata.full_prompt_blocks(source), metadata.full_prompt_blocks(rendered))
 
-    def test_inline_badges_mapping_is_rejected(self):
-        with self.assertRaises(ValueError):
-            generator.badge_values("---\nbadges: {language: R}\n---\n")
-
-
-class CatalogueChecksTests(unittest.TestCase):
-    def setUp(self):
-        temp = tempfile.TemporaryDirectory()
-        self.addCleanup(temp.cleanup)
-        self.root = Path(temp.name)
-        self.prompts = self.root / "frontier-analytics" / "prompts"
-        self.pages = self.root / "_pages"
-        self.source = self.prompts / "copilot-adoption" / "example.md"
-        self.page = self.pages / "frontier-analytics-prompt-example.md"
-        self.data = self.root / "_data" / "prompts.json"
-        self.source.parent.mkdir(parents=True)
-        self.pages.mkdir(parents=True)
-        self.mapping = {"copilot-adoption/example.md": self.page.name}
-        self.body = """# Example
+    def test_multiple_prompts_liquid_and_code_links_are_literal(self):
+        body = """# Example
 
 ## Purpose
 
-Summary with a [related prompt](../related.md).
+Description.
 
 ## Quick prompt (short version)
 
 ```
-quick prompt
+quick {{ value }}
 ```
 
-## Prompt 1: First part
+## Prompt 1: First
 
-```
-first part
+```text
+{{ site.baseurl }} [literal](../missing.md)
 ```
 
-## Prompt 2: Second part
+## Prompt 2: Second
 
-```
-second part
-```
+~~~
+second {% include missing %}
+~~~
 """
-        self.front_matter = """---
-permalink: /frontier-analytics-prompt-example/
-badges:
-  data_source: Person Query
-  output: "HTML report"
----
-"""
-        self.source.write_text(self.body, encoding="utf-8")
-        self.page.write_text(self.front_matter + self.body, encoding="utf-8")
-        patches = [
-            mock.patch.object(generator, "PROMPTS_DIR", self.prompts),
-            mock.patch.object(generator, "PAGES_DIR", self.pages),
-            mock.patch.object(generator, "SITE_DATA", self.data),
-            mock.patch.object(generator, "MAPPING", self.mapping),
-            mock.patch.object(drift, "PROMPTS_DIR", self.prompts),
-            mock.patch.object(drift, "PAGES_DIR", self.pages),
-            mock.patch.object(drift, "REPO_ROOT", self.root),
-            mock.patch.object(drift, "MAPPING", self.mapping),
-            mock.patch.object(drift, "KNOWN_SITE_LESS_CARDS", set()),
-            mock.patch.object(drift, "PARITY_KEYWORDS", []),
-        ]
-        for patch in patches:
-            patch.start()
-            self.addCleanup(patch.stop)
-        self.assertEqual(self.generate(), 0)
+        result = pages.render_page(metadata.PAGES[0], body)
+        self.assertEqual(metadata.full_prompt_blocks(body), metadata.full_prompt_blocks(result))
+        self.assertEqual(result.count("{% raw %}"), 3)
+        self.assertIn("[literal](../missing.md)", result)
 
-    def generate(self, *args):
-        with mock.patch.object(sys, "argv", ["generate_prompt_catalogue.py", *args]):
-            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
-                return generator.main()
-
-    def check_drift(self):
-        output = io.StringIO()
-        with contextlib.redirect_stdout(output):
-            result = drift.main()
-        return result, output.getvalue()
-
-    def test_check_detects_stale_metadata_without_writing(self):
-        original = self.data.read_text(encoding="utf-8")
-        self.assertEqual(self.generate("--check"), 0)
-        self.page.write_text(self.front_matter.replace("HTML report", "Notebook") + self.body, encoding="utf-8")
-        self.assertEqual(self.generate("--check"), 1)
-        self.assertEqual(self.data.read_text(encoding="utf-8"), original)
-        self.assertIn("Summary with a related prompt.", original)
-        self.assertNotIn("../related.md", original)
-
-    def test_missing_quick_fence_fails_even_when_both_copies_match(self):
-        body = self.body.replace("```\nquick prompt\n```", "quick prompt")
-        self.source.write_text(body, encoding="utf-8")
-        self.page.write_text(self.front_matter + body, encoding="utf-8")
-        result, output = self.check_drift()
-        self.assertEqual(result, 1)
-        self.assertIn("no complete fenced block", output)
-
-    def test_second_full_prompt_block_must_match(self):
-        self.assertEqual(self.check_drift()[0], 0)
-        self.page.write_text(
-            self.front_matter + self.body.replace("second part\n```", "changed part\n```"),
-            encoding="utf-8",
+    def test_relative_link_routes_and_fragments(self):
+        source = "copilot-adoption/copilot-causal-toolkit.md"
+        result = pages.rewrite_links(
+            "[adoption](dashboard-overview.md#prompt) [repo-only](../person-query/causal-diagnostics.md#purpose)",
+            source,
         )
-        result, output = self.check_drift()
-        self.assertEqual(result, 1)
-        self.assertIn("full prompt code blocks differ", output)
+        self.assertIn("{{ site.baseurl }}/frontier-analytics-prompt-dashboard/#prompt", result)
+        self.assertIn("blob/main/frontier-analytics/prompts/person-query/causal-diagnostics.md#purpose", result)
+        with self.assertRaisesRegex(ValueError, "unmapped relative link"):
+            pages.rewrite_links("[bad](missing.md)", source)
+
+    def test_missing_and_orphan_sources_fail(self):
+        with tempfile.TemporaryDirectory() as temp:
+            with mock.patch.object(pages, "PROMPTS_DIR", Path(temp)):
+                with self.assertRaisesRegex(ValueError, "Unmapped/missing"):
+                    pages.generated_pages()
+        with mock.patch.object(pages, "MAPPING", {**metadata.MAPPING, "extra.md": "orphan.md"}):
+            with self.assertRaisesRegex(ValueError, "Unmapped/missing"):
+                pages.generated_pages()
+
+    def test_check_is_read_only_and_detects_page_drift(self):
+        with tempfile.TemporaryDirectory() as temp:
+            page = Path(temp) / "page.md"
+            page.write_text("stale", encoding="utf-8")
+            with mock.patch.object(pages, "generated_pages", return_value={page: "expected"}):
+                with contextlib.redirect_stderr(io.StringIO()):
+                    self.assertFalse(pages.sync_pages(True))
+                self.assertEqual(page.read_text(encoding="utf-8"), "stale")
+                self.assertTrue(pages.sync_pages(False))
+                self.assertTrue(pages.sync_pages(True))
 
     def test_missing_full_prompt_fence_fails(self):
-        body = self.body.replace("```\nsecond part\n```", "second part")
-        self.source.write_text(body, encoding="utf-8")
-        self.page.write_text(self.front_matter + body, encoding="utf-8")
-        result, output = self.check_drift()
-        self.assertEqual(result, 1)
-        self.assertIn("no fenced prompt", output)
+        with self.assertRaisesRegex(ValueError, "no fenced prompt"):
+            metadata.full_prompt_blocks("## Prompt 1\n\n```\none\n```\n\n## Prompt 2\nmissing\n")
+        with self.assertRaisesRegex(ValueError, "Unclosed"):
+            list(metadata.fenced_parts("```\nunclosed"))
+
+    def test_metadata_routes_unique_and_existing(self):
+        slugs = [item["slug"] for item in metadata.PAGES]
+        self.assertEqual(len(slugs), len(set(slugs)))
+        self.assertEqual(len(metadata.MAPPING), len(metadata.PAGES))
+        self.assertTrue(set(metadata.METADATA["navigation"]) <= set(slugs))
+        for target in metadata.METADATA["links"]:
+            self.assertTrue(metadata.ROOT.joinpath(*target.split("/")).is_file(), target)
+        for group in json.loads(catalogue.generated_catalogue()):
+            for item in group["prompts"]:
+                self.assertTrue(item["quick_prompt"])
+                self.assertTrue(item["page_url"].endswith("/"))
 
 
 if __name__ == "__main__":

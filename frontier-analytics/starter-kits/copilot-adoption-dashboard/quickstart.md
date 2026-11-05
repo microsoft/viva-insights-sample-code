@@ -3,6 +3,9 @@
 Build a Copilot adoption dashboard with a coding agent. Runtime depends on data,
 dependencies and the agent; no fixed completion time is guaranteed.
 
+The [README](README.md) owns scope, policy and limitations. This is a
+prompt-driven build requiring output verification, not a packaged adapter.
+
 ## What you need
 
 | Item | Minimum requirement |
@@ -29,6 +32,9 @@ In your coding agent, type a brief context line and then paste the prompt:
 ```
 My person query CSV is at ./data/person-query.csv.
 The date column is MetricDate and the primary org column is Organization.
+The query is configured weekly with [week start] and scope [population/dates/products].
+Licence evidence is [Copilot Enabled User, Total Copilot enabled days, verified native licensed-only metric or dated licence file].
+Use max(our organisational requirement, 10 distinct people) for every published group.
 Use Python with matplotlib for static charts embedded in self-contained HTML.
 
 [paste the full Dashboard Overview prompt here]
@@ -39,7 +45,7 @@ Use Python with matplotlib for static charts embedded in self-contained HTML.
 The agent will:
 1. Load and validate your CSV
 2. Detect Copilot metric columns
-3. Classify licensed vs. active users
+3. Apply documented licence semantics, excluding native unlicensed nulls while preserving unresolved joins
 4. Compute weekly metrics
 5. Generate charts and a summary panel
 6. Output a self-contained HTML file

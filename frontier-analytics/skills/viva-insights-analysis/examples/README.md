@@ -44,8 +44,15 @@ Prerequisites: `pip install vivainsights` (Python) or
    `keymetrics_scan` across several metrics. Plots are written to the system
    temp directory, so the skill folder stays clean.
 3. **Copilot segmentation.** Builds a total-actions metric from the per-app
-   action columns, fills NaNs with 0, then `identify_usage_segments`. Shows the
-   full-panel segment mix. Filter to one week for a point-in-time report.
+   action columns, retaining native unlicensed nulls. Runs `identify_usage_segments` on
+   the intact weekly calendar, then withholds labels and derived rolling fields
+   without a full contiguous eligible history (4 or 12 weeks). Unknown
+   eligibility, unlicensed weeks and calendar gaps make the affected windows
+   unavailable. Native null enabled days classify a person-week as unlicensed.
+   Null actions among licensed people and unmatched licence-source joins leave
+   affected histories unresolved. Other people's valid histories still run.
+   The printed distribution counts person-weeks, not
+   distinct people. Filter to one week for a point-in-time snapshot.
 4. **Meeting quality.** The generalised meeting quality filter plus a per-rule
    attrition table. The sample Meeting Query is synthetic, so few rows survive.
    The lesson is the filter mechanics rather than the surviving counts.
@@ -85,3 +92,10 @@ counts in the printed output will not match line for line across languages. The
 shapes and conclusions do. Example 6 is the exception: its synthetic panel is
 generated identically in both languages, and its output was checked manually
 to match exactly for the committed seed.
+
+The corrected segmentation example is checked with Python `vivainsights` 0.4.3
+and R `vivainsights` 0.7.2. From the repository root, run
+`python -B -m unittest discover -s scripts -p test_analysis_recipes.py` and
+`Rscript scripts/test_segmentation.R` for native unlicensed nulls, unknown-history,
+calendar-gap and eligible-zero regression fixtures. These are sample-workflow tests, not a
+general real-export calendar completion or join adapter.

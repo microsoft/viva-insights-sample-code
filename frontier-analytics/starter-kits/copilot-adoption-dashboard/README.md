@@ -6,6 +6,16 @@ This starter kit helps you build a **self-contained static HTML dashboard** that
 
 You don't need to write code yourself. The kit provides structured **prompt cards** that you paste into a coding agent (GitHub Copilot, Claude Code, or similar). The agent generates the code; you provide the data and review the output.
 
+This is an agent-guided starter, not a packaged real-export adapter. See the
+[workflow support table](../../skills/viva-insights-analysis/reference/workflow-support.md)
+and [shared analysis policy](../../skills/viva-insights-analysis/reference/analysis-policy.md).
+Adoption rates need documented licence evidence. Prefer Copilot Enabled User or
+Total Copilot enabled days, with verified native licensed-only metric null/zero
+semantics as a fallback. Native unlicensed nulls are excluded from licensed
+denominators. Failed joins remain unresolved. Published dashboard groups require at least
+`max(organisation requirement, 10)` distinct people, including embedded data
+and complementary-cell protection.
+
 ## Use case
 
 Organizations deploying Microsoft 365 Copilot need to answer questions like:
@@ -13,7 +23,7 @@ Organizations deploying Microsoft 365 Copilot need to answer questions like:
 - How many licensed users are actively using Copilot each week?
 - Is adoption growing, plateauing, or declining?
 - Which departments or functions are leading or lagging?
-- Who are the power users, and who has disengaged?
+- How are usage segments distributed across privacy-safe groups?
 - What is the estimated return on Copilot license investment?
 
 This kit produces a dashboard that answers all of these in a single, shareable artifact.
@@ -26,8 +36,8 @@ A multi-panel HTML dashboard containing:
 2. **Adoption trend chart** — weekly time series of licensed users, active users, and adoption rate
 3. **Usage intensity chart** — distribution of Copilot actions or assisted hours across users, with percentile markers
 4. **Organizational breakdown** — adoption rates and average usage by `Organization`, `FunctionType`, or other HR attributes
-5. **User segment distribution** — proportions of power users, regular users, light users, and inactive licensed users over time
-6. **Top users table** — anonymized leaderboard of highest-usage individuals with their key metrics
+5. **User segment distribution** — the package's Power, Habitual, Novice, Low and Non-user ladder, with unavailable histories reported separately
+6. **Group summary table** — protected aggregate activity by approved HR group; no individual rankings or person rows
 
 The dashboard is styled for professional presentation and includes hover tooltips, responsive layout, and a clean color scheme.
 
@@ -87,7 +97,7 @@ Check the output against the **Common failure modes** section of each prompt car
 
 - **Column name mismatches**: Tell the agent which columns in your data correspond to expected fields.
 - **Date parsing issues**: Specify the date format explicitly (e.g., `"Dates are in YYYY-MM-DD format"`).
-- **Privacy thresholds**: Add `"Suppress any group with fewer than 5 people"` if needed.
+- **Privacy thresholds**: Apply the dashboard floor of 10 distinct people or the stricter organisational requirement to every panel and embedded dataset.
 - **Language/package preference**: Add `"Use R instead of Python"` or `"Use plotly for charts"` as needed.
 
 Repeat Steps 3–5 for each additional prompt card.
@@ -99,7 +109,7 @@ Repeat Steps 3–5 for each additional prompt card.
 | [Dashboard Overview](../../prompts/copilot-adoption/dashboard-overview.md) | Core dashboard with adoption trends, usage intensity, and organizational breakdowns. |
 | [Executive Summary](../../prompts/copilot-adoption/executive-summary.md) | Concise memo distilling Copilot adoption into findings and recommendations for leadership. |
 | [Segmentation & Churn](../../prompts/copilot-adoption/segmentation-and-churn.md) | Classify users into usage tiers, track segment transitions, and quantify churn rates. |
-| [ROI Estimation](../../prompts/copilot-adoption/roi-estimation.md) | Estimate time savings, monetary value, and license ROI with sensitivity analysis. |
+| [ROI Estimation](../../prompts/copilot-adoption/roi-estimation.md) | Estimate potential value scenarios with explicit realisation assumptions and sensitivity analysis, not measured savings or realised ROI. |
 
 ## Expected output
 

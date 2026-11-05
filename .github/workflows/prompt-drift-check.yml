@@ -1,30 +1,26 @@
-name: Frontier Prompt Drift Check
+name: Frontier Documentation Contracts
 
-# Checks that each Frontier Analytics prompt card (frontier-analytics/prompts/**/*.md)
-# stays in sync with its site-facing mirror page (_pages/frontier-analytics-prompt-*.md).
-# frontier-analytics/ is excluded from the Jekyll build, so these are two manually
-# maintained copies of the same content rather than one generated from the other.
-# See .github/scripts/check_prompt_drift.py for what this does and does not catch.
+# Authored prompts and shared references generate the excluded content's site mirrors.
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'frontier-analytics/prompts/**'
-      - '_pages/frontier-analytics-prompt-*.md'
-      - '_data/prompts.json'
-      - 'scripts/generate_prompt_catalogue.py'
-      - 'scripts/test_prompt_catalogue.py'
+      - 'frontier-analytics/**'
+      - '_pages/frontier-analytics-*.md'
+      - '_data/**'
+      - 'scripts/**'
+      - '_includes/skill-catalogue.html'
       - '.github/scripts/check_prompt_drift.py'
       - '.github/workflows/prompt-drift-check.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - 'frontier-analytics/prompts/**'
-      - '_pages/frontier-analytics-prompt-*.md'
-      - '_data/prompts.json'
-      - 'scripts/generate_prompt_catalogue.py'
-      - 'scripts/test_prompt_catalogue.py'
+      - 'frontier-analytics/**'
+      - '_pages/frontier-analytics-*.md'
+      - '_data/**'
+      - 'scripts/**'
+      - '_includes/skill-catalogue.html'
       - '.github/scripts/check_prompt_drift.py'
       - '.github/workflows/prompt-drift-check.yml'
 
@@ -43,13 +39,40 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          python-version: '3.x'
-
-      - name: Check prompt card / site page drift
-        run: python .github/scripts/check_prompt_drift.py
+          python-version: '3.12'
 
       - name: Check generated prompt catalogue
         run: python scripts/generate_prompt_catalogue.py --check
 
-      - name: Test prompt catalogue checks
-        run: python -m unittest discover -s scripts -p test_prompt_catalogue.py
+      - name: Install documentation test requirements
+        run: |
+          python -m pip install -r scripts/requirements-doc-tests.txt -r scripts/requirements-recipes.txt
+          python -c "import vivainsights; from importlib.metadata import version; assert version('vivainsights') == '0.4.3'"
+
+      - name: Test documentation contracts
+        run: python -B -m unittest discover -s scripts -p 'test_*.py'
+
+  r-segmentation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05 # v2
+        with:
+          r-version: '4.6.2'
+          use-public-rspm: true
+
+      - name: Install supported segmentation dependencies
+        uses: r-lib/actions/setup-r-dependencies@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05 # v2
+        with:
+          packages: |
+            cran::vivainsights@0.7.2
+            any::slider
+          dependencies: 'NA'
+
+      - name: Check R segmentation eligibility and history
+        run: |
+          Rscript --vanilla -e 'stopifnot(as.character(utils::packageVersion("vivainsights")) == "0.7.2")'
+          Rscript --vanilla scripts/test_segmentation.R

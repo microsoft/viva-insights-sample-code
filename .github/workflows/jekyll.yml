@@ -33,11 +33,18 @@ jobs:
           ruby-version: '3.1'
           bundler-cache: true
 
-      - name: Check generated join guide
+      - name: Setup Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Check generated documentation
         run: |
-          python3 -m pip install -r scripts/requirements-doc-tests.txt
+          python3 -m pip install -r scripts/requirements-doc-tests.txt -r scripts/requirements-recipes.txt
+          python3 -c "import vivainsights; from importlib.metadata import version; assert version('vivainsights') == '0.4.3'"
           python3 -B scripts/build_join_guide.py --check
-          python3 -B -m unittest discover -s scripts -p test_join_guide.py
+          python3 -B scripts/generate_prompt_catalogue.py --check
+          python3 -B -m unittest discover -s scripts -p 'test_*.py'
           
       - name: Setup Pages
         id: pages
@@ -47,6 +54,9 @@ jobs:
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
         env:
           JEKYLL_ENV: production
+
+      - name: Check rendered prompt blocks and links
+        run: python3 -B scripts/check_rendered_prompts.py --baseurl "${{ steps.pages.outputs.base_path }}"
           
       - name: Upload artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0

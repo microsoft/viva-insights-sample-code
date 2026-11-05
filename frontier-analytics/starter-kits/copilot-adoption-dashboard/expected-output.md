@@ -2,6 +2,11 @@
 
 This document describes what the finished dashboard looks like, how it's structured, and how to share it.
 
+The [starter README](README.md) owns scope and policy. Omit adoption rates
+without resolved licence evidence and unsupported metrics rather than
+filling panels with guessed values. Apply the dashboard privacy minimum to every
+panel, filter, embedded dataset and download.
+
 ## Output format
 
 The primary deliverable is a **single self-contained HTML file**. Everything — JavaScript, CSS, chart data, and layout — is embedded inline. No external dependencies, no server, no internet connection required to view.
@@ -64,7 +69,7 @@ A comparative view of adoption and usage across organizational units.
 - **Rows/categories**: Values of `Organization` (or `FunctionType`, depending on configuration)
 - **Metrics per group**: Licensed count, active count, adoption rate, average `Copilot_Actions`
 - **Sorting**: By adoption rate (descending) or by group size
-- **Privacy threshold**: Groups with fewer than 5 users are suppressed or aggregated into "Other"
+- **Privacy threshold**: max(organisation requirement, 10 distinct people), with complementary-cell checks; pooling into "Other" must itself meet the threshold
 
 **Design:** Enables leadership to see which departments lead adoption and which need attention. Color intensity or bar length encodes the metric value for quick visual scanning.
 
@@ -73,27 +78,29 @@ A comparative view of adoption and usage across organizational units.
 A stacked area or stacked bar chart showing how the user population breaks down into usage segments over time.
 
 **Contents:**
-- **Segments** (defined by percentile thresholds on `Copilot_Actions`):
-  - **Power users**: Top quartile of active users
-  - **Regular users**: 25th–75th percentile
-  - **Light users**: Bottom quartile of active users
-  - **Inactive licensed**: Licensed but zero actions that week
+- **Segments**: `identify_usage_segments()` Power, Habitual, Novice, Low and
+  Non-users, using the documented rolling window and thresholds, not percentiles.
+- **Unavailable histories**: report separately when licence/activity evidence
+  or the required calendar history is unknown.
 - **X-axis**: `MetricDate` (weekly)
 - **Y-axis**: Count or proportion of users in each segment
 - **Transition indicators**: Optional annotations showing net flows between segments
 
 **Design:** Reveals whether the organization is growing its power-user base or seeing users slip into lighter usage tiers. Stacked format makes proportional shifts easy to see.
 
-### Panel 6 — Top Users Table
+### Panel 6 — Group Summary Table
 
-A tabular view of the highest-usage individuals (anonymized).
+A privacy-protected aggregate view of approved HR groups.
 
 **Contents:**
-- **Columns**: `PersonId` (anonymized), `Organization`, `FunctionType`, total `Copilot_Actions` (summed over the reporting period), average weekly `Copilot_Assisted_Hours`, number of active weeks, usage segment
-- **Rows**: Top 20 users by total `Copilot_Actions`
-- **Sorting**: Descending by total actions (user can re-sort by clicking column headers, if interactivity is enabled)
+- **Columns**: Group, reporting window, distinct-person n, verified activity
+  summaries and their units/estimands
+- **Rows**: Groups satisfying the applicable privacy minimum in the displayed cut
+- **Disclosure**: No person identifiers, individual rankings, raw tooltips or
+  hidden person-level records; withhold the breakdown if totals reveal small cells
 
-**Design:** Useful for identifying Copilot champions who could serve as advocates or trainers. All identifiers are anonymized per the person query privacy model.
+**Design:** Supports aggregate enablement planning, not individual evaluation.
+Pseudonymisation does not make an individual leaderboard safe to publish.
 
 ## Additional panels (from supplementary prompts)
 
@@ -102,8 +109,8 @@ If you also run the supplementary prompt cards, the dashboard can include:
 | Prompt | Additional panels |
 |---|---|
 | [Executive Summary](../../prompts/copilot-adoption/executive-summary.md) | A text panel with a formatted executive memo — headline findings, trends, and recommendations |
-| [Segmentation & Churn](../../prompts/copilot-adoption/segmentation-and-churn.md) | Segment transition matrix (Sankey or heatmap), churn rate trend line, at-risk user list |
-| [ROI Estimation](../../prompts/copilot-adoption/roi-estimation.md) | ROI summary card, time-savings bar chart by organization, sensitivity analysis table, break-even threshold indicator |
+| [Segmentation & Churn](../../prompts/copilot-adoption/segmentation-and-churn.md) | Protected segment transition matrix, churn trend and at-risk group summaries |
+| [ROI Estimation](../../prompts/copilot-adoption/roi-estimation.md) | Potential-value scenario, approved realisation assumptions, sensitivity table and break-even indicator; not measured time savings or realised ROI |
 
 ## How to share
 

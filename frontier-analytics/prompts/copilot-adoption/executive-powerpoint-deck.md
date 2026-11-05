@@ -23,7 +23,7 @@ When a static HTML report or memo is not suitable and stakeholders need a polish
 - Data is at person-week granularity
 - `PersonId` is a consistent anonymized identifier
 - `MetricDate` is a date field representing the start of each week
-- Rows with missing Copilot metric values likely represent unlicensed users
+- Licensing follows documented native M365 Copilot null/zero semantics, with enabled-user or enabled-days evidence preferred
 - The `vivainsights` R or Python package is available in the environment
 - A package for creating PowerPoint files with native charts is available (for example `officer` + `mschart` in R, or `python-pptx` in Python)
 
@@ -39,10 +39,11 @@ Use this shorter prompt for a fast first pass that adapts to your data.
 Help me generate an exec-ready PowerPoint deck that summarizes Copilot adoption for senior leaders from a Viva Insights person query export.
 Start by loading the actual CSV and printing row count, column names, data types, date range, and unique people so you can map the real Copilot and HR fields before building slides.
 Adapt field names dynamically, use the installed toolchain that best supports native PowerPoint charts, and ask me for the file path, template path, or any ambiguous metric mapping before you proceed.
-Classify licensed versus active users correctly, using the real primary activity metric from the data rather than assuming the default names blindly.
+Prefer Copilot Enabled User or Total Copilot enabled days for licensing. Native licensed-only M365 Copilot nulls mean unlicensed and zero activity means licensed but inactive. Use a verified metric with those semantics as a fallback without explicit fields. Omit rates only when licence status or licensed activity is genuinely unresolved.
+Read configured cadence and measurement windows, not date spacing. In a supplied complete query's configured scope, absent activity rows contribute zero. Failed joins, out-of-scope periods and known coverage failures remain unresolved.
 Create the deck directly as a .pptx file with native editable chart objects wherever the library supports them, and avoid HTML to PowerPoint conversion pipelines.
 If a needed chart type cannot be created natively, simplify it to a supported native chart where possible and clearly note any remaining slide that must fall back to an image.
-Keep the deck concise, data-driven, and presentation-ready, suppress segments below about 5 people, and skip slides that depend on unavailable metrics rather than leaving blanks.
+Use distinct-person denominators and state whether summaries weight people or person-weeks. Suppress groups below max(the organisational requirement, 5 distinct people), using floor 10 in dashboard/joined workflows. Protect complementary cells and embedded chart data; never publish individual rankings. Skip unavailable slides.
 Finish by listing any assumptions you made about chart support, metric mappings, or optional slide substitutions.
 ```
 
@@ -59,12 +60,16 @@ Choose R or Python based on what is already installed in your environment to min
 - Python: Use the `python-pptx` package. Note that native chart support in python-pptx is more limited — if advanced chart types are needed, R with `mschart` is recommended.
 
 DATA LOADING AND PREPARATION
+Confirm configured weekly grouping, week start, metric measurement windows and query scope. Observed date gaps are diagnostic only. Within a supplied complete query's configured scope, absent activity rows contribute zero. Native licensed-only M365 Copilot nulls mean unlicensed. Failed joins, unavailable sources, out-of-scope periods and known coverage failures remain unresolved with reasons.
 1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python). This handles variable name cleaning and type parsing automatically.
 2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity metric.
 3. Identify HR / organizational attribute columns with `extract_hr(df, return = "names")` in R or `vi.extract_hr(df, return_type="suggestion")` in Python.
 4. Classify each person-week:
-   - "Licensed": if an enabled-days column is present (for example `Total_Copilot_enabled_days`), that column is greater than zero for the week. Otherwise, at least one non-null, non-zero Copilot metric value.
+   - "Licensed": positive Copilot Enabled User, positive Total Copilot enabled days or dated licence evidence for that week. Without these fields, a non-null value, including zero, in a verified native licensed-only M365 Copilot metric establishes licensing.
    - "Active": licensed AND Total_Copilot_actions_taken > 0.
+   - "Unlicensed": native null licensed-only M365 Copilot values, native null or zero enabled days, or explicit negative licence evidence.
+   - "Unknown": failed joins, unavailable sources or genuinely unresolved field semantics. Withhold the affected rate if licence status or licensed activity is unresolved. Investigate conflicting evidence.
+   - Ask for an approved dated licence list only if neither explicit fields nor documented native licensed-only metric semantics resolve licensing. Do not extend these semantics to unlicensed Copilot Chat or Consumption credits.
 5. Print: date range, total persons, licensed persons, active persons.
 
 METRIC CALCULATIONS
@@ -86,8 +91,8 @@ METRIC CALCULATIONS
    i. Top 3 and bottom 3 organizations by adoption rate (minimum 10 licensed users)
 
    ROI headline (if Copilot_Assisted_Hours is available):
-   j. Average weekly time saved per active user
-   k. Annualized estimated value (using $75/hour default, configurable)
+   j. Average weekly assisted hours per active user, not measured time saved
+   k. Potential annualised value only after approval of a realisation factor, hourly rate and any proxy conversion; label it an assumption-based scenario
 
 SLIDE DECK GENERATION
 7. Create a PowerPoint deck with the following slides. **Prefer R (mschart/officer)** for the charts: it produces genuinely native, editable PowerPoint chart objects across the full range of chart types used here. If you must use Python (python-pptx), be aware its native-chart support is more limited — restrict yourself to the chart types python-pptx supports as native charts (e.g., clustered/stacked bar and column, line, and pie charts) and avoid combo charts, secondary axes, or annotations it cannot render natively. For any chart type that python-pptx cannot create natively, either simplify it to a supported type or fall back to a high-resolution embedded image, and note in the output which slides use images rather than editable charts.
@@ -122,7 +127,7 @@ SLIDE DECK GENERATION
    SLIDES 7-9: Organizational breakdowns (one slide per HR attribute)
    - Native horizontal bar chart: adoption rate by segment (latest 4-week average)
    - Sort bars by adoption rate descending
-   - Suppress segments with fewer than 5 licensed users
+   - Suppress below max(the organisational requirement, 5 distinct licensed people), using floor 10 for dashboard/joined outputs and at least 10 for the top/bottom organisation table
    - If there are more than 12 segments, show only the top and bottom 6
 
    SLIDE 10: Top and bottom performers
@@ -132,7 +137,7 @@ SLIDE DECK GENERATION
    - Brief annotation on what distinguishes leading and lagging groups
 
    SLIDE 11: ROI summary (if Copilot_Assisted_Hours is available)
-   - Average weekly time saved per active user
+   - Average weekly assisted hours and the approved realisation factor
    - Annualized value estimate and cost
    - ROI ratio
    - Break-even threshold
@@ -172,10 +177,21 @@ SLIDE DECK GENERATION
 IMPORTANT NOTES
 - All charts MUST be native editable PowerPoint chart objects, not static images. This is the primary requirement — recipients need to be able to modify charts and update data.
 - Do NOT use RMarkdown or Jupyter notebook as an intermediary for this output. Generate the .pptx file directly using the appropriate PowerPoint package.
-- Handle missing values correctly: null in Copilot columns = unlicensed, 0 = licensed but inactive.
-- Suppress segments with fewer than 5 users to protect privacy.
+- Native licensed-only M365 Copilot nulls mean unlicensed. Keep processing failures unresolved rather than treating them as native nulls or zero activity.
+- Apply the stated privacy floor to charts, tables, hidden chart workbooks and complementary cells; never publish individual rankings.
+- Low-activity flags are review candidates, not verified holidays, employment status or job classifications.
 - Do NOT fabricate numbers. Every statistic must be computed from the data.
 - If a chart type is not supported natively by the PowerPoint library, use the closest available chart type and note the limitation.
+
+<!-- analysis-policy:start -->
+Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
+Absent activity inside a supplied complete query's configured scope contributes zero. Preserve unresolved joins, unavailable sources, out-of-scope periods and known coverage failures as unknown with reasons. Do not extend licensed-only M365 Copilot null semantics to unlicensed Copilot Chat or Consumption credits.
+Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
+Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
+Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.
+Choose a supported identifying design before causal claims and compatible estimators; default to association, retain unavailable checks and label synthetic evidence.
+Inspect installed package versions, signatures and return types; separate executed evidence from expected behaviour and do not silently fork upstream bugs.
+<!-- analysis-policy:end -->
 ```
 
 ## Adaptation notes

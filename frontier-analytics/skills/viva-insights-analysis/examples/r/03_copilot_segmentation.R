@@ -5,10 +5,9 @@
 # Low / Non-user) with identify_usage_segments.
 #
 # Convention reminders (see reference/analysis-conventions.md):
-# - Fill the metric NAs with 0 before segmenting, or the rolling window leaves
-#   people unclassified.
-# - Define the licensed population by enabled days for a snapshot rather than by
-#   action presence.
+# - Native null enabled days mean unlicensed. Preserve the full weekly calendar.
+# - Require known eligible activity history throughout the rolling window,
+#   rather than inferring eligibility from action presence.
 
 suppressMessages(library(vivainsights))
 
@@ -17,14 +16,44 @@ pq <- pq_data
 # 1. Build a total Copilot actions metric from the per-app action columns.
 action_cols <- grep("^Copilot_actions_taken_in_", names(pq), value = TRUE)
 cat("Per-app action columns:", paste(action_cols, collapse = ", "), "\n")
-pq$Total_Copilot_actions <- rowSums(pq[, action_cols], na.rm = TRUE)  # NA -> 0
+stopifnot(length(action_cols) > 0)
+pq$Total_Copilot_actions <- rowSums(pq[, action_cols, drop = FALSE], na.rm = FALSE)
+pq$is_licensed <- !is.na(pq$Total_Copilot_enabled_days) & pq$Total_Copilot_enabled_days > 0
+if ("licence_source_matched" %in% names(pq)) {
+  unmatched <- is.na(pq$licence_source_matched) | !pq$licence_source_matched
+  pq$is_licensed[unmatched] <- NA
+}
+pq$MetricDate <- as.Date(pq$MetricDate)
+stopifnot(!anyNA(pq$MetricDate),
+          !anyDuplicated(pq[, c("PersonId", "MetricDate")]),
+          length(unique(as.POSIXlt(pq$MetricDate)$wday)) == 1L)
+pq <- pq[order(pq$PersonId, pq$MetricDate), ]
 
-# 2. Classify into 12-week usage segments.
+# 2. Keep the calendar intact for rolling classification, then gate each window.
 seg <- identify_usage_segments(pq, metric = "Total_Copilot_actions",
                                version = "12w", return = "data")
+for (width in c(4L, 12L)) {
+  seg <- seg |>
+    dplyr::group_by(PersonId) |>
+    dplyr::mutate(.window_ok = slider::slide_lgl(
+      !is.na(is_licensed) & is_licensed &
+        !is.na(Total_Copilot_actions),
+      ~ length(.x) == width && all(.x), .before = width - 1L
+    ) & as.integer(MetricDate - dplyr::lag(MetricDate, width - 1L)) == (width - 1L) * 7L) |>
+    dplyr::ungroup()
+  columns <- c(paste0("UsageSegments_", width, "w"), paste0("IsHabit", width, "w"),
+               paste0("target_metric_l", width, "w"))
+  seg[!seg$.window_ok, columns] <- NA
+}
+seg$.window_ok <- NULL
 
 # 3. Segment distribution across the whole panel of person-weeks.
+#    Expect many NA rows. The first 11 weeks of each person's history lack a
+#    full 12-week window. Unlicensed weeks (native null or zero enabled days),
+#    unresolved joins and unknown licensed activity withhold affected windows.
+#    They do not become licensed Non-users or stop other people's histories. On the
+#    built-in sample, scattered zero-enabled weeks leave most person-weeks NA.
 #    For a point-in-time adoption report, filter to a single MetricDate first
 #    (for example seg[seg$MetricDate == max(seg$MetricDate), ]).
-cat("\nUsage segment distribution (all person-weeks):\n")
+cat("\nUsage segment distribution (person-weeks; NA = unavailable history):\n")
 print(table(seg$UsageSegments_12w, useNA = "ifany"))

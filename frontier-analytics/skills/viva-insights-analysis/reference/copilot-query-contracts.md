@@ -9,6 +9,10 @@ complete within each query's configured population, date window and product
 filters, with omitted inactive person-days contributing zero activity.
 This does not establish product eligibility or turn unavailable queries into zeros.
 
+The [shared policy](analysis-policy.md) owns common analytical rules and
+[workflow support](workflow-support.md) distinguishes guidance from executable
+adapters. The dated sections below do not override those current scope defaults.
+
 This reference retains historical layouts, synthetic-demo assumptions and
 additional analytical context. Use the dated sections to reproduce earlier
 examples or explain a layout difference, rather than silently adapting the
@@ -237,9 +241,10 @@ completion or monetary cost.
 4. **Missingness:** follow the current join guide for supplied Viva Insights
    exports. Assume completeness within the configured query scope and treat
    omitted inactive activity rows as zero. Keep unavailable sources, out-of-scope
-   people or periods, null cells and known export problems separate. Licence
-   eligibility remains a separate attribute and needs product-specific evidence
-   for adoption denominators. Historical synthetic demos retain their own
+   people or periods and known export problems separate. Native licensed-only
+   M365 Copilot nulls mean unlicensed under the shared policy. Failed joins and
+   unresolved null credit/GitHub/Agent fields do not inherit that meaning. Use
+   product-specific licence semantics for adoption denominators. Historical synthetic demos retain their own
    coverage logic and are not real-data adapters.
 5. **Populations:** preserve the developer roster for working-condition
    baselines; do not select only Copilot users. Joint-product categories

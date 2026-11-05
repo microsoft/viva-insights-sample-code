@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Estimate the return on investment (ROI) for Microsoft Copilot by quantifying time savings, translating them into monetary value, and comparing against license costs to build a defensible business case.
+Build an assumption-based Copilot value scenario from verified activity or assisted-time metrics and licence costs. Assisted time is not measured time saved or realised ROI.
 
 ## Audience
 
@@ -24,7 +24,7 @@ When stakeholders need a quantified business justification for Copilot investmen
 - Data is at person-week granularity
 - `PersonId` is a consistent anonymized identifier
 - `MetricDate` is a date field representing the start of each week
-- Rows with missing Copilot metric values likely represent unlicensed users
+- Licensing follows documented native M365 Copilot null/zero semantics, with enabled-user or enabled-days evidence preferred
 - `Copilot_Assisted_Hours` (or similar) represents time where Copilot contributed to the user's work
 - The `vivainsights` R or Python package is available in the environment
 
@@ -40,10 +40,11 @@ Use this shorter prompt for a fast first pass that adapts to your data.
 Help me build an ROI summary report for finance and IT leaders that estimates the value of Copilot usage from a Viva Insights person query export.
 Start by loading the actual CSV and printing row count, column names, data types, date range, and unique people so you can identify the real Copilot and collaboration fields.
 Adapt to the column names that are present, and ask me for the file path, hourly rate, license cost, or any ambiguous metric mapping instead of guessing.
-Separate licensed, active, and unlicensed rows correctly, use a recent multi-week average rather than a single week for annualization, and make the break-even threshold explicit.
-If Copilot_Assisted_Hours is missing, use the best available proxy only after telling me what you chose and why.
+Prefer Copilot Enabled User or Total Copilot enabled days per person-week. Native licensed-only M365 Copilot nulls mean unlicensed and zero activity means licensed but inactive. A verified metric with those semantics is a valid fallback without explicit fields. Omit licence-dependent estimates only if licensing remains genuinely unresolved.
+Read configured cadence and measurement windows, not date spacing. Within a supplied complete query's configured scope, absent activity rows contribute zero. Failed joins, unavailable sources, out-of-scope periods and known coverage failures remain unresolved.
+Use a recent multi-week average, distinct-person denominators and an explicit person versus person-week estimand. Assisted hours are not measured time saved: ask me to approve a realisation factor and any proxy conversion before estimating potential value, then make the break-even threshold explicit.
 Include a sensitivity analysis under multiple hourly-rate and adoption scenarios, and be explicit that any licensed versus unlicensed comparison is observational and does not prove causation.
-Report negative or uncertain ROI honestly, suppress any segment below about 5 people, and keep assumptions and caveats prominent throughout the output.
+Report negative or uncertain value scenarios honestly. Suppress groups below max(the organisational requirement, 5 distinct people), using floor 10 for dashboard/joined outputs. Protect complementary cells and embedded data; never publish individual rankings.
 Finish by listing every assumption you had to make about value realization, proxies, and segment definitions.
 ```
 
@@ -62,26 +63,30 @@ CONFIGURABLE ASSUMPTIONS (define as variables at the top of the script so they a
 - ANNUAL_LICENSE_COST = 360  # Annual Copilot license cost per user in USD
 - WEEKS_IN_YEAR = 52
 - ANALYSIS_WEEKS = 4  # Number of recent weeks to use for annualized projections
+- REALISATION_FACTOR = None  # Ask for an approved fraction of assisted time assumed saved; do not silently assume 100%. Propose 0.25, 0.5 and 0.75 as a starting range for me to choose from.
 
 DATA LOADING AND PREPARATION
+Confirm configured weekly grouping, week start, measurement windows and query scope. Date spacing is diagnostic only. Absent activity within a supplied complete query's configured scope contributes zero. Native licensed-only M365 Copilot nulls mean unlicensed. Failed joins, omitted sources, out-of-scope periods and known coverage failures remain unresolved with reasons.
 1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python). This handles variable name cleaning and type parsing automatically.
 2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity metric. Print detected columns.
 3. Identify HR / organizational attribute columns with `extract_hr(df, return = "names")` in R or `vi.extract_hr(df, return_type="suggestion")` in Python. Use the returned names for all organizational breakdowns instead of hard-coding column names.
 4. Classify each person-week:
-   - "Licensed": if an enabled-days column is present (for example `Total_Copilot_enabled_days`), that column is greater than zero for the week. Otherwise, at least one non-null, non-zero Copilot metric value.
+   - "Licensed": positive Copilot Enabled User, positive Total Copilot enabled days or dated licence evidence for the week. Without these fields, a non-null value, including zero, in a verified native licensed-only M365 Copilot metric establishes licensing.
    - "Active": licensed AND Total_Copilot_actions_taken > 0.
-   - "Unlicensed": the enabled-days column equals zero when available. Otherwise, all Copilot metric values are null or zero.
+   - "Unlicensed": native null licensed-only M365 Copilot values, native null or zero enabled days, or explicit negative licence evidence.
+   - "Unknown": failed joins, unavailable sources or genuinely unresolved field semantics. Omit licence-dependent figures if licensing remains unresolved. Investigate conflicting evidence.
+   - Ask for an approved dated licence list only if neither explicit fields nor documented native licensed-only metric semantics resolve licensing. Do not extend these semantics to unlicensed Copilot Chat or Consumption credits.
 5. Print: total persons, licensed persons, active persons (ever active), date range.
 
 TIME SAVINGS ESTIMATION
-5. For each active person-week, extract Copilot_Assisted_Hours (the primary time-savings metric). If this column is not available, fall back to estimating from Copilot_Summarized_Hours or a fraction of Total_Copilot_actions_taken (note the assumption if using a proxy).
-6. Compute per-user weekly time savings:
-   a. Mean Copilot_Assisted_Hours per active user per week (over the last ANALYSIS_WEEKS weeks).
-   b. Median Copilot_Assisted_Hours per active user per week.
-   c. Total Copilot_Assisted_Hours across all active users per week.
+5. For each active person-week, extract verified Copilot_Assisted_Hours as assisted time, not measured savings. Potential hours saved = assisted hours × approved REALISATION_FACTOR. If unavailable, propose a documented proxy and conversion for approval or omit the estimate (Copilot_Summarized_Hours is the closest candidate where present); do not invent hours from actions or credits. Use potential hours saved in the following calculations and label them as scenarios.
+6. Compute scenario potential time savings, keeping observed assisted hours separate:
+   a. Mean potential hours saved per active person-week over the last ANALYSIS_WEEKS complete configured weeks.
+   b. Median potential hours saved per active person-week.
+   c. Sum potential hours saved within each week, then average the weekly totals for annualisation. State the distinct-person n and missingness for each week.
 7. Annualize the time savings:
-   a. Per-user annualized hours saved = mean weekly hours × WEEKS_IN_YEAR.
-   b. Total annualized hours saved = total weekly hours × WEEKS_IN_YEAR. Print both figures.
+   a. Per-active-user annualised potential hours saved = mean weekly potential hours × WEEKS_IN_YEAR.
+   b. Total annualised potential hours saved = average weekly potential total × WEEKS_IN_YEAR. Do not multiply the multi-week sum by 52.
 
 MONETARY VALUE ESTIMATION
 8. Convert time savings to monetary value:
@@ -89,17 +94,17 @@ MONETARY VALUE ESTIMATION
    b. Total annual value = total annualized hours × HOURLY_RATE.
 9. Compute total annual license cost:
    a. Total licensed users (distinct PersonId with is_licensed in the latest week).
-   b. Total annual cost = total licensed users × ANNUAL_LICENSE_COST.
+   b. Total annual cost = total licensed users × ANNUAL_LICENSE_COST. Align the projected benefit population with this licensed population; if eligibility changes, declare a cohort/window rule instead of mixing unmatched populations.
 10. Compute ROI metrics:
     a. Net annual value = total annual value - total annual cost.
     b. ROI ratio = total annual value / total annual cost.
-    c. Break-even hours: the minimum weekly Copilot_Assisted_Hours per user needed for the license to pay for itself = (ANNUAL_LICENSE_COST / WEEKS_IN_YEAR) / HOURLY_RATE.
+    c. Break-even assisted hours per licensed user per week = ANNUAL_LICENSE_COST / (WEEKS_IN_YEAR × HOURLY_RATE × REALISATION_FACTOR), for positive hourly rate and factor. Report unavailable rather than divide by zero. Distinguish this from break-even assumed saved hours.
     d. Percentage of licensed users exceeding the break-even threshold.
 
 SENSITIVITY ANALYSIS
 11. Compute ROI under different assumptions. Create a table with rows for different hourly rates ($50, $75, $100, $125) and columns for different utilization scenarios:
     a. "Current active users only" — value from only currently active users.
-    b. "50% more adoption" — if 50% more licensed users become active at the current average.
+    b. "50% more adoption" — cap projected active people at the eligible population and retain the approved realisation assumption.
     c. "Full adoption" — if all licensed users become active at the current average.
 12. This table shows leadership how ROI improves with higher adoption.
 
@@ -131,8 +136,8 @@ REPORT GENERATION
        |--------|-------|
        | Licensed users | N |
        | Active users (last 4 weeks) | N |
-       | Avg. weekly time saved per active user | X.X hours |
-       | Annualized value of time saved | $X |
+       | Assumed weekly hours saved per active person-week | X.X hours |
+       | Potential annualised time value (scenario) | $X |
        | Annual license cost | $X |
        | Net annual value | $X |
        | ROI ratio | X.Xx |
@@ -147,11 +152,11 @@ REPORT GENERATION
 
     f. "Methodology & Caveats"
        - Data source and time period.
-       - How time savings are measured (Copilot_Assisted_Hours).
+       - How assisted hours are defined, the approved realisation factor and any proxy conversion. Savings are assumed, not measured.
        - The hourly rate assumption and its basis.
        - Explicit caveat: "This analysis estimates the potential value of time savings attributed to Copilot-assisted work. It does not establish a causal relationship between Copilot usage and productivity gains. Actual ROI depends on how saved time is reallocated. Correlation between Copilot usage and collaboration patterns may reflect selection effects rather than causal impact."
        - Note: time savings represent Copilot-assisted work, not necessarily net new time freed.
-       - Privacy note: segments with fewer than 5 users are suppressed.
+       - Privacy note: use max(the organisational requirement, 5 distinct people), with floor 10 for dashboard/joined outputs, including complementary cells and embedded data.
 
     g. "Assumptions" — list all configurable assumptions and their values.
 
@@ -160,10 +165,20 @@ REPORT GENERATION
 
 IMPORTANT NOTES
 - Do NOT overstate the ROI. This is an estimation framework, not a proven causal impact. Every section should include appropriate caveats.
-- Handle missing `Copilot_Assisted_Hours` **by licensing state** — this is not a blanket "treat null as 0" rule. Licensing/active status is determined from the *full set* of Copilot metrics in step 4, not from `Copilot_Assisted_Hours` alone. For a person-week already classified as **licensed/active**, a null `Copilot_Assisted_Hours` means the person did not use Copilot-assisted features that week, so treat it as 0. For **unlicensed** person-weeks (all Copilot metrics null or zero), do **not** impute 0 — exclude them from the ROI population entirely, since they are not licensed users.
-- The break-even calculation is a useful framing device — it tells leadership the minimum usage needed to justify the license cost.
+- Native null licensed-only M365 Copilot values indicate unlicensed person-weeks, which are excluded from licensed ROI populations. If explicit licence or activity evidence conflicts with a null assisted-hours field, investigate the field definition and source before estimating value. Join-created nulls and known coverage failures remain unresolved. Do not substitute zero to complete the ROI scenario.
+- Break-even is conditional on the approved realisation factor and price assumptions, not proof that observed usage recovers the licence cost.
 - If the ROI is negative, report it honestly and frame recommendations around increasing adoption.
-- Suppress segments with fewer than 5 users.
+- Apply the stated privacy minimum to every output and never publish individual rankings. Low activity alone does not establish a holiday, job classification or employment status.
+
+<!-- analysis-policy:start -->
+Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
+Absent activity inside a supplied complete query's configured scope contributes zero. Preserve unresolved joins, unavailable sources, out-of-scope periods and known coverage failures as unknown with reasons. Do not extend licensed-only M365 Copilot null semantics to unlicensed Copilot Chat or Consumption credits.
+Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
+Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
+Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.
+Choose a supported identifying design before causal claims and compatible estimators; default to association, retain unavailable checks and label synthetic evidence.
+Inspect installed package versions, signatures and return types; separate executed evidence from expected behaviour and do not silently fork upstream bugs.
+<!-- analysis-policy:end -->
 ```
 
 ## Adaptation notes
@@ -176,7 +191,7 @@ IMPORTANT NOTES
 
 ## Common failure modes
 
-- **Agent treats Copilot_Assisted_Hours as "time saved."** Clarify that Copilot_Assisted_Hours represents time where Copilot assisted the user — the actual time saved may be a fraction of this. Consider adding a "realization factor" (e.g., 50%) for more conservative estimates.
+- **Agent treats assisted time as measured savings.** Require the approved realisation factor throughout calculations and labels, rather than adding a caveat after a 100% savings assumption. A factor of 0.5 is a common conservative starting point for discussion, but the decision belongs to the person commissioning the analysis.
 - **Agent ignores selection bias in licensed vs. unlicensed comparison.** The prompt includes a causal caveat, but verify it appears prominently in the output.
 - **Agent annualizes from a single week.** The prompt uses the last `ANALYSIS_WEEKS` (4) weeks for stability, but ensure the agent averages across these weeks rather than extrapolating from one.
 - **Agent reports ROI without caveats.** Senior leadership will scrutinize the methodology. Ensure every value estimate is accompanied by its assumptions and limitations.

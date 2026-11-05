@@ -6,6 +6,13 @@ This starter kit helps you generate a **polished executive summary document** fr
 
 You don't write the analysis yourself. The kit provides a structured **prompt card** that you paste into a coding agent. The agent reads your data, computes the metrics, identifies noteworthy patterns, and drafts the memo.
 
+This is agent-guided generation requiring verification, not a packaged adapter.
+The [shared policy](../../skills/viva-insights-analysis/reference/analysis-policy.md)
+owns eligibility, missingness and privacy rules. Standalone generic memos have
+a floor of 5 distinct people, dashboard/joined outputs 10; always apply the
+stricter organisational requirement and suppress complementary disclosures.
+See the [capability table](../../skills/viva-insights-analysis/reference/workflow-support.md).
+
 ## Use case
 
 People analytics teams regularly need to report to senior leadership on:

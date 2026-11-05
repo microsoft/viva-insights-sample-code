@@ -51,6 +51,12 @@ Read frontier-analytics/skills/viva-insights-copilot-dashboards/SKILL.md in that
 Use its GitHub manifest and shared R runner; preserve coverage, privacy and synthetic labels.
 For real GitHub files, inspect only and explain the missing contract evidence; v1 has no verified real build adapter.
 Do not infer productivity, code quality, burnout, licensing or non-use from activity alone.
+Use max(the organisational requirement, 10 distinct people), protect complementary
+cells and embedded data, and never publish individual rankings. Read configured cadence
+and measurement windows, not date spacing. Within a supplied complete query's configured
+scope, absent activity is zero. Unresolved GitHub nulls, failed joins, out-of-scope
+periods and known coverage failures stay unknown. Licensed-only M365 Copilot null
+semantics do not establish GitHub licensing. This does not enable the missing real build adapter.
 ```
 
 ## Prompt
@@ -69,18 +75,37 @@ synthetic window, full developer baseline, eligibility and coverage distinctions
 In real mode, run bounded local inspection. Identify source grain, join keys, units,
 coverage, licence evidence and model/language allocation periods. Headers alone do not
 verify semantics. Return supported observations and missing evidence for a future adapter.
+Read configured grouping and measurement windows; spacing is diagnostic only.
+GitHub eligibility requires its own product-specific evidence.
+Inside a supplied complete query's configured scope, absent activity contributes zero;
+unresolved GitHub nulls, failed joins, unavailable sources, out-of-scope periods and
+known coverage failures remain unknown with reasons. For any Person Query companion,
+apply the documented native M365 Copilot licence semantics only to licensed-only
+M365 metrics, never to GitHub fields. The historical synthetic demo retains its own explicit
+coverage states; do not mistake it for a real-data adapter.
 Do not source the synthetic helper on real inputs or bypass the unsupported-build gate.
 
 For customisation, edit the copied source, not bundled HTML or the canonical example.
 Presentation changes should preserve aggregate values. Population or metric changes
 require renewed inspection and my approval. No arbitrary duplicate removal, fuzzy
 employee joins, individual rankings or converting unresolved coverage to zero.
-Keep at least 10 distinct people per published group or a stricter organisational rule.
+Keep at least 10 distinct people per published group or a stricter organisational rule,
+including embedded data and complementary-cell disclosure checks.
 Do not interpret acceptance as quality, available time as coding, or after-hours as burnout.
 
 Record revision, inputs and configuration. Avoid loading whole CSVs or generated HTML
 into model context. After two unsuccessful repairs of one failure, report the blocker.
 Return the report or readiness assessment, rerun command and limitations; do not publish.
+
+<!-- analysis-policy:start -->
+Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
+Absent activity inside a supplied complete query's configured scope contributes zero. Preserve unresolved joins, unavailable sources, out-of-scope periods and known coverage failures as unknown with reasons. Do not extend licensed-only M365 Copilot null semantics to unlicensed Copilot Chat or Consumption credits.
+Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
+Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
+Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.
+Choose a supported identifying design before causal claims and compatible estimators; default to association, retain unavailable checks and label synthetic evidence.
+Inspect installed package versions, signatures and return types; separate executed evidence from expected behaviour and do not silently fork upstream bugs.
+<!-- analysis-policy:end -->
 ```
 
 ## Adaptation notes
@@ -91,7 +116,9 @@ adapter. Do not rename public GitHub API fields into an assumed Viva contract.
 
 ## Common failure modes
 
-- **Missing activity becomes zero:** require independent coverage and eligibility.
+- **Missingness is flattened:** distinguish in-scope omitted activity from
+  unresolved GitHub nulls and known coverage failures. Verify GitHub eligibility
+  separately from M365 Copilot licensing.
 - **Only Copilot users form the baseline:** retain the full developer population.
 - **Full-window mixes become weekly trends:** preserve their actual period.
 - **Demo runs over customer data:** use distinct modes and output workspaces.

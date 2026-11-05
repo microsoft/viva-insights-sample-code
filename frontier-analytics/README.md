@@ -4,6 +4,11 @@ Frontier Analytics is an **export-first, self-service analytics toolkit** for [V
 
 > **Note:** Everything in this folder is sample code and starter assets. It is not production software. Outputs require review, validation, and adaptation to your environment before use.
 
+Start with the [shared analysis policy](skills/viva-insights-analysis/reference/analysis-policy.md)
+and [workflow support table](skills/viva-insights-analysis/reference/workflow-support.md)
+for eligibility, missingness, configured cadence, privacy and capability boundaries.
+Local export workflows do not implement live-product or MCP access.
+
 ## Who is this for?
 
 - **People analytics leads** building dashboards and reports from Viva Insights exports

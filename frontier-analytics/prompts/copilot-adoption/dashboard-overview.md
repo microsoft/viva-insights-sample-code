@@ -23,7 +23,7 @@ After exporting a person query with Copilot activity metrics spanning at least 8
 - Data is at person-week granularity
 - `PersonId` is a consistent anonymized identifier
 - `MetricDate` is a date field representing the start of each week
-- Licensing and coverage require explicit evidence; missing activity alone is inconclusive
+- Native licensed-only M365 Copilot nulls mean unlicensed, while zero activity means licensed but inactive. Processing nulls require separate investigation
 - The `vivainsights` R or Python package is available in the environment
 
 ## Recommended output
@@ -38,7 +38,8 @@ Use this shorter prompt for a fast first pass that adapts to your data.
 Help me create a self-contained static HTML dashboard for people analytics and IT leaders that summarizes Copilot adoption trends and group differences from a Viva Insights person query export.
 Start by loading the actual CSV and printing the row count, column names, data types, date range, and number of unique people, then map the real metric and HR columns from what is present.
 Do not assume exact field names, and ask me to confirm the primary activity metric or any missing HR columns if the mapping is ambiguous.
-Separate licensed users from active users using explicit licensing and coverage evidence. If those are unavailable, show observed activity and mark adoption rates unavailable; do not infer licensing from activity or missingness.
+Prefer Copilot Enabled User or Total Copilot enabled days for licensing. Under the documented native licensed-only M365 Copilot rules, null means unlicensed and zero activity means licensed but inactive. Without explicit licence fields, use a verified metric with those semantics. Do not apply this rule to unlicensed Copilot Chat or Consumption credits.
+Confirm configured weekly grouping and metric windows. Date gaps do not establish cadence. Within a supplied complete query's configured scope, absent activity rows contribute zero. Failed joins, unavailable sources, out-of-scope periods and known coverage failures remain unresolved.
 Build weekly adoption metrics using distinct people per week, then add the most useful group views from the available HR attributes.
 The output must be a single self-contained static HTML file with inline assets and no server or external dependencies.
 Suppress any group with fewer than 10 distinct people, or the stricter organisational minimum, and withhold breakdowns that could reveal suppressed cells. Do not publish individual rankings. Note skipped charts or missing segments.
@@ -56,6 +57,7 @@ LANGUAGE CHOICE
 Choose R or Python based on what is already installed in your environment to minimize setup.
 
 DATA LOADING AND VALIDATION
+Confirm configured grouping, week start, measurement windows and query scope before aggregation. Date spacing is a coverage/alignment diagnostic, not cadence evidence. State the person versus person-week estimand for each summary.
 1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python). This handles variable name cleaning and type parsing automatically.
 2. Ensure PersonId is treated as a string and MetricDate is parsed as a date type.
 3. Identify HR / organizational attribute columns with `extract_hr(df, return = "names")` in R or `vi.extract_hr(df, return_type="suggestion")` in Python. Use the returned names for all segmentation breakdowns instead of hard-coding column names.
@@ -64,7 +66,7 @@ DATA LOADING AND VALIDATION
 6. List all column names so I can verify the Copilot metric columns and HR attribute columns match what is expected. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity proxy **if it is present** — validate it against the taxonomy first, as it may not capture every Copilot surface or app.
 
 IDENTIFYING LICENSED USERS
-6. Use a documented enabled-days column (for example `Total_Copilot_enabled_days > 0`) or explicit licence records for the period. If unavailable, retain unknown licensing and omit adoption rates; do not infer licences from activity. Create `is_licensed` with unknown values retained. Confirm coverage before filling absent activity with zero.
+6. Prefer Copilot Enabled User, Total Copilot enabled days or dated licence records for the period. Native null enabled days mean unlicensed. If explicit licence fields are absent, use a verified native licensed-only M365 Copilot metric whose documented null means unlicensed and zero activity means licensed but inactive. Do not apply this to unlicensed Copilot Chat or Consumption credits. Preserve join-match indicators and keep processing failures unresolved. Withhold adoption only when licence status or licensed activity is genuinely unresolved. Within a supplied complete query's configured scope, absent activity rows contribute zero. Never blanket-fill after a join.
 7. Also flag "active" users: licensed users who have Total_Copilot_actions_taken > 0 (the primary activity metric) in that week. Create a boolean column `is_active`.
 8. Print a summary: total person-weeks, licensed person-weeks, active person-weeks.
 
@@ -130,12 +132,23 @@ IMPORTANT NOTES
 - Use the `vivainsights` package (R or Python) for data loading (`import_query()`) and HR attribute discovery (`extract_hr()`). Use ggplot2 (R) or matplotlib/seaborn (Python) for charting.
 - All charts should have clear titles, axis labels, and legends.
 - Use at least 10 distinct people per published group, or the stricter organisational minimum.
+- Low-activity flags are review candidates, not verified holidays or job classifications. Assisted hours and actions are not measured time saved or realised ROI.
+
+<!-- analysis-policy:start -->
+Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
+Absent activity inside a supplied complete query's configured scope contributes zero. Preserve unresolved joins, unavailable sources, out-of-scope periods and known coverage failures as unknown with reasons. Do not extend licensed-only M365 Copilot null semantics to unlicensed Copilot Chat or Consumption credits.
+Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
+Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
+Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.
+Choose a supported identifying design before causal claims and compatible estimators; default to association, retain unavailable checks and label synthetic evidence.
+Inspect installed package versions, signatures and return types; separate executed evidence from expected behaviour and do not silently fork upstream bugs.
+<!-- analysis-policy:end -->
 ```
 
 ## Adaptation notes
 
 - Adjust HR attribute column names to match your export (e.g., `Organization` vs `Org`). Prepend a note to the prompt specifying your actual column names.
-- If your data is at person-day granularity, add an instruction: _"Aggregate person-day data to person-week by summing Copilot metrics per PersonId per week."_
+- If grouping is configured daily, aggregate only verified additive flows to aligned weeks. Keep stocks and overlapping-window metrics separate; do not sum all Copilot columns indiscriminately.
 - Apply at least 10 distinct people per group, increase this if required by organisational policy, or omit segmentation entirely.
 - Add custom Copilot metrics by extending the list in step 5 (e.g., `Copilot_Edited_Hours`, `Copilot_Rewritten_Hours`).
 - If you prefer R over Python, add _"Use R with ggplot2 and R Markdown"_ at the start of the prompt.

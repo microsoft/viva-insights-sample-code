@@ -4,6 +4,8 @@ How to turn Viva Insights outputs into honest, defensible findings. These
 conventions matter more than any single chart: workplace-analytics results are
 easy to over-claim.
 
+Apply the [shared analysis policy](analysis-policy.md) first.
+
 ## 1. Prefer association over causation
 
 Viva Insights data is observational. Unless a designed experiment or a valid
@@ -32,12 +34,17 @@ demonstrated effect read as an empirical finding.
 `identify_usage_segments()` classifies a licensed population by rolling usage.
 Two rules prevent the most common misclassification:
 
-1. **Fill missing metric values with 0 before calling it.** A rolling window
-   propagates NaN and leaves people unclassified otherwise.
-2. **Define the licensed population by enabled days rather than by action presence.**
-   Use an enabled-days-positive filter (for example `Total_Copilot_enabled_days > 0`)
-   as the denominator for a target-week snapshot. Counting only rows where an
-   action metric is non-null understates the Non-user group.
+1. **Resolve missingness before calling it.** Fill only absent activity rows
+   within a supplied complete query's configured scope with zero. Native
+   licensed-only M365 Copilot nulls mean unlicensed. Failed joins, out-of-scope
+   periods and known coverage failures remain unresolved.
+   A rolling window can propagate unknown values; report affected segments as
+   unavailable rather than replacing those values to force classification.
+2. **Include licensed people with zero activity.** Prefer Copilot Enabled User
+   or Total Copilot enabled days for the period. Native null enabled days mean
+   unlicensed. Without those fields, a verified native licensed-only metric
+   can establish licensing through its documented null/zero semantics.
+   Filtering to positive actions would exclude licensed Non-users.
 
 Segment definitions (12-week version, `power_thres` default 15):
 
@@ -50,14 +57,36 @@ Segment definitions (12-week version, `power_thres` default 15):
 | Non-user | 12w rolling mean == 0 |
 
 ```python
-df_lic = df[df["Total_Copilot_enabled_days"].fillna(0) > 0].copy()
-df_lic["Total_Copilot_actions_taken"] = df_lic["Total_Copilot_actions_taken"].fillna(0)
+# df is a deliberately selected continuously licensed cohort with a full weekly calendar.
+enabled = df["Total_Copilot_enabled_days"].astype("Float64")
+if not enabled.gt(0).fillna(False).all():
+    raise ValueError("This minimal recipe requires eligibility throughout the window")
+if "licence_source_matched" in df and not df["licence_source_matched"].fillna(False).all():
+    raise ValueError("Unresolved licence join: affected rolling segments are unavailable")
+df_lic = df.copy()
+omitted = df_lic["activity_state"].eq("omitted_in_scope")
+df_lic.loc[omitted, "Total_Copilot_actions_taken"] = 0
+# Do not execute segmentation until its full required history is known.
+if df_lic["Total_Copilot_actions_taken"].isna().any():
+    raise ValueError("Unresolved activity: affected rolling segments are unavailable")
 seg = vi.identify_usage_segments(df_lic, metric="Total_Copilot_actions_taken",
                                  version="12w", return_type="data")
 ```
 
+`activity_state` is a column you create, because no export provides it. Build it
+while aligning each person to the full configured calendar. Use
+`"omitted_in_scope"` for person-periods the supplied complete query left out
+within its configured scope, `"observed"` for rows with a recorded value, and a
+specific reason such as `"native_unlicensed"`, `"unexpected_null"`, `"source_unavailable"`,
+`"out_of_scope"` or `"known_coverage_failure"` for everything else.
+This minimal recipe requires an explicitly selected continuously licensed cohort.
+For a mixed population, use the paired Python/R segmentation examples, which keep
+unlicensed weeks in the calendar and withhold only affected rolling segments.
+They do not abort because another person has native unlicensed nulls. Never drop
+unlicensed or unknown weeks and treat the remaining rows as consecutive history.
+
 If segments come back all Non-user or all None, check: metric renamed correctly?
-NaNs filled? correct population filter applied?
+missingness resolved? correct population filter and required calendar history applied?
 
 ## 4. Period framing as a pattern rather than fixed dates
 
@@ -78,9 +107,13 @@ eyeballing a line chart.
 
 ## 5. Respect privacy in every reported cut
 
-- Keep `mingroup` at or above the organisation's agreed threshold (default 5).
+- Use `max(organisation requirement, workflow floor)` for `mingroup`: generic
+  5, joined-query/dashboard/causal 10 distinct people.
 - Do not publish a group smaller than the threshold. Aggregate up instead.
-- Anonymise identifiers in any shared artefact (`anonymise()` in R).
+- Keep individual identifiers and rankings out of aggregate publications.
+  Anonymising or pseudonymising rows is not sufficient disclosure protection.
+- When sharing row-level data with other analysts, still pseudonymise
+  identifiers first (`anonymise()` in R).
 
 ## 6. Units and wording precision
 

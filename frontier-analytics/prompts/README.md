@@ -66,9 +66,15 @@ generate a new dashboard from scratch.
 
 - **Column names vary between tenants.** Always verify your actual column names against what the prompt expects. Prepend a note like _"In my data, the Organization column is called `Org`."_
 - **Granularity matters.** Most prompts assume person-week data. If your export is person-day, instruct the agent to aggregate first.
-- **Privacy thresholds.** For smaller organizations, add a note requesting minimum group sizes (e.g., suppress segments with fewer than 5 people).
+- **Privacy thresholds.** Always use max(organisation requirement, workflow floor):
+  generic 5, joined-query/dashboard/causal 10 distinct people. Protect
+  complementary cells and embedded data; no individual rankings.
 - **Language preference.** Prompts default to Python. If you prefer R, add _"Use R instead of Python"_ before the prompt.
 - **Package availability.** Prompts reference the [vivainsights R package](https://microsoft.github.io/vivainsights/) and [vivainsights Python package](https://microsoft.github.io/vivainsights-py/). Install them beforehand if you want the agent to use them.
+
+The [shared analysis policy](../skills/viva-insights-analysis/reference/analysis-policy.md)
+and [workflow support table](../skills/viva-insights-analysis/reference/workflow-support.md)
+own common guidance. Copyable prompts include the rules needed offline.
 
 ## Creating new prompt cards
 

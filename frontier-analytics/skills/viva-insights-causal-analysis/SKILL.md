@@ -29,7 +29,9 @@ DML or quasi-experimental estimator.
 ## Locate the shared rules
 
 Install alongside `viva-insights-analysis` from the same repository revision.
-Read its [analysis conventions](../viva-insights-analysis/reference/analysis-conventions.md)
+Read its [shared analysis policy](../viva-insights-analysis/reference/analysis-policy.md),
+[workflow support](../viva-insights-analysis/reference/workflow-support.md),
+[analysis conventions](../viva-insights-analysis/reference/analysis-conventions.md)
 and [data pitfalls](../viva-insights-analysis/reference/data-pitfalls.md) directly,
 rather than launching a second workflow for the same task. If those files are
 absent, ask for the local sample-code checkout and read them there. If neither
@@ -77,7 +79,10 @@ candidate variable. Audit its support, within-person variation, denominator,
 derivation and temporal alignment.
 
 **Gate:** do not run weekly within-person outcome models on copied annual scores,
-monthly stock values or quarterly totals. Do not treat missing telemetry as zero.
+monthly stock values or quarterly totals. Native licensed-only M365 Copilot nulls
+mean unlicensed, rather than licensed inactivity. Failed joins and unresolved
+coverage are not zero. Only absent activity within a supplied complete query's configured
+scope follows the shared omitted-inactivity zero rule, independently of eligibility.
 Stop an affected analysis when source definitions, joins or timing are unresolved.
 An explicit method rehearsal may proceed with a visible synthetic/unverified label.
 

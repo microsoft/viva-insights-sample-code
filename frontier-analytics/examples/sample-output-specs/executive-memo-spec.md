@@ -2,6 +2,11 @@
 
 This specification defines the structure, tone, and content expectations for an **executive summary memo** generated from Viva Insights data. Use this spec as context for coding agents when you want them to produce a concise, actionable document for VP/C-suite audiences.
 
+All numbers and example findings below are illustrative, not real-data evidence.
+Apply the [shared policy](../../skills/viva-insights-analysis/reference/analysis-policy.md):
+explicit eligibility, reason-preserving missingness, configured cadence and
+the stricter of organisation requirements and workflow privacy floors.
+
 ---
 
 ## Target format
@@ -63,7 +68,10 @@ Each finding should be one bullet with:
 
 **Example:**
 
-- **Manager adoption drives team adoption.** Teams where the manager is an active Copilot user have a 78% individual adoption rate, compared to 34% in teams with inactive managers. Manager enablement is the highest-leverage intervention.
+- **Manager adoption is associated with team adoption.** In this illustrative
+  comparison, teams with active managers have higher adoption. Selection or
+  shared context may explain the difference; manager enablement is a candidate
+  to evaluate, not an established highest-leverage intervention.
 - **Usage depth is increasing, not just breadth.** Average Copilot Actions per active user rose from 28 to 34 over the past 8 weeks, indicating that users who adopt Copilot are finding more ways to use it.
 - **Sales and Marketing segments are underperforming.** Adoption rates of 42% and 48% respectively lag the company average by 20+ percentage points. Interviews suggest these teams lack role-specific Copilot use cases.
 - **Churn is low but concentrated.** 8% of previously active users became inactive in the last 4 weeks, with 60% of churned users in junior IC roles. Targeted re-engagement for these users may be warranted.
@@ -99,7 +107,7 @@ A brief (2–4 sentence) note for transparency:
 
 State any limitations or caveats:
 
-> Data covers employees in the following regions: Americas, EMEA. APAC employees are excluded due to delayed license rollout. Contractors and vendor staff are not included. Copilot metrics for unlicensed users appear as blank (null) and are excluded from adoption calculations.
+> Illustrative scope note, not a real result: the supplied query covers the stated population and dates. Prefer Copilot Enabled User or Total Copilot enabled days for licensing. Native licensed-only M365 Copilot nulls mean unlicensed and zero activity means licensed but inactive. A verified metric with these semantics is a valid fallback. Failed joins and genuinely unresolved source coverage are reported separately. Only omitted activity within the supplied complete query's configured scope contributes zero.
 
 ---
 
