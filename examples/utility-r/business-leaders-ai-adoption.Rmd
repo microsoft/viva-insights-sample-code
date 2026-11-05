@@ -1,0 +1,423 @@
+---
+pagetitle: "Business Leaders AI Usage"
+lang: en-GB
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+source("copilot-super-panel-helpers.R")
+source("business-leaders-ai-simulation.R")
+source("business-leaders-ai-helpers.R")
+inputs <- read_business_leaders_data("_data", scenario = TRUE)
+payload <- business_dashboard_payload(inputs)
+```
+
+<style>
+:root{--ink:#233047;--muted:#526079;--border:#d9e0ec;--blue:#5b72e8;--pink:#b53180;--purple:#8551bc;--teal:#087f8c}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:130px}
+body{margin:0;max-width:none;padding:0;background:#eaf0f7;color:var(--ink);font:14px/1.55 "Segoe UI",system-ui,sans-serif}
+h1,h2,h3,p{margin:0}h1{font-size:25px;font-weight:600}h2{font-size:20px;font-weight:600;margin-bottom:4px}h3{font-size:16px;font-weight:600}
+a{color:#115ea3}button,select{font:inherit}a:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #115ea3;outline-offset:3px}
+.skip{position:absolute;left:16px;top:-100px;background:white;padding:10px;z-index:5}.skip:focus{top:8px}
+.appbar{height:56px;padding:0 28px;border-bottom:1px solid #354763;display:flex;align-items:center;gap:12px;background:#1e2d46;color:#f1f5ff}
+.brand{width:24px;height:24px;background:linear-gradient(135deg,#5b72e8,#9962d8);border-radius:6px;display:inline-block}
+.demo{font-size:12px;font-weight:600;background:#fff4ce;color:#614b00;border-radius:4px;padding:3px 8px;margin-left:auto}
+.layout{display:grid;grid-template-columns:196px minmax(0,1fr)}
+nav{background:#253650;color:#f1f5ff;border-right:1px solid #354763;padding:24px 12px;position:sticky;top:0;height:100vh}
+nav strong{font-size:12px;color:#c4cfe2;padding:0 12px;display:block;margin-bottom:12px}
+nav a,nav a:visited{display:block;color:#f1f5ff;text-decoration:none;padding:10px 12px;border-radius:5px;margin-bottom:4px}
+nav a:hover,nav a:focus{background:#3b4e6d}nav a:focus-visible{outline-color:#a9c5ff}nav small{display:block;padding:18px 12px;color:#c4cfe2;font-size:12px}
+main{min-width:0}.toolbar{position:sticky;top:0;z-index:2;background:#e3eaf5;border-bottom:1px solid var(--border);padding:16px 32px;display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.toolbar label{font-size:12px;color:var(--muted)}select{background:#f5f7fc;border:1px solid #b7c3d6;border-radius:4px;padding:7px 10px;color:var(--ink);margin-left:6px}
+.period{margin-left:auto;font-size:12px;color:var(--muted)}.content{max-width:1420px;margin:auto;padding:28px 32px}
+.intro{margin:8px 0 24px;color:var(--muted);max-width:90ch}.section{margin:0 0 32px;scroll-margin-top:130px}.subtitle{color:var(--muted);margin:4px 0 18px;font-size:13px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:20px 0}
+.card{border:1px solid var(--border);border-radius:8px;background:#f8faff;padding:18px;min-width:0;box-shadow:0 2px 6px #23304705}
+.kpis .card:nth-child(1){background:#e0e9fa}.kpis .card:nth-child(2){background:#e4e6f5}.kpis .card:nth-child(3){background:#dceef0}.kpis .card:nth-child(4){background:#ece2f3}
+.kpi-label{font-size:13px;min-height:40px}.number{font-size:30px;font-weight:600;margin:8px 0;line-height:1.3;font-variant-numeric:tabular-nums}
+.note{font-size:12px;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:16px 0}
+.services{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:16px 0}
+.service-title{border-left:3px solid var(--blue);padding-left:10px;margin-bottom:12px}.service-row{display:flex;gap:10px;justify-content:space-between;margin:9px 0}.service-row strong{text-align:right;font-variant-numeric:tabular-nums}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:14px 0;font-size:12px}.legend span::before{content:"";display:inline-block;width:10px;height:3px;background:var(--series);vertical-align:middle;margin-right:6px}
+.chart{width:100%;min-height:260px;overflow:hidden}.chart svg{display:block;width:100%;height:auto}.table-scroll{overflow:auto;max-width:100%;margin-top:14px}
+table{display:table;width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}th,td{text-align:right;padding:10px;border-bottom:1px solid var(--border);white-space:nowrap}th:first-child,td:first-child{text-align:left;white-space:normal;min-width:130px}th{font-weight:600;background:#eaf0f8;color:#35435c}
+caption{text-align:left;color:var(--muted);font-size:12px;padding:8px 0}.notice{border-left:3px solid #5b72e8;background:#e0e7f7;padding:12px 16px;font-size:13px;margin:16px 0}
+details{margin-top:14px}summary{cursor:pointer;color:#115ea3;padding:4px 0}dl{margin-bottom:0}dt{font-weight:600;margin-top:12px}dd{margin:4px 0 12px;color:var(--muted)}
+.scope{background:#e1e9f4;border:1px solid var(--border);padding:18px;border-radius:8px}.scope p+p{margin-top:10px}footer{font-size:12px;color:var(--muted);padding:12px 0 24px}
+.comparison-controls{display:flex;flex-wrap:wrap;gap:12px 18px;margin:16px 0}.comparison-controls label{font-size:12px;color:var(--muted)}
+.comparison-row{display:grid;grid-template-columns:minmax(120px,1fr) minmax(0,2fr) auto;align-items:center;gap:12px;margin:14px 0}
+.comparison-label{font-weight:600}.comparison-label small{display:block;color:var(--muted);font-weight:400}.comparison-track{height:12px;border-radius:8px;background:#dfe6f2;overflow:hidden}
+.comparison-fill{height:100%;border-radius:8px;background:var(--teal)}.comparison-value{text-align:right;font-variant-numeric:tabular-nums}
+.collaboration-trends h3:not(:first-child){margin-top:24px}
+@media(max-width:1100px){.kpis,.services{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:160px minmax(0,1fr)}.content,.toolbar{padding-left:20px;padding-right:20px}}
+@media(max-width:700px){.layout{display:block}nav{height:auto;position:static;border-right:0;border-bottom:1px solid var(--border);display:flex;gap:4px;overflow:auto;padding:8px}nav a{white-space:nowrap;font-size:12px;padding:8px}nav strong,nav small{display:none}.appbar{padding:0 16px;font-size:13px}.content{padding:20px 16px}.toolbar{position:static;padding:12px 16px;gap:10px}.period{width:100%;margin:0}.grid,.services{grid-template-columns:1fr}.kpis{gap:10px}.card{padding:14px}.number{font-size:25px}.demo{font-size:10px}.chart{min-height:240px}h1{font-size:22px}.comparison-row{grid-template-columns:minmax(100px,1fr) minmax(0,1.3fr) auto;gap:8px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+
+<a class="skip" href="#main">Skip to dashboard</a>
+<div class="appbar"><span class="brand" aria-hidden="true"></span><strong>Business Analytics</strong><span class="demo">SYNTHETIC DEMO</span></div>
+<div class="layout">
+<nav aria-label="Dashboard sections">
+<strong>AI USAGE</strong>
+<a href="#overview">Overview</a>
+<a href="#usage">Usage &amp; services</a>
+<a href="#credits">Credits</a>
+<a href="#groups">Teams &amp; functions</a>
+<a href="#collaboration">Collaboration activity</a>
+<a href="#definitions">Definitions &amp; coverage</a>
+<small>One organisation.<br>Cross-service usage.<br>Distinct people.</small>
+</nav>
+<main id="main">
+<div class="toolbar">
+<label for="lookback">Time period<select id="lookback"><option value="4">Latest 4 weeks</option><option value="8">Latest 8 weeks</option><option value="13" selected>All 13 weeks</option></select></label>
+<span class="period" id="period" aria-live="polite"></span>
+</div>
+<div class="content">
+<section class="section" id="overview">
+<h1>AI usage across your organisation</h1>
+<p class="intro">Who is using AI, what they use, and how usage is changing. A synthetic rollout across M365 Copilot, Cowork, agents and GitHub Copilot. Usage intensity is recorded activity per person per week, including everyone in the roster, not just AI users.</p>
+<div class="kpis" id="kpis"></div>
+<div class="card">
+<h2>Is AI usage growing?</h2>
+<p class="subtitle">Weekly people with recorded activity. Each person appears once in the overall line, even when they use several services.</p>
+<div class="legend" id="usage-legend"></div>
+<div class="chart" id="usage-trend"></div>
+<p class="note">These are observed users, not a complete census of every AI tool. Missing source records can make counts lower bounds. Service lines overlap and must not be added.</p>
+<details><summary>Weekly counts</summary><div class="table-scroll" id="trend-table"></div></details>
+</div>
+</section>
+<section class="section" id="usage">
+<h2>How are people using AI?</h2>
+<p class="subtitle">Distinct users show reach; recorded activity per person per week shows intensity. All rates use the full organisation roster, including non-users. “At least” marks incomplete observations. Product units differ and must not be added.</p>
+<div class="services" id="services"></div>
+<div class="grid">
+<div class="card"><h3>Which agents are being used?</h3><div class="table-scroll" id="agent-table"></div><p class="note" id="agent-note"></p></div>
+<div class="card"><h3>How are developers using GitHub Copilot?</h3><div class="table-scroll" id="feature-table"></div><p class="note">Feature uses are a separate breakdown. Do not add them to chat requests or accepted completions. The fixture's allocations are illustrative.</p></div>
+</div>
+<div class="notice" id="returning-note"></div>
+</section>
+<section class="section" id="credits">
+<h2>How much AI is being consumed?</h2>
+<p class="subtitle">Credits describe metered consumption. They are not currency, productivity or business value.</p>
+<div class="grid">
+<div class="card"><h3>M365 credits per person per week</h3><div class="chart" id="m365-credit-trend"></div><p class="note">Each week's recorded credits divided by all roster people that week.</p></div>
+<div class="card"><h3>GitHub credits per person per week</h3><div class="chart" id="github-credit-trend"></div><p class="note">A different credit unit, shown separately. No cross-product total is calculated.</p></div>
+</div>
+<div class="card"><h3>Which metered M365 services drive consumption?</h3><div class="table-scroll" id="credit-table"></div><p class="note">Current limits do not establish a budget period or forecast. This dashboard does not calculate limit exhaustion, monetary cost or future spend.</p></div>
+<details><summary>Audit details: recorded totals and weekly credit figures</summary>
+<p class="note" id="audit-denominator"></p>
+<div class="table-scroll" id="audit-totals"></div>
+<div class="table-scroll" id="weekly-credit-table"></div>
+</details>
+</section>
+<section class="section" id="groups">
+<h2>Where does AI usage differ?</h2>
+<p class="subtitle">Compare observed reach alongside group size. Higher recorded usage is not automatically better performance.</p>
+<label for="grouping">Compare by<select id="grouping"><option value="Organization">Organisation</option><option value="FunctionType">Function</option><option value="Team">Team</option></select></label>
+<div class="card" style="margin-top:16px"><div class="table-scroll" id="group-table"></div>
+<p class="note">Groups use each person's latest attributes in the selected window. Reach is recorded users divided by group headcount. Actions per person per week use all group members, including non-users and people with activity gaps. “At least” marks a lower bound where records are incomplete. A dash means unavailable or withheld.</p></div>
+</section>
+<section class="section" id="collaboration">
+<h2>Collaboration activity</h2>
+<p class="subtitle">Do people with higher recorded credit consumption also have higher collaboration activity? Compare groups in the same period, then explore their weekly context.</p>
+<div class="comparison-controls">
+<label for="collab-product">Credit source<select id="collab-product"><option value="M365">M365 credits</option><option value="GitHub">GitHub AI credits</option></select></label>
+<label for="collab-metric">Activity<select id="collab-metric"><option value="Emails_sent">Emails sent</option><option value="Chats_sent">Chats sent</option><option value="Meetings">Meetings attended</option><option value="Collaboration_hours">Collaboration hours</option></select></label>
+<label for="collab-dimension">Filter by<select id="collab-dimension"><option value="All">Entire organisation</option><option value="Organization">Organisation</option><option value="FunctionType">Function</option><option value="Team">Team</option></select></label>
+<label for="collab-group">Group<select id="collab-group"></select></label>
+</div>
+<p class="note" id="collab-scope" aria-live="polite"></p>
+<div class="card" style="margin-top:16px">
+<h3>Activity by credit level</h3>
+<p class="subtitle">Each activity rate uses all people in that credit group and all weeks in the selected period, including zeros. No recorded credits does not mean no AI use.</p>
+<div id="collab-comparison"></div>
+<p class="note" id="collab-comparison-note"></p>
+<details><summary>Credit groups and exact values</summary><div class="table-scroll" id="collab-band-table"></div></details>
+</div>
+<div class="card collaboration-trends" style="margin-top:16px">
+<h3 id="collab-credit-title">Credits over time</h3>
+<p class="subtitle">Recorded credits per person per week for the selected group.</p>
+<div class="chart" id="collab-credit-trend"></div>
+<h3 id="collab-activity-title">Collaboration activity over time</h3>
+<p class="subtitle">Selected activity per person per week for the same people and weeks.</p>
+<div class="chart" id="collab-activity-trend"></div>
+<p class="note">The charts use separate scales. A point may be a recorded lower bound if observations are missing; see the weekly values. A gap means unavailable or withheld.</p>
+<details><summary>Weekly values</summary><div class="table-scroll" id="collab-weekly-table"></div></details>
+</div>
+<div class="notice">This is an illustrative, descriptive comparison, not evidence that AI changes collaboration. Roles, teams and work patterns can differ between groups.</div>
+</section>
+<section class="section" id="definitions">
+<h2>Definitions &amp; coverage</h2>
+<div class="scope">
+<p><strong>Scope:</strong> the Person Query roster and the declared 13-week synthetic product window, 5 April to 4 July 2026. Headcount is the roster, not the sum of service user counts. Non-roster agent records are excluded from the dashboard.</p>
+<p><strong>Missing coverage:</strong> no confirmed unlicensed Copilot Chat activity, other AI vendors, satisfaction survey, task-completion outcomes or output-success measures are supplied. “AI users” means users observed in the supplied sources, not all AI use in the organisation.</p>
+<p><strong>Synthetic scenario:</strong> reproducible staggered team rollouts, changing weekly participation and demand, and a temporary dip with recovery. These changes are applied to source records, not chart lines. Access and HR attributes are unchanged. Existing licensed-activity gaps remain unresolved. The agent scenario assumes no use before its first week; committed CSVs and other demos are unchanged.</p>
+<p id="coverage-note"></p>
+</div>
+<details><summary>Metric definitions and denominator rules</summary>
+<dl>
+<dt>Observed AI users</dt><dd>A distinct person with positive M365 Copilot actions or active days, Cowork tasks or active days, agent sessions, metered M365 sessions or credits, or GitHub activity or credits during the window. A person using multiple services is counted once. A positive observation remains positive even if another source is unresolved.</dd>
+<dt>Recorded activity per person per week</dt><dd>Recorded actions, tasks, sessions, feature uses or credits divided by all roster person-weeks in the selected period: headcount multiplied by weeks. Non-users, unlicensed people and person-weeks with activity gaps stay in the denominator. Only received activity contributes to the numerator; rates are recorded lower bounds where coverage is incomplete, not estimates of missing usage. Group rates use that group's full roster; agent, feature and service breakdowns use the full organisation roster, not only that category's users. Raw totals remain in audit details.</dd>
+<dt>M365 Copilot access and adoption</dt><dd>Access uses positive Total Copilot enabled days in the latest week, not activity. Licensed zeros remain in the denominator. The latest-week adoption rate is published only when activity is known for every licensed person. Native licensed-only M365 nulls mean unlicensed under Microsoft's documented rules, but these historical fixtures deliberately contain processing gaps in licensed activity. Those gaps remain unresolved. Their unlicensed zeros are fixture conventions, not the native-export null convention.</dd>
+<dt>GitHub use and acceptance</dt><dd>Recorded use includes positive suggested or accepted completions, user-initiated chats, the Agent adoption indicator, or GitHub AI credits. A missing activity row is not a licence record or proof of non-use. Acceptance is total accepted completions divided by total suggested completions over the received records, not an average of person-level percentages. Zero suggestions produce no rate.</dd>
+<dt>Returning agent users</dt><dd>The share of distinct active agent users in the latest week whose exported seven-day returning indicator is one. Repeated person-level indicators are deduplicated across agents. They are never added across weeks. This is not retention across all AI services.</dd>
+<dt>Credit volume</dt><dd>M365 Copilot credits and GitHub AI credits retain separate units. Credits per roster person-week divide recorded credits by all roster person-weeks in the selected window, including people with no activity or no licence. Daily records are aggregated to Sunday-start weeks before joining to the roster. Feature and agent facts remain separate so they cannot multiply the person-week panel. No currency conversion, licence fees, policy-limit totals or savings are inferred.</dd>
+<dt>Collaboration activity and credit levels</dt><dd>Emails sent, Teams chats sent, meetings attended and collaboration hours come from the Person Query. Collaboration hours include overlapping meeting and other collaboration activity only once; do not add hours to the other measures. Metric rules can vary by organisation. Credit groups use each person's average recorded weekly credits in the selected period. People with zero recorded credits form one group; positive values are divided using organisation-wide tercile cutoffs, with ties kept together. A band can be empty. Filters retain those cutoffs and use each person's latest group in the selected period. M365 and GitHub credits are never combined. Missing credit observations make that product's group comparison unavailable. Missing activity remains in the denominator: “At least” marks a recorded lower bound, while all-missing values are unavailable. These are associations within the same period, not causal or predictive results.</dd>
+<dt>Disclosure and interpretation</dt><dd>Counts protect positive contributor groups and their complements at a minimum of ten people. Small additive breakdown categories receive complementary suppression. Only aggregate values are embedded in this HTML. This synthetic example is not an approved real-export adapter or a guarantee against disclosure from arbitrary linked reports. Real use requires mapping, coverage and organisation-specific disclosure review. Tool activity does not establish productivity, satisfaction or causal impact.</dd>
+</dl>
+<p><a href="https://microsoft.github.io/viva-insights-sample-code/query-join-guide/">Query setup and joins</a> · <a href="https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics#notes-on-copilot-metric-calculations">Microsoft Copilot metric rules</a></p>
+</details>
+</section>
+<footer id="footer"></footer>
+<noscript>This dashboard needs JavaScript to display its embedded aggregate data. No data leaves this file.</noscript>
+</div>
+</main>
+</div>
+
+```{r embedded-aggregates, results='asis'}
+cat('<script id="dashboard-data" type="application/json">',
+    business_payload_json(payload), '</script>', sep = "")
+```
+
+<script>
+"use strict";
+const dashboard = JSON.parse(document.getElementById("dashboard-data").textContent);
+const byId = id => document.getElementById(id);
+const number = (value, digits = 0, minimumDigits = 0) => value === null || !Number.isFinite(value) ? "\u2014" :
+  value.toLocaleString("en-GB", {maximumFractionDigits: digits, minimumFractionDigits: minimumDigits});
+const percent = value => value === null ? "\u2014" : number(value * 100, 1) + "%";
+const element = (tag, text, className) => {
+  const node = document.createElement(tag);
+  if (text !== undefined) node.textContent = text;
+  if (className) node.className = className;
+  return node;
+};
+const observed = (value, lower, digits = 0) => {
+  if (value === null || !Number.isFinite(value)) return number(value, digits);
+  const scale = 10 ** digits;
+  return lower ? "At least " + number(Math.floor(value * scale) / scale, digits) : number(value, digits);
+};
+const observedPercent = (value, lower) => value === null || !Number.isFinite(value) ? "\u2014" : observed(value * 100, lower, 1) + "%";
+function table(id, headers, rows, caption) {
+  const host = byId(id); host.replaceChildren();
+  const tab = element("table");
+  if (caption) tab.append(element("caption", caption));
+  const head = element("thead"), hr = element("tr");
+  headers.forEach(label => { const th = element("th", label); th.scope = "col"; hr.append(th); });
+  head.append(hr); tab.append(head);
+  const body = element("tbody");
+  rows.forEach(row => {
+    const tr = element("tr");
+    row.forEach((value, i) => {const cell = element(i === 0 ? "th" : "td", String(value)); if (i === 0) cell.scope = "row"; tr.append(cell);});
+    body.append(tr);
+  });
+  if (!rows.length) {
+    const cell = element("td", "No publishable categories in this window."); cell.colSpan = headers.length;
+    const row = element("tr"); row.append(cell); body.append(row);
+  }
+  tab.append(body); host.append(tab);
+}
+const colours = {any_active:"#242424",copilot_active:"#5b72e8",agents_active:"#d94ba3",github_active:"#9962d8"};
+const labels = {any_active:"Any observed AI",copilot_active:"M365 Copilot",agents_active:"Agents",github_active:"GitHub Copilot"};
+const collaborationMetrics = {
+  Emails_sent:{label:"Emails sent",unit:"emails",bit:1},
+  Chats_sent:{label:"Chats sent",unit:"chats",bit:2},
+  Meetings:{label:"Meetings attended",unit:"meetings",bit:4},
+  Collaboration_hours:{label:"Collaboration hours",unit:"hours",bit:8}
+};
+const collaborationTrendFields = ["Emails_sent","Chats_sent","Meetings","Collaboration_hours","m365_credits","github_credits","Gap"];
+const collaborationBandFields = ["People","Credit","Emails_sent","Chats_sent","Meetings","Collaboration_hours","Gap"];
+const collaborationBandLabels = ["No recorded credits","Low","Medium","High"];
+const unpackRow = (fields, values) => Object.fromEntries(fields.map((field,i)=>[field,values[i]]));
+function unpackCollaboration(scope, dates) {
+  const result={People:scope.People,Trend:scope.Trend.map((row,i)=>({
+    MetricDate:dates[i].MetricDate,...unpackRow(collaborationTrendFields,row)
+  }))};
+  ["M365","GitHub"].forEach(product=>{
+    if(scope[product]) result[product]=scope[product].map((row,i)=>({
+      Label:collaborationBandLabels[i],...unpackRow(collaborationBandFields,row)
+    }));
+  });
+  return result;
+}
+const collaborationValue = (value, gap, bit) => observed(value, (gap & bit) !== 0, 1);
+function collaborationBars(rows, metric, creditBit) {
+  const host=byId("collab-comparison"); host.replaceChildren();
+  const values=rows.map(row=>row[metric]).filter(Number.isFinite);
+  const maximum=Math.max(0,...values)||1;
+  rows.forEach(row=>{
+    const item=element("div",undefined,"comparison-row");
+    const label=element("div",row.Label,"comparison-label");
+    label.append(element("small",row.People===null?"Headcount withheld":`${number(row.People)} people`));
+    if(Number.isFinite(row.Credit)) label.append(element("small",
+      `Credits / person / week: ${collaborationValue(row.Credit,row.Gap,creditBit)}`));
+    const track=element("div",undefined,"comparison-track"); track.setAttribute("aria-hidden","true");
+    if(Number.isFinite(row[metric])) {
+      const fill=element("div",undefined,"comparison-fill");
+      fill.style.width=`${100*row[metric]/maximum}%`; track.append(fill);
+    }
+    const value=row.People===0?"No people":row[metric]===null?"Unavailable or withheld":
+      collaborationValue(row[metric],row.Gap,collaborationMetrics[metric].bit);
+    item.append(label,track,element("div",value,"comparison-value")); host.append(item);
+  });
+}
+function renderCollaboration(data) {
+  const product=byId("collab-product").value, metric=byId("collab-metric").value;
+  const dimension=byId("collab-dimension").value, select=byId("collab-group");
+  const scopes=data.collaboration.scopes[dimension]||{}, groups=Object.keys(scopes);
+  const previous=select.value;
+  select.replaceChildren(...groups.map(group=>{const option=element("option",group);option.value=group;return option;}));
+  if(groups.includes(previous)) select.value=previous;
+  select.disabled=dimension==="All"||!groups.length;
+  const compact=scopes[select.value], activity=collaborationMetrics[metric];
+  if(!compact) {
+    byId("collab-scope").textContent="This filter is unavailable because group sizes do not meet the disclosure threshold.";
+    ["collab-comparison","collab-credit-trend","collab-activity-trend"].forEach(id=>byId(id).replaceChildren());
+    byId("collab-comparison-note").textContent="";
+    table("collab-band-table",[],[]); table("collab-weekly-table",[],[]);
+    return;
+  }
+  const scope=unpackCollaboration(compact,data.trend);
+  const creditKey=product==="M365"?"m365_credits":"github_credits";
+  const creditLabel=product==="M365"?"M365 credits":"GitHub AI credits";
+  const creditBit=product==="M365"?16:32;
+  byId("collab-scope").textContent=`${select.value} \u00b7 ${number(scope.People)} people \u00b7 latest group in the selected period`;
+  byId("collab-credit-title").textContent=`${creditLabel} per person per week`;
+  byId("collab-activity-title").textContent=`${activity.label} per person per week`;
+  const rows=scope[product], status=data.collaboration.status[product];
+  if(rows) {
+    collaborationBars(rows,metric,creditBit);
+    byId("collab-comparison-note").textContent=`${activity.unit} per person per week. Low, medium and high use organisation-wide positive-credit tercile cutoffs; ties stay together, so a group can be empty. Values or complementary cells may be withheld.`;
+    table("collab-band-table",["Credit group","People",`${creditLabel} / person / week`,`${activity.label} / person / week`],
+      rows.map(row=>[row.Label,number(row.People),collaborationValue(row.Credit,row.Gap,creditBit),
+        collaborationValue(row[metric],row.Gap,activity.bit)]),
+      "At least indicates incomplete activity; a dash means unavailable or withheld.");
+  } else {
+    byId("collab-comparison").replaceChildren();
+    byId("collab-comparison-note").textContent=status==="incomplete"?
+      "Credit groups are unavailable because credit observations are incomplete.":
+      "Credit groups are withheld because a group or its complement is below the disclosure threshold.";
+    table("collab-band-table",[],[]);
+  }
+  lineChart("collab-credit-trend",scope.Trend,[{key:creditKey,label:creditLabel,colour:"#5b72e8",
+    format:(value,row)=>collaborationValue(value,row.Gap,creditBit)}],
+    `${creditLabel} per person per week`);
+  lineChart("collab-activity-trend",scope.Trend,[{key:metric,label:activity.label,colour:"#087f8c",
+    format:(value,row)=>collaborationValue(value,row.Gap,activity.bit)}],
+    `${activity.label} per person per week`);
+  table("collab-weekly-table",["Week starting",`${creditLabel} / person / week`,`${activity.label} / person / week`],
+    scope.Trend.map(row=>[row.MetricDate,collaborationValue(row[creditKey],row.Gap,creditBit),
+      collaborationValue(row[metric],row.Gap,activity.bit)]),
+    "All group members remain in the denominator. At least indicates incomplete records.");
+}
+function lineChart(id, rows, series, title) {
+  const host = byId(id); host.replaceChildren();
+  const ns = "http://www.w3.org/2000/svg";
+  const width = Math.max(300, host.clientWidth), height = 260;
+  const margin = {left:56,right:16,top:18,bottom:40};
+  const svg = document.createElementNS(ns,"svg");
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`); svg.setAttribute("role","img");
+  svg.setAttribute("aria-label", title + ". Exact values are available in the accompanying table.");
+  const add = (tag, attrs, text) => {
+    const node = document.createElementNS(ns,tag);
+    Object.entries(attrs).forEach(([k,v])=>node.setAttribute(k,String(v)));
+    if (text !== undefined) node.textContent = text;
+    svg.append(node); return node;
+  };
+  const values = rows.flatMap(row=>series.map(s=>row[s.key])).filter(x=>x !== null && Number.isFinite(x));
+  if (!values.length) {host.append(element("p","No publishable observations.","note")); return;}
+  const maximum = (Math.max(0,...values) || 1) * 1.12;
+  const x = i => margin.left + i * (width-margin.left-margin.right) / Math.max(1,rows.length-1);
+  const y = v => height-margin.bottom-v/maximum*(height-margin.top-margin.bottom);
+  for (let i=0;i<5;i++) {
+    const value = maximum*i/4, yy = y(value);
+    add("line",{x1:margin.left,y1:yy,x2:width-margin.right,y2:yy,stroke:"#eaeaea"});
+    add("text",{x:margin.left-8,y:yy+4,"text-anchor":"end",fill:"#526079","font-size":11}, number(value, maximum < 10 ? 2 : 0));
+  }
+  const step = Math.max(1,Math.ceil(rows.length/4));
+  rows.forEach((row,i)=>{
+    if (i%step === 0 || i === rows.length-1)
+      add("text",{x:x(i),y:height-12,"text-anchor":"middle",fill:"#565656","font-size":11},row.MetricDate.slice(5));
+  });
+  series.forEach(s=>{
+    let path="", connected=false;
+    rows.forEach((row,i)=>{
+      const v=row[s.key];
+      if (v === null || !Number.isFinite(v)) {connected=false;return;}
+      path += `${connected?"L":"M"}${x(i)},${y(v)} `; connected=true;
+    });
+    add("path",{d:path,fill:"none",stroke:s.colour,"stroke-width":2.5});
+    rows.forEach((row,i)=>{
+      const v=row[s.key]; if(v===null || !Number.isFinite(v)) return;
+      const dot=add("circle",{cx:x(i),cy:y(v),r:3,fill:s.colour});
+      const tip=document.createElementNS(ns,"title");
+      tip.textContent=`Week of ${row.MetricDate}: ${s.label} ${s.format ? s.format(v,row) : number(v,2)}`;dot.append(tip);
+    });
+  });
+  host.append(svg);
+}
+function kpi(label, value, note) {
+  const card=element("div",undefined,"card");card.append(element("p",label,"kpi-label"),element("p",value,"number"),element("p",note,"note"));return card;
+}
+function render() {
+  const data=dashboard.windows[byId("lookback").value];
+  byId("period").textContent=`${data.start} to ${data.end} \u00b7 ${number(data.population)} people in roster`;
+  byId("kpis").replaceChildren(
+    kpi("People with recorded AI use",observed(data.users,data.lower_bound),"Distinct people across the selected period. Services overlap."),
+    kpi("M365 Copilot access",number(data.licensed),"Licensed people in the latest week. "+(data.adoption===null?"Adoption unavailable: activity gaps.":"Latest-week adoption: "+percent(data.adoption)+".")),
+    kpi("M365 credits / person / week",number(data.m365_credits_per_person_week,1,1),"Across all roster people, including non-users. Not currency."),
+    kpi("GitHub credits / person / week",number(data.github_credits_per_person_week,1,1),"Across all roster people. Separate credit unit."));
+  const series=Object.keys(colours).map(key=>({key,label:labels[key],colour:colours[key]}));
+  byId("usage-legend").replaceChildren(...series.map(s=>{const n=element("span",s.label);n.style.setProperty("--series",s.colour);return n;}));
+  lineChart("usage-trend",data.trend,series,"Weekly observed AI users");
+  table("trend-table",["Week starting","Any observed AI","M365 Copilot","Cowork","Agents","GitHub Copilot","Metered M365"],
+    data.trend.map(r=>[r.MetricDate,...["any_active","copilot_active","cowork_active","agents_active","github_active","metered_active"].map(k=>number(r[k]))]),
+    "Counts may be lower bounds. A dash means unavailable or withheld.");
+  byId("services").replaceChildren(...data.products.map(p=>{
+    const card=element("div",undefined,"card");card.append(element("h3",p.Product,"service-title"));
+    const row=(label,value)=>{const n=element("p",undefined,"service-row");n.append(element("span",label),element("strong",value));return n;};
+    card.append(row("Observed users",observed(p.Users,p.LowerBound)),row("Recorded "+p.Unit+" / person / week",observed(p.PerPersonWeek,p.VolumeLowerBound,2)));
+    if(p.Product==="GitHub Copilot") {
+      card.append(row("Accepted completions / person / week",observed(data.accepted_per_person_week,p.VolumeLowerBound,2)),row("Observed-record acceptance",percent(data.acceptance)));
+      if(p.VolumeLowerBound) card.append(element("p","Acceptance covers received records and may differ with complete coverage.","note"));
+    }
+    return card;
+  }));
+  table("agent-table",["Agent","Users","Sessions / person / week"],data.agents.rows.map(r=>[r.Category,number(r.Users),number(r.PerPersonWeek,2)]),
+    "Distinct users per agent. User counts overlap.");
+  byId("agent-note").textContent=data.agents.withheld?"Some categories and a complementary category are withheld to protect small contributor groups.":"All displayed agents meet the contributor threshold.";
+  const featureNames={code_completion:"Code completions",chat_inline:"Inline chat",chat_panel_ask_mode:"Chat: ask mode",chat_panel_edit_mode:"Chat: edit mode",chat_panel_agent_mode:"Chat: agent mode",chat_panel_plan_mode:"Chat: plan mode",chat_panel_custom_mode:"Chat: custom mode",chat_panel_unknown_mode:"Chat: unspecified mode",agent_edit:"Agent edits",copilot_cli:"Copilot CLI",copilot_app:"Copilot app"};
+  table("feature-table",["Feature","Users","Uses / person / week"],data.features.rows.map(r=>[featureNames[r.Category]||r.Category,observed(r.Users,data.features.lower_bound),observed(r.PerPersonWeek,data.features.lower_bound,2)]),
+    (data.features.withheld?"Some categories withheld for disclosure protection.":"Selected-period feature activity.")+(data.features.lower_bound?" At least marks incomplete GitHub observations.":""));
+  byId("returning-note").textContent=`Returning agent users: ${percent(data.agent_returning)} of active agent users in the week starting ${data.returning_week} also used agents in the prior seven days. This is the exported agent indicator, deduplicated across agents, not an all-AI retention rate.`;
+  lineChart("m365-credit-trend",data.credit_trend,[{key:"M365PerPerson",label:"M365 credits / person / week",colour:"#5b72e8"}],"Weekly M365 credits per person");
+  lineChart("github-credit-trend",data.credit_trend,[{key:"GitHubPerPerson",label:"GitHub credits / person / week",colour:"#8551bc"}],"Weekly GitHub credits per person");
+  table("credit-table",["Service","Contributors","M365 credits / person / week"],data.services.rows.map(r=>[r.Category,number(r.Users),number(r.PerPersonWeek,2)]),
+    data.services.withheld?"Some service categories withheld.":"Recorded M365 credits by service, across the full roster.");
+  byId("audit-denominator").textContent=`Denominator: ${number(data.population)} people \u00d7 ${data.lookback} weeks = ${number(data.person_weeks)} person-weeks. Different credit units are never added.`;
+  table("audit-totals",["Metric","Recorded total","Unit"],
+    [...data.products.map(p=>[p.Product,observed(p.Volume,p.VolumeLowerBound),p.Unit]),
+      ["Accepted GitHub completions",observed(data.accepted,data.products.find(p=>p.Product==="GitHub Copilot").VolumeLowerBound),"completions"],
+      ["M365 consumption",number(data.m365_credits,2),"M365 credits"],
+      ["GitHub consumption",number(data.github_credits,2),"GitHub AI credits"]],
+    "Selected-period totals for reconciliation, not cross-product comparisons.");
+  table("weekly-credit-table",["Week starting","M365 credits / person","GitHub credits / person","M365 credits","GitHub AI credits"],data.credit_trend.map(r=>[r.MetricDate,number(r.M365PerPerson,2),number(r.GitHubPerPerson,2),number(r.M365,2),number(r.GitHub,2)]),"Each row is one week. Chart values divide recorded totals by the full weekly roster.");
+  const groups=data.groups[byId("grouping").value];
+  table("group-table",["Group","Headcount","Observed AI users","Recorded reach","Copilot actions / person / week"],
+    groups.map(r=>[r.Group,number(r.People),observed(r.Users,r.LowerBound),
+      observedPercent(r.Reach,r.LowerBound),observed(r.Actions,r.ActionsLowerBound,2)]),
+    "Selected-period unique users, grouped using latest-window attributes. Cells and complements below "+dashboard.minimum+" are withheld.");
+  renderCollaboration(data);
+  byId("coverage-note").textContent=dashboard.outside_agents?
+    "Some agent activity could not be matched to the Person Query roster and is excluded. Its count is withheld. Sparse licensed activity and incomplete GitHub observations remain unresolved.":
+    "All supplied agent users match the Person Query roster. Sparse licensed activity and incomplete GitHub observations remain unresolved.";
+  byId("footer").textContent=`Synthetic demonstration \u00b7 Generated ${dashboard.generated} \u00b7 Source: seeded rollout scenario from query-export fixtures \u00b7 Aggregate data only \u00b7 No external assets or data requests`;
+}
+byId("lookback").addEventListener("change",render);
+byId("grouping").addEventListener("change",render);
+["collab-product","collab-metric","collab-dimension","collab-group"].forEach(id=>
+  byId(id).addEventListener("change",()=>renderCollaboration(dashboard.windows[byId("lookback").value])));
+let resizeTimer;
+window.addEventListener("resize",()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(render,100);});
+render();
+</script>

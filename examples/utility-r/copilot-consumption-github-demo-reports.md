@@ -1,7 +1,7 @@
 # Copilot demo reports
 
-Two self-contained R Markdown flexdashboards demonstrate different analysis questions.
-All data used by these two demos are generated synthetic data. Neither report establishes
+Three self-contained R Markdown dashboards demonstrate different analysis questions.
+All data used by these demos are generated synthetic data. No report establishes
 causal effects, wellbeing or overall productivity from tool activity.
 
 Use [Joining Viva Insights queries](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/)
@@ -13,27 +13,104 @@ The general tutorial does not extend the real runner's supported inputs.
 |---|---|---|---|
 | Copilot Consumption and Ways of Working | [Rmd](copilot-consumption-ways-of-working-simulation.Rmd) | [HTML](copilot-consumption-ways-of-working-simulation.html) | Copilot credit consumption alongside collaboration patterns, by service, organisation and function, including credit concentration and heavy-user consumption patterns. |
 | Developer Experience and Copilot | [Rmd](github-copilot-developer-productivity-simulation.Rmd) | [HTML](github-copilot-developer-productivity-simulation.html) | Baseline working conditions for the developer population organised around GitHub Copilot usage: a heavy GitHub-use group defined and profiled on the Overview, collaboration, focus, after-hours and network breadth each compared across the three GitHub-intensity groups, plus feature/model/language breakdowns, GitHub coverage, M365 Copilot credit consumption and an evaluation framework. |
+| Business Leaders AI Usage | [Rmd](business-leaders-ai-adoption.Rmd) | [HTML](business-leaders-ai-adoption.html) | Cross-service observed AI reach, usage per person per week, rollout trends, separate credit rates, group comparisons and collaboration activity by credit level. |
+
+## Business Leaders AI Usage
+
+This dashboard answers five questions: who is using AI, what they use, how much
+they use, whether usage changes over time, and how groups differ. It combines
+M365 Copilot, Cowork, agents, metered M365 services and GitHub Copilot. The time
+selector offers the latest four or eight weeks and the full thirteen-week product
+window, shown by default. The group selector compares organisations, functions or teams using each
+person's latest attributes in that window.
+
+Render from the repository root:
+
+```powershell
+Rscript examples/utility-r/render-business-leaders-ai.R
+```
+
+Keep [business-leaders-ai-helpers.R](business-leaders-ai-helpers.R),
+[business-leaders-ai-simulation.R](business-leaders-ai-simulation.R),
+[copilot-super-panel-helpers.R](copilot-super-panel-helpers.R), the R Markdown
+source and `_data/` in their repository layout. Dependencies are `dplyr`, `tidyr`,
+`jsonlite`, `knitr`, `rmarkdown` and Pandoc. The dedicated renderer knits the
+source and produces a lightweight standalone HTML page without flexdashboard,
+CDN libraries, external assets or runtime data requests. An optional first
+argument selects another HTML output path.
+
+The renderer applies a seeded rollout scenario to the eight raw synthetic exports
+in memory, before the shared person-week aggregation. Staggered team activation,
+weekly participation, changing demand and a temporary dip with recovery produce
+an illustrative adoption story rather than a forecast. Licences, HR attributes
+and deliberate missing-value masks are preserved. GitHub feature allocations
+reconcile to accepted completions and chat requests; credit records follow
+billable activity. Agent returning indicators are recomputed from the scenario,
+which assumes no agent use before its first week. No committed CSV or other
+demo's input is rewritten. To analyse the baseline fixtures without the scenario,
+call `read_business_leaders_data(data_dir)` without `scenario = TRUE`.
+
+**Interpretation:** overall AI reach is a distinct-person union of positive
+activity, not the sum of product user counts. Known processing gaps remain
+unresolved. Counts are labelled as lower bounds where necessary, and full
+M365 adoption is unavailable when licensed activity is incomplete. Native
+licensed-only M365 null semantics do not turn deliberately missing synthetic
+activity into a licence signal. GitHub row presence is not provisioning.
+Incomplete activity rates are labelled as lower bounds. GitHub acceptance is
+calculated over received observations and may change with complete coverage.
+
+**Intensity denominator:** recorded activity divided by all roster person-weeks,
+including non-users, unlicensed people and person-weeks with activity gaps.
+Group rates use the group's full roster; service, agent and feature rates use
+the whole organisation. These are recorded lower bounds where coverage is
+incomplete, not imputed usage. Raw totals are retained only in expandable audit
+details. Acceptance and returning-user shares keep their specialised denominators.
+
+**Collaboration activity:** the Person Query supplies emails sent, Teams chats
+sent, meetings attended and collaboration hours. Compare one measure at a time
+across no-recorded-credit and low/medium/high positive-credit groups, or inspect
+aligned weekly rates for the entire roster or an organisation, function or team.
+The low/medium/high cutoffs are positive-credit terciles for the entire roster
+in the selected period; ties stay together, so a group can be empty. Filters
+retain those cutoffs and use each person's latest group in the selected window.
+Both credit and activity rates use all group person-weeks. Missing activity is
+not imputed: partial observations produce labelled recorded lower bounds, while
+all-missing outcomes are unavailable. Incomplete credit observations withhold
+that product's credit-group comparison. No recorded credits do not establish
+non-use of AI. The scenario does not manufacture a relationship, and differences
+may reflect roles, teams or other work patterns rather than an AI effect.
+
+Credit units are not pooled or converted into currency. Satisfaction, completion
+outcomes, forecasts, monetary costs and unlicensed Copilot Chat are not supplied.
+Out-of-roster agent users are excluded and flagged without exposing small counts.
+Contributor and complementary suppression is applied before aggregate data is
+embedded in the HTML. This is a synthetic demonstration, not an approved
+real-export adapter or a disclosure guarantee for arbitrary linked reports.
 
 ## Which queries each report needs
 
-Both synthetic reports draw on Person, Consumption and GitHub fixtures, but they
+All three synthetic reports draw on Person, Consumption and GitHub fixtures, but they
 do not need the same files. This table describes demo inputs, rather than the
-narrower real-v1 adapter. Neither demo uses Agent exports.
+narrower real-v1 adapter. Only Business Leaders uses the current Agent exports.
 
-| Export | Query | Consumption | Developer Experience |
-|---|---|---|---|
-| `PersonQuery.csv` | Person | Required | Required |
-| `PeopleMetaData.csv` | Consumption | Required | Required |
-| `PersonM365CreditsMetrics.csv` | Consumption | Required | Required |
-| `PersonGitHubCreditsMetrics.csv` | Consumption | Required | Required |
-| `PersonGitHubActivityMetrics.csv` | GitHub | Required | Required |
-| `GitHubActivityBreakdownBy*Metrics.csv` (four files) | GitHub | Not used | Required |
+| Export | Query | Consumption | Developer Experience | Business Leaders |
+|---|---|---|---|---|
+| `PersonQuery.csv` | Person | Required | Required | Required |
+| `PeopleMetaData.csv` | Consumption | Required | Required | Required |
+| `PersonM365CreditsMetrics.csv` | Consumption | Required | Required | Required |
+| `PersonGitHubCreditsMetrics.csv` | Consumption | Required | Required | Required |
+| `PersonGitHubActivityMetrics.csv` | GitHub | Required | Required | Required |
+| `GitHubActivityBreakdownByFeatureMetrics.csv` | GitHub | Not used | Required | Required |
+| Other three GitHub breakdowns | GitHub | Not used | Required | Not used |
+| `AgentMetadata.csv` and `PersonAgentActivityMetrics.csv` | Agent | Not used | Not used | Required |
 
 The Consumption report reads **five exports**; the Developer Experience report reads
 all **nine**. `build_copilot_super_panel()` takes `include_github_breakdowns = FALSE`
 for the five-export path, and the consumption report uses it. Opting out removes only
 the feature, language and model drilldown columns — every measure that remains in the
 panel is identical either way.
+Business Leaders reads **eight** exports, adding the feature and two Agent files
+to the five-export panel without joining dimensional rows into that panel.
 
 The Consumption report needs the GitHub *activity* file even though it presents no
 feature or model drilldowns, because that file carries explicit weekday zero rows.

@@ -62,8 +62,9 @@ Explore the repo to discover sample code:
 - [Within-Person Event-Study & Difference-in-Differences in R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/event-study-did.Rmd)
 - [Combining a Consumption query with a Person Query for Ways of Working analysis - R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-ways-of-working-simulation.Rmd)
 - [Developer Experience and Copilot: working conditions and joint GitHub/M365 use - R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/github-copilot-developer-productivity-simulation.Rmd)
+- [Business Leaders AI Usage: observed reach, services, trends and group comparisons - R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/business-leaders-ai-adoption.Rmd)
 
-  Both reports read the Consumption query and GitHub query, both accessible from the **Customised
+  These reports read the Consumption query and GitHub query, both accessible from the **Customised
   query** tab under **Create analysis** in the Viva Insights analyst experience. See the
   [AI cost query documentation](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/ai-cost-query)
   for the official schema and access details.

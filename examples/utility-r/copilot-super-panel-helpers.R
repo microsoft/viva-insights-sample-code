@@ -44,7 +44,8 @@ safe_divide <- function(num, den) {
 }
 
 build_copilot_super_panel <- function(data_dir = "_data",
-                                      include_github_breakdowns = TRUE) {
+                                      include_github_breakdowns = TRUE,
+                                      exports = NULL) {
   # The four GitHub breakdown exports only support feature, language and model
   # drilldowns. A report that does not present those drilldowns should not
   # require the files, so callers can opt out and read five exports instead of
@@ -52,21 +53,27 @@ build_copilot_super_panel <- function(data_dir = "_data",
   stopifnot(length(include_github_breakdowns) == 1L,
             is.logical(include_github_breakdowns),
             !is.na(include_github_breakdowns))
-  pq <- read_demo_export(data_dir, "person-query", "PersonQuery.csv") |>
+  read_export <- function(...) {
+    if (is.null(exports)) return(read_demo_export(data_dir, ...))
+    path <- paste(c(...), collapse = "/")
+    if (is.null(exports[[path]])) stop("Missing supplied export: ", path)
+    exports[[path]]
+  }
+  pq <- read_export("person-query", "PersonQuery.csv") |>
     mutate(MetricDate = as.Date(MetricDate),
            WeekStart = week_start_sunday(MetricDate))
-  people_meta <- read_demo_export(data_dir, "consumption-query",
+  people_meta <- read_export("consumption-query",
                                   "PeopleMetaData.csv")
-  m365_daily_raw <- read_demo_export(data_dir, "consumption-query",
+  m365_daily_raw <- read_export("consumption-query",
                                      "PersonM365CreditsMetrics.csv") |>
     mutate(MetricDate = as.Date(MetricDate),
            WeekStart = week_start_sunday(MetricDate),
            ServiceName = clean_label(ServiceName))
-  github_credits_daily <- read_demo_export(data_dir, "consumption-query",
+  github_credits_daily <- read_export("consumption-query",
                                            "PersonGitHubCreditsMetrics.csv") |>
     mutate(MetricDate = as.Date(MetricDate),
            WeekStart = week_start_sunday(MetricDate))
-  github_activity_daily <- read_demo_export(data_dir, "github-query",
+  github_activity_daily <- read_export("github-query",
                                             "PersonGitHubActivityMetrics.csv") |>
     mutate(MetricDate = as.Date(MetricDate),
            WeekStart = week_start_sunday(MetricDate),
@@ -76,27 +83,27 @@ build_copilot_super_panel <- function(data_dir = "_data",
   feature_daily <- language_feature_daily <- NULL
   language_model_daily <- model_feature_daily <- NULL
   if (include_github_breakdowns) {
-  feature_daily <- read_demo_export(data_dir, "github-query",
+  feature_daily <- read_export("github-query",
                                     "GitHubActivityBreakdownByFeatureMetrics.csv") |>
     mutate(MetricDate = as.Date(MetricDate),
            WeekStart = week_start_sunday(MetricDate),
            Feature = clean_label(Feature))
-  language_feature_daily <- read_demo_export(
-    data_dir, "github-query", "GitHubActivityBreakdownByLanguageFeatureMetrics.csv"
+  language_feature_daily <- read_export(
+    "github-query", "GitHubActivityBreakdownByLanguageFeatureMetrics.csv"
   ) |>
     mutate(MetricDate = as.Date(MetricDate),
            WeekStart = week_start_sunday(MetricDate),
            Language = clean_label(Language),
            Feature = clean_label(Feature))
-  language_model_daily <- read_demo_export(
-    data_dir, "github-query", "GitHubActivityBreakdownByLanguageModelMetrics.csv"
+  language_model_daily <- read_export(
+    "github-query", "GitHubActivityBreakdownByLanguageModelMetrics.csv"
   ) |>
     mutate(MetricDate = as.Date(MetricDate),
            WeekStart = week_start_sunday(MetricDate),
            Language = clean_label(Language),
            Model = clean_label(Model))
-  model_feature_daily <- read_demo_export(
-    data_dir, "github-query", "GitHubActivityBreakdownByModelFeatureMetrics.csv"
+  model_feature_daily <- read_export(
+    "github-query", "GitHubActivityBreakdownByModelFeatureMetrics.csv"
   ) |>
     mutate(MetricDate = as.Date(MetricDate),
            WeekStart = week_start_sunday(MetricDate),
