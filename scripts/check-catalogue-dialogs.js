@@ -166,6 +166,105 @@ const server = http.createServer(async (request, response) => {
       document.activeElement.closest('.skill-section')?.id === hash.slice(1), results);
     await skillDialog.locator('.skill-dialog-close').click();
     await page.waitForFunction(() => !document.querySelector('.skill-dialog[open]') && !location.hash);
+
+    for (const width of [320, 1280]) {
+      await page.setViewportSize({ width, height: 720 });
+      for (const pathname of ['copilot/', 'copilot-dashboards/']) {
+        await page.goto(base + pathname, { waitUntil: 'load' });
+        assert.equal(await page.locator('.dashboard-card').count(), 3);
+        assert.equal(await page.locator('[data-dashboard-details]').count(), 0);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+        const navDemo = page.locator('#vi-mega-copilot a', { hasText: 'Business Leaders AI Usage' });
+        assert.equal(await navDemo.getAttribute('href'), prefix + 'examples/utility-r/business-leaders-ai-adoption.html');
+        for (const trigger of await page.locator('[data-dashboard-open]').all()) {
+          const slug = await trigger.getAttribute('data-dashboard-open');
+          await trigger.focus();
+          await page.keyboard.press('Enter');
+          const dialog = page.locator('.dashboard-dialog[open]');
+          assert.equal(await dialog.count(), 1);
+          assert.equal(await dialog.getAttribute('aria-labelledby'), 'dashboard-title-' + slug);
+          assert.equal(await dialog.locator('h3').evaluate((title) => title === document.activeElement), true);
+          assert.equal(await dialog.getByRole('link', { name: 'View demo', exact: true }).count(), 1);
+          assert.equal(await dialog.getByRole('link', { name: 'Get source', exact: true }).count(), 1);
+          assert.equal(await dialog.getByRole('link', { name: 'Rendering and input requirements' }).count(), 1);
+          for (const link of await dialog.locator('a').all()) {
+            const url = new URL(await link.getAttribute('href'), base);
+            if (url.origin !== origin) continue;
+            const response = await context.request.get(url.href);
+            assert.equal(response.status(), 200, 'Dashboard link must resolve: ' + url.href);
+            if (url.hash) assert.ok((await response.text()).includes(`id="${url.hash.slice(1)}"`), url.href);
+          }
+          await dialog.locator('a').last().focus();
+          await page.keyboard.press('Tab');
+          assert.equal(await dialog.locator('.dashboard-dialog-close').evaluate((button) => button === document.activeElement), true);
+          await page.keyboard.press('Escape');
+          await page.waitForFunction(() => !document.querySelector('.dashboard-dialog[open]') && !location.hash);
+          assert.equal(await trigger.evaluate((link) => link === document.activeElement), true);
+        }
+        const business = page.locator('[data-dashboard-open="business-leaders-ai-usage"]');
+        await business.click();
+        await page.evaluate(() => history.back());
+        await page.waitForFunction(() => !document.querySelector('.dashboard-dialog[open]') && !location.hash);
+        await page.evaluate(() => history.forward());
+        await page.waitForSelector('.dashboard-dialog[open]');
+        await page.locator('.dashboard-dialog[open] .dashboard-dialog-close').click();
+        await page.waitForFunction(() => !document.querySelector('.dashboard-dialog[open]') && !location.hash);
+        await business.click();
+        await page.locator('.dashboard-dialog[open]').evaluate((dialog) => { dialog.scrollTop = dialog.scrollHeight; });
+        await page.keyboard.press('Escape');
+        await page.waitForFunction(() => !document.querySelector('.dashboard-dialog[open]'));
+        await business.click();
+        assert.equal(await page.locator('.dashboard-dialog[open]').evaluate((dialog) => dialog.scrollTop), 0);
+        await page.mouse.click(2, 2);
+        await page.waitForFunction(() => !document.querySelector('.dashboard-dialog[open]'));
+        if (pathname === 'copilot-dashboards/') {
+          for (const trigger of await page.locator('[data-dashboard-open]').all()) {
+            const slug = await trigger.getAttribute('data-dashboard-open');
+            for (const [label, id] of [
+              ['Full dashboard details and caveats', slug],
+              ['Setup guide', 'build-with-your-own-data'],
+            ]) {
+              await trigger.click();
+              await page.locator('.dashboard-dialog[open]').getByRole('link', { name: label, exact: true }).click();
+              await page.waitForFunction((id) =>
+                !document.querySelector('.dashboard-dialog[open]') &&
+                location.hash === '#' + id && document.activeElement.id === id, id);
+              await page.waitForFunction((id) => {
+                const bounds = document.getElementById(id).getBoundingClientRect();
+                const navBottom = document.querySelector('.vi-nav').getBoundingClientRect().bottom;
+                return bounds.top >= navBottom - 1 && bounds.bottom <= innerHeight + 1;
+              }, id).catch(async (error) => {
+                console.error('Guidance destination is outside the viewport:', { width, id },
+                  await page.locator('#' + id).boundingBox());
+                throw error;
+              });
+            }
+          }
+        }
+      }
+    }
+
+    await page.goto(base + 'copilot-dashboards/#dashboard-business-leaders-ai-usage', { waitUntil: 'load' });
+    await page.waitForSelector('.dashboard-dialog[open]');
+    await page.locator('.dashboard-dialog[open]').getByRole('link', { name: 'Full dashboard details and caveats' }).click();
+    await page.waitForFunction(() => !document.querySelector('.dashboard-dialog[open]') && location.hash === '#business-leaders-ai-usage');
+    assert.equal(await page.locator('#business-leaders-ai-usage').isVisible(), true);
+
+    for (const disabled of ['javascript', 'dialog']) {
+      const fallback = await browser.newContext({ javaScriptEnabled: disabled !== 'javascript', viewport: { width: 320, height: 720 } });
+      await fallback.route('**/*', (route) =>
+        new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
+      if (disabled === 'dialog') await fallback.addInitScript(() => { HTMLDialogElement.prototype.showModal = undefined; });
+      const fallbackPage = await fallback.newPage();
+      for (const pathname of ['copilot/', 'copilot-dashboards/']) {
+        await fallbackPage.goto(base + pathname, { waitUntil: 'load' });
+        assert.equal(await fallbackPage.locator('[data-dashboard-details] [data-dashboard-panel]').count(), 3);
+        await fallbackPage.locator('[data-dashboard-open]').first().click();
+        assert.equal(await fallbackPage.locator('#dashboard-business-leaders-ai-usage').isVisible(), true);
+        assert.equal(await fallbackPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+      }
+      await fallback.close();
+    }
     assert.deepEqual(pageErrors, []);
     console.log('Catalogue mobile, fallback, focus and history checks passed.');
   } finally {
