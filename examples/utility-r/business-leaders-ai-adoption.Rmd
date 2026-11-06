@@ -1,6 +1,8 @@
 ---
 pagetitle: "Business Leaders AI Usage"
 lang: en-GB
+params:
+  minimum: 10
 ---
 
 ```{r setup, include=FALSE}
@@ -9,7 +11,7 @@ source("copilot-super-panel-helpers.R")
 source("business-leaders-ai-simulation.R")
 source("business-leaders-ai-helpers.R")
 inputs <- read_business_leaders_data("_data", scenario = TRUE)
-payload <- business_dashboard_payload(inputs)
+payload <- business_dashboard_payload(inputs, params$minimum)
 ```
 
 <style>
@@ -163,7 +165,7 @@ details{margin-top:14px}summary{cursor:pointer;color:#115ea3;padding:4px 0}dl{ma
 <dt>Returning agent users</dt><dd>The share of distinct active agent users in the latest week whose exported seven-day returning indicator is one. Repeated person-level indicators are deduplicated across agents. They are never added across weeks. This is not retention across all AI services.</dd>
 <dt>Credit volume</dt><dd>M365 Copilot credits and GitHub AI credits retain separate units. Credits per roster person-week divide recorded credits by all roster person-weeks in the selected window, including people with no activity or no licence. Daily records are aggregated to Sunday-start weeks before joining to the roster. Feature and agent facts remain separate so they cannot multiply the person-week panel. No currency conversion, licence fees, policy-limit totals or savings are inferred.</dd>
 <dt>Collaboration activity and credit levels</dt><dd>Emails sent, Teams chats sent, meetings attended and collaboration hours come from the Person Query. Collaboration hours include overlapping meeting and other collaboration activity only once; do not add hours to the other measures. Metric rules can vary by organisation. Credit groups use each person's average recorded weekly credits in the selected period. People with zero recorded credits form one group; positive values are divided using organisation-wide tercile cutoffs, with ties kept together. A band can be empty. Filters retain those cutoffs and use each person's latest group in the selected period. M365 and GitHub credits are never combined. Missing credit observations make that product's group comparison unavailable. Missing activity remains in the denominator: “At least” marks a recorded lower bound, while all-missing values are unavailable. These are associations within the same period, not causal or predictive results.</dd>
-<dt>Disclosure and interpretation</dt><dd>Counts protect positive contributor groups and their complements at a minimum of ten people. Small additive breakdown categories receive complementary suppression. Only aggregate values are embedded in this HTML. This synthetic example is not an approved real-export adapter or a guarantee against disclosure from arbitrary linked reports. Real use requires mapping, coverage and organisation-specific disclosure review. Tool activity does not establish productivity, satisfaction or causal impact.</dd>
+<dt>Disclosure and interpretation</dt><dd>Some aggregates are withheld under a minimum group size of `r payload$minimum` people and complementary suppression rules. These rules do not prevent inference by comparing overlapping time windows, credit bands, teams or other linked aggregates. This synthetic example is not an approved real-export adapter or a privacy guarantee. Real use requires mapping, coverage, organisation-specific disclosure review and suitable controls. Tool activity does not establish productivity, satisfaction or causal impact.</dd>
 </dl>
 <p><a href="https://microsoft.github.io/viva-insights-sample-code/query-join-guide/">Query setup and joins</a> · <a href="https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics#notes-on-copilot-metric-calculations">Microsoft Copilot metric rules</a></p>
 </details>
@@ -385,10 +387,10 @@ function render() {
   }));
   table("agent-table",["Agent","Users","Sessions / person / week"],data.agents.rows.map(r=>[r.Category,number(r.Users),number(r.PerPersonWeek,2)]),
     "Distinct users per agent. User counts overlap.");
-  byId("agent-note").textContent=data.agents.withheld?"Some values or categories are withheld to protect small contributor groups and related totals.":"All displayed agents meet the contributor threshold.";
+  byId("agent-note").textContent=data.agents.withheld?"Some values or categories are withheld under the demo's small-group rules.":"All displayed agents meet the contributor threshold.";
   const featureNames={code_completion:"Code completions",chat_inline:"Inline chat",chat_panel_ask_mode:"Chat: ask mode",chat_panel_edit_mode:"Chat: edit mode",chat_panel_agent_mode:"Chat: agent mode",chat_panel_plan_mode:"Chat: plan mode",chat_panel_custom_mode:"Chat: custom mode",chat_panel_unknown_mode:"Chat: unspecified mode",agent_edit:"Agent edits",copilot_cli:"Copilot CLI",copilot_app:"Copilot app"};
   table("feature-table",["Feature","Users","Uses / person / week"],data.features.rows.map(r=>[featureNames[r.Category]||r.Category,observed(r.Users,data.features.lower_bound),observed(r.PerPersonWeek,data.features.lower_bound,2)]),
-    (data.features.withheld?"Some values or categories are withheld for disclosure protection.":"Selected-period feature activity.")+(data.features.lower_bound?" At least marks incomplete GitHub observations.":""));
+    (data.features.withheld?"Some values or categories are withheld under the demo's small-group rules.":"Selected-period feature activity.")+(data.features.lower_bound?" At least marks incomplete GitHub observations.":""));
   byId("returning-note").textContent=`Returning agent users: ${percent(data.agent_returning)} of active agent users in the week starting ${data.returning_week} also used agents in the prior seven days. This is the exported agent indicator, deduplicated across agents, not an all-AI retention rate.`;
   lineChart("m365-credit-trend",data.credit_trend,[{key:"M365PerPerson",label:"M365 credits / person / week",colour:"#5b72e8"}],"Weekly M365 credits per person");
   lineChart("github-credit-trend",data.credit_trend,[{key:"GitHubPerPerson",label:"GitHub credits / person / week",colour:"#8551bc"}],"Weekly GitHub credits per person");

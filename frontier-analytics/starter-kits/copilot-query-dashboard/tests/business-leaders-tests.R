@@ -149,7 +149,18 @@ test("privacy counts distinct contributors and protects small complements", {
             is.na(business$business_public_count(10, 19)),
             business$business_public_count(10, 20) == 10,
             is.na(business$business_public_count(0, 9)))
-  expect_error(business$business_dashboard_payload(business_data, 9), "at least ten")
+  expect_error(business$business_dashboard_payload(business_data, 4), "at least five")
+})
+test("dashboard minimum is configurable down to five and changes suppression", {
+  for (invalid in list(4, 5.5, NA_real_, Inf, "5", c(5, 6)))
+    expect_error(business$business_dashboard_payload(business_data, invalid), "at least five")
+  stopifnot(identical(business_payload$minimum, 10L))
+  lowered <- business$business_dashboard_payload(business_data, 5)
+  nulls <- function(payload) {
+    json <- business$business_payload_json(payload)
+    lengths(regmatches(json, gregexpr("null", json, fixed = TRUE)))
+  }
+  stopifnot(identical(lowered$minimum, 5L), nulls(lowered) < nulls(business_payload))
 })
 test("temporal suppression retains the most comparable safe windows", {
   stopifnot(identical(business$business_temporal_mask(c(429, 433, 433), 10),
@@ -814,4 +825,19 @@ test("business renderer resolves relative output from an unrelated working direc
             !grepl('src="https?://|href="https?://[^"]+\\.css', html),
             !any(vapply(unique(business_data$panel$PersonId),
                         function(id) grepl(id, html, fixed = TRUE), logical(1))))
+})
+test("business renderer applies a configured minimum and rejects one below five", {
+  command <- file.path(utility, "render-business-leaders-ai.R")
+  rscript <- file.path(R.home("bin"), "Rscript")
+  result <- system2(rscript, c(shQuote(command), shQuote("business-leaders-five.html"),
+                               "--minimum=5"), stdout = TRUE, stderr = TRUE)
+  stopifnot(is.null(attr(result, "status")))
+  html <- paste(readLines("business-leaders-five.html", warn = FALSE), collapse = "\n")
+  stopifnot(grepl('"minimum":5,', html, fixed = TRUE),
+            grepl("minimum group size of 5 people", html, fixed = TRUE))
+  rejected <- suppressWarnings(system2(rscript, c(shQuote(command),
+    shQuote("business-leaders-four.html"), "--minimum=4"), stdout = TRUE, stderr = TRUE))
+  stopifnot(!is.null(attr(rejected, "status")),
+            any(grepl("at least five", rejected, fixed = TRUE)),
+            !file.exists("business-leaders-four.html"))
 })

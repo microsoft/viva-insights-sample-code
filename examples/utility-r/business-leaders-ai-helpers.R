@@ -978,8 +978,11 @@ business_temporal_disclosure <- function(windows, minimum, data) {
 }
 
 business_dashboard_payload <- function(data, minimum = 10L) {
-  if (length(minimum) != 1 || is.na(minimum) || minimum < 10 || minimum != floor(minimum))
-    stop("The dashboard privacy minimum must be an integer of at least ten.")
+  # Five is the lowest minimum group size Viva Insights allows a tenant to configure.
+  if (!is.numeric(minimum) || length(minimum) != 1 || !is.finite(minimum) ||
+      minimum < 5 || minimum != floor(minimum))
+    stop("The dashboard privacy minimum must be a whole number of at least five.")
+  minimum <- as.integer(minimum)
   if (n_distinct(data$panel$PersonId) < minimum)
     stop("The roster is below the dashboard privacy minimum.")
   lookbacks <- c(4L, 8L, 13L)

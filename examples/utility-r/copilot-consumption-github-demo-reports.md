@@ -39,6 +39,15 @@ source and produces a lightweight standalone HTML page without flexdashboard,
 CDN libraries, external assets or runtime data requests. An optional first
 argument selects another HTML output path.
 
+The minimum group size defaults to 10 people. To match an organisation's Viva
+Insights minimum group size, pass a whole number of at least 5, for example
+`Rscript examples/utility-r/render-business-leaders-ai.R --minimum=5`. The
+`minimum` parameter in the R Markdown header does the same when knitting from
+RStudio or `rmarkdown::render()`. Values below 5 are rejected. A lower minimum
+shows more small groups, but it also makes it easier to infer information about
+individuals by comparing related figures, so agree the setting with your privacy
+reviewers.
+
 The renderer applies a seeded rollout scenario to the eight raw synthetic exports
 in memory, before the shared person-week aggregation. Staggered team activation,
 weekly participation, changing demand and a temporary dip with recovery produce
@@ -84,10 +93,12 @@ may reflect roles, teams or other work patterns rather than an AI effect.
 Credit units are not pooled or converted into currency. Satisfaction, completion
 outcomes, forecasts, monetary costs and unlicensed Copilot Chat are not supplied.
 Out-of-roster agent users are excluded and flagged without exposing small counts.
-Contributor and complementary suppression is applied across the selectable
-windows and linked aggregates before data is embedded in the HTML. This is a
-synthetic demonstration, not an approved real-export adapter or a disclosure
-guarantee for arbitrary linked reports.
+Some aggregates are withheld under the dashboard's small-group and complementary
+suppression rules before data is embedded in the HTML. These rules do not prevent
+inference by comparing overlapping windows, credit bands, teams or other linked
+aggregates. This is a synthetic demonstration, not an approved real-export adapter
+or a privacy guarantee. Real use requires an organisation-specific disclosure
+review and suitable controls.
 
 ## Which queries each report needs
 
@@ -316,9 +327,13 @@ conversion, combined total or cross-product share is established.
 
 ## Privacy
 
-Every published group requires at least 10 distinct people. A composition breakdown with any
-cell below 10 is withheld with all linked margins. Positive contributors, overlapping
-membership patterns and complements also meet the floor. Charts contain aggregates rather than
+Every published group requires at least 10 distinct people by default. Business Leaders
+can lower this to match an organisation's Viva Insights minimum group size, but never below 5.
+A composition breakdown with any
+cell below the minimum is withheld with all linked margins. Positive contributors, overlapping
+membership patterns and complements also meet the floor. These rules do not stop every
+inference from comparing related figures, such as overlapping time windows in Business
+Leaders. Charts contain aggregates rather than
 individual points. Identifiers in `_data/` are synthetic GUIDs that exist only to demonstrate
 joins.
 

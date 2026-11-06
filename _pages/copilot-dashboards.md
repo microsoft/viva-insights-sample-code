@@ -64,6 +64,12 @@ prices are not supplied. Known activity gaps remain unresolved, and counts are
 labelled as lower bounds where needed. This is a synthetic reference dashboard,
 not a verified real-export adapter.
 
+**Privacy:** groups below a minimum size are withheld. The default is 10 people,
+and the renderer accepts any whole number from 5 upwards to match your Viva
+Insights setting. Comparing related figures, such as overlapping time periods,
+credit bands or teams, can still reveal information about individuals. Review
+the output with your privacy team before sharing it.
+
 ## Copilot Consumption and Ways of Working
 
 **Synthetic data · R template · Seven-page HTML report**
