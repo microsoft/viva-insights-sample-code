@@ -7,6 +7,7 @@
 #   1. Person query          -> _data/person-query/
 #   2. Consumption query     -> _data/consumption-query/
 #   3. GitHub Copilot query  -> _data/github-query/
+#   4. Agent query           -> _data/agent-query/  (current guide layout)
 #
 # The VALUES are simulated. The SCHEMA is not. Every column name below appears
 # in a real export or in the official metric reference:
@@ -763,6 +764,176 @@ stopifnot(
 )
 
 # ---------------------------------------------------------------------------
+# Extension for the business leaders demo: Person query Copilot and Cowork
+# metrics, plus the current Agent query layout.
+#
+# Everything here draws from a second seeded stream that starts AFTER every
+# draw above, so the values of the nine original exports are unchanged.
+#
+# Copilot and Cowork columns cover the 13-week product window only, matching
+# the other product feeds. Earlier weeks are left empty (unknown), and a small
+# share of licensed person-weeks inside the window are also left empty so that
+# reports have to keep unknown apart from zero.
+# ---------------------------------------------------------------------------
+set.seed(SEED + 1L)
+
+m365_credit_weeks <- m365_credits |>
+  mutate(Week = week_start(MetricDate)) |>
+  group_by(PersonId, Week) |>
+  summarise(credit_days = n_distinct(MetricDate), .groups = "drop")
+
+copilot_weeks <- expand_grid(PersonId = people$PersonId, MetricDate = product_weeks) |>
+  left_join(latent |> select(PersonId, IsCopilotLicensed, m365_adopted,
+                             m365_intensity, premium_affinity),
+            by = "PersonId", relationship = "many-to-one") |>
+  left_join(m365_credit_weeks, by = c("PersonId", "MetricDate" = "Week"),
+            relationship = "one-to-one") |>
+  mutate(
+    credit_days = coalesce(credit_days, 0L),
+    # Licensed people outside the metered feed still try Copilot now and then.
+    casual = IsCopilotLicensed & !m365_adopted & runif(n()) < .3,
+    active_days = case_when(
+      !IsCopilotLicensed ~ 0L,
+      m365_adopted ~ pmin(5L, credit_days + rbinom(n(), 1L, .35)),
+      casual ~ 1L + rbinom(n(), 1L, .3),
+      TRUE ~ 0L),
+    action_draw = case_when(
+      m365_adopted ~ active_days * m365_intensity * runif(n(), .35, .85),
+      TRUE ~ active_days * runif(n(), 1, 4)),
+    Total_Copilot_actions_taken = if_else(active_days > 0L,
+                                          pmax(1, round(action_draw)), 0),
+    Total_Copilot_active_days = active_days,
+    cowork_person = IsCopilotLicensed & premium_affinity > .4,
+    cowork_days = if_else(cowork_person & active_days > 0L & runif(n()) < .55,
+                          pmin(active_days, 1L + rbinom(n(), 2L, .35)), 0L),
+    Cowork_tasks_submitted = cowork_days * (1L + rpois(n(), 1.2)),
+    Days_of_active_Cowork_usage = cowork_days,
+    unknown = IsCopilotLicensed & runif(n()) < .006
+  ) |>
+  mutate(across(c(Total_Copilot_actions_taken, Total_Copilot_active_days,
+                  Cowork_tasks_submitted, Days_of_active_Cowork_usage),
+                ~ if_else(unknown, NA_real_, as.numeric(.x)))) |>
+  select(PersonId, MetricDate, Total_Copilot_actions_taken, Total_Copilot_active_days,
+         Cowork_tasks_submitted, Days_of_active_Cowork_usage, credit_days)
+
+stopifnot(
+  all(is.na(copilot_weeks$Total_Copilot_actions_taken) ==
+        is.na(copilot_weeks$Days_of_active_Cowork_usage)),
+  with(na.omit(copilot_weeks), all(Total_Copilot_active_days >= credit_days)),
+  with(na.omit(copilot_weeks), all(Days_of_active_Cowork_usage <= Total_Copilot_active_days)),
+  with(na.omit(copilot_weeks), all((Total_Copilot_actions_taken > 0) ==
+                                     (Total_Copilot_active_days > 0))),
+  with(na.omit(copilot_weeks), all((Cowork_tasks_submitted > 0) ==
+                                     (Days_of_active_Cowork_usage > 0)))
+)
+
+pq <- pq |>
+  left_join(select(copilot_weeks, -credit_days), by = c("PersonId", "MetricDate"),
+            relationship = "one-to-one") |>
+  relocate(Total_Copilot_actions_taken, Total_Copilot_active_days,
+           Cowork_tasks_submitted, Days_of_active_Cowork_usage,
+           .after = Total_Copilot_enabled_days)
+unlicensed_ids <- latent$PersonId[!latent$IsCopilotLicensed]
+stopifnot(
+  all(is.na(pq$Total_Copilot_actions_taken[pq$MetricDate < product_start])),
+  all(pq$Total_Copilot_actions_taken[pq$MetricDate >= product_start &
+                                       pq$PersonId %in% unlicensed_ids] == 0)
+)
+
+# Agent query. Agents are a cohort-level dimension: each agent user keeps a
+# stable set of one to three agents. One niche agent deliberately has fewer than
+# ten users so reports must withhold it. A few agent users sit outside the
+# Person query population (for example contractors), so reports must count them
+# in coverage and keep them out of spine-based figures.
+AGENTS <- tibble(
+  AgentName = c("Policy Q and A agent", "Sales proposal agent", "IT help desk agent",
+                "Project status agent", "Onboarding guide agent", "Contract review agent",
+                "Travel desk agent", "Field service agent"),
+  CreatorType = c("Your org", "Your org", "Microsoft", "User", "Your org",
+                  "Third party", "User", "Your org"),
+  PublishingSource = c("Microsoft Copilot Studio", "Microsoft Copilot Studio",
+                       "Microsoft other", "Agent Builder", "SharePoint", "Other",
+                       "Agent Builder", "Microsoft Copilot Studio"),
+  weight = c(.26, .2, .17, .13, .1, .08, .06, 0)
+) |>
+  mutate(AgentId = vapply(seq_len(n()), function(i) make_guid(), character(1)))
+NICHE_AGENT_USERS <- 6L
+N_OUT_OF_SPINE <- 3L
+
+agent_users <- latent |>
+  transmute(PersonId,
+            uses_agents = runif(n()) < if_else(IsCopilotLicensed, .45, .3)) |>
+  filter(uses_agents) |>
+  select(PersonId) |>
+  bind_rows(tibble(PersonId = vapply(seq_len(N_OUT_OF_SPINE), function(i) make_guid(),
+                                     character(1)))) |>
+  mutate(engagement = runif(n(), .25, .9),
+         session_rate = rlnorm(n(), .4, .5),
+         n_agents = sample(1:3, n(), TRUE, c(.5, .35, .15)))
+stopifnot(!any(agent_users$PersonId[seq_len(nrow(agent_users) - N_OUT_OF_SPINE)] %in%
+                 tail(agent_users$PersonId, N_OUT_OF_SPINE)),
+          !any(tail(agent_users$PersonId, N_OUT_OF_SPINE) %in% people$PersonId))
+mainstream <- AGENTS |> filter(weight > 0)
+agent_profiles <- bind_rows(lapply(seq_len(nrow(agent_users)), function(i)
+  tibble(PersonId = agent_users$PersonId[i],
+         AgentId = sample(mainstream$AgentId, agent_users$n_agents[i], FALSE,
+                          mainstream$weight))))
+niche_users <- sample(setdiff(agent_users$PersonId, tail(agent_users$PersonId, N_OUT_OF_SPINE)),
+                      NICHE_AGENT_USERS)
+agent_profiles <- bind_rows(
+  agent_profiles,
+  tibble(PersonId = niche_users, AgentId = AGENTS$AgentId[AGENTS$weight == 0]))
+
+# Four warm-up weeks let the returning-user windows be filled from the first
+# exported week. They are dropped before export.
+warmup_weeks <- product_start - 7L * (4:1)
+agent_weeks <- c(warmup_weeks, product_weeks)
+agent_activity_all <- expand_grid(agent_profiles, MetricDate = agent_weeks) |>
+  left_join(agent_users, by = "PersonId", relationship = "many-to-one") |>
+  mutate(active = runif(n()) < engagement,
+         `Conversational agent sessions` = if_else(active, 1L + rpois(n(), session_rate), 0L)) |>
+  filter(active)
+person_agent_weeks <- agent_activity_all |>
+  distinct(PersonId, MetricDate) |>
+  mutate(week_no = match(MetricDate, agent_weeks))
+returning <- person_agent_weeks |>
+  left_join(person_agent_weeks |> select(PersonId, prior_no = week_no),
+            by = "PersonId", relationship = "many-to-many") |>
+  group_by(PersonId, MetricDate) |>
+  summarise(
+    `Returning Agent 365 user (most recent and prior 7 days)` =
+      as.integer(any(prior_no == week_no - 1L)),
+    `Returning Agent 365 user (most recent and prior 28 days)` =
+      as.integer(any(prior_no >= week_no - 4L & prior_no < week_no)),
+    .groups = "drop")
+agent_activity <- agent_activity_all |>
+  filter(MetricDate >= product_start) |>
+  left_join(returning, by = c("PersonId", "MetricDate"), relationship = "many-to-one") |>
+  select(all_of(agent_query_headers[["agent-query/PersonAgentActivityMetrics.csv"]])) |>
+  arrange(MetricDate, PersonId, AgentId)
+agent_metadata <- AGENTS |>
+  select(all_of(agent_query_headers[["agent-query/AgentMetadata.csv"]])) |>
+  arrange(AgentId)
+
+assert_key(agent_activity, c("PersonId", "AgentId", "MetricDate"), "PersonAgentActivityMetrics")
+assert_key(agent_metadata, "AgentId", "AgentMetadata")
+latest_four <- tail(product_weeks, 4L)
+agent_reach <- agent_activity |>
+  filter(MetricDate %in% latest_four) |>
+  group_by(AgentId) |>
+  summarise(users = n_distinct(PersonId), .groups = "drop")
+niche_id <- AGENTS$AgentId[AGENTS$weight == 0]
+stopifnot(
+  all(agent_activity$MetricDate %in% product_weeks),
+  all(agent_activity$`Conversational agent sessions` >= 1L),
+  all(agent_activity$AgentId %in% agent_metadata$AgentId),
+  sum(!unique(agent_activity$PersonId) %in% people$PersonId) == N_OUT_OF_SPINE,
+  all(agent_reach$users[agent_reach$AgentId != niche_id] >= 10L),
+  agent_reach$users[agent_reach$AgentId == niche_id] < 10L,
+  all(unlist(agent_activity[5:6]) %in% c(0L, 1L))
+)
+
+# ---------------------------------------------------------------------------
 # Export
 # ---------------------------------------------------------------------------
 bundle <- list(
@@ -777,6 +948,13 @@ bundle <- list(
   "github-query/GitHubActivityBreakdownByModelFeatureMetrics.csv" = model_feature_metrics
 )
 message("Validating entire bundle before writing exports ...")
+agent_bundle <- list(
+  "agent-query/AgentMetadata.csv" = agent_metadata,
+  "agent-query/PersonAgentActivityMetrics.csv" = agent_activity
+)
+validate_query_bundle(bundle)
+validate_query_bundle(agent_bundle, agent_query_headers)
 write_query_bundle(bundle, DATA_DIR)
+write_query_bundle(agent_bundle, DATA_DIR, agent_query_headers)
 
 message("Done.")

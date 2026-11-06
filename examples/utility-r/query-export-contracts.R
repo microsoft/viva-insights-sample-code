@@ -13,7 +13,8 @@ fixture_person_metrics <- c(
   "After_hours_meeting_hours", "After_hours_email_hours", "After_hours_chat_hours",
   "Weekend_collaboration_hours", "Collaboration_span", "Internal_network_size",
   "External_network_size", "Strong_ties", "Diverse_ties", "Network_outside_organization",
-  "Total_Copilot_enabled_days")
+  "Total_Copilot_enabled_days", "Total_Copilot_actions_taken",
+  "Total_Copilot_active_days", "Cowork_tasks_submitted", "Days_of_active_Cowork_usage")
 query_export_headers <- list(
   "person-query/PersonQuery.csv" = c("PersonId", "MetricDate", fixture_person_metrics,
                                     fixture_hr_columns),
@@ -38,12 +39,24 @@ query_export_headers <- list(
     "PersonId", "MetricDate", "Model", "Feature", "Usage count by model and feature")
 )
 
-validate_query_bundle <- function(bundle) {
-  if (!identical(names(bundle), names(query_export_headers)))
+# Current Agent query layout from the join guide. Kept apart from the nine
+# exports above so existing reports and their reference lists are unaffected.
+# AgentMetadata attributes are export-specific; these follow the earlier sample.
+agent_query_headers <- list(
+  "agent-query/AgentMetadata.csv" = c("AgentId", "AgentName", "CreatorType",
+                                      "PublishingSource"),
+  "agent-query/PersonAgentActivityMetrics.csv" = c(
+    "PersonId", "AgentId", "MetricDate", "Conversational agent sessions",
+    "Returning Agent 365 user (most recent and prior 7 days)",
+    "Returning Agent 365 user (most recent and prior 28 days)")
+)
+
+validate_query_bundle <- function(bundle, headers = query_export_headers) {
+  if (!identical(names(bundle), names(headers)))
     stop("Query bundle must contain the exact ordered fixture exports.")
-  for (path in names(query_export_headers)) {
+  for (path in names(headers)) {
     data <- bundle[[path]]
-    if (!identical(names(data), query_export_headers[[path]]))
+    if (!identical(names(data), headers[[path]]))
       stop("Ordered header contract failed: ", path)
     # Validate every output before opening even the first destination.
     if (any(vapply(data, function(x)
@@ -53,8 +66,8 @@ validate_query_bundle <- function(bundle) {
   invisible(TRUE)
 }
 
-write_query_bundle <- function(bundle, data_dir) {
-  validate_query_bundle(bundle)
+write_query_bundle <- function(bundle, data_dir, headers = query_export_headers) {
+  validate_query_bundle(bundle, headers)
   for (path in names(bundle)) {
     dest <- file.path(data_dir, path)
     dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)

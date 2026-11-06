@@ -2,21 +2,26 @@
 layout: page
 title: "Interactive Dashboards"
 eyebrow: "Copilot analytics"
-description: "Explore two Copilot demo reports, then use the R templates to build an analysis with your own Viva Insights exports."
+description: "Explore three synthetic AI usage dashboards, including a cross-service business leaders view, and learn which workflows support your own exports."
 permalink: /copilot-dashboards/
 ---
 
 [Copilot Analytics]({{ site.baseurl }}/copilot/) / Interactive Dashboards
 
-**Just exploring?** Open either demo in your browser; no installation is required.
+**Just exploring?** Open a demo in your browser; no installation is required.
 
 **Building your own?** Follow the [setup guide](#build-with-your-own-data).
 For cross-query analysis, use [Joining Viva Insights queries]({{ site.baseurl }}/query-join-guide/)
 for export setup, schemas and person-week joins.
 
-Both reports use **synthetic data**. They illustrate analysis approaches, not evidence of Copilot's impact. Assumptions and simulation details are included in each report's methods or appendix.
+All three reports use **synthetic data**. They illustrate analysis approaches, not evidence of Copilot's impact. Assumptions and simulation details are included in each report's methods or appendix.
 
 <div class="vi-card-grid" markdown="0">
+  <a class="vi-card" href="#business-leaders-ai-usage">
+    <span class="vi-card-title">Business Leaders AI Usage</span>
+    <span class="vi-card-desc">Who is using AI, how much, and how does usage vary over time and across groups?</span>
+    <span class="vi-card-more">Explore this dashboard →</span>
+  </a>
   <a class="vi-card" href="#copilot-consumption-and-ways-of-working">
     <span class="vi-card-title">Copilot Consumption and Ways of Working</span>
     <span class="vi-card-desc">How is Copilot consumed, and how does consumption relate to collaboration?</span>
@@ -28,6 +33,42 @@ Both reports use **synthetic data**. They illustrate analysis approaches, not ev
     <span class="vi-card-more">Explore this template →</span>
   </a>
 </div>
+
+## Business Leaders AI Usage
+
+**Synthetic data · R Markdown source · Offline, self-contained HTML**
+
+Start here for a cross-service view of **who uses AI, how they use it, how much
+they consume, trends over time, and differences across organisations, functions
+and teams**. Switch between four, eight and thirteen weeks, and change the
+grouping without reloading the file.
+
+The dashboard combines M365 Copilot, Cowork, current-layout Agent, Consumption
+and GitHub Copilot fixtures. Overall reach counts distinct people across sources,
+so someone using several products is counted once. Recorded usage is expressed
+**per person per week using the full roster, including non-users**. Product
+units are retained, and M365 Copilot credits are kept separate from GitHub AI
+credits. A seeded rollout scenario adds team differences, changing participation
+and a temporary dip with recovery without rewriting the baseline fixtures.
+Explore Person Query collaboration activity alongside separate M365 or GitHub
+credit levels, with aligned weekly trends and filters for organisations,
+functions and teams. These descriptive comparisons do not establish causation.
+
+**[View demo]({{ site.baseurl }}/examples/utility-r/business-leaders-ai-adoption.html)** ·
+[Get source](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/business-leaders-ai-adoption.Rmd) ·
+[Rendering and input requirements](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-github-demo-reports.md#business-leaders-ai-usage)
+
+**Coverage:** observed usage within the Person Query roster, not a census of all
+AI tools. Unlicensed Copilot Chat, satisfaction, completion outcomes and monetary
+prices are not supplied. Known activity gaps remain unresolved, and counts are
+labelled as lower bounds where needed. This is a synthetic reference dashboard,
+not a verified real-export adapter.
+
+**Privacy:** groups below a minimum size are withheld. The default is 10 people,
+and the renderer accepts any whole number from 5 upwards to match your Viva
+Insights setting. Comparing related figures, such as overlapping time periods,
+credit bands or teams, can still reveal information about individuals. Review
+the output with your privacy team before sharing it.
 
 ## Copilot Consumption and Ways of Working
 

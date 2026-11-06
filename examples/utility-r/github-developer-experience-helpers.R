@@ -545,7 +545,12 @@ gh_recorded <- gh_observed |> filter(GH_active_days > 0)
 gh_observed$GH_intensity <- github_intensity(gh_observed, HEAVY_GITHUB_SHARE)
 
 measure_values <- c(
-  unlist(pq |> select(where(is.numeric), -Total_Copilot_enabled_days,
+  # Copilot and Cowork activity columns are deliberately sparse (unknown before
+  # the product window) and are not used by this report.
+  unlist(pq |> select(where(is.numeric),
+                      -any_of(c('Total_Copilot_enabled_days', 'Total_Copilot_actions_taken',
+                                'Total_Copilot_active_days', 'Cowork_tasks_submitted',
+                                'Days_of_active_Cowork_usage')),
                       -starts_with('m365_'), -starts_with('github_'),
                       -credits_per_m365_session),
          use.names = FALSE),
