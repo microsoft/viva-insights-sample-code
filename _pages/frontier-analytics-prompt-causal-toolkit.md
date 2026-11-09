@@ -75,6 +75,7 @@ Do not assume exact paths or variables, and ask me for the CSV location, toolkit
 Keep the required two-part flow from this card, which means run and validate the analysis first, then interpret the generated outputs in a separate pass.
 Do not change the treatment variable from Total_Copilot_actions_taken, do not edit shared helper modules, and warn me if the dataset is shorter than about 12 weeks.
 When choosing or configuring the notebook, adapt subgroup, collaboration, and outcome variables to the columns that actually exist in my data.
+If no suitable subgroup attribute is available, skip subgroup analyses; run overall analysis only if the selected notebook supports it.
 Before fitting, verify the notebook's actual grain, exposure/outcome windows, pre-exposure controls, overlap and identifying assumptions. DML is not itself an identifying design. If unresolved, return readiness or an agreed association rather than a causal claim; do not run every estimator.
 Prefer Copilot Enabled User or Total Copilot enabled days for licensing. Native licensed-only M365 Copilot nulls mean unlicensed and zero activity means licensed but inactive. A verified metric with these semantics is a valid fallback. Read configured cadence, not date spacing. Absent in-scope activity contributes zero, while failed joins and known coverage failures remain unresolved. Check unlicensed Copilot Chat separately before assigning causal controls.
 Publish only groups meeting max(the organisational requirement, 10 distinct people), protect complementary cells and embedded data, and never publish individual rankings.
@@ -143,7 +144,7 @@ STEP 4: CONFIGURE PARAMETERS Open the selected notebook and update the following
 
 1. FILE PATHS: Update `data_file_path` to point to the user's CSV file. Update `output_base_dir` to include the user's organization name.
 
-2. ORGANIZATIONAL ATTRIBUTES: Update `SUBGROUP_VARS` to match the HR attribute columns identified by `extract_hr()` in Step 2. Include 2-4 key attributes (e.g., Organization, FunctionType, LevelDesignation, IsManager). Only include attributes that actually exist in the data.
+2. ORGANIZATIONAL ATTRIBUTES: Set `SUBGROUP_VARS` from fields identified by `extract_hr()` in Step 2. Use up to 2-4 relevant available attributes; use fewer if fewer exist. If none are suitable, skip subgroup analysis and run overall analysis only if the selected notebook supports it.
 
 3. NETWORK AND COLLABORATION VARIABLES: Verify that `NETWORK_VARS` and `COLLABORATION_VARS` match columns in the data. Remove any that do not exist.
 
@@ -161,7 +162,7 @@ STEP 5: RUN THE NOTEBOOK
    - Data loading: correct shape, no missing key columns
    - Preprocessing: no unexpected dropped rows
    - DML estimation: model converges without errors
-   - Subgroup analysis: results are generated for each subgroup variable
+   - Subgroup analysis: if subgroup variables are configured, results are generated for each. If none are available, report subgroup analysis as unavailable and proceed only with supported overall results.
 3. If errors occur, diagnose and fix them:
    - FileNotFoundError → check file path
    - KeyError → column name mismatch, update variable lists
@@ -173,8 +174,9 @@ STEP 6: VERIFY OUTPUTS
    - significant_subgroups_[timestamp].csv
    - sensitivity_analysis_results_[timestamp].json
    - Subgroup-specific folders with ATE plots, results CSVs, and transition matrices
-2. Confirm that the expected subgroup folders were created. If none were, check
-   the run log for failed fits before interpreting anything.
+2. If subgroup variables were configured, confirm the expected folders were created.
+   If none were expected because no suitable attributes are available, report subgroup
+   analysis as unavailable. Otherwise inspect the run log for failed fits.
 3. Record successful fits, failed/unavailable checks and null findings. No
    significant subgroup is a valid result, not a reason to alter the sample.
 4. Print a summary of what was generated and where the files are located.
@@ -192,6 +194,7 @@ Investigate conflicting licence evidence. Keep affected eligibility or activity 
 Within a supplied complete query's configured scope, absent activity rows contribute zero. Keep failed joins, unavailable sources, out-of-scope periods and known coverage failures unresolved with reasons.
 Use configured grouping, week start and metric windows; date gaps do not establish cadence. State grain, units and estimand. Count distinct people; do not sum stocks or overlapping windows.
 Use max(organisation requirement, workflow floor): 5 distinct people for general analysis and 10 for joined-query, dashboard, causal or process workflows. Protect complementary cells and embedded data; never publish individual rankings.
+Use only HR attributes present in the export. If none suit a requested breakdown, omit it, explain why, and continue with supported overall results.
 Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications. Value scenarios require explicit conversion and realisation assumptions.
 Default to association. Make causal claims only with a supported design and compatible estimators. Record unavailable checks and label synthetic data.
 Check installed API versions, signatures and return types. Separate executed results from expectations and do not silently fork upstream bugs.
@@ -227,6 +230,7 @@ STEP 1: LOCATE AND READ OUTPUTS
      - ate_results_[treatment]_[timestamp].csv → the estimated causal effect (ATE)
      - definition.txt → how the subgroup is defined
      - transition_matrix_[treatment]_[timestamp].csv → how users move between usage levels
+   If subgroup files are absent because no suitable attributes were available, state that and interpret only supported overall outputs.
 3. Also check for any ATE plot images (ate_plot_[timestamp].png) that visualize the effects.
 
 STEP 2: PRODUCE AN EXECUTIVE INTERPRETATION Write a clear, non-technical summary structured as follows:
@@ -241,16 +245,17 @@ STEP 2: PRODUCE AN EXECUTIVE INTERPRETATION Write a clear, non-technical summary
 - Name only controls actually used and temporally justified; more contemporaneous metrics do not guarantee confounding control.
 
 ### 3. Key Results Table Present a summary table with:
-- Subgroup name and definition
+- Overall or subgroup name and definition, as available
 - Estimated effect size (Average Treatment Effect) and direction
 - Statistical significance (p-value or confidence interval, explained in plain terms)
 - Practical significance (is the effect large enough to matter?)
 
-### 4. Subgroup Insights (3-5 bullets) Report predeclared groups, null findings and multiplicity limitations, not only significant results:
+### 4. Subgroup Insights (3-5 bullets), when subgroup results are available, report predeclared groups, null findings and multiplicity limitations, not only significant results:
 - Which group of employees is this? (e.g., "Managers in Engineering")
 - What is the estimated effect? (e.g., "1.2 fewer after-hours collaboration hours per week")
 - How uncertain is the estimate? State intervals, dependence and sensitivity assumptions without claiming that a p-value is the probability of a true effect.
 - What does this mean for the measured outcome? Reduced after-hours collaboration is not measured burnout reduction; external collaboration is not measured sales.
+If subgroup results are unavailable, say why and do not invent group findings.
 
 ### 5. Robustness Assessment Interpret the sensitivity analysis results:
 - Inspect the sensitivity statistic's actual definition, scale and applicability
@@ -264,8 +269,9 @@ STEP 2: PRODUCE AN EXECUTIVE INTERPRETATION Write a clear, non-technical summary
 - Report subgroups where effects were NOT statistically significant. A non-significant result does not establish that the effect is absent.
 
 ### 6. Recommendations (2-4 bullets) Based on the results, suggest actionable next steps:
-- If positive effects found: recommend expanding Copilot enablement in high-impact subgroups
-- If negative or null effects found: suggest investigating barriers to effective Copilot use
+- If positive subgroup effects are supported, recommend expanding Copilot enablement in those groups.
+- If negative or null overall or subgroup results are found, suggest investigating barriers to effective Copilot use.
+- If no subgroup analysis was available, do not invent group-specific recommendations.
 - Recommend repeating the analysis with more data (longer time period) if effects are borderline
 - Suggest combining with qualitative feedback (interviews, surveys) for a fuller picture
 
@@ -299,6 +305,7 @@ Investigate conflicting licence evidence. Keep affected eligibility or activity 
 Within a supplied complete query's configured scope, absent activity rows contribute zero. Keep failed joins, unavailable sources, out-of-scope periods and known coverage failures unresolved with reasons.
 Use configured grouping, week start and metric windows; date gaps do not establish cadence. State grain, units and estimand. Count distinct people; do not sum stocks or overlapping windows.
 Use max(organisation requirement, workflow floor): 5 distinct people for general analysis and 10 for joined-query, dashboard, causal or process workflows. Protect complementary cells and embedded data; never publish individual rankings.
+Use only HR attributes present in the export. If none suit a requested breakdown, omit it, explain why, and continue with supported overall results.
 Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications. Value scenarios require explicit conversion and realisation assumptions.
 Default to association. Make causal claims only with a supported design and compatible estimators. Record unavailable checks and label synthetic data.
 Check installed API versions, signatures and return types. Separate executed results from expectations and do not silently fork upstream bugs.

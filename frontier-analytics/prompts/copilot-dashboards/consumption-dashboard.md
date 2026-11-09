@@ -96,6 +96,7 @@ Investigate conflicting licence evidence. Keep affected eligibility or activity 
 Within a supplied complete query's configured scope, absent activity rows contribute zero. Keep failed joins, unavailable sources, out-of-scope periods and known coverage failures unresolved with reasons.
 Use configured grouping, week start and metric windows; date gaps do not establish cadence. State grain, units and estimand. Count distinct people; do not sum stocks or overlapping windows.
 Use max(organisation requirement, workflow floor): 5 distinct people for general analysis and 10 for joined-query, dashboard, causal or process workflows. Protect complementary cells and embedded data; never publish individual rankings.
+Use only HR attributes present in the export. If none suit a requested breakdown, omit it, explain why, and continue with supported overall results.
 Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications. Value scenarios require explicit conversion and realisation assumptions.
 Default to association. Make causal claims only with a supported design and compatible estimators. Record unavailable checks and label synthetic data.
 Check installed API versions, signatures and return types. Separate executed results from expectations and do not silently fork upstream bugs.

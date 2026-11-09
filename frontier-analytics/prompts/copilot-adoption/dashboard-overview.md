@@ -14,9 +14,9 @@ After exporting a person query with Copilot activity metrics spanning at least 8
 
 ## Required inputs
 
-- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`, `Copilot_Chat_Queries`, `Copilot_Summarized_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
+- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`, `Copilot_Chat_Queries`, `Copilot_Summarized_Hours`), and available HR attributes (e.g., `FunctionType`, `Area`, `Country`, or `Organization`)
 - At least 8 weeks of data recommended
-- HR attributes for segmentation (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
+- Optional HR attributes for group comparisons. Use fields present in the export; the examples above may not be available.
 
 ## Assumptions
 
@@ -40,7 +40,8 @@ Start by loading the actual CSV and printing the row count, column names, data t
 Do not assume exact field names, and ask me to confirm the primary activity metric or any missing HR columns if the mapping is ambiguous.
 Prefer Copilot Enabled User or Total Copilot enabled days for licensing. Under the documented native licensed-only M365 Copilot rules, null means unlicensed and zero activity means licensed but inactive. Without explicit licence fields, use a verified metric with those semantics. Do not apply this rule to unlicensed Copilot Chat or Consumption credits.
 Confirm configured weekly grouping and metric windows. Date gaps do not establish cadence. Within a supplied complete query's configured scope, absent activity rows contribute zero. Failed joins, unavailable sources, out-of-scope periods and known coverage failures remain unresolved.
-Build weekly adoption metrics using distinct people per week, then add the most useful group views from the available HR attributes.
+Build weekly adoption metrics using distinct people per week, then add useful group views from available HR attributes. If no suitable group field exists, skip those views and explain why.
+Keep the overall dashboard even when no HR attribute is suitable for grouping.
 The output must be a single self-contained static HTML file with inline assets and no server or external dependencies.
 Suppress any group with fewer than 10 distinct people, or the stricter organisational minimum, and withhold breakdowns that could reveal suppressed cells. Do not publish individual rankings. Note skipped charts or missing segments.
 At the end, list any assumptions you made about metric selection, licensing logic, or field mappings.
@@ -81,15 +82,15 @@ METRIC CALCULATIONS
 10. Store these weekly aggregates in a summary DataFrame called `weekly_summary`.
 
 SEGMENTATION METRICS
-11. For each HR attribute (Organization, FunctionType, LevelDesignation), for each week, compute:
+11. For each selected HR attribute returned by `extract_hr()`, compute for each week:
     a. Licensed user count
     b. Active user count
     c. Adoption rate
     d. Mean Total_Copilot_actions_taken per active user
-12. Store each in a separate DataFrame (e.g., `org_summary`, `function_summary`, `level_summary`).
+12. Store each attribute's results separately, using names derived from the available fields.
 
 GROUP SUMMARY TABLE
-13. Compute activity summaries by an approved HR group using distinct people and the declared time window. Apply privacy suppression to every cell and omit the entire breakdown if remaining cells or totals could reveal a suppressed value. Do not publish person rows.
+13. If a suitable HR attribute is available, compute activity summaries for the selected group using distinct people and the declared time window. Apply privacy suppression to every cell and omit the breakdown if totals could reveal a suppressed value. Do not publish person rows. If no suitable field exists, omit the group table, say why, and continue with overall results.
 
 SUMMARY STATISTICS PANEL
 14. Calculate overall summary statistics for the dashboard header:
@@ -98,7 +99,7 @@ SUMMARY STATISTICS PANEL
     c. Total unique licensed users across the entire period
     d. Total unique active users across the entire period
     e. Average Total_Copilot_actions_taken per active user per week (grand mean)
-    f. Most active organization (highest adoption rate in the latest week)
+    f. Highest-adoption group for the selected HR attribute in the latest week, if available
 
 DASHBOARD GENERATION
 15. Create the dashboard as an intermediary document first, then export to HTML:
@@ -107,17 +108,15 @@ DASHBOARD GENERATION
 
 16. The HTML dashboard should contain these sections in order:
     a. HEADER: Title ("Copilot Adoption Dashboard"), date range, generation timestamp.
-    b. SUMMARY PANEL: Cards showing the key metrics from step 14 (adoption rate, trend, total users, avg actions, top org). Use colored indicators (green for positive trend, red for negative).
+    b. SUMMARY PANEL: Cards showing the key metrics from step 14 (adoption rate, trend, total users, avg actions and top group). Use colored indicators (green for positive trend, red for negative).
     c. TREND CHARTS:
        - Line chart: Weekly adoption rate over time
        - Line chart: Mean Total_Copilot_actions_taken per active user over time
        - Line chart: Mean Copilot_Assisted_Hours per active user over time
     d. SEGMENTATION CHARTS:
-       - Grouped bar chart: Adoption rate by Organization (latest 4-week average)
-       - Grouped bar chart: Adoption rate by FunctionType (latest 4-week average)
-       - Grouped bar chart: Adoption rate by LevelDesignation (latest 4-week average)
-       - Heatmap: Adoption rate by Organization × week (if number of orgs <= 15)
-    e. GROUP SUMMARY TABLE: privacy-protected aggregate table from step 13, with no identifiers.
+       - Grouped bar chart for each selected HR attribute (latest 4-week average), such as FunctionType, Area, Country or Organization, when present; skip group charts if none are suitable
+       - Heatmap: Adoption rate by a selected HR attribute × week, if that field is available and has no more than 15 groups
+    e. GROUP SUMMARY TABLE (if a suitable HR attribute is available): privacy-protected aggregate table from step 13, with no identifiers.
     f. METHODOLOGY NOTE: Brief paragraph explaining how adoption rate is calculated, what "licensed" and "active" mean, and the data source.
 
 17. Style the HTML with a clean, professional design. Use a sans-serif font, consistent color palette, and adequate whitespace. The dashboard should look presentable when opened in a browser.
@@ -139,6 +138,7 @@ Investigate conflicting licence evidence. Keep affected eligibility or activity 
 Within a supplied complete query's configured scope, absent activity rows contribute zero. Keep failed joins, unavailable sources, out-of-scope periods and known coverage failures unresolved with reasons.
 Use configured grouping, week start and metric windows; date gaps do not establish cadence. State grain, units and estimand. Count distinct people; do not sum stocks or overlapping windows.
 Use max(organisation requirement, workflow floor): 5 distinct people for general analysis and 10 for joined-query, dashboard, causal or process workflows. Protect complementary cells and embedded data; never publish individual rankings.
+Use only HR attributes present in the export. If none suit a requested breakdown, omit it, explain why, and continue with supported overall results.
 Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications. Value scenarios require explicit conversion and realisation assumptions.
 Default to association. Make causal claims only with a supported design and compatible estimators. Record unavailable checks and label synthetic data.
 Check installed API versions, signatures and return types. Separate executed results from expectations and do not silently fork upstream bugs.

@@ -40,7 +40,7 @@ For budget reviews, renewal decisions or expansion proposals that need an assump
 
 ## Required inputs
 
-- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Assisted_Hours`, `Copilot_Actions`, `Copilot_Summarized_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
+- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Assisted_Hours`, `Copilot_Actions`, `Copilot_Summarized_Hours`), and optional HR attributes (e.g., `FunctionType`, `Area`, `Country`, or `Organization`)
 - At least 8 weeks of data recommended
 - Configurable assumptions: hourly cost of employee time (default: $75/hour), annual Copilot license cost per user (default: $360/year)
 - Optional: collaboration metrics for licensed vs. unlicensed comparison (e.g., `Collaboration_Hours`, `Meeting_Hours`, `Email_Hours`)
@@ -140,10 +140,11 @@ LICENSED VS. UNLICENSED COMPARISON (if collaboration metrics are available)
 14. If collaboration metrics are not present, skip this section and note its absence.
 
 VALUE BY SEGMENT
-15. Break down the annual value estimate by Organization (or the primary HR attribute):
-    a. For each organization, compute: licensed users, active users, total Copilot_Assisted_Hours, annualized value, license cost, net value.
+15. If an HR attribute is available, break down the annual value estimate by a selected field, such as FunctionType, Area, Country or Organization:
+    a. For each group, compute licensed users, active users, total Copilot_Assisted_Hours, annualized value, license cost and net value.
     b. Present as a sorted table (by net value descending).
-    c. Identify organizations with negative net value (license cost exceeds estimated value).
+    c. Identify groups with negative net value (license cost exceeds estimated value).
+    If no suitable attribute is available, omit this breakdown and state why.
 
 REPORT GENERATION
 16. Compile into a professional report. Create an intermediary document first, then export to HTML:
@@ -170,7 +171,7 @@ REPORT GENERATION
 
     c. "Sensitivity Analysis": the table from step 11.
 
-    d. "Value by Organization": the table from step 15.
+    d. "Value by Group" (if a suitable HR attribute is available): the table from step 15.
 
     e. "Licensed vs. Unlicensed Comparison" (if applicable): table from step 13.
 
@@ -198,6 +199,7 @@ Investigate conflicting licence evidence. Keep affected eligibility or activity 
 Within a supplied complete query's configured scope, absent activity rows contribute zero. Keep failed joins, unavailable sources, out-of-scope periods and known coverage failures unresolved with reasons.
 Use configured grouping, week start and metric windows; date gaps do not establish cadence. State grain, units and estimand. Count distinct people; do not sum stocks or overlapping windows.
 Use max(organisation requirement, workflow floor): 5 distinct people for general analysis and 10 for joined-query, dashboard, causal or process workflows. Protect complementary cells and embedded data; never publish individual rankings.
+Use only HR attributes present in the export. If none suit a requested breakdown, omit it, explain why, and continue with supported overall results.
 Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications. Value scenarios require explicit conversion and realisation assumptions.
 Default to association. Make causal claims only with a supported design and compatible estimators. Record unavailable checks and label synthetic data.
 Check installed API versions, signatures and return types. Separate executed results from expectations and do not silently fork upstream bugs.
@@ -207,7 +209,7 @@ Check installed API versions, signatures and return types. Separate executed res
 
 ## Adaptation notes
 
-- **Adjust the hourly rate** to match your organization's fully loaded labor cost. Many organizations use $50–$150/hour depending on geography and role mix. If available, use different rates per `LevelDesignation` or `FunctionType`.
+- **Adjust the hourly rate** to match your organization's fully loaded labor cost. Many organizations use $50–$150/hour depending on geography and role mix. If available and approved, use rates by FunctionType, Area, Country or another HR attribute.
 - **Adjust the license cost** based on your actual agreement (E3/E5 add-on vs. standalone Copilot license).
 - **Add qualitative benefits** by extending the report with a section on "Unquantified Benefits" (e.g., employee satisfaction, reduced context-switching, faster onboarding).
 - **Time horizon:** The default projects current weekly usage to an annual figure. For a multi-year business case, add a growth assumption (e.g., 10% quarterly adoption increase).

@@ -72,6 +72,7 @@ Create the deck directly as a .pptx file with native editable chart objects wher
 If a needed chart type cannot be created natively, simplify it to a supported native chart where possible and clearly note any remaining slide that must fall back to an image.
 Use distinct-person denominators and state whether summaries weight people or person-weeks. Suppress groups below max(the organisational requirement, 5 distinct people), using floor 10 in dashboard/joined workflows. Protect complementary cells and embedded chart data; never publish individual rankings. Skip unavailable slides.
 Use commentary-led slide titles and keep each number traceable to a local evidence ledger with dates, units, aggregation, bases and denominator. Related charts or tables can share a slide if labels and caveats remain readable.
+If no suitable HR attribute is available, skip group slides and note why; continue with supported overall slides.
 For an existing user-edited deck, save a rollback, preserve unrelated content and verify the source has not changed before replacement. Remove only comments whose requested edits have been verified.
 Verify numbers, embedded chart data, privacy and actual rendering separately. Report unavailable visual checks honestly.
 Finish by listing any assumptions you made about chart support, metric mappings, or optional slide substitutions.
@@ -119,7 +120,7 @@ METRIC CALCULATIONS
 
    Segmentation data:
    h. Adoption rate by each HR attribute (latest 4-week average)
-   i. Top 3 and bottom 3 organizations by adoption rate (minimum 10 licensed users)
+   i. Top 3 and bottom 3 groups by adoption rate for a selected available HR attribute (minimum 10 licensed users)
 
    ROI headline (if Copilot_Assisted_Hours is available):
    j. Average weekly assisted hours per active user, not measured time saved
@@ -155,16 +156,16 @@ SLIDE DECK GENERATION
    - Native line chart: weekly mean Copilot_Assisted_Hours per active user
    - If this metric is not available, replace with a slide on another relevant metric or skip
 
-   SLIDES 7-9: Organizational breakdowns (one slide per HR attribute)
+   SLIDES 7-9: Group breakdowns (one slide per selected HR attribute, if available)
    - Native horizontal bar chart: adoption rate by segment (latest 4-week average)
    - Sort bars by adoption rate descending
    - Suppress below max(the organisational requirement, 5 distinct licensed people), using floor 10 for dashboard/joined outputs and at least 10 for the top/bottom organisation table
    - If there are more than 12 segments, show only the top and bottom 6
 
-   SLIDE 10: Groups with higher and lower adoption
+   SLIDE 10: Groups with higher and lower adoption (if a suitable HR attribute is available)
    - A table or two-column layout showing:
-     - Top 3 organizations by adoption rate (with their rates and user counts)
-     - Bottom 3 organizations by adoption rate
+     - Top 3 groups for a selected HR attribute, such as FunctionType, Area, Country or Organization, with rates and user counts
+     - Bottom 3 groups for the same attribute
    - Brief annotation on observed usage differences and relevant coverage/context
    - Adoption differences do not establish productivity or employee performance
 
@@ -196,6 +197,7 @@ SLIDE DECK GENERATION
    - Data source details
 
    Adjust the slide count as needed. Aim for 10-15 slides total. Skip slides where data is unavailable rather than leaving them blank.
+   If no suitable HR attribute is available, skip group slides and note why.
 
 8. Design guidelines:
    - Use a clean, professional layout with consistent fonts (e.g., Calibri or Segoe UI)
@@ -234,6 +236,7 @@ Investigate conflicting licence evidence. Keep affected eligibility or activity 
 Within a supplied complete query's configured scope, absent activity rows contribute zero. Keep failed joins, unavailable sources, out-of-scope periods and known coverage failures unresolved with reasons.
 Use configured grouping, week start and metric windows; date gaps do not establish cadence. State grain, units and estimand. Count distinct people; do not sum stocks or overlapping windows.
 Use max(organisation requirement, workflow floor): 5 distinct people for general analysis and 10 for joined-query, dashboard, causal or process workflows. Protect complementary cells and embedded data; never publish individual rankings.
+Use only HR attributes present in the export. If none suit a requested breakdown, omit it, explain why, and continue with supported overall results.
 Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications. Value scenarios require explicit conversion and realisation assumptions.
 Default to association. Make causal claims only with a supported design and compatible estimators. Record unavailable checks and label synthetic data.
 Check installed API versions, signatures and return types. Separate executed results from expectations and do not silently fork upstream bugs.

@@ -14,10 +14,10 @@ After collecting at least 8–12 weeks of Person Query data, when you need to un
 
 ## Required inputs
 
-- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
+- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`), and available HR attributes (e.g., `FunctionType`, `Area`, `Country`, or `Organization`)
 - At least 8 weeks of data (12+ weeks recommended for meaningful churn analysis)
 - A Copilot enabled-days field or another confirmed source of weekly licence status
-- HR attributes for segmentation breakdowns
+- Optional HR attributes for group breakdowns
 
 ## Assumptions
 
@@ -42,6 +42,7 @@ Do not assume exact column names, and ask me for the file path, the main activit
 Prefer Copilot Enabled User or Total Copilot enabled days to establish licensing. For native licensed-only M365 Copilot metrics, null means unlicensed and zero activity means licensed but inactive. A verified metric with these semantics is a valid fallback without explicit licence fields.
 Use `identify_usage_segments()` (vivainsights) to compute the five weekly usage segments. If it is unavailable, clearly label any alternative segmentation and print its thresholds.
 Include both week-level segment trends and a stable user segment for group breakdowns, then build a week-to-week transition matrix only for users present in consecutive weeks.
+If no suitable HR attribute is available, skip group summaries and focus on overall segment and churn results.
 Independently of the rolling segments, define weekly activity from the observed action count. Churn means at least two consecutive active weeks followed by at least two consecutive inactive weeks; date it to the first inactive week once the second confirms it.
 Identify currently at-risk users separately: they have one inactive week immediately after at least two active weeks and have not yet met the churn definition. Do not treat unknown or unlicensed weeks as inactive.
 Flag if the time span is too short for reliable churn analysis.
@@ -83,7 +84,8 @@ SEGMENT BREAKDOWN BY HR ATTRIBUTES
 9. For each available HR attribute, compute the segment distribution using the "stable segment" label. Create:
    a. A stacked bar chart showing segment proportions by each HR attribute value.
    b. Only publish groups with max(the organisational requirement, 5 distinct licensed people), using floor 10 for dashboard/joined outputs. Protect complementary cells and embedded data, and never publish individual rankings.
-10. Identify groups with the highest proportions of Power Users and Non-users. Label these as segment distributions, not as the separate at-risk churn definition below.
+   If no suitable attribute is available, omit group charts and continue with the overall segment trends.
+10. If group attributes are available, identify groups with the highest proportions of Power Users and Non-users. Label these as segment distributions, not as the separate at-risk churn definition below.
 
 TRANSITION ANALYSIS
 11. Build a week-over-week transition matrix. For each consecutive pair of weeks, count how many users moved from each segment to every other segment. Aggregate across all week transitions.
@@ -110,8 +112,8 @@ CHURN ANALYSIS
 
 AT-RISK USER IDENTIFICATION
 20. Identify currently at-risk users: licensed users with exactly 1 inactive week immediately after at least 2 consecutive active weeks. They have not yet met the churn definition.
-21. Summarize at-risk users by HR attribute: which organizations, functions, or levels have the highest concentration of at-risk users?
-22. Create a table of at-risk user counts by available HR attributes.
+21. If an HR attribute is available, summarise at-risk users by a selected field, such as FunctionType, Area, Country or Organization.
+22. Create a table of at-risk user counts by available HR attributes. If no suitable field exists, omit group summaries and state why.
 
 REPORT GENERATION
 23. Compile all outputs into an intermediary document first, then export to HTML:
@@ -119,10 +121,10 @@ REPORT GENERATION
     - Python: Create a Jupyter notebook (.ipynb), then export to a self-contained HTML file. Keep the intermediary file alongside the HTML output for troubleshooting. The report should contain these sections:
     a. "Segment Definitions": explain the five segments and thresholds used.
     b. "Segment Distribution": charts from step 8 and summary table.
-    c. "Segment Breakdown by Group": charts and segment-distribution callouts from steps 9 and 10.
+    c. "Segment Breakdown by Group" (if suitable HR attributes are available): charts and segment-distribution callouts from steps 9 and 10.
     d. "Transition Analysis": heatmap from step 13, key transition highlights from step 14.
     e. "Churn Analysis": churn rate trend, time-to-churn histogram, summary statistics.
-    f. "At-Risk Users": summary table from step 22.
+    f. "At-Risk Users": overall summary and, if available, the group table from step 22.
     g. "Key Takeaways": 3-5 bullet points synthesising the most important findings.
     h. "Methodology": brief description of data source, segment definitions, churn definition.
 
@@ -141,6 +143,7 @@ Investigate conflicting licence evidence. Keep affected eligibility or activity 
 Within a supplied complete query's configured scope, absent activity rows contribute zero. Keep failed joins, unavailable sources, out-of-scope periods and known coverage failures unresolved with reasons.
 Use configured grouping, week start and metric windows; date gaps do not establish cadence. State grain, units and estimand. Count distinct people; do not sum stocks or overlapping windows.
 Use max(organisation requirement, workflow floor): 5 distinct people for general analysis and 10 for joined-query, dashboard, causal or process workflows. Protect complementary cells and embedded data; never publish individual rankings.
+Use only HR attributes present in the export. If none suit a requested breakdown, omit it, explain why, and continue with supported overall results.
 Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications. Value scenarios require explicit conversion and realisation assumptions.
 Default to association. Make causal claims only with a supported design and compatible estimators. Record unavailable checks and label synthetic data.
 Check installed API versions, signatures and return types. Separate executed results from expectations and do not silently fork upstream bugs.
