@@ -205,6 +205,10 @@ const server = http.createServer(async (request, response) => {
         const navGuide = page.locator('#vi-mega-copilot a', { hasText: 'Business Leaders AI Usage' });
         assert.equal(await navGuide.getAttribute('href'), prefix + 'copilot-dashboards/business-leaders-ai-usage/');
         assert.equal(await page.locator('.dashboard-card img').count(), 3);
+        assert.equal(await page.evaluate(() => {
+          const ids = Array.from(document.querySelectorAll('[id]'), (element) => element.id);
+          return ids.length === new Set(ids).size;
+        }), true, 'Element IDs must be unique on ' + pathname);
         for (const card of await page.locator('.dashboard-card').all()) {
           const slug = await card.getAttribute('id');
           const guidePath = prefix + 'copilot-dashboards/' + slug + '/';

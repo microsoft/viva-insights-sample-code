@@ -11,8 +11,10 @@
   scope: Explore four, eight or thirteen weeks by organisation, function and team. Reach counts distinct people across sources; recorded usage is per person per week across the full roster, including non-users.
   limitation: This is a synthetic reference, not a verified real-export adapter. Coverage is limited to observed usage within the Person Query roster. M365 Copilot credits and GitHub AI credits remain separate; descriptive comparisons do not establish causation.
   packages: [dplyr, tidyr, jsonlite, knitr, rmarkdown]
-  command: Rscript examples\utility-r\render-business-leaders-ai.R
-  output: examples\utility-r\business-leaders-ai-adoption.html, a self-contained HTML file with four-, eight- and thirteen-week views, group comparisons and separate product credit rates.
+  command: |-
+    New-Item -ItemType Directory -Force ..\copilot-dashboard-work\business-leaders
+    Rscript examples\utility-r\render-business-leaders-ai.R ..\copilot-dashboard-work\business-leaders\dashboard.html
+  output: ..\copilot-dashboard-work\business-leaders\dashboard.html, outside the checkout so the tracked demo is not overwritten. It is a self-contained HTML file with four-, eight- and thirteen-week views, group comparisons and separate product credit rates.
   real_support: Synthetic reference only. A real-data adaptation needs a separately implemented and verified mapping, coverage assessment and disclosure review.
   prompt: >-
     Reproduce the synthetic Business Leaders AI Usage report from my local

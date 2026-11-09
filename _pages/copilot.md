@@ -53,9 +53,6 @@ Pick a card to jump straight to a section, or read on for the full picture.
 
 Open a demo in your browser without installing anything. All three reports use **synthetic data** and are available as **R templates** to adapt. Select **Start using** for the demo, source, requirements and capability limits.
 
-<span id="copilot-consumption-and-ways-of-working"></span>
-<span id="developer-experience-and-copilot"></span>
-
 {% include dashboard-catalogue.html %}
 
 **[Browse dashboard templates]({{ site.baseurl }}/copilot-dashboards/)** for previews, required queries, source code, and setup guidance.
