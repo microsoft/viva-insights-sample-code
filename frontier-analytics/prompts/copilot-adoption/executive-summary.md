@@ -1,8 +1,8 @@
-# Executive Summary — Copilot Adoption
+# Copilot Adoption Executive Summary
 
 ## Purpose
 
-Generate a concise executive summary memo that distills Copilot adoption metrics into key findings, trend analysis, and actionable recommendations for senior leadership.
+Summarise Copilot adoption metrics, trends and recommended actions in a memo for senior leadership.
 
 ## Audience
 
@@ -10,7 +10,7 @@ VP/C-suite executives, senior leadership team, IT steering committee
 
 ## When to use
 
-When you need to communicate Copilot adoption progress to senior leadership — typically on a monthly or quarterly cadence after collecting at least 8 weeks of person query data.
+For monthly or quarterly updates on Copilot adoption progress to senior leadership, after collecting at least 8 weeks of Person Query data.
 
 ## Required inputs
 
@@ -52,7 +52,7 @@ Use the detailed prompt below for a reproducible, exact-structure output. Use th
 ## Prompt
 
 ```
-You are a senior people analytics consultant. Your task is to generate a polished executive summary memo about Microsoft Copilot adoption, based on a Viva Insights person query export. The memo must be suitable for a VP or C-suite audience — concise, insight-driven, and action-oriented.
+You are a senior people analytics consultant. Your task is to generate an executive summary memo about Microsoft Copilot adoption, based on a Viva Insights person query export. Write for a VP or C-suite audience. Keep the memo concise, support findings with numbers and recommend specific actions.
 
 LANGUAGE CHOICE
 Choose R or Python based on what is already installed in your environment to minimize setup.
@@ -103,8 +103,8 @@ AREAS OF CONCERN (flag 1-3 risks or issues)
 MEMO GENERATION
 15. Create the executive summary as an intermediary document first, then export to HTML:
     - R: Create an RMarkdown file (.Rmd), then knit to a self-contained HTML file (output: html_document, self_contained: true).
-    - Python: Create a Jupyter notebook (.ipynb), then export to a self-contained HTML file (e.g., `jupyter nbconvert --to html`). Keep the intermediary .Rmd or .ipynb file alongside the HTML output — it makes troubleshooting and iteration easier.
-    - Fallback: if you cannot create or execute a notebook/RMarkdown in this environment (e.g., the toolchain is unavailable), generate a single self-contained **HTML or Markdown report directly** instead — write the computed numbers into a plain `.html` or `.md` file. A direct report is preferable to failing; just note in the output that the intermediary notebook step was skipped. Use the following structure:
+    - Python: Create a Jupyter notebook (.ipynb), then export to a self-contained HTML file (e.g., `jupyter nbconvert --to html`). Keep the intermediary .Rmd or .ipynb file alongside the HTML output for troubleshooting and iteration.
+    - Fallback: if you cannot create or execute a notebook/RMarkdown in this environment (e.g., the toolchain is unavailable), write the computed numbers directly into a single self-contained **HTML or Markdown report**. Note in the output that the intermediary notebook step was skipped. Use the following structure:
 
     HEADER:
     - Title: "Copilot Adoption: Executive Summary"
@@ -145,7 +145,7 @@ IMPORTANT NOTES
 - If the dataset has fewer than 8 weeks, note this limitation and adjust trend calculations accordingly (e.g., compare last 2 weeks to prior 2 weeks).
 - Apply max(the organisational requirement, 5 distinct people) to all reported cells, using floor 10 for dashboard/joined outputs. Protect complementary cells and embedded data. Never publish individual rankings.
 - Low-activity flags are review candidates, not verified holidays or employment status. Use approved calendar/HR evidence before asserting those facts.
-- The tone should be balanced — highlight successes but do not oversell. Flag genuine concerns.
+- Keep the tone balanced. Report successes and genuine concerns without overstating either.
 
 <!-- analysis-policy:start -->
 Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.

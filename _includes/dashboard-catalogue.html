@@ -1,0 +1,43 @@
+<link rel="stylesheet" href="{{ '/assets/css/dashboard-catalogue.css' | relative_url }}">
+<div class="dashboard-catalogue">
+  <div class="dashboard-grid">
+    {% for dashboard in site.data.copilot_dashboards %}
+    <article class="dashboard-card" aria-labelledby="dashboard-card-{{ dashboard.slug }}">
+      {% if dashboard.image %}
+      <img src="{{ dashboard.image | relative_url }}" alt="{{ dashboard.image_alt }}" loading="lazy">
+      {% endif %}
+      <p class="dashboard-badge">Synthetic data · R template</p>
+      <h3 id="dashboard-card-{{ dashboard.slug }}">{{ dashboard.name }}</h3>
+      <p>{{ dashboard.summary }}</p>
+      <a class="dashboard-start" href="#dashboard-{{ dashboard.slug }}" data-dashboard-open="{{ dashboard.slug }}">Start using<span class="vi-sr-only"> {{ dashboard.name }}</span></a>
+    </article>
+    {% endfor %}
+  </div>
+  <div data-dashboard-details>
+    {% for dashboard in site.data.copilot_dashboards %}
+    <section class="dashboard-details" id="dashboard-{{ dashboard.slug }}" data-dashboard-panel="{{ dashboard.slug }}" aria-labelledby="dashboard-title-{{ dashboard.slug }}">
+      <h3 id="dashboard-title-{{ dashboard.slug }}" tabindex="-1">{{ dashboard.name }}</h3>
+      <p class="dashboard-badge">Synthetic data · R template</p>
+      <p>{{ dashboard.scope }}</p>
+      <p class="dashboard-links">
+        <a href="{{ dashboard.demo | relative_url }}">View demo</a> ·
+        <a href="{{ dashboard.source }}">Get source</a> ·
+        <a href="{{ dashboard.requirements }}">Rendering and input requirements</a>
+      </p>
+      <h4>Start using</h4>
+      <ol>
+        <li>Open the synthetic demo in your browser. No installation is required.</li>
+        <li>To render the source, install R, Pandoc, R Markdown, flexdashboard and the packages listed in the requirements. Keep the repository folder structure and render the synthetic example first.</li>
+        <li>Before adapting or sharing a report, verify input coverage and your organisation's privacy requirements. Do not include customer exports in this repository or shareable HTML.</li>
+      </ol>
+      <p><strong>Demo inputs:</strong> {{ dashboard.inputs }}</p>
+      <p><strong>Capability and interpretation:</strong> {{ dashboard.limitation }}</p>
+      {% if dashboard.journey %}
+      <p><a href="{{ dashboard.journey | relative_url }}">Build or customise with AI</a></p>
+      {% endif %}
+      <p><a href="{{ '/copilot-dashboards/' | relative_url }}#{{ dashboard.slug }}">Full dashboard details and caveats</a> · <a href="{{ '/copilot-dashboards/' | relative_url }}#build-with-your-own-data">Setup guide</a> · <a href="{{ '/query-join-guide/' | relative_url }}">Query setup and joins</a></p>
+    </section>
+    {% endfor %}
+  </div>
+</div>
+<script src="{{ '/assets/js/dashboard-dialog.js' | relative_url }}"></script>

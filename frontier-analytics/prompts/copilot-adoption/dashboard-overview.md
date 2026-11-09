@@ -1,8 +1,8 @@
-# Dashboard Overview — Copilot Adoption
+# Copilot Adoption Dashboard
 
 ## Purpose
 
-Generate a comprehensive static HTML dashboard showing Copilot adoption trends, usage patterns, and organizational breakdowns.
+Build a static HTML dashboard of Copilot adoption trends, usage patterns and organisational breakdowns.
 
 ## Audience
 
@@ -63,7 +63,7 @@ Confirm configured grouping, week start, measurement windows and query scope bef
 3. Identify HR / organizational attribute columns with `extract_hr(df, return = "names")` in R or `vi.extract_hr(df, return_type="suggestion")` in Python. Use the returned names for all segmentation breakdowns instead of hard-coding column names.
 4. Verify the panel structure: each row should represent a unique PersonId × MetricDate combination. If there are duplicates, report their count and stop for an explicit resolution rule.
 5. Print the shape of the data, the date range covered, and the number of unique persons.
-6. List all column names so I can verify the Copilot metric columns and HR attribute columns match what is expected. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity proxy **if it is present** — validate it against the taxonomy first, as it may not capture every Copilot surface or app.
+6. List all column names so I can verify the Copilot metric columns and HR attribute columns match what is expected. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity proxy **if it is present**. Validate it against the taxonomy first, as it may not capture every Copilot surface or app.
 
 IDENTIFYING LICENSED USERS
 6. Prefer Copilot Enabled User, Total Copilot enabled days or dated licence records for the period. Native null enabled days mean unlicensed. If explicit licence fields are absent, use a verified native licensed-only M365 Copilot metric whose documented null means unlicensed and zero activity means licensed but inactive. Do not apply this to unlicensed Copilot Chat or Consumption credits. Preserve join-match indicators and keep processing failures unresolved. Withhold adoption only when licence status or licensed activity is genuinely unresolved. Within a supplied complete query's configured scope, absent activity rows contribute zero. Never blanket-fill after a join.
@@ -103,7 +103,7 @@ SUMMARY STATISTICS PANEL
 DASHBOARD GENERATION
 15. Create the dashboard as an intermediary document first, then export to HTML:
     - R: Create an RMarkdown file (.Rmd) with ggplot2 charts, then knit to a self-contained HTML file (output: html_document, self_contained: true).
-    - Python: Create a Jupyter notebook (.ipynb) with matplotlib/seaborn charts, then export to a self-contained HTML file (e.g., `jupyter nbconvert --to html`). Keep the intermediary .Rmd or .ipynb file alongside the HTML output — it makes troubleshooting and iteration easier. Do NOT use a web framework or server.
+    - Python: Create a Jupyter notebook (.ipynb) with matplotlib/seaborn charts, then export to a self-contained HTML file (e.g., `jupyter nbconvert --to html`). Keep the intermediary .Rmd or .ipynb file alongside the HTML output for troubleshooting and iteration. Do NOT use a web framework or server.
 
 16. The HTML dashboard should contain these sections in order:
     a. HEADER: Title ("Copilot Adoption Dashboard"), date range, generation timestamp.

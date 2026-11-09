@@ -27,9 +27,9 @@
 <div class="responsible-use" role="note" aria-label="Responsible use and data privacy">
   <h4><span aria-hidden="true">🔒</span> Responsible use &amp; data privacy</h4>
   <ul>
-    <li><strong>Suppress small groups.</strong> Apply a minimum group-size threshold to every breakdown, segment, and chart — Viva Insights typically uses 5–10. Raise it for smaller organizations.</li>
-    <li><strong>Never expose individuals.</strong> Do not print raw UPNs or email addresses; hash, truncate, or report only aggregates. Person query <code>PersonId</code> is already de-identified, but Purview <code>UserId</code> is not.</li>
-    <li><strong>Analyze groups, not individuals.</strong> These outputs are for understanding cohorts and trends — not for evaluating, ranking, or monitoring named employees.</li>
-    <li><strong>Keep data in approved environments.</strong> Don't paste sensitive HR data into cloud agents unless your organization's policies allow it; prefer local or enterprise-hosted tools. Validate every agent output before sharing.</li>
+    <li><strong>Suppress small groups.</strong> Apply the stricter of your organisation's minimum group size and the selected workflow's privacy floor to every breakdown, segment and chart.</li>
+    <li><strong>Never expose individuals.</strong> Do not print raw UPNs or email addresses. Hash, truncate or report only aggregates. Person Query <code>PersonId</code> is already de-identified, but Purview <code>UserId</code> is not.</li>
+    <li><strong>Report group patterns.</strong> Use these outputs to understand cohorts and trends. Do not evaluate, rank or monitor named employees.</li>
+    <li><strong>Keep data in approved environments.</strong> Follow your organisation's policies when choosing an agent and deciding which data it may access. Validate every agent output before sharing.</li>
   </ul>
 </div>

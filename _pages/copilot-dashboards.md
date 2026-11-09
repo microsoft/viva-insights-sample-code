@@ -16,23 +16,9 @@ for export setup, schemas and person-week joins.
 
 All three reports use **synthetic data**. They illustrate analysis approaches, not evidence of Copilot's impact. Assumptions and simulation details are included in each report's methods or appendix.
 
-<div class="vi-card-grid" markdown="0">
-  <a class="vi-card" href="#business-leaders-ai-usage">
-    <span class="vi-card-title">Business Leaders AI Usage</span>
-    <span class="vi-card-desc">Who is using AI, how much, and how does usage vary over time and across groups?</span>
-    <span class="vi-card-more">Explore this dashboard →</span>
-  </a>
-  <a class="vi-card" href="#copilot-consumption-and-ways-of-working">
-    <span class="vi-card-title">Copilot Consumption and Ways of Working</span>
-    <span class="vi-card-desc">How is Copilot consumed, and how does consumption relate to collaboration?</span>
-    <span class="vi-card-more">Explore this template →</span>
-  </a>
-  <a class="vi-card" href="#developer-experience-and-copilot">
-    <span class="vi-card-title">Developer Experience and Copilot</span>
-    <span class="vi-card-desc">What do developer working conditions and joint Copilot use look like?</span>
-    <span class="vi-card-more">Explore this template →</span>
-  </a>
-</div>
+Select **Start using** for the demo, source, setup steps and input requirements. Full report details and caveats remain below.
+
+{% include dashboard-catalogue.html %}
 
 ## Business Leaders AI Usage
 

@@ -2,14 +2,18 @@
 layout: page
 title: "Frontier"
 eyebrow: "Frontier"
-description: "Turn a Viva Insights export into a finished dashboard, executive deck, or ROI analysis by pasting a prompt into a coding agent. Includes reusable prompts, schema guides, and example outputs."
+description: "Explore synthetic Viva Insights dashboards, or use prompts, Skills and schema guides to build and review your own analysis."
 permalink: /frontier-analytics/
 ---
-# Frontier
+<span id="frontier"></span>
 
-**Turn a Viva Insights export into a finished dashboard, executive deck, or ROI analysis by pasting a prompt into a coding agent.**
-
-Frontier is a collection of ready-to-use prompts, schema guides, and example outputs for [Viva Insights](https://learn.microsoft.com/en-us/viva/insights/). Instead of writing analysis code from scratch, you export your data, pick a prompt, and let a coding agent such as [GitHub Copilot](https://github.com/features/copilot) or [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview) generate the deliverable for you to review and adapt.
+Frontier brings together dashboard examples, prompts, agent Skills and schema
+guides for [Viva Insights](https://learn.microsoft.com/en-us/viva/insights/).
+Explore a synthetic report in your browser, or use a coding agent such as
+[GitHub Copilot](https://github.com/features/copilot) or
+[Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview)
+to build an analysis from your exports. Review the inputs, calculations and
+limitations before sharing the output.
 
 > **Note:** Everything in this section is sample code and starter assets. It is not production software. Outputs require review, validation, and adaptation to your environment before use.
 
@@ -17,7 +21,7 @@ Frontier is a collection of ready-to-use prompts, schema guides, and example out
 
 ## Which asset should I use?
 
-Frontier offers four ways to bring this work into a coding agent. Pick a card to jump straight to what you need, or see the full comparison below for more nuance.
+Frontier offers three ways to bring this work into a coding agent. Pick a card to jump straight to what you need, or use the comparison below.
 
 <div class="vi-card-grid" markdown="0">
   <a class="vi-card" href="{{ site.baseurl }}/frontier-analytics-prompts/">
@@ -38,22 +42,15 @@ Frontier offers four ways to bring this work into a coding agent. Pick a card to
     <span class="vi-card-desc">Paste once at the start of a session. A lighter fallback when your agent doesn't support Skills.</span>
     <span class="vi-card-more">View on GitHub →</span>
   </a>
-  <a class="vi-card" href="https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/mcp">
-    <span class="vi-card-icon">🔌</span>
-    <span class="vi-card-title">MCP (concept only)</span>
-    <span class="vi-card-desc">A protocol-level integration that would let an agent query prompts and schemas directly from a server. Not implemented yet.</span>
-    <span class="vi-card-more">Read the design intent →</span>
-  </a>
 </div>
 
 ### Full comparison
 
 | Mechanism | What it is | Status | Use it when |
 |-----------|------------|--------|-------------|
-| [Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/) | Structured text you copy and paste into any coding agent for a single analysis task. | Available | Your agent does not support Skills or MCP, or you want a one-off analysis without any setup. |
+| [Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/) | Structured text you copy and paste into any coding agent for a single analysis task. | Available | You want a one-off analysis without installing a Skill. |
 | [Agent Skills]({{ site.baseurl }}/frontier-analytics-skills/) | A packaged capability that a compatible coding agent loads automatically, so it applies the right conventions without you pasting anything. | Available | Your coding agent supports the Skill format (for example GitHub Copilot CLI or Claude Code) and you want ongoing, repeated Viva Insights work to follow consistent conventions. |
 | [vivainsights-context.md](https://github.com/microsoft/viva-insights-sample-code/blob/main/vivainsights-context.md) | A single context file you paste once at the start of a session. | Available | Your agent does not support Skills, but you still want to avoid repeating setup instructions in every prompt. |
-| [mcp/](https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/mcp) | A protocol-level integration that would let an agent query prompts, schemas, and tools directly from a server. | Concept only, no server implemented | Not yet. Read the folder for the design intent and to track progress. |
 
 ---
 
@@ -70,11 +67,25 @@ You do not need to be a software engineer. If you can export a CSV from Viva Ins
 
 ## What's inside
 
+### Explore the dashboard demos
+
+Open any of these three reports in your browser without installing anything.
+They use synthetic data and include R Markdown source and rendering requirements.
+Select **Start using** for the links and capability limits.
+
+**Business Leaders AI Usage** brings together M365 Copilot, Cowork, Agent,
+Consumption and GitHub Copilot fixtures. Explore reach, usage and trends over
+four, eight or thirteen weeks by organisation, function and team. It is a synthetic
+reference dashboard, with no verified real-export adapter or dedicated prompt
+journey. Descriptive comparisons do not establish causal effects.
+
+{% include dashboard-catalogue.html %}
+
 ### Build or customise the query dashboards
 
-Use a guided prompt to reproduce a working R demo, then change only what you
-need. The agent inspects real inputs and asks you to approve supported analyses
-before building; it does not invent missing metrics or coverage.
+These two guided journeys reproduce the existing Consumption and Developer
+Experience R demos. The agent inspects real inputs and asks you to approve
+supported analyses before building. Missing metrics and coverage remain explicit.
 
 | Journey | Demo | Real-data support |
 |---|---|---|
@@ -102,9 +113,14 @@ Additional resources available on GitHub:
 
 ### Prerequisites
 
-Before you start, make sure you have:
+Viewing the synthetic demos above needs only a browser. To run a prompt or
+render a report, check its specific requirements. The general analysis prompts
+use R or Python. The dashboard templates require R, Pandoc, R Markdown,
+flexdashboard and the packages listed in their rendering requirements.
 
-1. **Exported Viva Insights data.** Typically a person query CSV exported from the Viva Insights Analyst portal. Person query data has a panel structure with rows keyed by `PersonId` and `MetricDate` (person-week or person-day granularity). HR attributes such as organization, function, geography, and level are included as columns.
+For analysis of your own exports, prepare:
+
+1. **Exported Viva Insights data.** Use the query types required by the selected workflow. A Person Query has rows keyed by `PersonId` and `MetricDate` (person-week or person-day granularity). HR attributes such as organisation, function, geography and level are included as columns. Cross-query dashboards may need several exports.
 
 2. **An R or Python environment.** You need one of the following set up locally:
    - **R** (4.1+) with [vivainsights](https://microsoft.github.io/vivainsights/) installed: `install.packages("vivainsights")`
@@ -119,7 +135,7 @@ Before you start, make sure you have:
 
 - **GitHub Copilot** is free to start with a personal GitHub account. Install the Copilot extension in [VS Code](https://code.visualstudio.com/), or install the [GitHub Copilot CLI](https://github.com/features/copilot) and sign in from a terminal.
 - **Claude Code** is a terminal-based coding agent from Anthropic. Its [getting started guide](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview) covers installation.
-- If your organization already provides an enterprise-hosted coding agent, use that instead, especially when working with real HR data, since it keeps your data inside your organization's boundary.
+- Use your organisation's approved coding agent and data-handling environment for real HR data.
 
 Once installed, open the agent in a folder that has R or Python available, then continue with the workflow below.
 

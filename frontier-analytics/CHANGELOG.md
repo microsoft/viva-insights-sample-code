@@ -121,9 +121,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Corrected the adoption quickstart's plotting recommendation to match its
   static-image prompt, and removed its unmeasured completion-time promise.
 
-- The "What's inside" table now flags [mcp/](mcp/) as a concept with no server implemented yet, so this is visible before opening the folder.
+- The "What's inside" table now flags `mcp/` as a concept with no server implemented yet, so this is visible before opening the folder.
 - [vivainsights-context.md](../vivainsights-context.md) now points to the `viva-insights-analysis` skill for agents that support the Skill format, positioning itself as the fallback for agents that do not.
 - Consolidated `QUICKSTART.md` and `STARTER_KITS.md` into [README.md](README.md) and [starter-kits/README.md](starter-kits/README.md) respectively, since the three files repeated the same workflow steps with small wording differences. Removed the two standalone files.
+
+### Removed
+
+- Removed the unimplemented MCP concept documents, non-functional sample
+  configuration and navigation links. Frontier now presents prompt cards,
+  Skills and the context file as its three agent entry points. The workflow
+  support reference retains the unsupported-capability boundary.
 
 ## [0.1.0] - 2025-04-15
 

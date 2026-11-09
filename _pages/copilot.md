@@ -24,7 +24,7 @@ Pick a card to jump straight to a section, or read on for the full picture.
   <a class="vi-card" href="#interactive-dashboards">
     <span class="vi-card-icon">📊</span>
     <span class="vi-card-title">Interactive Dashboards</span>
-    <span class="vi-card-desc">Two ready-to-view flexdashboard reports pairing the new Consumption and GitHub queries with a Person Query — see what a finished stakeholder report looks like.</span>
+    <span class="vi-card-desc">Three ready-to-view reports covering business leaders' AI usage, credit consumption and developer experience — see what a finished stakeholder report looks like.</span>
     <span class="vi-card-more">Jump to section →</span>
   </a>
   <a class="vi-card" href="#analysis-scripts">
@@ -51,22 +51,12 @@ Pick a card to jump straight to a section, or read on for the full picture.
 
 ## Interactive Dashboards
 
-Open a demo in your browser without installing anything. Both reports use **synthetic data** and are available as **R templates** to adapt.
+Open a demo in your browser without installing anything. All three reports use **synthetic data** and are available as **R templates** to adapt. Select **Start using** for the demo, source, requirements and capability limits.
 
-<div class="vi-card-grid" markdown="0">
-  <a class="vi-card" id="copilot-consumption-and-ways-of-working" href="{{ site.baseurl }}/examples/utility-r/copilot-consumption-ways-of-working-simulation.html">
-    <img src="{{ site.baseurl }}/assets/images/reports/copilot-consumption-overview.png" alt="Consumption report overview preview" loading="lazy">
-    <span class="vi-card-title">Copilot Consumption and Ways of Working</span>
-    <span class="vi-card-desc">Explore Copilot credit consumption, cost per session, and their associations with collaboration patterns.</span>
-    <span class="vi-card-more">View demo →</span>
-  </a>
-  <a class="vi-card" id="developer-experience-and-copilot" href="{{ site.baseurl }}/examples/utility-r/github-copilot-developer-productivity-simulation.html">
-    <img src="{{ site.baseurl }}/assets/images/reports/github-copilot-devex-overview.png" alt="Developer experience report heavy GitHub Copilot user overview preview" loading="lazy">
-    <span class="vi-card-title">Developer Experience and Copilot</span>
-    <span class="vi-card-desc">Explore developer working conditions alongside GitHub and Microsoft 365 Copilot use.</span>
-    <span class="vi-card-more">View demo →</span>
-  </a>
-</div>
+<span id="copilot-consumption-and-ways-of-working"></span>
+<span id="developer-experience-and-copilot"></span>
+
+{% include dashboard-catalogue.html %}
 
 **[Browse dashboard templates]({{ site.baseurl }}/copilot-dashboards/)** for previews, required queries, source code, and setup guidance.
 

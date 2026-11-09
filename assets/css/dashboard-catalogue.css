@@ -1,0 +1,65 @@
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: 16px;
+  margin: 16px 0 32px;
+}
+.dashboard-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+.dashboard-card img { width: 100%; height: auto; border-radius: 6px; }
+.dashboard-card p { margin: 0; }
+.vi-page-body .dashboard-card h3 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 1.15rem;
+}
+.dashboard-badge { color: var(--muted); font-size: 0.85rem; }
+a.dashboard-start {
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  background: var(--primary);
+  color: #fff !important;
+  font-weight: 600;
+  text-decoration: none;
+}
+a.dashboard-start:hover { background: var(--primary-h); }
+.dashboard-details { padding: 24px; margin-bottom: 24px; border: 1px solid var(--rule); border-radius: var(--radius-card); }
+.dashboard-details h3 { margin-top: 0; }
+.dashboard-details p, .dashboard-details li { line-height: 1.55; }
+.dashboard-dialog {
+  width: min(760px, calc(100% - 24px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--text);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.dashboard-dialog::backdrop { background: rgb(0 0 0 / 55%); }
+.dashboard-dialog .dashboard-details { margin: 0; border: 0; overflow-wrap: anywhere; }
+.dashboard-dialog-bar { display: flex; justify-content: flex-end; padding: 12px 12px 0; }
+.dashboard-dialog-close { padding: 6px 12px; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; }
+.dashboard-dialog a:focus-visible,
+.dashboard-dialog button:focus-visible,
+.dashboard-details h3:focus-visible,
+.dashboard-guidance-target:focus-visible,
+a.dashboard-start:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+.dashboard-guidance-target { scroll-margin-top: var(--sticky-offset, 56px); }
+html.dashboard-dialog-open { overflow: hidden; }
+@media (max-width: 480px) {
+  .dashboard-dialog .dashboard-details { padding: 16px; }
+}

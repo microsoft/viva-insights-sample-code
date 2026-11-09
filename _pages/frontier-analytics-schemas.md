@@ -1,10 +1,10 @@
 ---
 layout: page
-title: "Frontier — Schema Documentation"
+title: "Viva Insights Schema Documentation"
 eyebrow: "Frontier"
 permalink: /frontier-analytics-schemas/
 ---
-This page provides **practical schema guidance** for working with Viva Insights data exports. It focuses on structural concepts, join patterns, and common pitfalls — things that are not obvious from the official documentation alone.
+Use this guidance to inspect Viva Insights export structures, plan joins and check for common data-quality issues.
 
 For authoritative and up-to-date metric definitions and column references, see:
 
@@ -15,17 +15,17 @@ For authoritative and up-to-date metric definitions and column references, see:
 
 **On this page:**
 
-- [Consumption and GitHub queries](#consumption-and-github-queries) — Documented versus illustrative inputs, and supported AI-guided workflows.
-- [Person Query — Key Concepts](#person-query-key-concepts) — Panel structure, licensing logic, and what to watch for.
-- [Purview Audit Logs — Key Concepts](#purview-audit-log-key-concepts) — Structure, the AuditData column, and data quality.
-- [Join Patterns](#join-patterns) — How to join person query data with Purview audit logs, external HR data, and license records.
-- [Common Pitfalls](#common-pitfalls) — Data quality issues, analytical mistakes, and edge cases to watch for.
+- [Consumption and GitHub queries](#consumption-and-github-queries) covers documented and illustrative inputs and supported AI-guided workflows.
+- [Person Query concepts](#person-query-key-concepts) explains panel structure, licensing logic and common checks.
+- [Purview Audit Log concepts](#purview-audit-log-key-concepts) covers event structure, the AuditData column and data quality.
+- [Join patterns](#join-patterns) covers Person Query joins with Purview audit logs, external HR data and licence records.
+- [Common pitfalls](#common-pitfalls) lists analytical mistakes and data-quality checks.
 
 **Related resources:**
 
-- [Prompt Card Library]({{ site.baseurl }}/frontier-analytics-prompts/) — ready-to-use prompts for coding agents
-- [Frontier Overview]({{ site.baseurl }}/frontier-analytics/) — overview and getting started
-- [Joining Viva Insights queries]({{ site.baseurl }}/query-join-guide/) — Person, Consumption, GitHub and Agent schemas, export setup and person-week joins
+- [Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/) has prompts for coding agents.
+- [Frontier overview]({{ site.baseurl }}/frontier-analytics/) introduces the available assets and setup.
+- [Joining Viva Insights queries]({{ site.baseurl }}/query-join-guide/) covers Person, Consumption, GitHub and Agent schemas, export setup and person-week joins.
 - [vivainsights R package](https://microsoft.github.io/vivainsights/)
 - [vivainsights Python package](https://microsoft.github.io/vivainsights-py/)
 
@@ -59,14 +59,14 @@ retain dated layouts and analytical context. See the
 for official product documentation. Missing fields exclude panels; agents must not
 generate synthetic replacements in a real-data run.
 
-## Person Query — Key Concepts {#person-query-key-concepts}
+## Person Query concepts {#person-query-key-concepts}
 
 ### Panel structure
 
 Person query data follows a **person-time panel** format:
 
 - **Each row** represents one person for one time period (typically one week).
-- **Primary key** is the combination of `(PersonId, MetricDate)` — each person appears once per time period.
+- **Primary key** is the combination of `(PersonId, MetricDate)`. Each person appears once per time period.
 - **Granularity** is usually **person-week** (one row per person per week), but some exports use **person-day**.
 - A typical export contains `N_persons × N_periods` rows. For example, 5,000 employees over 12 weeks produces approximately 60,000 rows.
 
@@ -75,12 +75,12 @@ values. Sparse observed dates alone do not establish the export's cadence.
 
 ### Column categories
 
-Person query exports typically contain these categories of columns. Exact column names vary by tenant — use `extract_hr()` and pattern matching (columns containing "Copilot") to identify them programmatically rather than hard-coding names.
+Person Query exports typically contain these categories of columns. Use `extract_hr()` and pattern matching (columns containing "Copilot") to identify the available columns, as exact names vary by tenant.
 
 | Category | Description |
 |----------|-------------|
 | **Identifiers** | `PersonId` (anonymized), `MetricDate` (period start date) |
-| **HR attributes** | Organizational metadata (org, function, level, region, etc.) — configurable per tenant |
+| **HR attributes** | Organisational metadata (org, function, level, region, etc.), configurable per tenant |
 | **Collaboration metrics** | Meeting hours, email hours, chat hours, focus hours, network size, etc. |
 | **Copilot metrics** | Selected activity metrics with product-specific definitions. Licensed Copilot activity and unlicensed Copilot Chat are separate families. |
 
@@ -103,11 +103,11 @@ This distinction is critical for any Copilot adoption analysis:
 
 ---
 
-## Purview Audit Logs — Key Concepts {#purview-audit-log-key-concepts}
+## Purview Audit Log concepts {#purview-audit-log-key-concepts}
 
 Purview audit logs capture user activity events across Microsoft 365 services, including Copilot interactions. They supplement person query data with granular event-level detail.
 
-For authoritative documentation, see [Microsoft Learn — Audit log activities](https://learn.microsoft.com/en-us/purview/audit-log-activities).
+For authoritative documentation, see [Audit log activities on Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-activities).
 
 ### Key characteristics
 
@@ -121,7 +121,7 @@ For authoritative documentation, see [Microsoft Learn — Audit log activities](
 
 ### Working with AuditData
 
-The `AuditData` column is a JSON string with event-specific details. Its structure varies by `Operation` and `Workload` — do not assume a consistent schema across all rows.
+The `AuditData` column is a JSON string with event-specific details. Inspect its structure for each `Operation` and `Workload` before extracting fields.
 
 **Best practices:**
 - **Explore before you extract.** Inspect key frequency across a sample before writing extraction logic.
@@ -131,7 +131,7 @@ The `AuditData` column is a JSON string with event-specific details. Its structu
 
 ### Data quality considerations
 
-- **Malformed JSON:** Always wrap JSON parsing in error handling — a single bad row should not crash the pipeline.
+- **Malformed JSON:** Wrap JSON parsing in error handling so one bad row does not crash the pipeline.
 - **Mixed schemas:** Different `Operation` types produce completely different `AuditData` structures.
 - **Encoding:** Purview CSV exports frequently use UTF-8 BOM encoding (`utf-8-sig`). If the first column name appears garbled, re-read with the correct encoding.
 - **Volume:** Audit logs can be extremely large. For exports exceeding 500MB, use chunked reading.
@@ -139,7 +139,7 @@ The `AuditData` column is a JSON string with event-specific details. Its structu
 
 ---
 
-## Join Patterns — Viva Insights Data Sources {#join-patterns}
+## Joining Viva Insights data sources {#join-patterns}
 
 This section describes how to join different Viva Insights data sources together. Joining data correctly is essential but introduces pitfalls around key matching, time alignment, and granularity differences.
 
@@ -160,14 +160,14 @@ The scenarios below cover other sources, including Purview and external HR data.
 
 Stack (concatenate) exports vertically using `PersonId` as the key. Check for duplicate `(PersonId, MetricDate)` pairs after stacking, especially if exports have overlapping date ranges.
 
-**Watch for:** Column name mismatches between exports from different time periods (new metrics may have been added). Use `bind_rows()` (R) or `pd.concat()` (Python) — both handle mismatched columns by inserting `NA`/`NaN`.
+**Watch for:** Column name mismatches between exports from different time periods (new metrics may have been added). Use `bind_rows()` (R) or `pd.concat()` (Python). Both handle mismatched columns by inserting `NA`/`NaN`.
 
 ### Person query ↔ Purview audit data
 
 The key challenge is that person query data uses an anonymized `PersonId` while Purview uses `UserId` (UPN/email). These are **not the same identifier**.
 
 **Mapping options:**
-- **Authorised mapping table** — a verified `PersonId` → UPN lookup where available. Apply only contract-approved normalisation to UPNs; preserve opaque PersonIds exactly.
+- **Authorised mapping table:** use a verified `PersonId` → UPN lookup where available. Apply only contract-approved normalisation to UPNs and preserve opaque PersonIds exactly.
 - **No authorised identity bridge:** stop the person-level join; shared HR attributes are not unique identities and must not be used for fuzzy employee matching.
 
 **Time alignment:** Purview logs are event-level. For a weekly Person Query,
@@ -191,7 +191,7 @@ Both follow the same pattern: you need a mapping table to link the anonymized `P
 
 ---
 
-## Common Pitfalls — Viva Insights Data Analysis {#common-pitfalls}
+## Common analysis pitfalls {#common-pitfalls}
 
 These are the most common analytical mistakes when working with Viva Insights exports. Each is subtle and can invalidate results silently.
 
@@ -217,7 +217,7 @@ Ignoring time zone differences when comparing collaboration metrics across geogr
 
 ### 6. HR attribute changes over time
 
-Assuming a person's organizational attributes are static. People change roles, teams, and levels over time — each row reflects their attributes at that `MetricDate`. Decide whether to use point-in-time attribution (each row's attributes as-is) or fixed-period attribution (attributes from a specific date).
+Assuming a person's organisational attributes are static. People change roles, teams and levels over time. Each row reflects their attributes at that `MetricDate`. Decide whether to use point-in-time attribution (each row's attributes as-is) or fixed-period attribution (attributes from a specific date).
 
 ### 7. Metric definition changes
 

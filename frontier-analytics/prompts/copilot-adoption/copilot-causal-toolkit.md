@@ -73,7 +73,7 @@ STEP 1: ENVIRONMENT CHECK
 
 STEP 2: DATA INSPECTION
 1. Ask the user where their CSV data file is located.
-2. Load the data using `import_query()` from the `vivainsights` package — i.e. import the package (`import vivainsights as vi`) and then call `data = vi.import_query("path/to/data.csv")`.
+2. Load the data using `import_query()` from the `vivainsights` package. Import the package (`import vivainsights as vi`) and then call `data = vi.import_query("path/to/data.csv")`.
 3. Print the shape, date range (MetricDate or Date column), and number of unique PersonIds.
 4. Run `vi.extract_hr(data, return_type="suggestion")` to obtain the available HR/organizational attribute column names.
 5. List all columns containing "Copilot" to confirm Copilot metrics are present.
@@ -157,10 +157,10 @@ STEP 6: VERIFY OUTPUTS
 4. Print a summary of what was generated and where the files are located.
 
 IMPORTANT NOTES
-- Do NOT modify the helper modules in script/modules/ — they are shared across notebooks.
+- Do NOT modify the helper modules in script/modules/. They are shared across notebooks.
 - The treatment variable is always `Total_Copilot_actions_taken`. Do not change this.
 - If the user's data has fewer than 12 weeks, warn them that results may be less reliable.
-- Keep explanations accessible — the user may not be a data scientist.
+- Explain the analysis in language a non-specialist can follow.
 - Publish only groups with max(the organisational requirement, 10 distinct people).
   Protect complementary cells and embedded data. No individual rankings.
 - Low-activity flags are review candidates, not verified holidays or job classes.
@@ -233,7 +233,7 @@ STEP 2: PRODUCE AN EXECUTIVE INTERPRETATION Write a clear, non-technical summary
   to explain away the estimate. Values close to 1 indicate a fragile finding, and
   larger values indicate more robustness, though the threshold that counts as
   reassuring depends on what plausible confounders exist in this setting.
-- Note any subgroups where effects were NOT statistically significant — absence of evidence is not evidence of absence.
+- Report subgroups where effects were NOT statistically significant. A non-significant result does not establish that the effect is absent.
 
 ### 6. Recommendations (2-4 bullets) Based on the results, suggest actionable next steps:
 - If positive effects found: recommend expanding Copilot enablement in high-impact subgroups
@@ -242,7 +242,7 @@ STEP 2: PRODUCE AN EXECUTIVE INTERPRETATION Write a clear, non-technical summary
 - Suggest combining with qualitative feedback (interviews, surveys) for a fuller picture
 
 ### 7. Caveats Include standard caveats:
-- Causal inference from observational data has limitations — DML reduces but does not eliminate confounding risk.
+- Causal inference from observational data has limitations. DML reduces but does not eliminate confounding risk.
 - Results apply to the specific time period and population analyzed.
 - The sensitivity analysis indicates robustness but cannot guarantee no unmeasured confounders.
 - Subgroup estimates from small samples are imprecise even when they clear the
@@ -252,7 +252,7 @@ STEP 2: PRODUCE AN EXECUTIVE INTERPRETATION Write a clear, non-technical summary
 
 FORMATTING
 - Use clear section headers.
-- Avoid statistical jargon — translate p-values, confidence intervals, and E-values into plain language (e.g., "We are 95% confident the true effect is between X and Y").
+- Explain p-values, confidence intervals and E-values in plain language (e.g., "We are 95% confident the true effect is between X and Y").
 - Use bold text for key numbers and findings.
 - Target length: 2-4 pages.
 - Save as "copilot_causal_analysis_interpretation_YYYYMMDD.md".
@@ -263,7 +263,7 @@ IMPORTANT NOTES
   otherwise use "adjusted association".
 - Explain measured outcomes in business language without relabelling activity
   as measured time saved, wellbeing, productivity or realised ROI.
-- If no significant effects are found, this is still a valid and useful result — frame it constructively (e.g., "The data does not yet show a measurable effect, which may indicate the need for a longer observation period or targeted enablement strategies").
+- Report when no significant effects are found. Describe the uncertainty and whether more data or a different design would help.
 
 <!-- analysis-policy:start -->
 Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
