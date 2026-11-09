@@ -124,7 +124,7 @@ version match. See [Meeting Query](meeting-query.md) and
 ## 5. Respect privacy in every reported cut
 
 - Use `max(organisation requirement, workflow floor)` for `mingroup`: generic
-  5, joined-query/dashboard/causal 10 distinct people.
+  5, joined-query/dashboard/causal/process 10 distinct people.
 - Do not publish a group smaller than the threshold. Aggregate up instead.
 - Keep individual identifiers and rankings out of aggregate publications.
   Anonymising or pseudonymising rows is not sufficient disclosure protection.

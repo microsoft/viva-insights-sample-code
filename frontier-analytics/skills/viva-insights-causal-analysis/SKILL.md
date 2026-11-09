@@ -12,7 +12,7 @@ description: >
   tasks, arbitrary metric-pair scans or pipeline validation. An explicit request
   for the existing Copilot Causal Toolkit follows that toolkit's workflow.
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Person Query analysis and causal diagnostics
@@ -138,6 +138,10 @@ The user reviews the claim and disclosure boundaries before external sharing.
 
 ## Routing boundaries
 
+- Named process footprints and Meeting Query title/date scoping belong to
+  `viva-insights-process-analysis`. Its descriptive cycle comparisons do not
+  become causal estimates through this skill. A Meeting Query event-level
+  intervention design needs its own inspected plan and implementation.
 - An explicit request to use the existing Copilot Causal Toolkit stays with its
   documented notebooks and prescribed treatment. See the repository's
   [toolkit prompt](../../prompts/copilot-adoption/copilot-causal-toolkit.md) when

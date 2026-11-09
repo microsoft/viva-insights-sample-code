@@ -11,7 +11,8 @@ from pathlib import Path
 from prompt_metadata import ROOT
 
 SKILLS = ROOT / "frontier-analytics" / "skills"
-NAMES = ("viva-insights-analysis", "viva-insights-copilot-dashboards", "viva-insights-causal-analysis")
+NAMES = ("viva-insights-analysis", "viva-insights-copilot-dashboards",
+         "viva-insights-causal-analysis", "viva-insights-process-analysis")
 
 
 def mandatory_references(skill):

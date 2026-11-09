@@ -1,0 +1,15 @@
+{
+  "schema": "fabricated-audit/v1",
+  "version": "fictional-audit-v1",
+  "status": "approved",
+  "annual_start": "02-01",
+  "annual_end": "06-30",
+  "coverage_start": "2020-01-01",
+  "coverage_through": "2022-03-15",
+  "coverage_confirmed": true,
+  "years": [2020, 2021, 2022],
+  "year_codes": {"2020": "AUD20", "2021": "AUD21", "2022": "AUD22"},
+  "categories": {"Audit": "\\baudit\\b", "Coordination": "\\bcontrols review\\b"},
+  "exclude_pattern": "\\b(?:software|system|log)\\b",
+  "privacy_floor": 10
+}

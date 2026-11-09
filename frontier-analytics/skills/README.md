@@ -23,11 +23,12 @@ The Skill format used here follows the convention introduced by Anthropic's Clau
 | [viva-insights-analysis/](viva-insights-analysis/) | Analyzing Viva Insights data with the open-source vivainsights R and Python packages: importing and validating a query, computing and visualizing metrics, segmenting Copilot usage, building common deliverables (dashboards, executive summaries, ROI estimates), running network or information-value analysis, and avoiding well-known export data pitfalls. |
 | [viva-insights-copilot-dashboards/](viva-insights-copilot-dashboards/) | Optional, R-first workflow for the Consumption and Developer Experience reference dashboards: reproduce, inspect/adapt and customise. Uses shared analysis contracts rather than duplicating them. |
 | [viva-insights-causal-analysis/](viva-insights-causal-analysis/) | Optional Person Query design and diagnostic workflow for a selected exposure and metric or organisational outcome. Checks actual outcome frequency before panel analysis, with matched synthetic R/Python demonstrations. |
+| [viva-insights-process-analysis/](viva-insights-process-analysis/) | Optional workflow for collaboration around audits, close or planning cycles: reviewable title/date scope, comparable periods, organisational attribution and evidence-led reporting. Includes a fabricated audit rehearsal. |
 
 The core skill's [analysis policy](viva-insights-analysis/reference/analysis-policy.md)
 owns shared rules, and its [support table](viva-insights-analysis/reference/workflow-support.md)
 owns capability summaries. Installed core analysis remains self-contained;
-optional dashboard and causal workflows require the paired references described
+optional dashboard, causal and process workflows require the paired references described
 below, and dashboard execution also needs its retained runner checkout.
 
 ## Installing a skill
@@ -101,6 +102,30 @@ within-person analysis before running models."**
 The existing [Copilot Causal Toolkit prompt](../prompts/copilot-adoption/copilot-causal-toolkit.md)
 remains the entry point for its prescribed Copilot/DML notebooks. The new skill
 does not replace that toolkit or modify its treatment and helpers.
+
+## Business-process analysis skill installation
+
+Install `viva-insights-analysis` and `viva-insights-process-analysis` as siblings
+from the same revision, keeping their `reference/` and `examples/` folders.
+Review existing customised copies before replacing them. The process skill reads
+the shared core references directly. It does not install dependencies or need
+private services, telemetry or a live-product connection.
+
+```powershell
+gh skill install microsoft/viva-insights-sample-code frontier-analytics/skills/viva-insights-analysis --agent github-copilot --scope user
+gh skill install microsoft/viva-insights-sample-code frontier-analytics/skills/viva-insights-process-analysis --agent github-copilot --scope user
+```
+
+For guaranteed revision parity, use the same local checkout with `--from-local`,
+as in the dashboard installation. Start with **"Help me define and compare the
+collaboration footprint of our annual audit using my Meeting Query exports."**
+This means the business audit process, not Purview audit-log parsing.
+
+The [fabricated rehearsal](viva-insights-process-analysis/examples/README.md)
+executes scoped classification, reconciliation, partial-period and privacy
+checks in Python, with matched R classifier fixtures. Real-data analysis is
+agent-guided. No universal export adapter, process-mining engine, inferential
+runner or report renderer is bundled.
 
 ## Contributing a new skill
 

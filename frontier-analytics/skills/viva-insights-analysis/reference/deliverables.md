@@ -94,7 +94,7 @@ historical layouts and analytical context, rather than overriding the current gu
 ## Shared requirements across all of these
 
 - Suppress groups below `max(organisation requirement, workflow floor)`: generic
-  5; joined-query, dashboard and causal 10 distinct people. Protect complementary
+  5; joined-query, dashboard, causal and process 10 distinct people. Protect complementary
   cells and never publish individual rankings.
 - State assumptions and caveats prominently in the output itself rather than
   only in a footnote.

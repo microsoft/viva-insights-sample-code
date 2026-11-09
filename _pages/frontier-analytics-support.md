@@ -19,6 +19,7 @@ support is not proof of a real-data trial or an executed agent evaluation.
 | GitHub developer dashboard | Synthetic R reproduction; real exports inspect/readiness only | Synthetic activity, Person Query and roster fixture; real headers inspected against the contract | No implemented real GitHub build adapter; no productivity or causal interpretation | Runner README and dashboard GitHub manifest |
 | Person and Agent integration | Schema/join guidance, not a packaged dashboard adapter | Current selected-query join contract, historical identity and weekly Person spine | No implemented real Person/Agent dashboard adapters; documented joins do not extend runner support | Current join contract and its deterministic tests |
 | Person Query causal skill | Agent-guided design and readiness; bounded synthetic Python/base-R runners | Verified exposure/outcome windows; fabricated balanced continuous-outcome panels in bundled runners | Synthetic readiness and limited linear comparisons, not general real-data PPML, DML, bootstrap or quasi-experimental execution | Causal `examples/README.md` and `reference/evaluation.md`; historical evidence is bounded there |
+| Business-process collaboration skill | Agent-guided R/Python workflow; standard-library Python rehearsal and R/jsonlite classifier checks | Reviewed MQ scope/coverage, exact event decisions and optional purpose-specific PQ evidence | Descriptive contracts and generated analyses; bundled examples are fabricated. No general export adapter, process mining, inference engine or report renderer | Process skill `examples/README.md`, `examples/test_examples.py` and `reference/evaluation.md` |
 | Copilot Causal Toolkit | Separate prescribed notebook/DML workflow | Selected toolkit notebook, its fixed treatment, dependencies and design-specific input contract | Do not replace with or claim equivalence to the synthetic causal runner; inspect identification and actual notebook preprocessing before causal interpretation | Toolkit prompt and selected notebook's own diagnostics |
 | External-collaboration integration | Standalone schemas/examples only where documented; no general cross-query adapter | Source-specific keys, grain and privacy must be established | No inferred identity bridge or assumed compatible join | Relevant source schema and example, not another query's contract |
 | Live product / MCP access | Unsupported by this repository | Local exported files only in maintained workflows | No MCP server, live-product connector or credentials workflow is supplied | Not applicable |
@@ -32,13 +33,14 @@ workflow assets live in a retained sample-code checkout:
   its `tests/`, and the dashboard skill's report manifests and `evals/README.md`.
 - Causal: the paired causal skill's `examples/README.md` and
   `reference/evaluation.md`.
+- Process: the paired process skill's `examples/README.md` and
+  `reference/evaluation.md`, installed with its core references.
 - DML: `frontier-analytics/prompts/copilot-adoption/copilot-causal-toolkit.md`
   and the notebook it selects.
 - Joins: [current guide and downloadable contract](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/).
 
 Do not treat a missing optional checkout as missing core analysis functionality.
-Ask for the specific asset only when that workflow is requested. Keep the
-analysis, dashboard, causal and DML workflows separate.
+Ask for the specific asset only when that workflow is requested. Keep the analysis, dashboard, process, causal and DML workflow boundaries explicit.
 
 ## Catalogue summaries
 
@@ -64,5 +66,12 @@ These marked plain-text lists are authored here for generated skill cards.
 - The prescribed Copilot Causal Toolkit remains a separate notebook/DML workflow; do not silently substitute treatments or methods.
 - Install alongside the core analysis skill. Use max(organisation requirement, 10 distinct people), protect complementary cells and never publish individual rankings or person-specific effects.
 <!-- catalogue:viva-insights-causal-analysis:end -->
+
+<!-- catalogue:viva-insights-process-analysis:start -->
+- Agent-guided collaboration analysis around business processes using Meeting Query and optional purpose-specific Person Query exports.
+- Requires approved title/date scope and verified coverage before reporting process totals. Purview audit logs and process mining are separate.
+- Bundled Python rehearsal and R classifier checks use fabricated audit events; no general export adapter, inference engine or report renderer is implemented.
+- Install alongside the core skill. Use max(organisation requirement, 10 distinct people), verify the applicable person base and keep event stability thresholds separate.
+<!-- catalogue:viva-insights-process-analysis:end -->
 
 [Back to Skills]({{ site.baseurl }}/frontier-analytics-skills/)

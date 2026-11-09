@@ -86,7 +86,7 @@ before joining or summing.
 
 Use `max(organisation requirement, workflow floor)` distinct people per
 published group: generic analysis has a floor of **5**; joined-query,
-dashboard and causal workflows have a floor of **10**. A workflow may require
+dashboard, causal and process workflows have a floor of **10**. A workflow may require
 more. Apply the same rule to tables, charts, embedded data and downloadable
 aggregates. Suppress complementary cells or entire breakdowns if totals reveal
 small cells. Pseudonymisation is not permission to publish individual rankings.

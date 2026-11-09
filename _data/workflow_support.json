@@ -16,5 +16,11 @@
     "Choose a supported identifying design and compatible diagnostics first; readiness-only and unavailable checks are valid. No general PPML, DML, bootstrap or quasi-experimental runner is implemented here.",
     "The prescribed Copilot Causal Toolkit remains a separate notebook/DML workflow; do not silently substitute treatments or methods.",
     "Install alongside the core analysis skill. Use max(organisation requirement, 10 distinct people), protect complementary cells and never publish individual rankings or person-specific effects."
+  ],
+  "viva-insights-process-analysis": [
+    "Agent-guided collaboration analysis around business processes using Meeting Query and optional purpose-specific Person Query exports.",
+    "Requires approved title/date scope and verified coverage before reporting process totals. Purview audit logs and process mining are separate.",
+    "Bundled Python rehearsal and R classifier checks use fabricated audit events; no general export adapter, inference engine or report renderer is implemented.",
+    "Install alongside the core skill. Use max(organisation requirement, 10 distinct people), verify the applicable person base and keep event stability thresholds separate."
   ]
 }

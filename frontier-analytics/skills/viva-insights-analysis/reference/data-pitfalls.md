@@ -82,13 +82,13 @@ reproducible against the portal, which suppresses small groups.
 **Cause:** Viva Insights enforces a minimum aggregation group size (commonly 5).
 Below it, a group should not be reported.
 **Fix:** use the stricter of the organisation requirement and workflow floor:
-5 distinct people for generic analysis, 10 for joined-query, dashboard and
-causal outputs. Pass the applicable value as `mingroup` in supported package
+5 distinct people for generic analysis, 10 for joined-query, dashboard, causal
+and process outputs. Pass the applicable value as `mingroup` in supported package
 calls, and audit all published groups and complementary cells explicitly.
 
 ```r
 org_minimum <- 5L  # replace with the organisation's actual requirement
-workflow_floor <- 5L  # 10L for joined-query, dashboard or causal outputs
+workflow_floor <- 5L  # 10L for joined-query, dashboard, causal or process outputs
 min_group <- max(org_minimum, workflow_floor)
 identify_privacythreshold(pq, hrvar = "Organization", mingroup = min_group, return = "table")
 create_rank(pq, metric = "Collaboration_hours", hrvar = "Organization", mingroup = min_group)

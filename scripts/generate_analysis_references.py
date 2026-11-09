@@ -101,7 +101,8 @@ def generated_references():
                 if slug in support:
                     raise ValueError(f"Duplicate catalogue support facts: {slug}")
                 support[slug] = lines
-    expected = {"viva-insights-analysis", "viva-insights-copilot-dashboards", "viva-insights-causal-analysis"}
+    expected = {"viva-insights-analysis", "viva-insights-copilot-dashboards",
+                "viva-insights-causal-analysis", "viva-insights-process-analysis"}
     if set(support) != expected:
         raise ValueError("Missing or unexpected canonical Skill catalogue support blocks")
     outputs[ROOT / "_data" / "workflow_support.json"] = json.dumps(support, indent=2) + "\n"

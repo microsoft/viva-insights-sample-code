@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Optional `viva-insights-process-analysis` Skill for collaboration around
+  business processes, with approved scope contracts, exact event decisions,
+  comparable windows, privacy and evidence-led reporting. Includes independently
+  fabricated audit fixtures, a Python rehearsal, matched R classifier checks,
+  routing/evaluation scenarios and paired-install catalogue guidance.
+
 - Evidence-led reporting reference covering claim traceability, compact
   comparison layouts, separate numerical/privacy/visual verification and
   preservation-first publication edits. The executive deck prompt retains

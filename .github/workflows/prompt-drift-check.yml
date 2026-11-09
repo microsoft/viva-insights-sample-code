@@ -70,6 +70,7 @@ jobs:
           packages: |
             cran::vivainsights@0.7.2
             any::slider
+            any::jsonlite
           dependencies: 'NA'
 
       - name: Check R segmentation eligibility and history
@@ -77,3 +78,4 @@ jobs:
           Rscript --vanilla -e 'stopifnot(as.character(utils::packageVersion("vivainsights")) == "0.7.2")'
           Rscript --vanilla scripts/test_segmentation.R
           Rscript --vanilla scripts/test_meeting_quality.R
+          Rscript --vanilla frontier-analytics/skills/viva-insights-process-analysis/examples/run_classifier.R

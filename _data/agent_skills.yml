@@ -113,3 +113,36 @@
     - A readiness assessment that states whether the data can support the question and what is missing, without fitting models.
     - After a supported analysis, reproducible scripts, audit and results records, and a self-contained HTML report.
     - Model-labelled results with visible caveats and plain-language definitions.
+
+- slug: viva-insights-process-analysis
+  name: Business-process collaboration
+  badge: Optional add-on
+  summary: Define and compare collaboration around an audit, financial close or planning cycle using Meeting Query and optional Person Query evidence.
+  card_note: Installs alongside Viva Insights analysis.
+  requires: viva-insights-analysis
+  source: https://github.com/microsoft/viva-insights-sample-code/tree/main/frontier-analytics/skills/viva-insights-process-analysis
+  steps:
+    - title: Install both Skills
+      text: >-
+        Install the process and shared analysis Skills from the same revision.
+        For guaranteed revision parity, use a local checkout with --from-local,
+        as in the dashboard Skill steps. Review customised copies before replacing them.
+      command: |-
+        gh skill install microsoft/viva-insights-sample-code frontier-analytics/skills/viva-insights-analysis --agent github-copilot --scope user
+        gh skill install microsoft/viva-insights-sample-code frontier-analytics/skills/viva-insights-process-analysis --agent github-copilot --scope user
+    - title: Load and check the Skills
+      text: >-
+        In GitHub Copilot CLI, run `/skills reload` and then `/skills info viva-insights-process-analysis`.
+        For another agent, change --agent in the install commands and restart the agent.
+        The Python rehearsal uses the standard library. The matched R classifier checks require jsonlite.
+  prompt: Help me define and compare the collaboration footprint of our annual audit using my Meeting Query exports. Start with scope and coverage before reporting totals.
+  prompt_note: Add local file locations, preferred R/Python runtime and the process/calendar context. This is business-process analysis, not Purview audit-log parsing.
+  questions:
+    - Which meetings count towards the process, and what needs approval?
+    - How do matched observed process phases compare across years?
+    - Is a change associated with event volume, time per meeting or organisational composition?
+    - Can we refresh the report while retaining its scope, evidence and manual edits?
+  outputs:
+    - An analysis contract with reviewable title/date rules, worked examples and open scope questions.
+    - Agent-guided aggregate evidence for volume, format, attribution and matched periods, with reconciliations and caveats.
+    - A fabricated audit rehearsal and evidence-led reporting guidance. Real-export adapters, statistical engines and report renderers are not bundled.

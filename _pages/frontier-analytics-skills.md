@@ -2,7 +2,7 @@
 layout: page
 title: "Agent Skills for Viva Insights"
 eyebrow: "Frontier"
-description: "Choose a Viva Insights agent Skill for analysis, query dashboards, or Person Query causal diagnostics."
+description: "Choose a Viva Insights agent Skill for analysis, business processes, query dashboards, or Person Query causal diagnostics."
 permalink: /frontier-analytics-skills/
 css: /assets/css/skill-catalogue.css
 ---
@@ -24,7 +24,7 @@ shared rules, supported inputs, runtime requirements and evidence boundaries.
 
 ## Choose a Skill
 
-Select **Start using** on a card for setup steps, a starter prompt, the questions each Skill helps answer and the results to expect. The two optional Skills read references from the shared analysis Skill, so their steps install both.
+Select **Start using** on a card for setup steps, a starter prompt, the questions each Skill helps answer and the results to expect. Optional Skills read references from the shared analysis Skill, so their steps install both.
 
 {% include skill-catalogue.html %}
 

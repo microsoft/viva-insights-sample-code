@@ -1,0 +1,19 @@
+case,MeetingId,Date,Subject,quality_pass,decision,prior_in_scope,expected
+audit_word,case-audit,2021-03-10,Audit fieldwork,true,,,true
+code_2020,case-code20,2020-03-10,AUD20 planning,true,,,true
+code_2021,case-code21,2021-03-10,AUD21 planning,true,,,true
+code_2022,case-code22,2022-03-10,AUD22 planning,true,,,true
+coordination,case-coordination,2021-03-10,Controls review,true,,,true
+overlap,case-overlap,2021-03-10,Audit controls review,true,,,true
+technical,case-technical,2021-03-10,Software audit log,true,,,false
+accent_boundary,case-accent-boundary,2021-03-10,Audité,true,,,false
+accent_valid,case-accent-valid,2021-03-10,Pré-audit de contrôle,true,,,true
+substring,case-substring,2021-03-10,Auditorium booking,true,,,false
+manual_keep,case-keep,2021-03-10,Planning discussion,true,Keep,,true
+outside_keep,case-outside,2021-01-12,Audit planning,true,Keep,,false
+quality_keep,case-quality,2021-03-10,Audit planning,false,Keep,,false
+manual_remove,case-remove,2021-03-10,Audit controls review,true,Remove,,false
+pending_keep,case-pending-keep,2021-03-10,Needs context,true,Pending,true,true
+pending_remove,case-pending-remove,2021-03-10,Audit planning,true,Pending,false,false
+unrelated,case-unrelated,2021-03-10,Planning discussion,true,,,false
+same_title_other_date,case-other-date,2021-04-10,Planning discussion,true,,,false

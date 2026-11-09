@@ -31,6 +31,11 @@ owner. It reads this skill's shared conventions directly and adds measurement-
 frequency and inferential gates. An explicit Copilot Causal Toolkit request
 stays with its existing prompt and prescribed notebooks.
 
+For collaboration around an audit, close, planning cycle or other named business
+process, use the optional `viva-insights-process-analysis` skill as workflow
+owner. It adds reviewable title/date scope and matched-cycle reporting while
+reading this skill's shared rules. Purview audit logs remain a separate workflow.
+
 Microsoft Viva Insights lets analysts export "flexible queries" as CSVs from the
 Analyst portal. The open-source **`vivainsights`** packages (R and Python) read,
 validate, analyse, and visualise those exports in a consistent, best-practice way.
@@ -155,8 +160,8 @@ real customer data: `pq_data`, `mt_data`, `p2p_data`, `g2g_data` (R), and the
 - **Never embed customer data or identifiers** in scripts, examples, or committed
   files. Use the built-in sample datasets for illustration.
 - **Read `reference/analysis-policy.md` first.** Apply the stricter of the
-  organisation requirement and workflow floor (generic 5; joined, dashboard
-  and causal 10 distinct people). Never publish individual rankings.
+  organisation requirement and workflow floor (generic 5; joined, dashboard,
+  causal and process 10 distinct people). Never publish individual rankings.
 - **Prefer association over causation** unless a supported identifying design
   and explicit assumptions justify otherwise. See `reference/analysis-conventions.md`.
 - **Prefer an existing package function over new code.** Check the relevant
