@@ -63,16 +63,11 @@ Choose R or Python based on what is already installed in your environment to min
 - Python: Use the `python-pptx` package. Its native chart support is more limited. If advanced chart types are needed, R with `mschart` is recommended.
 
 DATA LOADING AND PREPARATION
-Confirm configured weekly grouping, week start, metric measurement windows and query scope. Observed date gaps are diagnostic only. Within a supplied complete query's configured scope, absent activity rows contribute zero. Native licensed-only M365 Copilot nulls mean unlicensed. Failed joins, unavailable sources, out-of-scope periods and known coverage failures remain unresolved with reasons.
+Read the configured grouping, week start, measurement windows and query scope before calculating metrics. Apply the shared analysis policy below to eligibility, missingness and privacy.
 1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python). This handles variable name cleaning and type parsing automatically.
 2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity metric.
 3. Identify HR / organizational attribute columns with `extract_hr(df, return = "names")` in R or `vi.extract_hr(df, return_type="suggestion")` in Python.
-4. Classify each person-week:
-   - "Licensed": positive Copilot Enabled User, positive Total Copilot enabled days or dated licence evidence for that week. Without these fields, a non-null value, including zero, in a verified native licensed-only M365 Copilot metric establishes licensing.
-   - "Active": licensed AND Total_Copilot_actions_taken > 0.
-   - "Unlicensed": native null licensed-only M365 Copilot values, native null or zero enabled days, or explicit negative licence evidence.
-   - "Unknown": failed joins, unavailable sources or genuinely unresolved field semantics. Withhold the affected rate if licence status or licensed activity is unresolved. Investigate conflicting evidence.
-   - Ask for an approved dated licence list only if neither explicit fields nor documented native licensed-only metric semantics resolve licensing. Do not extend these semantics to unlicensed Copilot Chat or Consumption credits.
+4. Classify person-weeks using the shared eligibility policy. Prefer explicit enablement or dated licence evidence, then a verified native licensed-only M365 metric. Mark a person active when licensed and `Total_Copilot_actions_taken` is positive. Keep unresolved eligibility separate and withhold affected rates.
 5. Print: date range, total persons, licensed persons, active persons.
 
 METRIC CALCULATIONS
@@ -199,22 +194,20 @@ SLIDE DECK GENERATION
     If visual verification cannot run, label it unavailable rather than approved.
 
 IMPORTANT NOTES
-- Recipients must be able to modify charts and update their data. Use native editable PowerPoint chart objects wherever supported, and identify any image fallback described in step 7.
+- Use native editable PowerPoint charts wherever supported, as described in step 7.
 - Do NOT use RMarkdown or Jupyter notebook as an intermediary for this output. Generate the .pptx file directly using the appropriate PowerPoint package.
-- Native licensed-only M365 Copilot nulls mean unlicensed. Keep processing failures unresolved rather than treating them as native nulls or zero activity.
-- Apply the stated privacy floor to charts, tables, hidden chart workbooks and complementary cells; never publish individual rankings.
-- Low-activity flags are review candidates, not verified holidays, employment status or job classifications.
 - Do NOT fabricate numbers. Every statistic must be computed from the data.
-- If a chart type is not supported natively by the PowerPoint library, use the closest available chart type and note the limitation.
+- Skip metrics whose inputs are unavailable. For unsupported chart types, follow step 7 and document any image fallback.
 
 <!-- analysis-policy:start -->
-Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
-Absent activity inside a supplied complete query's configured scope contributes zero. Preserve unresolved joins, unavailable sources, out-of-scope periods and known coverage failures as unknown with reasons. Do not extend licensed-only M365 Copilot null semantics to unlicensed Copilot Chat or Consumption credits.
-Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
-Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
-Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.
-Choose a supported identifying design before causal claims and compatible estimators; default to association, retain unavailable checks and label synthetic evidence.
-Inspect installed package versions, signatures and return types; separate executed evidence from expected behaviour and do not silently fork upstream bugs.
+Use product-specific licence evidence. For documented native licensed-only M365 Copilot metrics, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days. Do not extend these semantics to unlicensed Copilot Chat or Consumption credits.
+Investigate conflicting licence evidence. Keep affected eligibility or activity unresolved, and withhold affected rates or estimates until resolved.
+Within a supplied complete query's configured scope, absent activity rows contribute zero. Keep failed joins, unavailable sources, out-of-scope periods and known coverage failures unresolved with reasons.
+Use configured grouping, week start and metric windows; date gaps do not establish cadence. State grain, units and estimand. Count distinct people; do not sum stocks or overlapping windows.
+Use max(organisation requirement, workflow floor): 5 distinct people for general analysis and 10 for joined-query, dashboard, causal or process workflows. Protect complementary cells and embedded data; never publish individual rankings.
+Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications. Value scenarios require explicit conversion and realisation assumptions.
+Default to association. Make causal claims only with a supported design and compatible estimators. Record unavailable checks and label synthetic data.
+Check installed API versions, signatures and return types. Separate executed results from expectations and do not silently fork upstream bugs.
 <!-- analysis-policy:end -->
 ```
 

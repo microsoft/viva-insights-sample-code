@@ -88,8 +88,8 @@ LANGUAGE CHOICE
 Choose R or Python based on what is already installed in your environment to minimize setup.
 
 DATA LOADING AND EXPLORATION
-1. Load the audit log file and detect whether it uses CSV or JSON. JSON may be an array or newline-delimited (one object per line). Parse CSV with pandas or readr.
-2. Print the column names, data types, and the first 5 rows to understand the schema.
+1. Load the audit log file and detect whether it uses CSV or JSON. JSON may be an array or newline-delimited (one object per line). Parse CSV with pandas or readr. If the file exceeds 1M rows, sample for exploration but use the full dataset for final metrics.
+2. Print the column names, data types, and the first 5 rows to understand the schema. Mask direct user identifiers in sample output.
 3. Print the number of total records and the date range (from CreationTime or the equivalent timestamp field).
 4. If there is an "AuditData" column that contains JSON strings, note it. Parse it in a later step if needed.
 
@@ -105,11 +105,12 @@ COPILOT EVENT FILTERING
 7. Explore the unique values in the Operation and Workload columns. Print value counts for both.
 8. Filter for Copilot-related events. Use a broad filter first:
    - Operation values containing "Copilot", "AI", "Agent", "GPT", "Assist", "Summarize" (case-insensitive)
-   - Workload values containing "Copilot", "Microsoft365", "M365" (case-insensitive) Print the number of matching events and the operation/workload values that matched.
+   - Workload values containing "Copilot", "Microsoft365", "M365" (case-insensitive)
+   Print the number of matching events and the operation/workload values that matched. Where fields permit, distinguish user-initiated events from system-generated events.
 9. If the filtered dataset is empty, expand the filter or report that no Copilot events were found and list all unique Operation and Workload values for manual inspection.
 10. If an AuditData column exists and the initial filtering is too broad, parse the JSON in AuditData for a sample of 100 rows and look for additional fields that indicate Copilot usage (e.g., "AppName", "CopilotEventType", "AgentName", "ExtensionName").
 
-    What a successful Copilot event looks like: a matched row typically has an Operation such as `CopilotInteraction` (or a workload-specific variant) and a Workload like `Copilot` or `Microsoft365`, with a populated user identifier and timestamp. For example, `Operation = "CopilotInteraction"`, `Workload = "Microsoft365"`, `UserId = "user@contoso.com"`, `CreationTime = "2024-05-01T14:22:31Z"`. When AuditData is parsed, a genuine Copilot event usually carries an `AppHost`/`AppName` (e.g., "Teams", "Word") and a `CopilotEventType` field. Print 1–2 such example rows so the user can confirm the filter is capturing real Copilot activity and not unrelated events.
+    What a successful Copilot event looks like: a matched row typically has an Operation such as `CopilotInteraction` (or a workload-specific variant) and a Workload like `Copilot` or `Microsoft365`, with a populated user identifier and timestamp. For example, `Operation = "CopilotInteraction"`, `Workload = "Microsoft365"`, `UserId = "[masked]"`, `CreationTime = "2024-05-01T14:22:31Z"`. When AuditData is parsed, a genuine Copilot event usually carries an `AppHost`/`AppName` (e.g., "Teams", "Word") and a `CopilotEventType` field. Print 1–2 such example rows so the user can confirm the filter is capturing real Copilot activity and not unrelated events, with direct identifiers masked.
 
 USAGE METRICS
 11. Using the filtered Copilot events, compute:
@@ -163,16 +164,11 @@ REPORT GENERATION
     e. "Agent/Extension Usage": analysis from step 20 (if available).
     f. "Key Findings": 3-5 bullet points summarising the most notable patterns.
     g. "Data Notes": document any field mapping decisions, filter criteria and schema observations for reproducibility.
+    Do not include raw user identifiers in the report. Use aggregates or masked identifiers.
 
 22. Use static charts (matplotlib/seaborn or ggplot2).
 23. Save the report and intermediary file as "purview_copilot_agent_analysis_YYYYMMDD.html".
 
-IMPORTANT NOTES
-- This is an EXPLORATORY analysis. Inspect the data before choosing fields and values, as Purview schemas vary.
-- Print intermediate outputs (unique values, sample rows) so I can verify the field mappings.
-- If the dataset is very large (>1M rows), sample for exploration but use the full data for final metrics.
-- User identifiers in Purview logs may be email addresses/UPNs. Do not expose raw email addresses in the report. Hash or truncate them, or use only aggregate statistics.
-- Some operations may be system-generated rather than user-initiated. Look for patterns that distinguish user actions from system events.
 ```
 {% endraw %}
 
