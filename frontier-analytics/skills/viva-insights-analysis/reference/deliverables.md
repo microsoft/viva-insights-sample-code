@@ -8,6 +8,9 @@ Adapt every number, column name, and threshold to the data in front of you.
 Read [analysis policy](analysis-policy.md) and [workflow support](workflow-support.md)
 before choosing a path. Prompt cards guide code generation; their validation
 metadata does not establish that a new report or every agent has been tested.
+Use [report verification](report-verification.md) for a claim-level evidence
+ledger, compact comparison layouts, numerical/privacy/visual checks and safe
+revisions of an existing user-edited report.
 
 For a prescribed, reproducible structure, prefer the matching prompt card
 under `frontier-analytics/prompts/` instead of reinventing the deliverable from
@@ -95,5 +98,11 @@ historical layouts and analytical context, rather than overriding the current gu
   cells and never publish individual rankings.
 - State assumptions and caveats prominently in the output itself rather than
   only in a footnote.
+- Keep each view's source, exact dates, aggregation, valid bases and denominator
+  traceable to shared analytical evidence. Retain supporting detail when the
+  narrative is condensed, and keep unavailable values distinct from observed zero.
+- For an existing publication, snapshot the live version, preserve unrelated
+  edits and resolve only the comments actually addressed. Verify the persisted
+  result after an authorised replacement.
 - When a Frontier Analytics prompt card exists for the deliverable, mention it
   to the user as the prescribed-structure alternative requiring verification.

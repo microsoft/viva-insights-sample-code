@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Evidence-led reporting reference covering claim traceability, compact
+  comparison layouts, separate numerical/privacy/visual verification and
+  preservation-first publication edits. The executive deck prompt retains
+  supporting evidence and avoids performance claims from adoption rankings.
+
 - Shared seven-rule Meeting Query quality helpers in R and Python, with
   explicit flag parsing, duration checks and synthetic boundary regressions.
   Expanded refresh reconciliation, organiser-attribution, weighting, exact

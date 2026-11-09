@@ -44,6 +44,9 @@ Read configured cadence and measurement windows, not date spacing. In a supplied
 Create the deck directly as a .pptx file with native editable chart objects wherever the library supports them, and avoid HTML to PowerPoint conversion pipelines.
 If a needed chart type cannot be created natively, simplify it to a supported native chart where possible and clearly note any remaining slide that must fall back to an image.
 Use distinct-person denominators and state whether summaries weight people or person-weeks. Suppress groups below max(the organisational requirement, 5 distinct people), using floor 10 in dashboard/joined workflows. Protect complementary cells and embedded chart data; never publish individual rankings. Skip unavailable slides.
+Use commentary-led slide titles and keep each number traceable to a local evidence ledger with dates, units, aggregation, bases and denominator. Related charts or tables can share a slide if labels and caveats remain readable.
+For an existing user-edited deck, save a rollback, preserve unrelated content and verify the source has not changed before replacement. Remove only comments whose requested edits have been verified.
+Verify numbers, embedded chart data, privacy and actual rendering separately. Report unavailable visual checks honestly.
 Finish by listing any assumptions you made about chart support, metric mappings, or optional slide substitutions.
 ```
 
@@ -74,6 +77,10 @@ Confirm configured weekly grouping, week start, metric measurement windows and q
 
 METRIC CALCULATIONS
 6. Compute the following metrics for the deck:
+
+   Retain a local evidence ledger linking every claim/view to source fingerprints,
+   exact dates, metric definitions, aggregation, valid bases and numerator/denominator.
+   Generate prose, tables and chart data from the same aggregates.
 
    Headline metrics (latest 4 complete weeks vs. prior 4 weeks):
    a. Current adoption rate (active / licensed in the latest week)
@@ -130,11 +137,12 @@ SLIDE DECK GENERATION
    - Suppress below max(the organisational requirement, 5 distinct licensed people), using floor 10 for dashboard/joined outputs and at least 10 for the top/bottom organisation table
    - If there are more than 12 segments, show only the top and bottom 6
 
-   SLIDE 10: Top and bottom performers
+   SLIDE 10: Groups with higher and lower adoption
    - A table or two-column layout showing:
      - Top 3 organizations by adoption rate (with their rates and user counts)
      - Bottom 3 organizations by adoption rate
-   - Brief annotation on what distinguishes leading and lagging groups
+   - Brief annotation on observed usage differences and relevant coverage/context
+   - Adoption differences do not establish productivity or employee performance
 
    SLIDE 11: ROI summary (if Copilot_Assisted_Hours is available)
    - Average weekly assisted hours and the approved realisation factor
@@ -170,9 +178,25 @@ SLIDE DECK GENERATION
    - Use a consistent color palette across all charts
    - Keep text concise and use bullet points
    - Every chart must have a clear title and takeaway annotation
+   - Slide titles should state the specific finding and its important qualification
+   - One question may use two tables or several related charts on one slide when readable
+   - Keep exact windows, bases, denominator and material caveats visible
+   - Retain complete eligible supporting tables in an indexed appendix when condensing
+   - Use stable colours and common scales for like-for-like panels; label intentional differences
    - Number all slides
 
 9. Save the deck as "copilot_adoption_deck_YYYYMMDD.pptx".
+   For an existing user-edited deck, work from a recoverable live snapshot and an
+   unused candidate path. Preserve unrelated manual edits and compare retained
+   content before publishing. Refresh affected contents, footers, links and notes.
+   Recheck the live source before replacement, retain a rollback and verify the
+   persisted file. Remove only resolved comments after their changes pass checks.
+
+10. Verify numerical consistency, privacy and rendering independently. Check
+    chart caches and embedded workbooks as well as visible labels. Open and inspect
+    the actual PPTX where a compatible renderer is available, fix clipping/wrapping
+    and re-render affected slides. XML/ZIP validity alone is insufficient.
+    If visual verification cannot run, label it unavailable rather than approved.
 
 IMPORTANT NOTES
 - Recipients must be able to modify charts and update their data. Use native editable PowerPoint chart objects wherever supported, and identify any image fallback described in step 7.
@@ -207,5 +231,7 @@ Inspect installed package versions, signatures and return types; separate execut
 - **Agent pastes images instead of creating native charts.** This is the most common failure. Verify that charts are editable by opening the .pptx and clicking on a chart. You should be able to edit the data. If the agent falls back to images, explicitly instruct it to use `mschart` (R) or chart objects in `python-pptx` (Python).
 - **Agent uses an R/Python to HTML to PPTX conversion pipeline.** This produces image-based slides, not native charts. The agent should create the .pptx directly using the PowerPoint package.
 - **Chart types not supported.** Some chart types (for example heatmaps) may not be available as native PowerPoint charts. The agent should substitute with a table or the closest available chart type.
-- **Slide layout is cluttered.** Review the deck for readability. Each slide should convey one main point. If a slide has too much content, ask the agent to split it.
+- **Slide layout is cluttered or fragmented.** Organise each slide around one question. Combine related comparisons where readable, or paginate/simplify if crowded. Keep supporting detail in an indexed appendix rather than deleting it or shrinking text excessively.
+- **A revision overwrites manual edits or leaves stale chart data.** Snapshot the current live deck and use a candidate. Verify unchanged content and both cached/embedded data. Stop on concurrent content changes and rebase before publishing. Delete only verified resolved comments.
+- **The file opens but the slide is unreadable.** Render and inspect actual chart labels, legends, wrapping and footnotes. Record visual verification separately from numerical and privacy checks.
 - **Agent does not handle missing metrics gracefully.** If `Copilot_Assisted_Hours` or other optional metrics are not in the data, the agent should skip those slides rather than error.

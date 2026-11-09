@@ -112,6 +112,7 @@ everything:
 | `reference/analysis-conventions.md` | To write honest, defensible claims (association vs causation), segment definitions, and period framing. |
 | `reference/usage-archetypes.md` | Experimental usage archetypes (Consistency, Surface mix, Metered use): reference rule v1, evidence states, context record, sensitivity diagnostics, publication and governance rules. Descriptive only. |
 | `reference/deliverables.md` | To build a standard deliverable (adoption dashboard, executive summary, ROI estimate, usage segmentation) when there is no Frontier Analytics prompt card for the task, or the user wants a faster first pass. |
+| `reference/report-verification.md` | Evidence ledgers, commentary-led reporting, compact comparison panels and preservation-first revisions of a user-edited publication. |
 | `reference/ecosystem.md` | The canonical upstream: package docs, the sample-code repo, and the Frontier Analytics toolkit to defer to. |
 | `reference/environment.md` | Practical run tips: performant loads, headless plotting, script-file vs inline execution. |
 
