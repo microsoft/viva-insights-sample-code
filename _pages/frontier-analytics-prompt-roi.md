@@ -103,7 +103,7 @@ Confirm the query scope, configured grouping and measurement windows before esti
 5. Print: total persons, licensed persons, active persons (ever active), date range.
 
 TIME SAVINGS ESTIMATION
-5. For each active person-week, extract verified Copilot_Assisted_Hours as assisted time, not measured savings. Potential hours saved = assisted hours × approved REALISATION_FACTOR. If unavailable, propose a documented proxy and conversion for approval or omit the estimate (Copilot_Summarized_Hours is the closest candidate where present); do not invent hours from actions or credits. Use potential hours saved in the following calculations and label them as scenarios.
+5. For each active person-week, use verified Copilot_Assisted_Hours as assisted time, not measured savings. Potential hours saved = assisted hours × approved REALISATION_FACTOR. If Copilot_Assisted_Hours is null despite positive licence or activity evidence, inspect the field definition and source joins; withhold affected estimates until resolved. If the field is unavailable, propose a documented proxy and conversion for approval; do not infer hours from actions or credits. Label potential savings as scenarios.
 6. Compute scenario potential time savings, keeping observed assisted hours separate:
    a. Mean potential hours saved per active person-week over the last ANALYSIS_WEEKS complete configured weeks.
    b. Median potential hours saved per active person-week.

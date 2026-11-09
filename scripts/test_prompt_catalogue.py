@@ -45,6 +45,12 @@ class PromptGenerationTests(unittest.TestCase):
             with self.subTest(instruction=instruction):
                 self.assertIn(instruction, source)
 
+    def test_roi_prompt_resolves_null_assisted_hours_before_proxying(self):
+        source = (metadata.PROMPTS_DIR / "copilot-adoption/roi-estimation.md").read_text(encoding="utf-8")
+        self.assertIn("If Copilot_Assisted_Hours is null despite positive licence or activity evidence", source)
+        self.assertIn("withhold affected estimates until resolved", source)
+        self.assertIn("propose a documented proxy and conversion for approval", source)
+
     def test_multiple_prompts_liquid_and_code_links_are_literal(self):
         body = """# Example
 
