@@ -6,7 +6,11 @@ so they need no customer data and produce no privacy risk. Each
 concept is provided as a matched pair: one Python script under `python/` and the
 equivalent R script under `r/`.
 
-All scripts were verified to run end-to-end (exit 0) against R `vivainsights`
+The additional `merge_meeting_exports.py` helper is Python-only and uses
+synthetic fixtures in `test_merge_meeting_exports.py`. It performs an optional
+in-memory historical reconstruction, not a production file merge.
+
+Examples 1 to 5 were originally verified end-to-end (exit 0) against R `vivainsights`
 0.7.0.9000 and Python `vivainsights` 0.4.2. Example 6 was verified with R 4.6.1
 (base R only) and Python 3.14 with `pandas` 3.0.5.
 
@@ -99,3 +103,26 @@ and R `vivainsights` 0.7.2. From the repository root, run
 `Rscript scripts/test_segmentation.R` for native unlicensed nulls, unknown-history,
 calendar-gap and eligible-zero regression fixtures. These are sample-workflow tests, not a
 general real-export calendar completion or join adapter.
+
+## Optional Meeting Query merge
+
+Read [Meeting Query specifics](../reference/meeting-query.md) before using
+`merge_mq(old, new, attribute_columns=...)`. The caller must confirm comparable
+export settings and keys and normalise the schemas explicitly. The helper keeps
+the full raw ID union, prefers an older quality-passing row only when the newer
+row fails, refuses populated HR conflicts and backfills blanks from the other
+vintage. It returns an aggregate audit with selection and backfill sources.
+This preference can change attendance totals, so compare a newest-only sensitivity.
+
+From the skill directory:
+
+```powershell
+python -B examples\test_merge_meeting_exports.py
+```
+
+Tests cover selection, all seven quality rules, missing inputs, blank tokens,
+both backfill directions, conflicts, schema/key/timestamp failures, empty inputs
+and input preservation. No customer data or output files are used. The helper
+and tests were executed with Python `vivainsights` 0.4.3 and `pandas` 3.0.5
+installed. The helper itself uses only `pandas` and `numpy`.
+The repository's `scripts/test_skill_references.py` also runs these regressions.

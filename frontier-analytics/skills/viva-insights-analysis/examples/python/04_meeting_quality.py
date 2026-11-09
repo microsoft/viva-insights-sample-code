@@ -1,9 +1,9 @@
 """
 Example 4 - Meeting Query quality filter.
 
-Roughly half of raw Meeting Query rows are not real collaborative meetings
-(personal holds, all-day markers, cancelled items, huge broadcasts). This shows
-the generalised quality filter and a per-rule attrition table.
+Raw Meeting Query rows can include personal holds, all-day markers, cancelled
+items and broadcasts. This shows a generalised quality filter and a per-rule
+attrition table. Exclusion rates depend on the export and analytical question.
 
 Note: the built-in mt_data sample is small and synthetic, so very few rows
 survive the strict filter. The point here is the filter mechanics and the
@@ -17,6 +17,7 @@ import vivainsights as vi
 mt = vi.load_mt_data()
 n0 = len(mt)
 
+# Sample flags are boolean. Parse real-export text explicitly before filtering.
 # Per-rule attrition: how many rows each rule would remove on its own.
 rules = {
     "attendees < 2":            mt["Number_of_attendees"] < 2,

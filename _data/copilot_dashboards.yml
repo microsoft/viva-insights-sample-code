@@ -1,16 +1,30 @@
 - slug: business-leaders-ai-usage
   name: Business Leaders AI Usage
   summary: Who is using AI, how much, and how does usage vary over time and across groups?
+  guide: /copilot-dashboards/business-leaders-ai-usage/
+  image: /assets/images/reports/business-leaders-ai-overview.png
+  image_alt: Synthetic Business Leaders AI Usage overview with cross-service reach and weekly trends
   demo: /examples/utility-r/business-leaders-ai-adoption.html
   source: https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/business-leaders-ai-adoption.Rmd
   requirements: https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-github-demo-reports.md#business-leaders-ai-usage
   inputs: Person, M365 Copilot, Cowork, Agent, Consumption and GitHub Copilot fixtures.
   scope: Explore four, eight or thirteen weeks by organisation, function and team. Reach counts distinct people across sources; recorded usage is per person per week across the full roster, including non-users.
   limitation: This is a synthetic reference, not a verified real-export adapter. Coverage is limited to observed usage within the Person Query roster. M365 Copilot credits and GitHub AI credits remain separate; descriptive comparisons do not establish causation.
+  packages: [dplyr, tidyr, jsonlite, knitr, rmarkdown]
+  command: Rscript examples\utility-r\render-business-leaders-ai.R
+  output: examples\utility-r\business-leaders-ai-adoption.html, a self-contained HTML file with four-, eight- and thirteen-week views, group comparisons and separate product credit rates.
+  real_support: Synthetic reference only. A real-data adaptation needs a separately implemented and verified mapping, coverage assessment and disclosure review.
+  prompt: >-
+    Reproduce the synthetic Business Leaders AI Usage report from my local
+    viva-insights-sample-code checkout at [path]. Read its rendering guide
+    and use render-business-leaders-ai.R, not the dashboard Skill runner.
+    Check dependencies first and ask before installing them. Save to a fresh
+    output HTML path and report the command, validation and coverage limits.
 
 - slug: copilot-consumption-and-ways-of-working
   name: Copilot Consumption and Ways of Working
   summary: How is Copilot consumed, and how does consumption relate to collaboration?
+  guide: /copilot-dashboards/copilot-consumption-and-ways-of-working/
   image: /assets/images/reports/copilot-consumption-overview.png
   image_alt: Consumption report overview preview
   demo: /examples/utility-r/copilot-consumption-ways-of-working-simulation.html
@@ -20,10 +34,23 @@
   inputs: Five fixture files across Person, Consumption and GitHub queries; GitHub breakdown files are not used.
   scope: Separate credit volume from cost per session, explore concentration and heavy-user patterns, and compare services, organisations and functions in a seven-page report.
   limitation: The real-v1 runner supports only M365 credits from Consumption activity and matching people metadata, with explicit mapping approval. Sessions, Person Query associations and GitHub panels are not implemented by that adapter. Credit intensity does not measure value or quality.
+  packages: [jsonlite, rmarkdown, flexdashboard, dplyr, tidyr, ggplot2, scales, knitr, stringr, vivainsights, ggrepel]
+  command: Rscript frontier-analytics\starter-kits\copilot-query-dashboard\dashboard.R reproduce frontier-analytics\starter-kits\copilot-query-dashboard\configs\demo-consumption.json
+  output: A seven-page synthetic HTML report, provenance.json and an isolated working copy under the configured output_dir\reproduce folder outside the repository.
+  real_support: M365 credits by period and service, with optional grouping when the metadata supports it. Inspect the activity and matching people metadata first, approve exact mappings and confirm spending-policy additivity when required.
+  prompt: >-
+    Use the Copilot query dashboards Skill to reproduce the synthetic Consumption
+    demo. My checkout is at [path]. Check dependencies before rendering and
+    ask before installing them. Use a fresh private output directory, preserve
+    the reference files, and return the HTML location, configuration,
+    provenance and validation summary. Explain which demo panels are excluded
+    from the real M365 credits-only adapter.
+  skill: viva-insights-copilot-dashboards
 
 - slug: developer-experience-and-copilot
   name: Developer Experience and Copilot
   summary: What do developer working conditions and joint Copilot use look like?
+  guide: /copilot-dashboards/developer-experience-and-copilot/
   image: /assets/images/reports/github-copilot-devex-overview.png
   image_alt: Developer experience report heavy GitHub Copilot user overview preview
   demo: /examples/utility-r/github-copilot-developer-productivity-simulation.html
@@ -33,3 +60,16 @@
   inputs: Person, GitHub and Consumption fixtures, including GitHub feature, model and language breakdowns.
   scope: Compare collaboration, focus, after-hours activity and network breadth across three GitHub-intensity groups. Explore joint M365 and GitHub use while keeping observation and eligibility gaps visible.
   limitation: No verified real GitHub dashboard adapter is supplied. Synthetic breakdown allocations are not verified real-export semantics. Acceptance rate is not code quality, after-hours activity is not burnout, and calendar space does not establish coding time.
+  packages: [jsonlite, rmarkdown, flexdashboard, dplyr, tidyr, ggplot2, scales, knitr, stringr, vivainsights]
+  command: Rscript frontier-analytics\starter-kits\copilot-query-dashboard\dashboard.R reproduce frontier-analytics\starter-kits\copilot-query-dashboard\configs\demo-github.json
+  output: A self-contained synthetic HTML report with Overview, Collaboration, Focus, After-hours, Network and additional breakdowns, plus provenance.json and isolated work files under output_dir\reproduce.
+  real_support: Readiness inspection only. The runner does not build this dashboard from real GitHub exports. Missing observation must not be relabelled as zero use or as lack of provisioning.
+  prompt: >-
+    Use the Copilot query dashboards Skill to reproduce the synthetic Developer
+    Experience demo. My checkout is at [path]. Check dependencies and ask
+    before installing them. Use a fresh private output directory and return
+    the HTML location, configuration, provenance and validation summary.
+    Keep the GitHub observation limits and privacy gates visible. If I later
+    supply real exports, inspect readiness only because no verified real
+    GitHub build adapter is supplied.
+  skill: viva-insights-copilot-dashboards

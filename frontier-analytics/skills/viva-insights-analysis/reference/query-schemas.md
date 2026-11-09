@@ -71,13 +71,17 @@ Notes:
 
 ## Meeting Query anatomy and the quality filter
 
-A Meeting Query row is a calendar item, and roughly **half of raw rows are not
-real collaborative meetings** (personal blocks, holds, all-day markers,
-cancelled items, huge broadcasts). Apply a quality filter before any analysis.
+A Meeting Query row is a calendar item. Personal blocks, holds, all-day markers,
+cancelled items and broadcasts can require exclusion, depending on the question.
+Apply and report a reviewed quality filter before interpreting meeting metrics.
+Do not assume a universal exclusion rate.
 
 Key columns (imported names): `MeetingId`, `Subject`, `Number_of_attendees`,
 `Intended_participant_count`, `Attendee_meeting_hours`, `Duration` (where
-present), `Cancelled`, `All_Day_Meeting`, `Recurring`.
+present), `Cancelled`, `All_Day_Meeting`, `Recurring`. Depending on query
+configuration, exports also include `Organizer`, `Collaboration_start_time`,
+behavioural attendee counts and RSVP counts. Organisational attributes describe
+the organiser, not the attendees.
 
 **Generalised meeting quality filter** (adapt thresholds to the engagement):
 
@@ -115,6 +119,12 @@ one place rather than inlining it repeatedly. Beware legitimate business terms
 that look like noise in context (for example "flight" in a training programme
 name, or a client name that matches a travel word), so review matches before
 dropping.
+
+See [Meeting Query specifics](meeting-query.md) for organiser attribution,
+behavioural shares, subject privacy, coverage checks and overlapping-export
+reconstruction. Its optional merge helper requires `Duration` and explicitly
+normalised booleans. Missing quality inputs fail its analysis filter but remain
+in the raw union.
 
 ## Network query anatomy
 

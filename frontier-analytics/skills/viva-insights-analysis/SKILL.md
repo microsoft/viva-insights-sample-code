@@ -105,8 +105,10 @@ everything:
 | [Joining Viva Insights queries](https://microsoft.github.io/viva-insights-sample-code/query-join-guide/) | Current Person, Consumption, GitHub and Agent integration. This guide and its downloadable JSON take precedence over older references. Recommend weekly exports and use its complete-data and omitted-inactivity defaults within each supplied query's scope. |
 | `reference/packages.md` | The function inventory, grouped by purpose, with R/Python parity and verified signatures. A curated complement to the live `llms.txt` (see above). |
 | `reference/query-schemas.md` | The shape of each query type (grain, key columns, raw vs imported column names) and the meeting quality filter. |
+| `reference/meeting-query.md` | Meeting Query organiser attribution, attendee hours, behavioural shares, subject handling, coverage and an optional audited overlapping-export merge. |
 | `reference/copilot-query-contracts.md` | Historical layouts, synthetic-demo assumptions and analytical context. It defers to the current query join guide for integration and does not extend dashboard runner capabilities. |
 | `reference/data-pitfalls.md` | To diagnose or pre-empt a loading / aggregation problem (IsManager, "#N/A", locales, privacy threshold, trailing windows, holidays). |
+| `reference/cross-query-diagnostics.md` | Missing organisational attributes, optional population and rerun comparisons, weighting, dated versus latest labels and evidence preservation. The shared policy and current join guide still govern missing activity. |
 | `reference/analysis-conventions.md` | To write honest, defensible claims (association vs causation), segment definitions, and period framing. |
 | `reference/usage-archetypes.md` | Experimental usage archetypes (Consistency, Surface mix, Metered use): reference rule v1, evidence states, context record, sensitivity diagnostics, publication and governance rules. Descriptive only. |
 | `reference/deliverables.md` | To build a standard deliverable (adoption dashboard, executive summary, ROI estimate, usage segmentation) when there is no Frontier Analytics prompt card for the task, or the user wants a faster first pass. |
@@ -121,6 +123,8 @@ built-in sample datasets (no customer data), each verified end-to-end. See
 ranking, Copilot usage segmentation, the Meeting Query quality filter, and
 person-to-person network analysis. Example 6 applies the experimental usage
 archetypes to a seeded synthetic panel generated in the script.
+An additional in-memory Meeting Query merge helper has synthetic regression
+tests. It is not a production file merger or a cross-query join adapter.
 
 ## Minimal workflow
 

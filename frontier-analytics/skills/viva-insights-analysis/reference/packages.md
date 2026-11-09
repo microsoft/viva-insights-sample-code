@@ -8,8 +8,9 @@
 > this file for the grouped context (wrapper families, sample-dataset shapes,
 > export/theming) it doesn't cover. See `ecosystem.md`.
 
-Grouped by purpose. Function names verified against **R `vivainsights` 0.7.0.9000**
-(~156 exported objects) and **Python `vivainsights` 0.4.2** (~74 exported objects).
+Grouped by purpose. Inventory checked against **R `vivainsights` 0.7.2**
+(153 exported objects) and **Python `vivainsights` 0.4.3** (85 public names).
+These counts do not establish that every recipe was executed on those versions.
 R is the fuller package. Where a Python equivalent exists it is noted, otherwise
 assume R-only.
 
@@ -140,7 +141,7 @@ There is no Python equivalent, so replicate with a standard NLP stack if needed.
 | Group-to-group network | `g2g_data` | `load_g2g_data()`, `g2g_data` |
 | Person-to-group network | N/A | `load_p2g_data()`, `p2g_data` |
 
-Verified shapes (current versions): the Python `load_pq_data()` returns ~10,500
+Verified shapes (versions above): the Python `load_pq_data()` returns ~10,500
 person-weeks x 73 cols and the R `pq_data` ~6,900 x 73 (the two packages ship
 slightly different samples). `mt_data` is ~612 rows x 41 cols in both. Use them
 for every worked example, doc snippet, and test.

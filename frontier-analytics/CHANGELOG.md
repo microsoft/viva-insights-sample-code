@@ -8,6 +8,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Standalone guides for Business Leaders AI Usage, Consumption and Ways of
+  Working, and Developer Experience, with query requirements, screenshots,
+  expected outputs and rendering commands. Dashboard navigation now opens
+  these guides, and the shorter catalogue retains direct demo access.
+- A coding-agent quick start recommending the core analysis Skill, and fuller
+  dashboard setup dialogs with report-specific commands, starter prompts and
+  explicit real-data support limits. Playwright captures the Business Leaders
+  overview and collaboration previews.
+- Meeting Query and cross-query diagnostic references reconciled with the
+  installed analysis Skill, preserving the repository's stronger shared policy.
+  Includes an audited, optional overlapping-export merge example with synthetic
+  regression tests, corrected attendee-hours guidance and reviewed missing-HR
+  diagnostics.
+
 - Deterministic generation of prompt site pages and catalogue from canonical
   prompt cards, with shared routing metadata, preserved URLs/anchors and literal
   fenced prompts. Shared policy and workflow-support references also generate

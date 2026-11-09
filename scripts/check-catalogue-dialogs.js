@@ -191,19 +191,28 @@ const server = http.createServer(async (request, response) => {
       const navToggle = page.getByRole('button', { name: 'Toggle navigation' });
       if (await navToggle.isVisible()) await navToggle.click();
       await page.locator('[aria-controls="vi-mega-copilot"]').click();
-      const navDemo = page.locator('#vi-mega-copilot a', { hasText: 'Business Leaders AI Usage' });
-      await navDemo.focus();
+      const navGuideLink = page.locator('#vi-mega-copilot a', { hasText: 'Business Leaders AI Usage' });
+      await navGuideLink.focus();
       await page.keyboard.press('Enter');
-      await page.waitForURL(base + 'examples/utility-r/business-leaders-ai-adoption.html');
-      assert.equal(await page.title(), 'Business Leaders AI Usage');
-      assert.equal(await page.getByRole('heading', { name: 'AI usage across your organisation' }).isVisible(), true);
+      await page.waitForURL(base + 'copilot-dashboards/business-leaders-ai-usage/');
+      assert.equal(await page.getByRole('heading', { name: 'Business Leaders AI Usage', exact: true }).isVisible(), true);
+      assert.equal(await page.locator('#you-will-need').count(), 1);
       for (const pathname of ['copilot/', 'copilot-dashboards/', 'frontier-analytics/']) {
         await page.goto(base + pathname, { waitUntil: 'load' });
         assert.equal(await page.locator('.dashboard-card').count(), 3);
         assert.equal(await page.locator('[data-dashboard-details]').count(), 0);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
-        const navDemo = page.locator('#vi-mega-copilot a', { hasText: 'Business Leaders AI Usage' });
-        assert.equal(await navDemo.getAttribute('href'), prefix + 'examples/utility-r/business-leaders-ai-adoption.html');
+        const navGuide = page.locator('#vi-mega-copilot a', { hasText: 'Business Leaders AI Usage' });
+        assert.equal(await navGuide.getAttribute('href'), prefix + 'copilot-dashboards/business-leaders-ai-usage/');
+        assert.equal(await page.locator('.dashboard-card img').count(), 3);
+        for (const card of await page.locator('.dashboard-card').all()) {
+          const slug = await card.getAttribute('id');
+          const guidePath = prefix + 'copilot-dashboards/' + slug + '/';
+          assert.equal(await card.getByRole('link', { name: /^Full guide/ }).getAttribute('href'), guidePath);
+          for (const menu of ['copilot', 'frontier']) {
+            assert.equal(await page.locator(`#vi-mega-${menu} a[href="${guidePath}"]`).count(), 1);
+          }
+        }
         for (const trigger of await page.locator('[data-dashboard-open]').all()) {
           const slug = await trigger.getAttribute('data-dashboard-open');
           await trigger.focus();
@@ -215,6 +224,14 @@ const server = http.createServer(async (request, response) => {
           assert.equal(await dialog.getByRole('link', { name: 'View demo', exact: true }).count(), 1);
           assert.equal(await dialog.getByRole('link', { name: 'Get source', exact: true }).count(), 1);
           assert.equal(await dialog.getByRole('link', { name: 'Rendering and input requirements' }).count(), 1);
+          assert.match(await dialog.innerText(), /Expected output:/);
+          assert.match(await dialog.innerText(), /Using real exports:/);
+          assert.match(await dialog.innerText(), /Work with a coding agent/);
+          assert.match(await dialog.locator('pre').first().innerText(), /git clone/);
+          assert.match(await dialog.locator('pre').nth(1).innerText(), /install\.packages\(c\('(?:\w+', ')*\w+'\)/);
+          assert.match(await dialog.locator('pre').nth(2).innerText(), /Rscript.*(?:render-business-leaders-ai|reproduce)/);
+          assert.ok(await dialog.locator('pre').count() >= 4);
+          assert.equal(await dialog.evaluate((element) => element.scrollWidth <= element.clientWidth), true);
           for (const link of await dialog.locator('a').all()) {
             const url = new URL(await link.getAttribute('href'), base);
             if (url.origin !== origin) continue;
@@ -248,25 +265,27 @@ const server = http.createServer(async (request, response) => {
         if (pathname === 'copilot-dashboards/') {
           for (const trigger of await page.locator('[data-dashboard-open]').all()) {
             const slug = await trigger.getAttribute('data-dashboard-open');
-            for (const [label, id] of [
-              ['Full dashboard details and caveats', slug],
-              ['Setup guide', 'build-with-your-own-data'],
-            ]) {
-              await trigger.click();
-              await page.locator('.dashboard-dialog[open]').getByRole('link', { name: label, exact: true }).click();
-              await page.waitForFunction((id) =>
-                !document.querySelector('.dashboard-dialog[open]') &&
-                location.hash === '#' + id && document.activeElement.id === id, id);
-              await page.waitForFunction((id) => {
-                const bounds = document.getElementById(id).getBoundingClientRect();
-                const navBottom = document.querySelector('.vi-nav').getBoundingClientRect().bottom;
-                return bounds.top >= navBottom - 1 && bounds.bottom <= innerHeight + 1;
-              }, id).catch(async (error) => {
-                console.error('Guidance destination is outside the viewport:', { width, id },
-                  await page.locator('#' + id).boundingBox());
-                throw error;
-              });
+            await trigger.click();
+            await page.locator('.dashboard-dialog[open]').getByRole('link', { name: 'Full dashboard details and caveats', exact: true }).click();
+            await page.waitForURL(base + 'copilot-dashboards/' + slug + '/');
+            assert.equal(await page.locator('h1').count(), 1);
+            assert.equal(await page.locator('#you-will-need').count(), 1);
+            assert.ok(await page.locator('.vi-page-body img').count() >= 2);
+            assert.ok(await page.locator('.vi-page-body pre').count() >= 2);
+            assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+            for (const image of await page.locator('.vi-page-body img').all()) {
+              await image.scrollIntoViewIfNeeded();
+              await image.evaluate((img) => img.decode());
+              assert.equal(await image.evaluate((img) => img.complete && img.naturalWidth > 0), true);
             }
+            for (const link of await page.locator('.vi-page-body a').all()) {
+              const url = new URL(await link.getAttribute('href'), base);
+              if (url.origin !== origin) continue;
+              const response = await context.request.get(url.href);
+              assert.equal(response.status(), 200, 'Guide link must resolve: ' + url.href);
+              if (url.hash) assert.ok((await response.text()).includes(`id="${url.hash.slice(1)}"`), url.href);
+            }
+            await page.goto(base + 'copilot-dashboards/', { waitUntil: 'load' });
           }
         }
       }
@@ -275,8 +294,8 @@ const server = http.createServer(async (request, response) => {
     await page.goto(base + 'copilot-dashboards/#dashboard-business-leaders-ai-usage', { waitUntil: 'load' });
     await page.waitForSelector('.dashboard-dialog[open]');
     await page.locator('.dashboard-dialog[open]').getByRole('link', { name: 'Full dashboard details and caveats' }).click();
-    await page.waitForFunction(() => !document.querySelector('.dashboard-dialog[open]') && location.hash === '#business-leaders-ai-usage');
-    assert.equal(await page.locator('#business-leaders-ai-usage').isVisible(), true);
+    await page.waitForURL(base + 'copilot-dashboards/business-leaders-ai-usage/');
+    assert.equal(await page.locator('#you-will-need').isVisible(), true);
 
     for (const disabled of ['javascript', 'dialog']) {
       const fallback = await browser.newContext({ javaScriptEnabled: disabled !== 'javascript', viewport: { width: 320, height: 720 } });

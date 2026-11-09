@@ -2,13 +2,14 @@
 <div class="dashboard-catalogue">
   <div class="dashboard-grid">
     {% for dashboard in site.data.copilot_dashboards %}
-    <article class="dashboard-card" aria-labelledby="dashboard-card-{{ dashboard.slug }}">
+    <article class="dashboard-card" id="{{ dashboard.slug }}" aria-labelledby="dashboard-card-{{ dashboard.slug }}">
       {% if dashboard.image %}
       <img src="{{ dashboard.image | relative_url }}" alt="{{ dashboard.image_alt }}" loading="lazy">
       {% endif %}
       <p class="dashboard-badge">Synthetic data · R template</p>
       <h3 id="dashboard-card-{{ dashboard.slug }}">{{ dashboard.name }}</h3>
       <p>{{ dashboard.summary }}</p>
+      <a href="{{ dashboard.guide | relative_url }}">Full guide<span class="vi-sr-only"> for {{ dashboard.name }}</span></a>
       <a class="dashboard-start" href="#dashboard-{{ dashboard.slug }}" data-dashboard-open="{{ dashboard.slug }}">Start using<span class="vi-sr-only"> {{ dashboard.name }}</span></a>
     </article>
     {% endfor %}
@@ -27,15 +28,42 @@
       <h4>Start using</h4>
       <ol>
         <li>Open the synthetic demo in your browser. No installation is required.</li>
-        <li>To render the source, install R, Pandoc, R Markdown, flexdashboard and the packages listed in the requirements. Keep the repository folder structure and render the synthetic example first.</li>
-        <li>Before adapting or sharing a report, verify input coverage and your organisation's privacy requirements. Do not include customer exports in this repository or shareable HTML.</li>
+        <li>To render it locally, clone the whole repository so that the source, helpers and synthetic fixtures stay together. You will need Git, R and Pandoc (also supplied with RStudio).</li>
       </ol>
+      <pre><code>git clone https://github.com/microsoft/viva-insights-sample-code.git
+cd viva-insights-sample-code</code></pre>
+      <p><strong>R packages:</strong> {{ dashboard.packages | join: ", " }}. Install missing packages from your approved package source. For CRAN:</p>
+      <pre><code>Rscript -e "install.packages(c('{{ dashboard.packages | join: "', '" }}'), repos='https://cloud.r-project.org')"
+Rscript -e "stopifnot(rmarkdown::pandoc_available())"</code></pre>
+      <p>Run this from the repository root in a terminal:</p>
+      <pre><code>{{ dashboard.command | escape }}</code></pre>
+      {% if dashboard.skill %}
+      <p>The demo configuration selects an output folder outside the checkout. Choose a fresh folder if it already exists. The runner refuses to overwrite a previous run.</p>
+      {% endif %}
+      <p><strong>Expected output:</strong> {{ dashboard.output }}</p>
       <p><strong>Demo inputs:</strong> {{ dashboard.inputs }}</p>
+      <p><strong>Using real exports:</strong> {{ dashboard.real_support }}</p>
+      <h4>Work with a coding agent</h4>
+      {% if dashboard.skill %}
+      {% assign dashboard_skill = site.data.agent_skills | where: "slug", dashboard.skill | first %}
+      <p>Install the dashboard and analysis Skills from the same checkout. Keep the checkout because the Skill runs its R code.</p>
+      {% for step in dashboard_skill.steps %}
+      {% if step.command and forloop.index == 2 %}
+      <p>From the parent folder containing your checkout:</p>
+      <pre><code>{{ step.command | escape }}</code></pre>
+      {% endif %}
+      {% endfor %}
+      <p>Reload the Skills in your agent, then replace <code>[path]</code> in this starter prompt:</p>
+      {% else %}
+      <p>This report is not supported by the optional dashboard Skill runner. Ask your agent to use the dedicated renderer with this prompt:</p>
+      {% endif %}
+      <pre><code>{{ dashboard.prompt | escape }}</code></pre>
       <p><strong>Capability and interpretation:</strong> {{ dashboard.limitation }}</p>
+      <p><strong>Before sharing:</strong> review coverage and your organisation's privacy requirements, including data embedded in the HTML. Keep customer exports outside this repository.</p>
       {% if dashboard.journey %}
       <p><a href="{{ dashboard.journey | relative_url }}">Build or customise with AI</a></p>
       {% endif %}
-      <p><a href="{{ '/copilot-dashboards/' | relative_url }}#{{ dashboard.slug }}">Full dashboard details and caveats</a> · <a href="{{ '/copilot-dashboards/' | relative_url }}#build-with-your-own-data">Setup guide</a> · <a href="{{ '/query-join-guide/' | relative_url }}">Query setup and joins</a></p>
+      <p><a href="{{ dashboard.guide | relative_url }}">Full dashboard details and caveats</a> · <a href="{{ dashboard.guide | relative_url }}#you-will-need">Query and setup requirements</a> · <a href="{{ '/query-join-guide/' | relative_url }}">Query setup and joins</a></p>
     </section>
     {% endfor %}
   </div>

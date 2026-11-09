@@ -19,6 +19,40 @@ limitations before sharing the output.
 
 ---
 
+## Quick start with a coding agent
+
+Start with the [Viva Insights analysis Skill]({{ site.baseurl }}/frontier-analytics-skills/#skill-viva-insights-analysis).
+It helps your agent choose functions from the **vivainsights R or Python
+package**, check export quality and apply the shared analytical conventions.
+You still need the chosen language and package installed.
+
+1. **Install the whole Skill folder**, including its references and examples.
+   The linked Skill panel includes installation commands.
+2. **Open an approved coding agent** in a private working folder with your
+   export. Keep employee data outside this public sample repository and use
+   an agent approved by your organisation for that data.
+3. **Start with validation.** Paste the following, replacing the file location
+   and choosing R or Python:
+
+```text
+Use the Viva Insights analysis Skill with the vivainsights Python package.
+My Person Query CSV is at [local file path]. Inspect its columns, confirm
+the query cadence and date range, and report data-quality issues first.
+Use existing package functions where available. Do not publish individual
+results or groups below the applicable privacy minimum.
+Then propose an analysis of Copilot usage by organisation for my review.
+```
+
+For R, replace "Python package" with "R package". The Skill selects suitable
+package functions, but does not install dependencies or certify the output.
+Check the validation summary and proposed scope before proceeding.
+For the supplied Consumption or Developer Experience templates, use the
+[Copilot query dashboards Skill]({{ site.baseurl }}/frontier-analytics-skills/#skill-viva-insights-copilot-dashboards)
+alongside the analysis Skill. Business Leaders currently has its own
+[rendering guide]({{ site.baseurl }}/copilot-dashboards/business-leaders-ai-usage/).
+
+---
+
 ## Which asset should I use?
 
 Frontier offers three ways to bring this work into a coding agent. Pick a card to jump straight to what you need, or use the comparison below.

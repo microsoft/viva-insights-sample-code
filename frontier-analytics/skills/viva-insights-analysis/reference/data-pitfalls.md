@@ -231,7 +231,7 @@ pq |>
 
 - [ ] Loaded with `import_query()` so columns are underscore-named?
 - [ ] `IsManager` and other Yes/No flags normalised?
-- [ ] `"#N/A"` strings filtered from HR attributes?
+- [ ] Literal HR missing-value tokens identified, with affected rows retained for coverage diagnostics?
 - [ ] Locale/encoding handled if headers are accented?
 - [ ] `mingroup` >= agreed privacy threshold everywhere?
 - [ ] Trailing-window plateaus not misread as change?
@@ -239,3 +239,5 @@ pq |>
 - [ ] Grain confirmed before aggregation?
 - [ ] Additivity checked separately from key uniqueness (multiple positive policy rows)?
 - [ ] Network stocks averaged rather than summed, with boundary-month windows checked?
+- [ ] Meeting organiser attribution, attendee hours and period coverage reviewed? See [Meeting Query specifics](meeting-query.md).
+- [ ] Missing HR and optional population/rerun comparisons investigated without automatic backfill? See [cross-query diagnostics](cross-query-diagnostics.md).

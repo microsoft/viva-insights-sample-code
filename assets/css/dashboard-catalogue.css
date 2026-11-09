@@ -37,6 +37,7 @@ a.dashboard-start:hover { background: var(--primary-h); }
 .dashboard-details { padding: 24px; margin-bottom: 24px; border: 1px solid var(--rule); border-radius: var(--radius-card); }
 .dashboard-details h3 { margin-top: 0; }
 .dashboard-details p, .dashboard-details li { line-height: 1.55; }
+.dashboard-details pre { white-space: pre-wrap; overflow-wrap: anywhere; }
 .dashboard-dialog {
   width: min(760px, calc(100% - 24px));
   max-width: none;

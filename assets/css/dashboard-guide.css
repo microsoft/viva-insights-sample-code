@@ -1,0 +1,44 @@
+.dashboard-guide .dashboard-query-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 1.1rem;
+  border: 1px solid #d5dce5;
+  border-radius: .75rem;
+  background: #f8fafc;
+}
+.dashboard-guide .dashboard-query-card img {
+  flex: 0 0 52px;
+}
+.dashboard-guide .dashboard-query-card h3 {
+  margin: 0 0 .4rem;
+  font-size: 1.1rem;
+}
+.dashboard-guide .dashboard-query-card p {
+  margin: 0 0 .5rem;
+  overflow-wrap: anywhere;
+}
+.dashboard-guide figure {
+  margin: 1.5rem 0;
+}
+.dashboard-guide figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #d5dce5;
+  border-radius: .5rem;
+}
+.dashboard-guide figcaption {
+  margin-top: .5rem;
+  color: #475569;
+  font-size: .9rem;
+}
+.dashboard-guide pre {
+  overflow-x: auto;
+}
+@media (max-width: 480px) {
+  .dashboard-guide .dashboard-query-card {
+    flex-direction: column;
+  }
+}

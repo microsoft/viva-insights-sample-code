@@ -1,0 +1,9 @@
+<section class="dashboard-query-card">
+  <img src="{{ '/assets/images/queries/' | append: include.icon | append: '.svg' | relative_url }}" alt="" width="52" height="52" loading="lazy">
+  <div>
+    <h3>{{ include.title | escape }}</h3>
+    <p>{{ include.description | escape }}</p>
+    <p><strong>Exports:</strong> {{ include.exports | escape }}</p>
+    <a href="{{ '/query-join-guide/' | relative_url }}#{{ include.anchor | escape }}">Query setup and schema</a>
+  </div>
+</section>

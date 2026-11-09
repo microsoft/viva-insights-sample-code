@@ -2,6 +2,8 @@
 
 import re
 import shutil
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -20,6 +22,13 @@ def mandatory_references(skill):
 
 
 class InstalledReferencesTests(unittest.TestCase):
+    def test_bundled_meeting_merge_regressions(self):
+        test = SKILLS / NAMES[0] / "examples" / "test_merge_meeting_exports.py"
+        result = subprocess.run(
+            [sys.executable, "-B", str(test)], capture_output=True, text=True
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_matched_R_segmentation_fixture_is_a_PR_gate(self):
         workflow = (ROOT / ".github" / "workflows" / "prompt-drift-check.yml").read_text(encoding="utf-8")
         self.assertIn("  pull_request:", workflow)

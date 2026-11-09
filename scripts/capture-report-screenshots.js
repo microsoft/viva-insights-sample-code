@@ -1,7 +1,8 @@
 // Regenerate the docs-site report screenshots from the rendered flexdashboards.
 //
 // Prerequisites (Playwright is not a committed dependency):
-//   npm install --no-save playwright
+//   npm install --prefix "$env:TEMP\vi-dashboard-browser-tools" --no-save playwright
+//   $env:NODE_PATH = "$env:TEMP\vi-dashboard-browser-tools\node_modules"
 //
 // Drives the system Microsoft Edge install via Playwright's `msedge` channel,
 // so no separate browser download is required.
@@ -9,8 +10,10 @@
 // Usage, from the repository root:
 //   node scripts/capture-report-screenshots.js
 //   node scripts/capture-report-screenshots.js --github-only
+//   node scripts/capture-report-screenshots.js --business-only
 //
-// Render both reports first, otherwise the screenshots capture stale charts:
+// Render the selected reports first if their source/data has changed:
+//   Rscript examples/utility-r/render-business-leaders-ai.R
 //   cd examples/utility-r
 //   Rscript -e "rmarkdown::render('copilot-consumption-ways-of-working-simulation.Rmd')"
 //   Rscript render-github-developer-experience.R
@@ -22,6 +25,16 @@ const UTILITY = path.join(REPO, 'examples', 'utility-r');
 const OUT = path.join(REPO, 'assets', 'images', 'reports');
 
 const SHOTS = [
+  {
+    html: 'business-leaders-ai-adoption.html',
+    section: 'overview',
+    file: 'business-leaders-ai-overview.png',
+  },
+  {
+    html: 'business-leaders-ai-adoption.html',
+    section: 'collaboration',
+    file: 'business-leaders-ai-collaboration.png',
+  },
   {
     html: 'copilot-consumption-ways-of-working-simulation.html',
     page: 'overview',
@@ -53,11 +66,28 @@ const SHOTS = [
     });
     const page = await context.newPage();
 
-    const shots = process.argv.includes('--github-only')
-      ? SHOTS.filter((shot) => shot.html.startsWith('github-')) : SHOTS;
+    const githubOnly = process.argv.includes('--github-only');
+    const businessOnly = process.argv.includes('--business-only');
+    if (githubOnly && businessOnly) throw new Error('Choose only one report filter.');
+    const shots = SHOTS.filter((shot) =>
+      (!githubOnly || shot.html.startsWith('github-')) &&
+      (!businessOnly || shot.html.startsWith('business-')));
     for (const shot of shots) {
       const url = 'file:///' + path.join(UTILITY, shot.html).replace(/\\/g, '/');
       await page.goto(url, { waitUntil: 'load' });
+      if (shot.section) {
+        await page.waitForSelector('#kpis .number');
+        await page.waitForSelector('#usage-trend svg');
+        await page.waitForSelector('#collab-credit-trend svg');
+        await page.emulateMedia({ reducedMotion: 'reduce' });
+        if (shot.section !== 'overview') {
+          await page.locator('#' + shot.section).evaluate((section) =>
+            window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY - 90, behavior: 'instant' }));
+        }
+        await page.screenshot({ path: path.join(OUT, shot.file) });
+        console.log(`captured ${shot.file}`);
+        continue;
+      }
       await page.waitForSelector('.navbar-nav a', { timeout: 60000 });
 
       const clicked = await page.evaluate((id) => {
