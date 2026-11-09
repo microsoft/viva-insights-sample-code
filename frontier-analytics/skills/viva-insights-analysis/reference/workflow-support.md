@@ -14,7 +14,7 @@ support is not proof of a real-data trial or an executed agent evaluation.
 | Person Query causal skill | Agent-guided design and readiness; bounded synthetic Python/base-R runners | Verified exposure/outcome windows; fabricated balanced continuous-outcome panels in bundled runners | Synthetic readiness and limited linear comparisons, not general real-data PPML, DML, bootstrap or quasi-experimental execution | Causal `examples/README.md` and `reference/evaluation.md`; historical evidence is bounded there |
 | Copilot Causal Toolkit | Separate prescribed notebook/DML workflow | Selected toolkit notebook, its fixed treatment, dependencies and design-specific input contract | Do not replace with or claim equivalence to the synthetic causal runner; inspect identification and actual notebook preprocessing before causal interpretation | Toolkit prompt and selected notebook's own diagnostics |
 | External-collaboration integration | Standalone schemas/examples only where documented; no general cross-query adapter | Source-specific keys, grain and privacy must be established | No inferred identity bridge or assumed compatible join | Relevant source schema and example, not another query's contract |
-| Live product / MCP access | Unsupported by this repository | Local exported files only in maintained workflows | MCP material is conceptual; no implemented live-product connector, server or credentials workflow | `mcp/README.md` in a full checkout |
+| Live product / MCP access | Unsupported by this repository | Local exported files only in maintained workflows | No MCP server, live-product connector or credentials workflow is supplied | Not applicable |
 
 ## Resolving references
 
@@ -38,7 +38,7 @@ analysis, dashboard, causal and DML workflows separate.
 These marked plain-text lists are authored here for generated skill cards.
 
 <!-- catalogue:viva-insights-analysis:start -->
-- Agent-guided local R/Python analysis, not a universal export adapter or live-product/MCP connector.
+- Agent-guided local R/Python analysis. Export layouts and installed APIs require verification for each workflow.
 - Verify installed APIs and generated outputs. Built-in and synthetic examples are not real-export validation.
 - Prefer enabled-user/enabled-days fields. Documented native licensed-only M365 Copilot nulls mean unlicensed. Failed joins remain unresolved. These licence semantics do not apply to unlicensed Copilot Chat or Consumption credits.
 - Use max(organisation requirement, workflow floor): generic 5, joined-query/dashboard/causal 10 distinct people. Protect complementary cells and never publish individual rankings.

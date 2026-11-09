@@ -9,7 +9,6 @@ Frontier Analytics offers a few distinct mechanisms for bringing this work into 
 - **Prompt cards** (see [prompts/](../prompts/)) are text that a person copies and pastes into an agent for a single analysis task. They require no setup, but they only apply to the one task being pasted, and they rely on the person remembering to paste the right card.
 - **Skills** (this folder) are a small set of files that a compatible agent discovers and loads on its own, based on the task at hand. Once installed, the agent applies the conventions in the Skill to every relevant task in a session instead of only the one task that was pasted.
 - **[vivainsights-context.md](../../vivainsights-context.md)** is a single file a person pastes once at the start of a session, as a fallback for agents that do not support the Skill format.
-- **MCP** (see [mcp/](../mcp/)) is a protocol-level integration that would let an agent query prompts, schemas, and tools directly from a server. This is a concept only today. There is no MCP server implemented yet.
 
 Use the comparison table on the [Frontier Analytics overview](../README.md#which-asset-should-i-use) to decide which of these fits your situation.
 

@@ -7,7 +7,7 @@ Frontier Analytics is an **export-first, self-service analytics toolkit** for [V
 Start with the [shared analysis policy](skills/viva-insights-analysis/reference/analysis-policy.md)
 and [workflow support table](skills/viva-insights-analysis/reference/workflow-support.md)
 for eligibility, missingness, configured cadence, privacy and capability boundaries.
-Local export workflows do not implement live-product or MCP access.
+The maintained workflows use locally exported files.
 
 ## Who is this for?
 
@@ -20,14 +20,13 @@ You do not need to be a software engineer. If you can export a CSV from Viva Ins
 
 ## Which asset should I use?
 
-Frontier Analytics offers four ways to bring this work into a coding agent. They solve overlapping problems, so use this table to pick the right one before browsing the folders below.
+Frontier Analytics offers three ways to bring this work into a coding agent. Use this table to choose before browsing the folders below.
 
 | Mechanism | What it is | Status | Use it when |
 |-----------|------------|--------|-------------|
-| [Prompt cards](prompts/) | Structured text you copy and paste into any coding agent for a single analysis task. | Available | Your agent does not support Skills or MCP, or you want a one-off analysis without any setup. |
+| [Prompt cards](prompts/) | Structured text you copy and paste into any coding agent for a single analysis task. | Available | You want a one-off analysis without installing a Skill. |
 | [Skills](skills/) | A packaged capability that a compatible coding agent loads automatically, so it applies the right conventions without you pasting anything. | Available | Your coding agent supports the Skill format (for example GitHub Copilot CLI or Claude Code) and you want ongoing, repeated Viva Insights work to follow consistent conventions. |
 | [vivainsights-context.md](../vivainsights-context.md) | A single context file you paste once at the start of a session. | Available | Your agent does not support Skills, but you still want to avoid repeating setup instructions in every prompt. |
-| [mcp/](mcp/) | A protocol-level integration that would let an agent query prompts, schemas, and tools directly from a server. | Concept only, no server implemented | Not yet. Read the folder for the design intent and to track progress. |
 
 If you are not sure where to start, use a [starter kit](starter-kits/) for an end-to-end walkthrough, or a [prompt card](prompts/) for a single task.
 
@@ -74,7 +73,6 @@ without a measured comparison.
 | [schemas/](schemas/) | Data dictionaries and documentation for person query exports, Purview audit logs, join patterns, and common data pitfalls. |
 | [examples/](examples/) | Sample output specifications that describe what a finished deliverable should look like. |
 | [templates/](templates/) | Templates for contributing new prompt cards, skills, starter kits, and schema documentation. |
-| [mcp/](mcp/) | Concept and sample configuration for Model Context Protocol (MCP) integration with Viva Insights workflows. Not yet implemented: there is no MCP server today, see the folder's README for the design intent. |
 
 ## How to use this with a coding agent
 

@@ -62,7 +62,6 @@ supports. Prefer pointing users to it rather than reinventing its assets.
 | `schemas/` | Data dictionaries for person-query exports, Purview audit logs, join patterns, and common data pitfalls |
 | `examples/` | Sample output specifications describing what a finished deliverable looks like |
 | `templates/` | Templates for contributing new prompt cards, starter kits, schema docs |
-| `mcp/` | Concepts and sample config for Model Context Protocol integration |
 
 Intended flow: export your data, pick a starter kit or prompt card, review the
 schema docs, open a coding agent in an R/Python workspace, paste the prompt at
