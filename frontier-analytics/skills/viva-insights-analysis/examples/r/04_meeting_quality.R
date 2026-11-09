@@ -11,6 +11,9 @@
 # Reminder: Duration and *_hours columns are measured in hours rather than minutes.
 
 suppressMessages(library(vivainsights))
+script <- sub("^--file=", "", grep("^--file=", commandArgs(), value = TRUE))
+if (length(script) != 1L) stop("Run this example with Rscript r/04_meeting_quality.R")
+source(file.path(dirname(script), "..", "meeting_quality.R"))
 
 mt <- mt_data
 n0 <- nrow(mt)
@@ -20,8 +23,10 @@ rules <- list(
   "attendees < 2"              = mt$Number_of_attendees < 2,
   "intended <= 1"              = mt$Intended_participant_count <= 1,
   "intended > 150 (broadcast)" = mt$Intended_participant_count > 150,
-  "cancelled"                  = as.logical(mt$Cancelled),
-  "all-day"                    = as.logical(mt$All_Day_Meeting)
+  "cancelled"                  = normalise_flag(mt$Cancelled),
+  "all-day"                    = normalise_flag(mt$All_Day_Meeting),
+  "duration < 1 minute"        = mt$Duration < 1 / 60,
+  "duration > 8 hours"         = mt$Duration > 8
 )
 attrition <- data.frame(
   rule = names(rules),
@@ -32,13 +37,9 @@ cat(sprintf("Raw rows: %d\n", n0))
 print(attrition)
 
 # Combined quality filter.
-mq <- subset(
-  mt,
-  Number_of_attendees >= 2 &
-    Intended_participant_count > 1 &
-    Intended_participant_count <= 150 &
-    !as.logical(Cancelled) &
-    !as.logical(All_Day_Meeting)
-)
+mq <- mt[quality_mask(mt), , drop = FALSE]
+missing <- !complete.cases(mt[c("Number_of_attendees", "Intended_participant_count", "Duration")]) |
+  is.na(normalise_flag(mt$Cancelled)) | is.na(normalise_flag(mt$All_Day_Meeting))
+cat("Missing quality inputs:", sum(missing), "\n")
 cat(sprintf("\nAfter quality filter: %d -> %d rows (%.1f%% retained)\n",
             n0, nrow(mq), 100 * nrow(mq) / n0))

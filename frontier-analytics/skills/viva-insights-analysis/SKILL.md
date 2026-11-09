@@ -15,7 +15,7 @@ description: >
   viva-insights-sample-code repo and its Frontier Analytics toolkit for
   ready-made prompts, starter kits, and schema docs.
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 ## What this skill is for

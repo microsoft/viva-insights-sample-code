@@ -76,3 +76,4 @@ jobs:
         run: |
           Rscript --vanilla -e 'stopifnot(as.character(utils::packageVersion("vivainsights")) == "0.7.2")'
           Rscript --vanilla scripts/test_segmentation.R
+          Rscript --vanilla scripts/test_meeting_quality.R

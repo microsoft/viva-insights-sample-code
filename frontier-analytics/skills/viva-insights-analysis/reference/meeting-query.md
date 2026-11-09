@@ -21,10 +21,13 @@ calendar item can be a personal hold, all-day marker or cancelled item. A
 meeting-row average is not an average per person, and meeting count alone
 cannot establish meetings per employee.
 
-An organisational cut describes **ownership**, not attendee composition or
-attendee-side workload. Write "organisers in Function X own meetings totalling
-4,000 attendee hours", rather than "Function X spent 4,000 hours in meetings".
-People in that function also attend meetings owned elsewhere.
+An organisational cut describes the organiser's **recorded reporting line**,
+not verified process ownership, attendee composition or attendee-side workload.
+Write "meetings organised by people recorded in Function X total 4,000 attendee
+hours". People in that function also attend meetings organised elsewhere.
+Establish whether the attributes are historical or export-time labels. A
+leadership succession is not automatically an alias or a behavioural change.
+Keep exact source keys for joins and a separate display-name mapping.
 
 Report attribution coverage for each grouping field, including the share of
 known attendee hours with a usable attribute and any missing hours. Define blank
@@ -43,6 +46,12 @@ inclusive. These thresholds are analytical choices, not product definitions.
 Parse boolean text explicitly before filtering. The text `"False"` is truthy
 under Python `astype(bool)`. Reject unknown tokens rather than treating them as
 false. Missing quality inputs fail the example filter but stay in raw data.
+
+The bundled [quality helpers](../examples/meeting_quality.py) and
+[matched R helper](../examples/meeting_quality.R) implement this seven-rule
+example. Their flag parser accepts true/false, yes/no, y/n and 1/0 variants.
+Unknown nonmissing tokens stop execution. Missing flags remain unknown and fail
+the mask. Reconcile R/Python results when regex or data backends differ.
 
 Report both per-rule flagged counts and a sequential retained-row funnel.
 Rules overlap, so their independent attrition counts must not be added.
@@ -169,6 +178,16 @@ For an explicitly agreed historical reconstruction, one possible rule is:
 The quality-based preference can favour higher attendance and change totals.
 Compare its results with a newest-only sensitivity before interpreting trends.
 Do not silently treat an earlier HR label as a dated or current assignment.
+Newer cancellation or attendance changes may be genuine corrections. The
+older-passing preference must be explicitly approved for the reconstruction,
+not silently applied to every refresh. A newer-populated HR policy needs its
+own old/new audit and approval rather than bypassing conflict checks.
+
+Person Query history requires a separate key and compatibility assessment.
+Do not apply a MeetingId policy to `(PersonId, MetricDate)`. A complete-row
+newer-wins policy, if approved, retains observed zeros and blank attributes
+instead of blending older values into the winning row. Check metric definition
+changes before stitching, and keep source-vintage provenance.
 
 [merge_meeting_exports.py](../examples/merge_meeting_exports.py) implements this
 optional in-memory rule. It leaves inputs unchanged and returns `(combined,
@@ -208,6 +227,9 @@ See [cross-query diagnostics](cross-query-diagnostics.md).
 - Apply the shared distinct-person privacy floor, never a meeting-row threshold.
   Many meetings from one organiser do not establish a safe group. If a valid
   person base cannot be established, withhold the breakdown.
+- Keep any minimum-event stability rule separate from privacy. A person can
+  organise many events, and attendee counts cannot be added to recover distinct
+  people. Check both bases before publishing an organisational comparison.
 
 ## Sources
 

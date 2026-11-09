@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Shared seven-rule Meeting Query quality helpers in R and Python, with
+  explicit flag parsing, duration checks and synthetic boundary regressions.
+  Expanded refresh reconciliation, organiser-attribution, weighting, exact
+  volume decomposition and inference guidance. Core analysis Skill 1.2.0.
+
 - Standalone guides for Business Leaders AI Usage, Consumption and Ways of
   Working, and Developer Experience, with query requirements, screenshots,
   expected outputs and rendering commands. Dashboard navigation now opens

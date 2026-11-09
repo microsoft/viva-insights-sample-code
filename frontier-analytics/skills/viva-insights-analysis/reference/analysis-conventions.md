@@ -95,15 +95,31 @@ the windows as a **parameter of the analysis**, chosen from the data and the
 intervention date rather than as fixed constants.
 
 - Use windows of equal length on each side of the intervention.
-- Prefer **matched calendar periods** (same quarter year over year) so
-  seasonality and holidays cancel.
+- Prefer **matched calendar periods** (same quarter year over year) to reduce
+  seasonal differences. Holidays, weekday mix, scope and coverage can still differ.
 - State the exact window boundaries in the output so a reader can reproduce them.
 - Exclude or flag holiday / inactive weeks inside the windows (see
   `data-pitfalls.md`).
 
-For a formal interrupted-time-series test, use `create_itsa()` (R) with explicit
-`before_start / before_end / after_start / after_end` arguments rather than
-eyeballing a line chart.
+For a formal interrupted-time-series question, assess intervention timing,
+pre-trend support, seasonality and serial dependence before choosing a model.
+Inspect `create_itsa()` (R) and its explicit period arguments where appropriate.
+Its availability does not establish that the design identifies an effect.
+
+### Comparable reporting and refreshes
+
+Keep the source endpoint, verified complete-month cutoff, complete-week cutoff
+and process-cycle window separate. Advance every dependent chart and table
+when the approved window advances, or label an intentionally different window.
+Observed dates support diagnostics but do not prove complete capture.
+
+When a refresh changes a headline, reconcile source revisions, scope revisions,
+time-window changes and population/attribute changes on a common envelope.
+Compare exact internal event sets before aggregating. An ordered bridge must
+reconcile without counting an overlapping change twice. Preserve the previous
+approved specification and evidence instead of rewriting them to make a new
+version match. See [Meeting Query](meeting-query.md) and
+[cross-query diagnostics](cross-query-diagnostics.md).
 
 ## 5. Respect privacy in every reported cut
 
@@ -130,3 +146,29 @@ eyeballing a line chart.
 - Avoid contrastive marketing phrasing (for example "simple, not simplistic"). State what something is directly.
 - Lead with the finding, then the caveat, then the method.
 - Every number in prose should be traceable to a cut in the code.
+
+## 8. Separate volume, intensity and composition
+
+For the same included meetings with observed attendee hours:
+`total attendee hours = meeting count * mean attendee hours per meeting`.
+Use this exact identity to separate meeting volume from time investment per
+event. A change decomposition must state how it allocates the interaction.
+Do not substitute mean duration multiplied by mean attendance: covariance,
+attendance time and scheduled duration can make that product differ.
+
+State whether a quality measure is a mean of per-meeting ratios or a ratio of
+sums. A person-level mean answers another question. Keep total hours, hours per
+meeting and hours per person separate, with their own valid bases.
+
+For rates, distinguish percentage changes from percentage-point changes.
+A share falling from 2.0% to 1.8% falls 0.2 percentage points and 10% relative
+to its original level. Show the numerator and denominator when their changes
+could make the share misleading.
+
+Report effect size and uncertainty before a significance label. Agree practical
+reporting yardsticks rather than inventing a success target. If inference is
+requested, choose its independent units, temporal dependence assumptions and
+test family before comparing p-values. Repeated meetings do not automatically
+provide independent observations. Distinguish pointwise intervals from
+multiple-testing-adjusted decisions. Non-significance does not establish
+equivalence, and a significant change does not establish intervention impact.

@@ -85,28 +85,34 @@ the organiser, not the attendees.
 
 **Generalised meeting quality filter** (adapt thresholds to the engagement):
 
+Run these snippets from the installed core Skill's `examples/` directory, with
+the relevant `vivainsights` package loaded. The bundled
+[Python](../examples/meeting_quality.py) and [R](../examples/meeting_quality.R)
+helpers explicitly normalise text/boolean flags, reject unknown tokens and
+apply all seven reviewed checks. Missing quality values fail the mask without
+deleting the raw rows. This example requires `Duration`. If it is unavailable,
+agree and label a reduced filter instead of claiming the full profile ran.
+
 ```r
 # R
-mq <- mt_data %>%
-  dplyr::filter(
-    Number_of_attendees >= 2,            # drop solo holds / personal blocks
-    Intended_participant_count > 1,
-    Intended_participant_count <= 150,   # drop broadcasts / all-hands
-    !as.logical(Cancelled),
-    !as.logical(All_Day_Meeting)
-    # if a Duration column exists (hours): Duration >= 1/60, Duration <= 8
-  )
+source("meeting_quality.R")
+mq <- mt_data[quality_mask(mt_data, max_intended = 150,
+                         min_duration_hours = 1/60, max_duration_hours = 8), ]
 ```
 
 ```python
 # Python
+from meeting_quality import quality_mask
+
 mt = vi.load_mt_data()
-mq = mt[(mt["Number_of_attendees"] >= 2)
-        & (mt["Intended_participant_count"] > 1)
-        & (mt["Intended_participant_count"] <= 150)
-        & (~mt["Cancelled"].astype(bool))
-        & (~mt["All_Day_Meeting"].astype(bool))]
+mq = mt.loc[quality_mask(mt, max_intended=150,
+                        min_duration_hours=1/60, max_duration_hours=8)]
 ```
+
+The checks are attendees >=2, intended participants >1 and <= the agreed
+maximum, neither cancelled nor all-day, and duration within the agreed bounds.
+A large gathering can be a valid meeting outside this study's scope. Report
+per-rule flags, missing inputs and the sequential funnel separately.
 
 **Critical unit gotcha:** where a `Duration` column is present it is measured in
 **hours rather than minutes**. Multiply by 60 for a minutes display. `Meeting_hours`

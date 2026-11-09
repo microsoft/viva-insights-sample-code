@@ -9,6 +9,8 @@ import numpy as np
 import pandas as pd
 from pandas.api.types import is_bool_dtype, is_datetime64_any_dtype, is_numeric_dtype
 
+from meeting_quality import quality_mask
+
 
 KEY = "MeetingId"
 TIME = "Collaboration_start_time"
@@ -44,19 +46,6 @@ def _validate(frame, attributes):
     for col in attributes:
         if col not in frame or not all(isinstance(v, str) for v in frame[col].dropna()):
             raise ValueError(f"Missing or nontext organiser/HR column: {col}")
-
-
-def quality_mask(frame):
-    """Seven reviewed conventions, with missing inputs failing the filter."""
-    return (
-        frame[NUMERIC[0]].ge(2)
-        & frame[NUMERIC[1]].gt(1)
-        & frame[NUMERIC[1]].le(150)
-        & frame[FLAGS[0]].eq(False)
-        & frame[FLAGS[1]].eq(False)
-        & frame["Duration"].ge(1 / 60)
-        & frame["Duration"].le(8)
-    ).fillna(False)
 
 
 def merge_mq(old, new, *, attribute_columns):
