@@ -40,9 +40,8 @@ After exporting a person query with Copilot activity metrics spanning at least 8
 
 ## Required inputs
 
-- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`, `Copilot_Chat_Queries`, `Copilot_Summarized_Hours`), and available HR attributes (e.g., `FunctionType`, `Area`, `Country`, or `Organization`)
+- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`, `Copilot_Chat_Queries`, `Copilot_Summarized_Hours`), and optional HR attributes (e.g., `FunctionType`, `Area`, `Country` or `Organization`)
 - At least 8 weeks of data recommended
-- Optional HR attributes for group comparisons. Use fields present in the export; the examples above may not be available.
 
 ## Assumptions
 

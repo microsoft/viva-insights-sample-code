@@ -34,7 +34,8 @@ a skill; frequent users can install the optional dashboard skill.
 - R and the dependencies listed by the runner; Pandoc for the reference demo.
 - Demo: supplied synthetic fixture files only.
 - Real: locally extracted activity and people-metadata CSVs, query grain,
-  date window, chosen HR group, mapping evidence and privacy requirements.
+  date window, mapping evidence and privacy requirements. An HR group is optional
+  and only used when a suitable field is available and grouping is requested.
 
 ## Assumptions
 
@@ -58,6 +59,7 @@ Recover choices already supplied, then ask only for missing checkout, demo versu
 Read frontier-analytics/skills/viva-insights-copilot-dashboards/SKILL.md in that checkout as workflow instructions, without requiring skill installation.
 Use its Consumption manifest and the shared R runner; do not regenerate the dashboard from scratch.
 For real exports, inspect locally, show supported and excluded panels, and get my approval before building.
+If no suitable HR group field is available, set `group=false`, omit group breakdowns, and keep supported period/service results.
 Do not invent tokens, licensing, coverage, identity mappings or causal conclusions.
 Use max(the organisational requirement, 10 distinct people) for all published
 and embedded data, protect complementary cells and never publish individual rankings.
@@ -92,6 +94,9 @@ complete query's configured scope. Null credit cells, failed joins, unavailable
 sources, out-of-scope periods and known coverage failures remain unresolved.
 Licensed-only M365 Copilot null semantics do not apply to credits. The credits-only runner reports
 observed records, not an invented eligible roster or non-user panel.
+Set the runner's `group` option to true only when a suitable mapped HR attribute is
+available and the user wants group breakdowns. Otherwise set it to false, omit HR-group
+outputs and retain supported period/service results.
 Present supported/excluded panels and mapping evidence; wait for my approval to build.
 Build only the supported M365 credits panels in real v1; sessions, Person Query
 associations and GitHub panels require separate verified adapters. Do not generate

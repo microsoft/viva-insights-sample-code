@@ -40,9 +40,8 @@ For monthly or quarterly updates on Copilot adoption progress to senior leadersh
 
 ## Required inputs
 
-- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`), and available HR attributes (e.g., `FunctionType`, `Area`, `Country`, or `Organization`)
+- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`), and optional HR attributes (e.g., `FunctionType`, `Area`, `Country`, or `Organization`)
 - At least 8 weeks of data recommended (12+ weeks preferred for trend analysis)
-- Optional HR attributes for group comparisons, discovered from the export
 
 ## Assumptions
 

@@ -40,9 +40,8 @@ When a static HTML report or memo is not suitable and stakeholders need a polish
 
 ## Required inputs
 
-- Person query CSV with Copilot metrics and HR attributes
+- Person Query CSV with Copilot metrics and optional HR attributes for group comparisons. Use only fields present in the export.
 - At least 8 weeks of data recommended (12+ weeks preferred)
-- HR attributes for organizational breakdowns
 
 ## Assumptions
 

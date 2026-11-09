@@ -75,7 +75,7 @@ Do not assume exact paths or variables, and ask me for the CSV location, toolkit
 Keep the required two-part flow from this card, which means run and validate the analysis first, then interpret the generated outputs in a separate pass.
 Do not change the treatment variable from Total_Copilot_actions_taken, do not edit shared helper modules, and warn me if the dataset is shorter than about 12 weeks.
 When choosing or configuring the notebook, adapt subgroup, collaboration, and outcome variables to the columns that actually exist in my data.
-If no suitable subgroup attribute is available, skip subgroup analyses; run overall analysis only if the selected notebook supports it.
+Before execution, check the selected notebook's minimum subgroup requirements. The supplied notebooks require at least two suitable subgroup attributes for pairwise analysis. With zero or one, skip subgroup analyses and run overall analysis only if the notebook has a verified overall-only path. Otherwise return a readiness assessment and do not run it.
 Before fitting, verify the notebook's actual grain, exposure/outcome windows, pre-exposure controls, overlap and identifying assumptions. DML is not itself an identifying design. If unresolved, return readiness or an agreed association rather than a causal claim; do not run every estimator.
 Prefer Copilot Enabled User or Total Copilot enabled days for licensing. Native licensed-only M365 Copilot nulls mean unlicensed and zero activity means licensed but inactive. A verified metric with these semantics is a valid fallback. Read configured cadence, not date spacing. Absent in-scope activity contributes zero, while failed joins and known coverage failures remain unresolved. Check unlicensed Copilot Chat separately before assigning causal controls.
 Publish only groups meeting max(the organisational requirement, 10 distinct people), protect complementary cells and embedded data, and never publish individual rankings.
@@ -144,7 +144,7 @@ STEP 4: CONFIGURE PARAMETERS Open the selected notebook and update the following
 
 1. FILE PATHS: Update `data_file_path` to point to the user's CSV file. Update `output_base_dir` to include the user's organization name.
 
-2. ORGANIZATIONAL ATTRIBUTES: Set `SUBGROUP_VARS` from fields identified by `extract_hr()` in Step 2. Use up to 2-4 relevant available attributes; use fewer if fewer exist. If none are suitable, skip subgroup analysis and run overall analysis only if the selected notebook supports it.
+2. ORGANIZATIONAL ATTRIBUTES: Set `SUBGROUP_VARS` from fields identified by `extract_hr()` in Step 2, using 2-4 relevant available attributes when possible. Before execution, inspect the selected notebook's minimum subgroup requirements. The supplied notebooks form pairs of attributes and require at least two suitable fields. With zero or one, skip subgroup analysis and run overall analysis only if the notebook has a verified overall-only path. Otherwise return a readiness assessment naming the limitation and do not run the notebook. Do not invent attributes to meet the minimum.
 
 3. NETWORK AND COLLABORATION VARIABLES: Verify that `NETWORK_VARS` and `COLLABORATION_VARS` match columns in the data. Remove any that do not exist.
 

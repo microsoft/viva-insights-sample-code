@@ -40,10 +40,9 @@ After collecting at least 8–12 weeks of Person Query data, when you need to un
 
 ## Required inputs
 
-- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`), and available HR attributes (e.g., `FunctionType`, `Area`, `Country`, or `Organization`)
+- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`), and optional HR attributes (e.g., `FunctionType`, `Area`, `Country` or `Organization`)
 - At least 8 weeks of data (12+ weeks recommended for meaningful churn analysis)
 - A Copilot enabled-days field or another confirmed source of weekly licence status
-- Optional HR attributes for group breakdowns
 
 ## Assumptions
 
