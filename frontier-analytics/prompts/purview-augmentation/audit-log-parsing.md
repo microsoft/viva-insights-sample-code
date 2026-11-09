@@ -1,4 +1,4 @@
-# Audit Log Parsing — Purview Audit Logs
+# Purview Audit Log Parsing
 
 ## Purpose
 
@@ -52,7 +52,7 @@ Use the detailed prompt below for a reproducible, exact-structure output. Use th
 ```
 You are a data engineer. Your task is to parse and clean a raw Microsoft Purview audit log export into a flat, analysis-ready dataset. Purview audit logs contain nested JSON fields and mixed event schemas, so this task requires careful exploration, parsing, and normalization.
 
-IMPORTANT: Purview audit log schemas vary by tenant and event type. Do NOT assume specific field names in the AuditData JSON — explore the data first and adapt.
+IMPORTANT: Purview audit log schemas vary by tenant and event type. Explore the data before choosing field names from the AuditData JSON.
 
 LANGUAGE CHOICE
 Choose R or Python based on what is already installed in your environment to minimize setup.
@@ -67,7 +67,8 @@ PHASE 1: INITIAL LOADING AND INSPECTION
    - User: typically "UserId" or "UserKey"
    - Operation: typically "Operation"
    - Workload: typically "Workload"
-   - AuditData: typically "AuditData" — a JSON string with event details Print which columns were identified and which are missing.
+   - AuditData: typically "AuditData", a JSON string with event details.
+   Print which columns were identified and which are missing.
 4. Check for data quality issues:
    a. How many rows have null/empty values in each core column?
    b. How many rows have non-parseable JSON in AuditData (if present)?
@@ -75,7 +76,7 @@ PHASE 1: INITIAL LOADING AND INSPECTION
 
 PHASE 2: PARSING THE AUDITDATA JSON COLUMN
 5. If an AuditData column exists:
-   a. Parse the JSON string for each row into a dictionary/object. Wrap in a try-except to handle malformed JSON gracefully — log the count of unparseable rows and skip them.
+   a. Parse the JSON string for each row into a dictionary/object. Wrap parsing in a try-except to handle malformed JSON. Log the count of unparseable rows and skip them.
    b. Inspect the parsed JSON structure for a sample of 50 rows. Print the unique top-level keys found and their frequency. Identify which keys are present in most records vs. rare.
    c. Identify common nested objects (keys whose values are dicts or lists). Print examples of the nested structures.
 
@@ -91,7 +92,7 @@ PHASE 2: PARSING THE AUDITDATA JSON COLUMN
    - "AppAccessContext" → extract nested fields like "AADSessionId", "CorrelationId"
    - "CopilotEventData" or similar → extract Copilot-specific details (agent name, plugin name, interaction type, prompt length, etc.) Create a new column for each extracted field.
 
-7. For nested objects, flatten one level deep. For example, if AuditData contains: {"CopilotEventData": {"AgentName": "MyAgent", "InteractionType": "Chat"}} Create columns: copilot_agent_name, copilot_interaction_type. Do NOT attempt to flatten deeply nested structures (3+ levels) — store them as JSON strings.
+7. For nested objects, flatten one level deep. For example, if AuditData contains: {"CopilotEventData": {"AgentName": "MyAgent", "InteractionType": "Chat"}} Create columns: copilot_agent_name, copilot_interaction_type. Store deeply nested structures (3+ levels) as JSON strings.
 
 PHASE 3: EVENT TYPE CLASSIFICATION
 8. Analyze the distinct values in Operation (and audit_operation if different). Print:
@@ -162,15 +163,15 @@ PHASE 6: OUTPUT
 
 IMPORTANT NOTES
 - Prioritize robustness over speed. Wrap every JSON parse and type conversion in error handling.
-- Do NOT assume the AuditData JSON structure is consistent across all rows — different Operation types may have completely different AuditData schemas. Handle this gracefully.
+- Different Operation types may have different AuditData schemas. Check the structure before extracting fields from each row.
 - If the file is very large (>500MB), process in chunks rather than loading all at once.
-- Do NOT expose raw UserIds/email addresses in printed output — show only the first few characters or use aggregate counts when printing summaries.
+- Do NOT expose raw UserIds/email addresses in printed output. Show only the first few characters or use aggregate counts when printing summaries.
 - The data dictionary is critical for downstream users. Invest time in making it accurate.
 ```
 
 ## Adaptation notes
 
-- **Your AuditData fields will differ.** The field names listed in step 6 (e.g., `CopilotEventData`, `AppAccessContext`) are examples. The prompt instructs the agent to explore first and adapt — but you may need to guide it if your tenant uses unusual field names.
+- **Your AuditData fields will differ.** The field names listed in step 6 (e.g., `CopilotEventData`, `AppAccessContext`) are examples. Review the agent's field mapping if your tenant uses different names.
 - **Filtering criteria:** If you know your tenant's Copilot operation names (e.g., from the Purview audit log documentation or prior inspection), prepend them to the prompt: _"In my tenant, Copilot events use Operation values: CopilotInteraction, CopilotQuery."_
 - **Large files:** For exports exceeding 1GB, add: _"Process the file in chunks of 100,000 rows using pandas chunked reading."_
 - **Multiple export files:** If your audit log is split across multiple files (e.g., one per day), add: _"Load all CSV files from the directory and concatenate them before processing."_
@@ -178,7 +179,7 @@ IMPORTANT NOTES
 
 ## Common failure modes
 
-- **Agent fails on malformed JSON in AuditData.** Some rows may have truncated or malformed JSON. The prompt includes try-except handling, but verify the agent implements it — a single bad row should not crash the entire parse.
+- **Agent fails on malformed JSON in AuditData.** Some rows may have truncated or malformed JSON. Verify that the agent's try-except handling logs and skips these rows without crashing the entire parse.
 - **Agent creates inconsistent column names.** When extracting from AuditData, column naming can become inconsistent across event types. Verify that the final output has standardized snake_case names.
 - **Agent loads the entire file into memory.** For very large exports, this may cause out-of-memory errors. Watch for memory warnings and switch to chunked processing if needed.
 - **Agent flattens deeply nested JSON, creating hundreds of columns.** The prompt limits flattening to one level deep, but some agents may over-expand. Verify the output schema is manageable (ideally <50 columns).

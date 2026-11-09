@@ -61,6 +61,8 @@ def check_site(site, baseurl):
             legacy.update(metadata["heading_aliases"].values())
         else:
             legacy.update({"recommended-output", "prompt", "adaptation-notes"})
+        if metadata.get("title_anchor"):
+            legacy.add(metadata["title_anchor"])
         if not legacy <= set(page.ids):
             raise AssertionError(f"{route}: missing legacy anchors: {sorted(legacy - set(page.ids))}")
         source = (PROMPTS_DIR / metadata["source"]).read_text(encoding="utf-8")

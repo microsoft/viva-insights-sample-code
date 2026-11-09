@@ -1,17 +1,22 @@
 ---
 layout: page
-title: "Frontier — Agent Skills"
+title: "Agent Skills for Viva Insights"
 eyebrow: "Frontier"
 description: "Choose a Viva Insights agent Skill for analysis, query dashboards, or Person Query causal diagnostics."
 permalink: /frontier-analytics-skills/
 css: /assets/css/skill-catalogue.css
 ---
 
-# Agent Skills for Viva Insights
+<span id="agent-skills-for-viva-insights"></span>
 
 An agent Skill is a folder containing a `SKILL.md` file and supporting references. A compatible coding agent can load the Skill when your request matches its description, applying its guidance without you pasting instructions each time. The Skills in this library are for working with Viva Insights exports in R or Python. They are separate from [People Skills data analysis]({{ site.baseurl }}/skills-data-join/).
 
 For a single task without installation, use the [Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/). Check your agent's documentation for Skill support and installation locations.
+
+To explore the three synthetic reports, including **Business Leaders AI Usage**,
+open the [dashboard catalogue]({{ site.baseurl }}/copilot-dashboards/).
+Viewing a demo needs only a browser. The dashboard Skill supports the Consumption
+and Developer Experience workflows described below.
 
 Read the [analysis policy]({{ site.baseurl }}/frontier-analytics-policy/) and
 [workflow capability map]({{ site.baseurl }}/frontier-analytics-support/) for the

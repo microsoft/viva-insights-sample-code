@@ -1,6 +1,6 @@
 ---
 layout: "page"
-title: "Prompt — Executive PowerPoint Deck"
+title: "Copilot Adoption PowerPoint Prompt"
 eyebrow: "Frontier · Prompt library"
 permalink: "/frontier-analytics-prompt-powerpoint/"
 last_validated: 2026-06-02
@@ -28,7 +28,7 @@ badges:
 
 ## Purpose
 
-Generate an exec-ready 10-15 page PowerPoint deck (.pptx) with editable native PowerPoint charts, summarizing Copilot adoption trends, organizational breakdowns, and key recommendations.
+Create a 10-15 slide PowerPoint deck (.pptx) with editable native charts covering Copilot adoption trends, organisational breakdowns and recommendations.
 
 ## Audience
 
@@ -81,12 +81,12 @@ Use the detailed prompt below for a reproducible, exact-structure output. Use th
 
 {% raw %}
 ```
-You are a senior people analytics consultant. Your task is to generate a polished, exec-ready PowerPoint deck (.pptx) summarizing Microsoft Copilot adoption from a Viva Insights person query export. The deck must use editable native PowerPoint charts — NOT pasted images — so that recipients can modify charts and data as needed.
+You are a senior people analytics consultant. Your task is to generate a PowerPoint deck (.pptx) summarising Microsoft Copilot adoption from a Viva Insights person query export for senior leaders. Use editable native PowerPoint charts so recipients can modify charts and data as needed. Do not paste chart images where a native chart is supported.
 
 LANGUAGE CHOICE
 Choose R or Python based on what is already installed in your environment to minimize setup.
 - R: Use the `officer` and `mschart` packages for native PowerPoint chart generation.
-- Python: Use the `python-pptx` package. Note that native chart support in python-pptx is more limited — if advanced chart types are needed, R with `mschart` is recommended.
+- Python: Use the `python-pptx` package. Its native chart support is more limited. If advanced chart types are needed, R with `mschart` is recommended.
 
 DATA LOADING AND PREPARATION
 Confirm configured weekly grouping, week start, metric measurement windows and query scope. Observed date gaps are diagnostic only. Within a supplied complete query's configured scope, absent activity rows contribute zero. Native licensed-only M365 Copilot nulls mean unlicensed. Failed joins, unavailable sources, out-of-scope periods and known coverage failures remain unresolved with reasons.
@@ -124,7 +124,7 @@ METRIC CALCULATIONS
    k. Potential annualised value only after approval of a realisation factor, hourly rate and any proxy conversion; label it an assumption-based scenario
 
 SLIDE DECK GENERATION
-7. Create a PowerPoint deck with the following slides. **Prefer R (mschart/officer)** for the charts: it produces genuinely native, editable PowerPoint chart objects across the full range of chart types used here. If you must use Python (python-pptx), be aware its native-chart support is more limited — restrict yourself to the chart types python-pptx supports as native charts (e.g., clustered/stacked bar and column, line, and pie charts) and avoid combo charts, secondary axes, or annotations it cannot render natively. For any chart type that python-pptx cannot create natively, either simplify it to a supported type or fall back to a high-resolution embedded image, and note in the output which slides use images rather than editable charts.
+7. Create a PowerPoint deck with the following slides. Prefer R (mschart/officer) for native, editable PowerPoint charts. If you use Python (python-pptx), restrict yourself to its supported native chart types (e.g., clustered/stacked bar and column, line, and pie charts). Avoid combo charts, secondary axes or annotations it cannot render natively. For an unsupported chart type, simplify it to a supported type or fall back to a high-resolution embedded image. Note which slides use images rather than editable charts.
 
    SLIDE 1: Title slide
    - Title: "Copilot Adoption Review"
@@ -136,10 +136,10 @@ SLIDE DECK GENERATION
    - Lead with the headline adoption rate and trend direction
    - Use bold text for key numbers
 
-   SLIDE 3: At a Glance — KPI cards
+   SLIDE 3: At a Glance (KPI cards)
    - Layout showing key metrics: adoption rate, trend, active users, avg actions/user, avg assisted hours/user
    - Use directional indicators (▲ ▼ ►) for trends
-   - Use text boxes with large numbers — these do not need to be charts
+   - Use text boxes with large numbers for these metrics
 
    SLIDE 4: Adoption trend over time
    - Native line chart: weekly adoption rate over the full period
@@ -197,14 +197,14 @@ SLIDE DECK GENERATION
 8. Design guidelines:
    - Use a clean, professional layout with consistent fonts (e.g., Calibri or Segoe UI)
    - Use a consistent color palette across all charts
-   - Keep text concise — use bullet points, not paragraphs
+   - Keep text concise and use bullet points
    - Every chart must have a clear title and takeaway annotation
    - Number all slides
 
 9. Save the deck as "copilot_adoption_deck_YYYYMMDD.pptx".
 
 IMPORTANT NOTES
-- All charts MUST be native editable PowerPoint chart objects, not static images. This is the primary requirement — recipients need to be able to modify charts and update data.
+- Recipients must be able to modify charts and update their data. Use native editable PowerPoint chart objects wherever supported, and identify any image fallback described in step 7.
 - Do NOT use RMarkdown or Jupyter notebook as an intermediary for this output. Generate the .pptx file directly using the appropriate PowerPoint package.
 - Native licensed-only M365 Copilot nulls mean unlicensed. Keep processing failures unresolved rather than treating them as native nulls or zero activity.
 - Apply the stated privacy floor to charts, tables, hidden chart workbooks and complementary cells; never publish individual rankings.

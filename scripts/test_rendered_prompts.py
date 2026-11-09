@@ -43,6 +43,14 @@ class RenderedPromptTests(unittest.TestCase):
         with self.assertRaisesRegex(AssertionError, "broken anchor"):
             rendered.check_site(self.site, "/prefix")
 
+    def test_renamed_title_keeps_its_legacy_anchor(self):
+        rendered.PAGES[0]["title_anchor"] = "previous-title"
+        self.page.write_text('<span id="previous-title"></span>' + self.html, encoding="utf-8")
+        rendered.check_site(self.site, "/prefix")
+        self.page.write_text(self.html, encoding="utf-8")
+        with self.assertRaisesRegex(AssertionError, "missing legacy anchors.*previous-title"):
+            rendered.check_site(self.site, "/prefix")
+
     def test_baseurl_escape_is_rejected(self):
         self.page.write_text(self.html.replace("/prefix/target/", "/target/"), encoding="utf-8")
         with self.assertRaisesRegex(AssertionError, "escapes non-root"):

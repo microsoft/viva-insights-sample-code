@@ -61,6 +61,24 @@ const server = http.createServer(async (request, response) => {
     const pageErrors = [];
     page.on('pageerror', (error) => pageErrors.push(error.message));
 
+    for (const [pathname, title] of [
+      ['frontier-analytics/', 'Frontier'],
+      ['frontier-analytics-skills/', 'Agent Skills for Viva Insights'],
+      ['frontier-analytics-prompts/', 'Viva Insights Prompt Library'],
+      ['frontier-analytics-schemas/', 'Viva Insights Schema Documentation'],
+    ]) {
+      await page.goto(base + pathname, { waitUntil: 'load' });
+      assert.equal(await page.locator('h1').count(), 1);
+      assert.equal(await page.locator('h1').innerText(), title);
+      assert.equal((await page.locator('.vi-page-body').innerText()).includes('\u2014'), false);
+      if (pathname === 'frontier-analytics-skills/' || pathname === 'frontier-analytics-prompts/') {
+        const catalogue = page.getByRole('link', { name: 'dashboard catalogue', exact: true });
+        await catalogue.click();
+        await page.waitForURL(base + 'copilot-dashboards/');
+        assert.equal(await page.locator('[data-dashboard-open="business-leaders-ai-usage"]').count(), 1);
+      }
+    }
+
     await page.goto(base + 'frontier-analytics-prompts/', { waitUntil: 'load' });
     assert.equal(await page.locator('.prompt-card').count(), 10);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
@@ -169,7 +187,17 @@ const server = http.createServer(async (request, response) => {
 
     for (const width of [320, 1280]) {
       await page.setViewportSize({ width, height: 720 });
-      for (const pathname of ['copilot/', 'copilot-dashboards/']) {
+      await page.goto(base, { waitUntil: 'load' });
+      const navToggle = page.getByRole('button', { name: 'Toggle navigation' });
+      if (await navToggle.isVisible()) await navToggle.click();
+      await page.locator('[aria-controls="vi-mega-copilot"]').click();
+      const navDemo = page.locator('#vi-mega-copilot a', { hasText: 'Business Leaders AI Usage' });
+      await navDemo.focus();
+      await page.keyboard.press('Enter');
+      await page.waitForURL(base + 'examples/utility-r/business-leaders-ai-adoption.html');
+      assert.equal(await page.title(), 'Business Leaders AI Usage');
+      assert.equal(await page.getByRole('heading', { name: 'AI usage across your organisation' }).isVisible(), true);
+      for (const pathname of ['copilot/', 'copilot-dashboards/', 'frontier-analytics/']) {
         await page.goto(base + pathname, { waitUntil: 'load' });
         assert.equal(await page.locator('.dashboard-card').count(), 3);
         assert.equal(await page.locator('[data-dashboard-details]').count(), 0);
@@ -256,7 +284,7 @@ const server = http.createServer(async (request, response) => {
         new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
       if (disabled === 'dialog') await fallback.addInitScript(() => { HTMLDialogElement.prototype.showModal = undefined; });
       const fallbackPage = await fallback.newPage();
-      for (const pathname of ['copilot/', 'copilot-dashboards/']) {
+      for (const pathname of ['copilot/', 'copilot-dashboards/', 'frontier-analytics/']) {
         await fallbackPage.goto(base + pathname, { waitUntil: 'load' });
         assert.equal(await fallbackPage.locator('[data-dashboard-details] [data-dashboard-panel]').count(), 3);
         await fallbackPage.locator('[data-dashboard-open]').first().click();

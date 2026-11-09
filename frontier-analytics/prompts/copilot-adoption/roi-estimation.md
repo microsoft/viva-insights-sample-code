@@ -1,4 +1,4 @@
-# ROI Estimation — Copilot Adoption
+# Copilot Adoption ROI Estimation
 
 ## Purpose
 
@@ -10,7 +10,7 @@ CFO/finance teams, IT leadership, Copilot program sponsors, business case review
 
 ## When to use
 
-When stakeholders need a quantified business justification for Copilot investment — typically during budget reviews, renewal decisions, or expansion proposals. Requires at least 8 weeks of data for stable estimates.
+For budget reviews, renewal decisions or expansion proposals that need an assumption-based estimate of Copilot's potential value. Requires at least 8 weeks of data for stable estimates.
 
 ## Required inputs
 
@@ -103,9 +103,9 @@ MONETARY VALUE ESTIMATION
 
 SENSITIVITY ANALYSIS
 11. Compute ROI under different assumptions. Create a table with rows for different hourly rates ($50, $75, $100, $125) and columns for different utilization scenarios:
-    a. "Current active users only" — value from only currently active users.
-    b. "50% more adoption" — cap projected active people at the eligible population and retain the approved realisation assumption.
-    c. "Full adoption" — if all licensed users become active at the current average.
+    a. "Current active users only": value from only currently active users.
+    b. "50% more adoption": cap projected active people at the eligible population and retain the approved realisation assumption.
+    c. "Full adoption": if all licensed users become active at the current average.
 12. This table shows leadership how ROI improves with higher adoption.
 
 LICENSED VS. UNLICENSED COMPARISON (if collaboration metrics are available)
@@ -144,11 +144,11 @@ REPORT GENERATION
        | Break-even threshold | X.X hours/week |
        | Users above break-even | X% |
 
-    c. "Sensitivity Analysis" — the table from step 11.
+    c. "Sensitivity Analysis": the table from step 11.
 
-    d. "Value by Organization" — the table from step 15.
+    d. "Value by Organization": the table from step 15.
 
-    e. "Licensed vs. Unlicensed Comparison" (if applicable) — table from step 13.
+    e. "Licensed vs. Unlicensed Comparison" (if applicable): table from step 13.
 
     f. "Methodology & Caveats"
        - Data source and time period.
@@ -158,7 +158,7 @@ REPORT GENERATION
        - Note: time savings represent Copilot-assisted work, not necessarily net new time freed.
        - Privacy note: use max(the organisational requirement, 5 distinct people), with floor 10 for dashboard/joined outputs, including complementary cells and embedded data.
 
-    g. "Assumptions" — list all configurable assumptions and their values.
+    g. "Assumptions": list all configurable assumptions and their values.
 
 17. Use a clean, professional design. Format currency values with dollar signs and commas. Use bold text for headline numbers.
 18. Save as "copilot_roi_estimation_YYYYMMDD.html".

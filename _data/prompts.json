@@ -4,8 +4,8 @@
     "prompts": [
       {
         "slug": "dashboard",
-        "title": "Dashboard Overview — Copilot Adoption",
-        "summary": "Generate a comprehensive static HTML dashboard showing Copilot adoption trends, usage patterns, and organizational breakdowns.",
+        "title": "Copilot Adoption Dashboard",
+        "summary": "Build a static HTML dashboard of Copilot adoption trends, usage patterns and organisational breakdowns.",
         "page_url": "/frontier-analytics-prompt-dashboard/",
         "source_card": "copilot-adoption/dashboard-overview.md",
         "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/copilot-adoption/dashboard-overview.md",
@@ -20,8 +20,8 @@
       },
       {
         "slug": "executive-summary",
-        "title": "Executive Summary — Copilot Adoption",
-        "summary": "Generate a concise executive summary memo that distills Copilot adoption metrics into key findings, trend analysis, and actionable recommendations for senior leadership.",
+        "title": "Copilot Adoption Executive Summary",
+        "summary": "Summarise Copilot adoption metrics, trends and recommended actions in a memo for senior leadership.",
         "page_url": "/frontier-analytics-prompt-executive-summary/",
         "source_card": "copilot-adoption/executive-summary.md",
         "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/copilot-adoption/executive-summary.md",
@@ -36,7 +36,7 @@
       },
       {
         "slug": "roi",
-        "title": "ROI Estimation — Copilot Adoption",
+        "title": "Copilot Adoption ROI Estimation",
         "summary": "Build an assumption-based Copilot value scenario from verified activity or assisted-time metrics and licence costs. Assisted time is not measured time saved or realised ROI.",
         "page_url": "/frontier-analytics-prompt-roi/",
         "source_card": "copilot-adoption/roi-estimation.md",
@@ -52,8 +52,8 @@
       },
       {
         "slug": "segmentation",
-        "title": "Segmentation & Churn Analysis — Copilot Adoption",
-        "summary": "Classify Copilot users into behavioral segments based on usage intensity, track how users move between segments over time, and quantify churn — the rate at which users disengage from Copilot after initial adoption.",
+        "title": "Copilot Adoption Segmentation and Churn",
+        "summary": "Classify Copilot users by usage intensity, track movement between segments and quantify churn. Churn measures disengagement after initial adoption.",
         "page_url": "/frontier-analytics-prompt-segmentation/",
         "source_card": "copilot-adoption/segmentation-and-churn.md",
         "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/copilot-adoption/segmentation-and-churn.md",
@@ -69,7 +69,7 @@
       {
         "slug": "powerpoint",
         "title": "Executive PowerPoint Deck: Copilot Adoption",
-        "summary": "Generate an exec-ready 10-15 page PowerPoint deck (.pptx) with editable native PowerPoint charts, summarizing Copilot adoption trends, organizational breakdowns, and key recommendations.",
+        "summary": "Create a 10-15 slide PowerPoint deck (.pptx) with editable native charts covering Copilot adoption trends, organisational breakdowns and recommendations.",
         "page_url": "/frontier-analytics-prompt-powerpoint/",
         "source_card": "copilot-adoption/executive-powerpoint-deck.md",
         "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/copilot-adoption/executive-powerpoint-deck.md",
@@ -130,7 +130,7 @@
     "prompts": [
       {
         "slug": "audit-parsing",
-        "title": "Audit Log Parsing — Purview Audit Logs",
+        "title": "Purview Audit Log Parsing",
         "summary": "Parse and clean raw Microsoft Purview audit log exports into a flat, analysis-ready dataset. This is a data engineering prompt that prepares audit log data for downstream analytics (such as the Agent Usage Analysis prompt).",
         "page_url": "/frontier-analytics-prompt-audit-parsing/",
         "source_card": "purview-augmentation/audit-log-parsing.md",
@@ -146,8 +146,8 @@
       },
       {
         "slug": "agent-usage",
-        "title": "Agent Usage Analysis — Purview Audit Logs",
-        "summary": "Analyze Copilot agent and extension usage patterns from Microsoft Purview audit logs to understand which Copilot features and agents are being used, by whom, and how usage trends over time.",
+        "title": "Purview Agent Usage Analysis",
+        "summary": "Analyse Copilot agent and extension usage from Microsoft Purview audit logs, including which features and agents are used and how group-level usage changes over time.",
         "page_url": "/frontier-analytics-prompt-agent-usage/",
         "source_card": "purview-augmentation/agent-usage-analysis.md",
         "source_url": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/prompts/purview-augmentation/agent-usage-analysis.md",
