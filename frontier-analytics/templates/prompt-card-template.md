@@ -70,6 +70,7 @@ additional context. Include specific instructions about:
 - Output format and structure (file type, sections, charts, tables)
 - Error handling for common data issues (missing values, unexpected types, duplicates)
 - Which packages or libraries to use (and fallbacks if unavailable)
+- HR groupings: use fields present in the export. If none suit a breakdown, omit it, explain why, and continue with supported overall outputs.
 - Privacy: max(organisation requirement, workflow floor), generic 5 or joined-query/dashboard/causal 10 distinct people, including complementary cells and embedded data; no individual rankings
 - Configured cadence and measurement windows, not inferred from date spacing
 

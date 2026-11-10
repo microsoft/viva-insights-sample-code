@@ -22,7 +22,8 @@ a skill; frequent users can install the optional dashboard skill.
 - R and the dependencies listed by the runner; Pandoc for the reference demo.
 - Demo: supplied synthetic fixture files only.
 - Real: locally extracted activity and people-metadata CSVs, query grain,
-  date window, chosen HR group, mapping evidence and privacy requirements.
+  date window, mapping evidence and privacy requirements. An HR group is optional
+  and only used when a suitable field is available and grouping is requested.
 
 ## Assumptions
 
@@ -45,6 +46,7 @@ Recover choices already supplied, then ask only for missing checkout, demo versu
 Read frontier-analytics/skills/viva-insights-copilot-dashboards/SKILL.md in that checkout as workflow instructions, without requiring skill installation.
 Use its Consumption manifest and the shared R runner; do not regenerate the dashboard from scratch.
 For real exports, inspect locally, show supported and excluded panels, and get my approval before building.
+If no suitable HR group field is available, set `group=false`, omit group breakdowns, and keep supported period/service results.
 Do not invent tokens, licensing, coverage, identity mappings or causal conclusions.
 Use max(the organisational requirement, 10 distinct people) for all published
 and embedded data, protect complementary cells and never publish individual rankings.
@@ -77,6 +79,9 @@ complete query's configured scope. Null credit cells, failed joins, unavailable
 sources, out-of-scope periods and known coverage failures remain unresolved.
 Licensed-only M365 Copilot null semantics do not apply to credits. The credits-only runner reports
 observed records, not an invented eligible roster or non-user panel.
+Set the runner's `group` option to true only when a suitable mapped HR attribute is
+available and the user wants group breakdowns. Otherwise set it to false, omit HR-group
+outputs and retain supported period/service results.
 Present supported/excluded panels and mapping evidence; wait for my approval to build.
 Build only the supported M365 credits panels in real v1; sessions, Person Query
 associations and GitHub panels require separate verified adapters. Do not generate
@@ -91,13 +96,15 @@ After two unsuccessful repairs of the same failure, stop with the specific block
 Return the local report, rerun command, config/provenance and limitations. Do not publish.
 
 <!-- analysis-policy:start -->
-Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
-Absent activity inside a supplied complete query's configured scope contributes zero. Preserve unresolved joins, unavailable sources, out-of-scope periods and known coverage failures as unknown with reasons. Do not extend licensed-only M365 Copilot null semantics to unlicensed Copilot Chat or Consumption credits.
-Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
-Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
-Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.
-Choose a supported identifying design before causal claims and compatible estimators; default to association, retain unavailable checks and label synthetic evidence.
-Inspect installed package versions, signatures and return types; separate executed evidence from expected behaviour and do not silently fork upstream bugs.
+Use product-specific licence evidence. For documented native licensed-only M365 Copilot metrics, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days. Do not extend these semantics to unlicensed Copilot Chat or Consumption credits.
+Investigate conflicting licence evidence. Keep affected eligibility or activity unresolved, and withhold affected rates or estimates until resolved.
+Within a supplied complete query's configured scope, absent activity rows contribute zero. Keep failed joins, unavailable sources, out-of-scope periods and known coverage failures unresolved with reasons.
+Use configured grouping, week start and metric windows; date gaps do not establish cadence. State grain, units and estimand. Count distinct people; do not sum stocks or overlapping windows.
+Use max(organisation requirement, workflow floor): 5 distinct people for general analysis and 10 for joined-query, dashboard, causal or process workflows. Protect complementary cells and embedded data; never publish individual rankings.
+Use only HR attributes present in the export. If none suit a requested breakdown, omit it, explain why, and continue with supported overall results.
+Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications. Value scenarios require explicit conversion and realisation assumptions.
+Default to association. Make causal claims only with a supported design and compatible estimators. Record unavailable checks and label synthetic data.
+Check installed API versions, signatures and return types. Separate executed results from expectations and do not silently fork upstream bugs.
 <!-- analysis-policy:end -->
 ```
 

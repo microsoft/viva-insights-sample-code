@@ -14,9 +14,8 @@ For monthly or quarterly updates on Copilot adoption progress to senior leadersh
 
 ## Required inputs
 
-- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
+- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`), and optional HR attributes (e.g., `FunctionType`, `Area`, `Country`, or `Organization`)
 - At least 8 weeks of data recommended (12+ weeks preferred for trend analysis)
-- HR attributes for organizational breakdowns
 
 ## Assumptions
 
@@ -44,6 +43,7 @@ Calculate every reported number directly from the data, with distinct-person den
 Compare recent adoption and usage trends using the amount of history actually available, and call out when the dataset is too short for the preferred comparison window.
 Keep the tone balanced and executive-friendly, include specific numbers in findings and recommendations, and avoid unsupported claims.
 Suppress groups below max(the organisational requirement, 5 distinct people), including complementary cells and embedded data. Use floor 10 if this memo is part of a dashboard or joined-query workflow. Never publish individual rankings.
+Use only available HR attributes for group findings; if none are suitable, omit group comparisons and report overall results.
 End by listing any assumptions you made about activity metrics, comparison windows, or segment mappings.
 ```
 
@@ -58,16 +58,11 @@ LANGUAGE CHOICE
 Choose R or Python based on what is already installed in your environment to minimize setup.
 
 DATA LOADING AND PREPARATION
-Confirm configured weekly grouping, week start, measurement windows and supplied query scope before aggregation. Date gaps do not establish cadence. In a supplied complete query's configured scope, absent activity rows contribute zero. Native licensed-only M365 Copilot nulls mean unlicensed. Failed joins, unavailable sources, out-of-scope periods and known coverage failures stay unresolved with reasons. Do not blanket-fill nulls.
+Read the configured weekly grouping, period and metric windows before calculating rates. Apply the shared analysis policy below to eligibility, missingness and privacy.
 1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python). This handles variable name cleaning and type parsing automatically.
 2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity metric. Print the detected columns and the date range for verification.
 3. Identify HR / organizational attribute columns with `extract_hr(df, return = "names")` in R or `vi.extract_hr(df, return_type="suggestion")` in Python. Use the returned names for all organizational breakdowns instead of hard-coding column names.
-4. Classify each person-week row:
-   - "Licensed": positive Copilot Enabled User, positive Total Copilot enabled days or dated licence evidence for that week. Without these fields, a non-null value, including zero, in a verified native licensed-only M365 Copilot metric establishes licensing.
-   - "Active": is licensed AND has Total_Copilot_actions_taken > 0 (the primary activity metric).
-   - "Unlicensed": native null licensed-only M365 Copilot values, native null or zero enabled days, or explicit negative licence evidence.
-   - "Unknown": failed joins, unavailable sources or genuinely unresolved field semantics. Withhold the affected overall rate if licence status or licensed activity is unresolved. Investigate conflicting evidence.
-   - Ask for an approved dated licence list only if neither explicit fields nor documented native licensed-only metric semantics resolve licensing. Otherwise do not require an external list.
+4. Classify person-weeks using the shared eligibility policy. Prefer explicit enablement or dated licence evidence, then a verified native licensed-only M365 metric. Mark a person active when licensed and `Total_Copilot_actions_taken` is positive. Keep unresolved eligibility separate and do not calculate affected rates.
 5. If any expected HR attribute columns are not found by `extract_hr()`, note which ones are unavailable and proceed with what is present.
 
 HEADLINE METRICS (compute these for the memo)
@@ -75,22 +70,24 @@ HEADLINE METRICS (compute these for the memo)
 6. Adoption trend: Compare the average weekly adoption rate over the last 4 complete weeks to the prior 4 weeks. Calculate the percentage-point change. Classify as "improving", "stable" (within ±2pp), or "declining".
 7. Usage intensity: Average Total_Copilot_actions_taken per active user per week over the last 4 weeks. Compare to the prior 4-week period. Report the direction and magnitude of change.
 8. Breadth of adoption: Total unique users who have been active at least once in the last 4 weeks as a percentage of all licensed users in that period.
-9. Top 3 organizations by adoption rate (latest 4-week average). Bottom 3 organizations by adoption rate. Only include organizations with at least max(the organisational requirement, 10) distinct licensed people. Count distinct people per week, and distinguish average weekly rates from a pooled period rate.
+9. Select an available HR attribute for group comparisons, such as FunctionType, Area, Country or Organization. Rank the top and bottom three groups by the latest 4-week average adoption rate. Require at least max(the organisational requirement, 10) distinct licensed people per group. Count distinct people per week, and distinguish average weekly rates from a pooled period rate.
+   If no suitable attribute is available, omit group rankings and state why.
 10. Copilot_Assisted_Hours: Average weekly assisted hours per active user (last 4 weeks). Convert to a relatable figure (e.g., "X minutes per user per week").
 
 KEY FINDINGS (synthesize the metrics into 3-5 bullet points)
 11. Identify the most important story in the data. Is adoption growing? Plateauing? Declining? Which groups are leading and which are lagging?
+If no suitable HR attribute is available, focus on overall results and do not infer group differences.
 12. Look for notable patterns:
     - Is there a gap between license deployment and actual usage?
-    - Are certain functions or levels adopting faster than others?
+    - Are certain functions, areas, countries or other available groups adopting faster than others?
     - Is usage intensity growing even if adoption rate is flat (deepening engagement)?
     - Are there signs of churn (users who were active but stopped)?
 
 RECOMMENDATIONS (generate 2-4 actionable recommendations)
 13. Based on the findings, generate specific, actionable recommendations. Examples:
-    - "Target [specific org] for enablement workshops, as their adoption rate is X pp below average."
-    - "Investigate why [function type] has low adoption despite high license deployment."
-    - "Celebrate and share practices from [top org], which has achieved X% adoption."
+    - "Target [specific group] for enablement workshops, as its adoption rate is X pp below average."
+    - "Investigate why [available HR group] has low adoption despite high licence deployment."
+    - "Celebrate and share practices from [top group], which has achieved X% adoption."
     - "Consider a re-engagement campaign for the estimated N users who were active in weeks 1-4 but inactive in the most recent 4 weeks." Recommendations should reference specific numbers from the data.
 
 AREAS OF CONCERN (flag 1-3 risks or issues)
@@ -120,7 +117,7 @@ MEMO GENERATION
 
     SECTION 2: "Key Findings" (3-5 concise bullet points, each 1-2 sentences)
 
-    SECTION 3: "Organizational Breakdown" (a small table showing top and bottom orgs)
+    SECTION 3: "Group Breakdown" (if an HR attribute is available; otherwise state why it is omitted and continue with overall findings)
 
     SECTION 4: "Recommendations" (2-4 numbered recommendations, each 2-3 sentences)
 
@@ -141,20 +138,19 @@ MEMO GENERATION
 
 IMPORTANT NOTES
 - Do NOT fabricate numbers. Every statistic must be computed directly from the data.
-- Native licensed-only M365 Copilot nulls mean unlicensed. Preserve processing failures as unresolved and report exclusions and denominators.
-- If the dataset has fewer than 8 weeks, note this limitation and adjust trend calculations accordingly (e.g., compare last 2 weeks to prior 2 weeks).
-- Apply max(the organisational requirement, 5 distinct people) to all reported cells, using floor 10 for dashboard/joined outputs. Protect complementary cells and embedded data. Never publish individual rankings.
-- Low-activity flags are review candidates, not verified holidays or employment status. Use approved calendar/HR evidence before asserting those facts.
+- If the dataset has fewer than 8 weeks, state that limitation and use a shorter trend window only when the data supports a like-for-like comparison.
 - Keep the tone balanced. Report successes and genuine concerns without overstating either.
 
 <!-- analysis-policy:start -->
-Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
-Absent activity inside a supplied complete query's configured scope contributes zero. Preserve unresolved joins, unavailable sources, out-of-scope periods and known coverage failures as unknown with reasons. Do not extend licensed-only M365 Copilot null semantics to unlicensed Copilot Chat or Consumption credits.
-Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
-Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
-Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.
-Choose a supported identifying design before causal claims and compatible estimators; default to association, retain unavailable checks and label synthetic evidence.
-Inspect installed package versions, signatures and return types; separate executed evidence from expected behaviour and do not silently fork upstream bugs.
+Use product-specific licence evidence. For documented native licensed-only M365 Copilot metrics, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days. Do not extend these semantics to unlicensed Copilot Chat or Consumption credits.
+Investigate conflicting licence evidence. Keep affected eligibility or activity unresolved, and withhold affected rates or estimates until resolved.
+Within a supplied complete query's configured scope, absent activity rows contribute zero. Keep failed joins, unavailable sources, out-of-scope periods and known coverage failures unresolved with reasons.
+Use configured grouping, week start and metric windows; date gaps do not establish cadence. State grain, units and estimand. Count distinct people; do not sum stocks or overlapping windows.
+Use max(organisation requirement, workflow floor): 5 distinct people for general analysis and 10 for joined-query, dashboard, causal or process workflows. Protect complementary cells and embedded data; never publish individual rankings.
+Use only HR attributes present in the export. If none suit a requested breakdown, omit it, explain why, and continue with supported overall results.
+Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications. Value scenarios require explicit conversion and realisation assumptions.
+Default to association. Make causal claims only with a supported design and compatible estimators. Record unavailable checks and label synthetic data.
+Check installed API versions, signatures and return types. Separate executed results from expectations and do not silently fork upstream bugs.
 <!-- analysis-policy:end -->
 ```
 

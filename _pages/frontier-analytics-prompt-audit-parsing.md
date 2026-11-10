@@ -63,7 +63,7 @@ Use this shorter prompt for a fast first pass that adapts to your data.
 {% raw %}
 ```
 Help me parse a raw Microsoft Purview audit log export into a clean flat dataset and data dictionary that are ready for downstream analysis.
-Start by loading the actual file and printing row count, column names, data types, date range if available, and sample records so you can inspect the real schema before assuming any mappings.
+Start by loading the actual file and printing row count, column names, data types, date range if available, and sample records with direct identifiers such as UserId, UPNs and email addresses masked so you can inspect the real schema before assuming any mappings.
 Do not assume exact Purview or AuditData field names, and ask me for the file path or any known Copilot operation names if the mapping or filter logic is unclear.
 Parse AuditData defensively with error handling, count malformed rows, and adapt extracted columns to the structures actually present in the data.
 Flatten nested JSON only one level deep, keep deeper structures as JSON strings, standardize final names to snake_case, and avoid exposing raw UserIds in printed output.
@@ -90,7 +90,8 @@ PHASE 1: INITIAL LOADING AND INSPECTION
 1. Load the raw audit log file. Auto-detect the format:
    - If CSV: load with pandas (Python) or readr (R). Handle encoding issues (try utf-8, then utf-8-sig, then latin-1).
    - If JSON: detect whether it is a JSON array, newline-delimited JSON, or a single object. Load accordingly.
-2. Print: column names, data types, row count, and the first 3 rows.
+   - If the file exceeds 500MB, process it in chunks; for exploration, sample large datasets but use the full data for final counts.
+2. Print column names, data types, row count and 3 sample rows with direct user identifiers masked.
 3. Identify the core columns:
    - Timestamp: typically "CreationTime" or "CreationDate"
    - User: typically "UserId" or "UserKey"
@@ -107,7 +108,7 @@ PHASE 2: PARSING THE AUDITDATA JSON COLUMN
 5. If an AuditData column exists:
    a. Parse the JSON string for each row into a dictionary/object. Wrap parsing in a try-except to handle malformed JSON. Log the count of unparseable rows and skip them.
    b. Inspect the parsed JSON structure for a sample of 50 rows. Print the unique top-level keys found and their frequency. Identify which keys are present in most records vs. rare.
-   c. Identify common nested objects (keys whose values are dicts or lists). Print examples of the nested structures.
+   c. Identify common nested objects (keys whose values are dicts or lists). Print masked examples, recursively redacting direct identifiers such as UserId, UPNs and email addresses.
 
 6. Extract top-level fields from AuditData into new columns. Prioritize these fields (but use whatever is actually present in your data):
    - "Id" or "UniqueId" → event_id
@@ -144,11 +145,11 @@ PHASE 4: FILTERING FOR COPILOT EVENTS
     a. Count of Copilot events.
     b. Unique Copilot operation types.
     c. Date range of Copilot events.
-    d. Sample of 5 Copilot event rows (all extracted columns).
+    d. Sample of 5 Copilot event rows with direct user identifiers masked.
 
 PHASE 5: DATA CLEANING AND NORMALIZATION
 13. Apply the following cleaning steps to the full dataset (or the Copilot-filtered subset):
-    a. Parse all timestamp columns to datetime with timezone handling (Purview typically uses UTC).
+    a. Parse timestamps to datetime with timezone handling (usually UTC). Report invalid conversions rather than silently coercing them.
     b. Normalize UserId:
        - Strip whitespace and convert to lowercase.
        - If UPNs (email format), keep as-is for joining. Optionally create a hashed_user_id column for anonymized output.
@@ -180,6 +181,7 @@ PHASE 6: OUTPUT
       - Description (based on observed values)
       - Example values (2-3 examples)
       - Null rate
+    Mask or omit direct user identifiers in examples.
 
 17. Print a final summary:
     a. Total raw records loaded.
@@ -190,12 +192,6 @@ PHASE 6: OUTPUT
     f. Date range.
     g. Unique users.
 
-IMPORTANT NOTES
-- Prioritize robustness over speed. Wrap every JSON parse and type conversion in error handling.
-- Different Operation types may have different AuditData schemas. Check the structure before extracting fields from each row.
-- If the file is very large (>500MB), process in chunks rather than loading all at once.
-- Do NOT expose raw UserIds/email addresses in printed output. Show only the first few characters or use aggregate counts when printing summaries.
-- The data dictionary is critical for downstream users. Invest time in making it accurate.
 ```
 {% endraw %}
 

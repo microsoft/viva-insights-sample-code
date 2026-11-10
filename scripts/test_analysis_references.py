@@ -48,6 +48,13 @@ class AnalysisReferencesTests(unittest.TestCase):
         result = references.site_links("[support](workflow-support.md#capabilities)", source)
         self.assertIn("{{ site.baseurl }}/frontier-analytics-support/#capabilities", result)
 
+    def test_shared_policy_skips_group_breakdowns_without_available_fields(self):
+        summary = references.policy_summary()
+        self.assertIn(
+            "If none suit a requested breakdown, omit it, explain why, and continue with supported overall results.",
+            summary,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

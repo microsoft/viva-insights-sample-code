@@ -34,6 +34,23 @@ class PromptGenerationTests(unittest.TestCase):
             )
             self.assertEqual(metadata.full_prompt_blocks(source), metadata.full_prompt_blocks(rendered))
 
+    def test_purview_audit_samples_require_identifier_masking(self):
+        source = (metadata.PROMPTS_DIR / "purview-augmentation/audit-log-parsing.md").read_text(encoding="utf-8")
+        for instruction in (
+            "sample records with direct identifiers such as UserId, UPNs and email addresses masked",
+            "Print masked examples, recursively redacting direct identifiers",
+            "Sample of 5 Copilot event rows with direct user identifiers masked",
+            "Mask or omit direct user identifiers in examples.",
+        ):
+            with self.subTest(instruction=instruction):
+                self.assertIn(instruction, source)
+
+    def test_roi_prompt_resolves_null_assisted_hours_before_proxying(self):
+        source = (metadata.PROMPTS_DIR / "copilot-adoption/roi-estimation.md").read_text(encoding="utf-8")
+        self.assertIn("If Copilot_Assisted_Hours is null despite positive licence or activity evidence", source)
+        self.assertIn("withhold affected estimates until resolved", source)
+        self.assertIn("propose a documented proxy and conversion for approval", source)
+
     def test_multiple_prompts_liquid_and_code_links_are_literal(self):
         body = """# Example
 

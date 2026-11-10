@@ -40,9 +40,8 @@ After exporting a person query with Copilot activity metrics spanning at least 8
 
 ## Required inputs
 
-- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`, `Copilot_Chat_Queries`, `Copilot_Summarized_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
+- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`, `Copilot_Chat_Queries`, `Copilot_Summarized_Hours`), and optional HR attributes (e.g., `FunctionType`, `Area`, `Country` or `Organization`)
 - At least 8 weeks of data recommended
-- HR attributes for segmentation (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
 
 ## Assumptions
 
@@ -67,7 +66,8 @@ Start by loading the actual CSV and printing the row count, column names, data t
 Do not assume exact field names, and ask me to confirm the primary activity metric or any missing HR columns if the mapping is ambiguous.
 Prefer Copilot Enabled User or Total Copilot enabled days for licensing. Under the documented native licensed-only M365 Copilot rules, null means unlicensed and zero activity means licensed but inactive. Without explicit licence fields, use a verified metric with those semantics. Do not apply this rule to unlicensed Copilot Chat or Consumption credits.
 Confirm configured weekly grouping and metric windows. Date gaps do not establish cadence. Within a supplied complete query's configured scope, absent activity rows contribute zero. Failed joins, unavailable sources, out-of-scope periods and known coverage failures remain unresolved.
-Build weekly adoption metrics using distinct people per week, then add the most useful group views from the available HR attributes.
+Build weekly adoption metrics using distinct people per week, then add useful group views from available HR attributes. If no suitable group field exists, skip those views and explain why.
+Keep the overall dashboard even when no HR attribute is suitable for grouping.
 The output must be a single self-contained static HTML file with inline assets and no server or external dependencies.
 Suppress any group with fewer than 10 distinct people, or the stricter organisational minimum, and withhold breakdowns that could reveal suppressed cells. Do not publish individual rankings. Note skipped charts or missing segments.
 At the end, list any assumptions you made about metric selection, licensing logic, or field mappings.
@@ -86,7 +86,7 @@ LANGUAGE CHOICE
 Choose R or Python based on what is already installed in your environment to minimize setup.
 
 DATA LOADING AND VALIDATION
-Confirm configured grouping, week start, measurement windows and query scope before aggregation. Date spacing is a coverage/alignment diagnostic, not cadence evidence. State the person versus person-week estimand for each summary.
+Read the configured grouping, week start, measurement windows and query scope before aggregation. State whether each summary is person-weighted or person-week-weighted.
 1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python). This handles variable name cleaning and type parsing automatically.
 2. Ensure PersonId is treated as a string and MetricDate is parsed as a date type.
 3. Identify HR / organizational attribute columns with `extract_hr(df, return = "names")` in R or `vi.extract_hr(df, return_type="suggestion")` in Python. Use the returned names for all segmentation breakdowns instead of hard-coding column names.
@@ -95,7 +95,7 @@ Confirm configured grouping, week start, measurement windows and query scope bef
 6. List all column names so I can verify the Copilot metric columns and HR attribute columns match what is expected. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity proxy **if it is present**. Validate it against the taxonomy first, as it may not capture every Copilot surface or app.
 
 IDENTIFYING LICENSED USERS
-6. Prefer Copilot Enabled User, Total Copilot enabled days or dated licence records for the period. Native null enabled days mean unlicensed. If explicit licence fields are absent, use a verified native licensed-only M365 Copilot metric whose documented null means unlicensed and zero activity means licensed but inactive. Do not apply this to unlicensed Copilot Chat or Consumption credits. Preserve join-match indicators and keep processing failures unresolved. Withhold adoption only when licence status or licensed activity is genuinely unresolved. Within a supplied complete query's configured scope, absent activity rows contribute zero. Never blanket-fill after a join.
+6. Classify each person-week as licensed, unlicensed or unknown using the shared eligibility policy. Prefer explicit enabled-user/days or dated licence evidence; otherwise use only a verified native licensed-only M365 Copilot metric. Preserve join-match indicators and processing failures. Withhold adoption rates when eligibility or licensed activity is unresolved.
 7. Also flag "active" users: licensed users who have Total_Copilot_actions_taken > 0 (the primary activity metric) in that week. Create a boolean column `is_active`.
 8. Print a summary: total person-weeks, licensed person-weeks, active person-weeks.
 
@@ -110,15 +110,15 @@ METRIC CALCULATIONS
 10. Store these weekly aggregates in a summary DataFrame called `weekly_summary`.
 
 SEGMENTATION METRICS
-11. For each HR attribute (Organization, FunctionType, LevelDesignation), for each week, compute:
+11. For each selected HR attribute returned by `extract_hr()`, compute for each week:
     a. Licensed user count
     b. Active user count
     c. Adoption rate
     d. Mean Total_Copilot_actions_taken per active user
-12. Store each in a separate DataFrame (e.g., `org_summary`, `function_summary`, `level_summary`).
+12. Store each attribute's results separately, using names derived from the available fields.
 
 GROUP SUMMARY TABLE
-13. Compute activity summaries by an approved HR group using distinct people and the declared time window. Apply privacy suppression to every cell and omit the entire breakdown if remaining cells or totals could reveal a suppressed value. Do not publish person rows.
+13. If a suitable HR attribute is available, compute activity summaries for the selected group using distinct people and the declared time window. Apply privacy suppression to every cell and omit the breakdown if totals could reveal a suppressed value. Do not publish person rows. If no suitable field exists, omit the group table, say why, and continue with overall results.
 
 SUMMARY STATISTICS PANEL
 14. Calculate overall summary statistics for the dashboard header:
@@ -127,7 +127,7 @@ SUMMARY STATISTICS PANEL
     c. Total unique licensed users across the entire period
     d. Total unique active users across the entire period
     e. Average Total_Copilot_actions_taken per active user per week (grand mean)
-    f. Most active organization (highest adoption rate in the latest week)
+    f. Highest-adoption group for the selected HR attribute in the latest week, if available
 
 DASHBOARD GENERATION
 15. Create the dashboard as an intermediary document first, then export to HTML:
@@ -136,17 +136,15 @@ DASHBOARD GENERATION
 
 16. The HTML dashboard should contain these sections in order:
     a. HEADER: Title ("Copilot Adoption Dashboard"), date range, generation timestamp.
-    b. SUMMARY PANEL: Cards showing the key metrics from step 14 (adoption rate, trend, total users, avg actions, top org). Use colored indicators (green for positive trend, red for negative).
+    b. SUMMARY PANEL: Cards showing the key metrics from step 14 (adoption rate, trend, total users, avg actions and top group). Use colored indicators (green for positive trend, red for negative).
     c. TREND CHARTS:
        - Line chart: Weekly adoption rate over time
        - Line chart: Mean Total_Copilot_actions_taken per active user over time
        - Line chart: Mean Copilot_Assisted_Hours per active user over time
     d. SEGMENTATION CHARTS:
-       - Grouped bar chart: Adoption rate by Organization (latest 4-week average)
-       - Grouped bar chart: Adoption rate by FunctionType (latest 4-week average)
-       - Grouped bar chart: Adoption rate by LevelDesignation (latest 4-week average)
-       - Heatmap: Adoption rate by Organization × week (if number of orgs <= 15)
-    e. GROUP SUMMARY TABLE: privacy-protected aggregate table from step 13, with no identifiers.
+       - Grouped bar chart for each selected HR attribute (latest 4-week average), such as FunctionType, Area, Country or Organization, when present; skip group charts if none are suitable
+       - Heatmap: Adoption rate by a selected HR attribute × week, if that field is available and has no more than 15 groups
+    e. GROUP SUMMARY TABLE (if a suitable HR attribute is available): privacy-protected aggregate table from step 13, with no identifiers.
     f. METHODOLOGY NOTE: Brief paragraph explaining how adoption rate is calculated, what "licensed" and "active" mean, and the data source.
 
 17. Style the HTML with a clean, professional design. Use a sans-serif font, consistent color palette, and adequate whitespace. The dashboard should look presentable when opened in a browser.
@@ -155,22 +153,23 @@ DASHBOARD GENERATION
 
 IMPORTANT NOTES
 - Do NOT create interactive plots that require a running server (no plotly, no bokeh server). Static charts embedded in the RMarkdown/Jupyter output are preferred.
-- Preserve unknown coverage and eligibility. NaN is not proof of an unlicensed user.
 - Omit metrics without verified inputs, including assisted hours or licensing-dependent summaries. Describe skipped panels rather than estimating missing values.
 - If any HR attribute column is missing from the data, skip that segmentation chart and note it.
 - Use the `vivainsights` package (R or Python) for data loading (`import_query()`) and HR attribute discovery (`extract_hr()`). Use ggplot2 (R) or matplotlib/seaborn (Python) for charting.
 - All charts should have clear titles, axis labels, and legends.
-- Use at least 10 distinct people per published group, or the stricter organisational minimum.
-- Low-activity flags are review candidates, not verified holidays or job classifications. Assisted hours and actions are not measured time saved or realised ROI.
+- Use at least 10 distinct people per published group, or the stricter organisational minimum. Suppress complementary cells.
+- Assisted hours and actions are not measured time saved or realised ROI.
 
 <!-- analysis-policy:start -->
-Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
-Absent activity inside a supplied complete query's configured scope contributes zero. Preserve unresolved joins, unavailable sources, out-of-scope periods and known coverage failures as unknown with reasons. Do not extend licensed-only M365 Copilot null semantics to unlicensed Copilot Chat or Consumption credits.
-Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
-Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
-Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.
-Choose a supported identifying design before causal claims and compatible estimators; default to association, retain unavailable checks and label synthetic evidence.
-Inspect installed package versions, signatures and return types; separate executed evidence from expected behaviour and do not silently fork upstream bugs.
+Use product-specific licence evidence. For documented native licensed-only M365 Copilot metrics, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days. Do not extend these semantics to unlicensed Copilot Chat or Consumption credits.
+Investigate conflicting licence evidence. Keep affected eligibility or activity unresolved, and withhold affected rates or estimates until resolved.
+Within a supplied complete query's configured scope, absent activity rows contribute zero. Keep failed joins, unavailable sources, out-of-scope periods and known coverage failures unresolved with reasons.
+Use configured grouping, week start and metric windows; date gaps do not establish cadence. State grain, units and estimand. Count distinct people; do not sum stocks or overlapping windows.
+Use max(organisation requirement, workflow floor): 5 distinct people for general analysis and 10 for joined-query, dashboard, causal or process workflows. Protect complementary cells and embedded data; never publish individual rankings.
+Use only HR attributes present in the export. If none suit a requested breakdown, omit it, explain why, and continue with supported overall results.
+Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications. Value scenarios require explicit conversion and realisation assumptions.
+Default to association. Make causal claims only with a supported design and compatible estimators. Record unavailable checks and label synthetic data.
+Check installed API versions, signatures and return types. Separate executed results from expectations and do not silently fork upstream bugs.
 <!-- analysis-policy:end -->
 ```
 {% endraw %}

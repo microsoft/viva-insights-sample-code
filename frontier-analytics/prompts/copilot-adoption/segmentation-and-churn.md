@@ -14,10 +14,9 @@ After collecting at least 8–12 weeks of Person Query data, when you need to un
 
 ## Required inputs
 
-- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`), and HR attributes (e.g., `Organization`, `FunctionType`, `LevelDesignation`)
+- Person query CSV with columns: `PersonId`, `MetricDate`, Copilot metrics (e.g., `Copilot_Actions`, `Copilot_Assisted_Hours`), and optional HR attributes (e.g., `FunctionType`, `Area`, `Country` or `Organization`)
 - At least 8 weeks of data (12+ weeks recommended for meaningful churn analysis)
 - A Copilot enabled-days field or another confirmed source of weekly licence status
-- HR attributes for segmentation breakdowns
 
 ## Assumptions
 
@@ -42,6 +41,7 @@ Do not assume exact column names, and ask me for the file path, the main activit
 Prefer Copilot Enabled User or Total Copilot enabled days to establish licensing. For native licensed-only M365 Copilot metrics, null means unlicensed and zero activity means licensed but inactive. A verified metric with these semantics is a valid fallback without explicit licence fields.
 Use `identify_usage_segments()` (vivainsights) to compute the five weekly usage segments. If it is unavailable, clearly label any alternative segmentation and print its thresholds.
 Include both week-level segment trends and a stable user segment for group breakdowns, then build a week-to-week transition matrix only for users present in consecutive weeks.
+If no suitable HR attribute is available, skip group summaries and focus on overall segment and churn results.
 Independently of the rolling segments, define weekly activity from the observed action count. Churn means at least two consecutive active weeks followed by at least two consecutive inactive weeks; date it to the first inactive week once the second confirms it.
 Identify currently at-risk users separately: they have one inactive week immediately after at least two active weeks and have not yet met the churn definition. Do not treat unknown or unlicensed weeks as inactive.
 Flag if the time span is too short for reliable churn analysis.
@@ -64,12 +64,9 @@ DATA LOADING AND PREPARATION
 1. Load the person query CSV using `import_query()` from the `vivainsights` library (R or Python). This handles variable name cleaning and type parsing automatically.
 2. Identify Copilot metric columns by checking for columns containing the word "Copilot" in their name. Reference the taxonomy at https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/example-data/copilot-metrics-taxonomy.csv to classify and validate the detected metrics. Use `Total_Copilot_actions_taken` as the primary activity metric. Print detected columns and the date range.
 3. Identify HR / organizational attribute columns with `extract_hr(df, return = "names")` in R or `vi.extract_hr(df, return_type="suggestion")` in Python. Use the returned names for all segmentation breakdowns instead of hard-coding column names.
-4. Classify each person-week:
-   - "Licensed": positive Copilot Enabled User, positive Total Copilot enabled days or dated licence evidence for the week. Without these fields, a non-null value, including zero, in a verified native licensed-only M365 Copilot metric establishes licensing.
-   - "Unlicensed": native null licensed-only M365 Copilot values, native null or zero enabled days, or explicit negative licence evidence.
-   - "Unknown": failed joins, unavailable sources or genuinely unresolved field semantics. Investigate conflicting evidence. Do not extend licensed-only M365 Copilot semantics to unlicensed Copilot Chat or Consumption credits.
+4. Classify person-weeks using the shared eligibility policy. Prefer explicit enablement or dated licence evidence, then a verified native licensed-only M365 metric. Keep unresolved eligibility separate.
 5. Restrict segment and churn denominators to confirmed licensed person-weeks. Report the count with unknown licence status.
-6. Confirm configured weekly grouping, week start and measurement windows before calendar alignment. Date spacing alone does not establish cadence. Among licensed people, positive actions mean active and zero means inactive. An absent activity row within a supplied complete query's configured scope contributes zero, independently of licensing. Native unlicensed nulls are not inactive weeks. Failed joins, unavailable sources, out-of-scope periods and known coverage failures remain unresolved. Unlicensed or unresolved weeks break streaks and must remain in the calendar.
+6. Read configured grouping, week start and measurement windows before calendar alignment. For licensed weeks, positive actions mean active and zero means inactive. Keep unlicensed or unresolved weeks in the calendar as breaks in segment windows and activity streaks.
 
 USER SEGMENTATION
 6. Use `identify_usage_segments()` from the `vivainsights` library to classify users into segments. This function uses `Total_Copilot_actions_taken` and classifies users based on both usage volume and consistency (habit formation over 12 weeks). Its canonical, mutually exclusive ladder is Power Users → Habitual Users → Novice Users → Low Users → Non-users (see the [Copilot Usage Segments definitions](https://microsoft.github.io/viva-insights-sample-code/copilot-usage-segments/#formal-definitions)). It is preferred over manual percentile-based segmentation. Use these exact segment names consistently throughout the report. Do not use the rolling segment as the weekly activity flag. Require a full contiguous licensed history with known activity for each rolling window. Withhold only affected windows when unlicensed weeks or unresolved evidence occur, without aborting other people's valid histories or recoding unlicensed people as licensed Non-users.
@@ -86,7 +83,8 @@ SEGMENT BREAKDOWN BY HR ATTRIBUTES
 9. For each available HR attribute, compute the segment distribution using the "stable segment" label. Create:
    a. A stacked bar chart showing segment proportions by each HR attribute value.
    b. Only publish groups with max(the organisational requirement, 5 distinct licensed people), using floor 10 for dashboard/joined outputs. Protect complementary cells and embedded data, and never publish individual rankings.
-10. Identify groups with the highest proportions of Power Users and Non-users. Label these as segment distributions, not as the separate at-risk churn definition below.
+   If no suitable attribute is available, omit group charts and continue with the overall segment trends.
+10. If group attributes are available, identify groups with the highest proportions of Power Users and Non-users. Label these as segment distributions, not as the separate at-risk churn definition below.
 
 TRANSITION ANALYSIS
 11. Build a week-over-week transition matrix. For each consecutive pair of weeks, count how many users moved from each segment to every other segment. Aggregate across all week transitions.
@@ -113,8 +111,8 @@ CHURN ANALYSIS
 
 AT-RISK USER IDENTIFICATION
 20. Identify currently at-risk users: licensed users with exactly 1 inactive week immediately after at least 2 consecutive active weeks. They have not yet met the churn definition.
-21. Summarize at-risk users by HR attribute: which organizations, functions, or levels have the highest concentration of at-risk users?
-22. Create a table of at-risk user counts by available HR attributes.
+21. If an HR attribute is available, summarise at-risk users by a selected field, such as FunctionType, Area, Country or Organization.
+22. Create a table of at-risk user counts by available HR attributes. If no suitable field exists, omit group summaries and state why.
 
 REPORT GENERATION
 23. Compile all outputs into an intermediary document first, then export to HTML:
@@ -122,10 +120,10 @@ REPORT GENERATION
     - Python: Create a Jupyter notebook (.ipynb), then export to a self-contained HTML file. Keep the intermediary file alongside the HTML output for troubleshooting. The report should contain these sections:
     a. "Segment Definitions": explain the five segments and thresholds used.
     b. "Segment Distribution": charts from step 8 and summary table.
-    c. "Segment Breakdown by Group": charts and segment-distribution callouts from steps 9 and 10.
+    c. "Segment Breakdown by Group" (if suitable HR attributes are available): charts and segment-distribution callouts from steps 9 and 10.
     d. "Transition Analysis": heatmap from step 13, key transition highlights from step 14.
     e. "Churn Analysis": churn rate trend, time-to-churn histogram, summary statistics.
-    f. "At-Risk Users": summary table from step 22.
+    f. "At-Risk Users": overall summary and, if available, the group table from step 22.
     g. "Key Takeaways": 3-5 bullet points synthesising the most important findings.
     h. "Methodology": brief description of data source, segment definitions, churn definition.
 
@@ -134,22 +132,20 @@ REPORT GENERATION
 
 IMPORTANT NOTES
 - Segments are assigned by `identify_usage_segments()` based on both usage volume and consistency (habit formation over 12 weeks). Print the segment definitions used so the reader can interpret them.
-- Do NOT count unlicensed or unknown-licence users in licensed denominators.
-- Apply max(the organisational requirement, 5 distinct people), using floor 10
-  for dashboard/joined outputs, including complementary cells and embedded data.
-- Low-activity flags need review; they do not establish verified holidays,
-  employment status or job classifications.
-- The transition matrix should only include users who appear in both consecutive weeks.
+- Use at least 10 distinct people for dashboard or joined-query breakdowns, or the stricter organisational minimum. Suppress complementary cells.
+- Build transitions only for users observed in both consecutive weeks.
 - If the dataset has fewer than 8 weeks, note that churn analysis may not be reliable; do not silently change the churn definition.
 
 <!-- analysis-policy:start -->
-Use product-specific licence evidence. For native M365 Copilot metrics covered by Microsoft's documented rules, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days when present.
-Absent activity inside a supplied complete query's configured scope contributes zero. Preserve unresolved joins, unavailable sources, out-of-scope periods and known coverage failures as unknown with reasons. Do not extend licensed-only M365 Copilot null semantics to unlicensed Copilot Chat or Consumption credits.
-Read configured grouping, week start and measurement windows; date spacing is diagnostic only. State grain, units and estimand, count distinct people and do not sum stocks or overlapping windows.
-Use max(organisation requirement, workflow-specific privacy floor), protect complementary cells and embedded data, and never publish individual rankings.
-Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications; value scenarios need explicit conversion and realisation assumptions.
-Choose a supported identifying design before causal claims and compatible estimators; default to association, retain unavailable checks and label synthetic evidence.
-Inspect installed package versions, signatures and return types; separate executed evidence from expected behaviour and do not silently fork upstream bugs.
+Use product-specific licence evidence. For documented native licensed-only M365 Copilot metrics, null means unlicensed and zero activity means licensed but inactive. Prefer Copilot Enabled User or Total Copilot enabled days. Do not extend these semantics to unlicensed Copilot Chat or Consumption credits.
+Investigate conflicting licence evidence. Keep affected eligibility or activity unresolved, and withhold affected rates or estimates until resolved.
+Within a supplied complete query's configured scope, absent activity rows contribute zero. Keep failed joins, unavailable sources, out-of-scope periods and known coverage failures unresolved with reasons.
+Use configured grouping, week start and metric windows; date gaps do not establish cadence. State grain, units and estimand. Count distinct people; do not sum stocks or overlapping windows.
+Use max(organisation requirement, workflow floor): 5 distinct people for general analysis and 10 for joined-query, dashboard, causal or process workflows. Protect complementary cells and embedded data; never publish individual rankings.
+Use only HR attributes present in the export. If none suit a requested breakdown, omit it, explain why, and continue with supported overall results.
+Treat low-activity flags as review candidates, not verified holidays, employment status or job classifications. Value scenarios require explicit conversion and realisation assumptions.
+Default to association. Make causal claims only with a supported design and compatible estimators. Record unavailable checks and label synthetic data.
+Check installed API versions, signatures and return types. Separate executed results from expectations and do not silently fork upstream bugs.
 <!-- analysis-policy:end -->
 ```
 
