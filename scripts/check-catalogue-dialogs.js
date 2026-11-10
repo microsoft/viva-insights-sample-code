@@ -80,7 +80,7 @@ const server = http.createServer(async (request, response) => {
     }
 
     await page.goto(base + 'frontier-analytics-prompts/', { waitUntil: 'load' });
-    assert.equal(await page.locator('.prompt-card').count(), 10);
+    assert.equal(await page.locator('.prompt-card').count(), 13);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
     assert.equal(await page.locator('.prompt-card-summary a').count(), 0);
     assert.match(await page.locator('[data-prompt-open="audit-parsing"]').locator('..').innerText(), /Agent Usage Analysis/);
@@ -127,8 +127,8 @@ const server = http.createServer(async (request, response) => {
       new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
     const fallbackPage = await noScript.newPage();
     await fallbackPage.goto(base + 'frontier-analytics-prompts/', { waitUntil: 'load' });
-    assert.equal(await fallbackPage.locator('[data-prompt-details] [data-prompt-panel]').count(), 10);
-    for (const id of ['copilot-adoption', 'query-dashboards', 'purview-augmentation']) {
+    assert.equal(await fallbackPage.locator('[data-prompt-details] [data-prompt-panel]').count(), 13);
+    for (const id of ['copilot-adoption', 'person-query-analysis', 'query-dashboards', 'purview-augmentation']) {
       assert.equal(await fallbackPage.locator(`[id="${id}"]`).count(), 1);
     }
     await noScript.close();

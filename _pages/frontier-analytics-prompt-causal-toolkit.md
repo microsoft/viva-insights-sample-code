@@ -335,5 +335,5 @@ Check installed API versions, signatures and return types. Separate executed res
 
 <div class="prompt-nav">
   <a href="{{ site.baseurl }}/frontier-analytics-prompt-audit-parsing/">← Previous: Audit Log Parsing</a>
-  <span class="nav-disabled">Next →</span>
+  <a href="{{ site.baseurl }}/frontier-analytics-prompt-employee-wellbeing/">Next: Employee Wellbeing →</a>
 </div>

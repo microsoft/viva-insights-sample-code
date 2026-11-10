@@ -10,6 +10,14 @@
       "badges": {"data_source": "Person Query", "min_data": "8+ weeks", "language": "R or Python", "output": "Static HTML dashboard", "difficulty": "Intermediate"}
     },
     {
+      "source": "copilot-adoption/ai-adoption-overview.md",
+      "slug": "ai-adoption",
+      "title": "AI Adoption Across Tools Prompt",
+      "nav_label": "AI Adoption Across Tools",
+      "last_validated": null,
+      "badges": {"data_source": "Person / Consumption / Agent queries", "min_data": "1 common week; 8+ recommended", "language": "R or Python", "output": "Static HTML report", "difficulty": "Intermediate"}
+    },
+    {
       "source": "copilot-adoption/executive-summary.md",
       "slug": "executive-summary",
       "title": "Copilot Adoption Executive Summary Prompt",
@@ -56,6 +64,22 @@
       }
     },
     {
+      "source": "person-query/employee-wellbeing.md",
+      "slug": "employee-wellbeing",
+      "title": "Employee Wellbeing and Workload Signals Prompt",
+      "nav_label": "Employee Wellbeing",
+      "last_validated": null,
+      "badges": {"data_source": "Person Query", "min_data": "4 complete weeks for exposure flag", "language": "R or Python", "output": "Static HTML report", "difficulty": "Intermediate"}
+    },
+    {
+      "source": "person-query/external-collaboration.md",
+      "slug": "external-collaboration",
+      "title": "External Collaboration Patterns Prompt",
+      "nav_label": "External Collaboration",
+      "last_validated": null,
+      "badges": {"data_source": "Person Query; optional counterpart data", "min_data": "1 complete period; 2+ for trends", "language": "R or Python", "output": "Static HTML report", "difficulty": "Intermediate"}
+    },
+    {
       "source": "purview-augmentation/audit-log-parsing.md",
       "slug": "audit-parsing",
       "title": "Purview Audit Log Parsing Prompt",
@@ -85,7 +109,7 @@
     }
   ],
   "repo_only": ["person-query/causal-diagnostics.md"],
-  "navigation": ["dashboard", "executive-summary", "segmentation", "roi", "powerpoint", "agent-usage", "audit-parsing", "causal-toolkit"],
+  "navigation": ["dashboard", "ai-adoption", "executive-summary", "segmentation", "roi", "powerpoint", "agent-usage", "audit-parsing", "causal-toolkit", "employee-wellbeing", "external-collaboration"],
   "links": {
     "frontier-analytics/starter-kits/consumption-dashboard/README.md": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/starter-kits/consumption-dashboard/README.md",
     "frontier-analytics/starter-kits/developer-experience-dashboard/README.md": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/starter-kits/developer-experience-dashboard/README.md",

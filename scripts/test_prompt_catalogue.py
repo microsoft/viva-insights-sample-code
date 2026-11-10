@@ -24,6 +24,15 @@ class PromptGenerationTests(unittest.TestCase):
         with mock.patch.object(pages, "PAGES_DIR", Path("nonexistent")):
             self.assertEqual(catalogue.generated_catalogue(), catalogue.SITE_DATA.read_text(encoding="utf-8"))
 
+    def test_unvalidated_card_does_not_inherit_historical_validation_date(self):
+        item = {**metadata.PAGES[0], "last_validated": None}
+        source = (metadata.PROMPTS_DIR / item["source"]).read_text(encoding="utf-8")
+        rendered = pages.render_page(item, source)
+        front_matter = rendered.split("---", 2)[1]
+        self.assertNotIn("last_validated:", front_matter)
+        self.assertIn("badges:", front_matter)
+        self.assertEqual(metadata.full_prompt_blocks(source), metadata.full_prompt_blocks(rendered))
+
     def test_fenced_prompt_and_code_bytes_preserved(self):
         for item in metadata.PAGES:
             source = (metadata.PROMPTS_DIR / item["source"]).read_text(encoding="utf-8")

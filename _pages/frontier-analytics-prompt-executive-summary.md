@@ -205,6 +205,6 @@ Check installed API versions, signatures and return types. Separate executed res
 {% include responsible-use.html %}
 
 <div class="prompt-nav">
-  <a href="{{ site.baseurl }}/frontier-analytics-prompt-dashboard/">← Previous: Dashboard Overview</a>
+  <a href="{{ site.baseurl }}/frontier-analytics-prompt-ai-adoption/">← Previous: AI Adoption Across Tools</a>
   <a href="{{ site.baseurl }}/frontier-analytics-prompt-segmentation/">Next: Segmentation &amp; Churn →</a>
 </div>

@@ -194,5 +194,5 @@ Check installed API versions, signatures and return types. Separate executed res
 
 <div class="prompt-nav">
   <span class="nav-disabled">← Previous</span>
-  <a href="{{ site.baseurl }}/frontier-analytics-prompt-executive-summary/">Next: Executive Summary →</a>
+  <a href="{{ site.baseurl }}/frontier-analytics-prompt-ai-adoption/">Next: AI Adoption Across Tools →</a>
 </div>
