@@ -139,6 +139,7 @@
         this.ref("id");
         this.field("title", { boost: 10 });
         this.field("description", { boost: 5 });
+        this.field("keywords", { boost: 5 });
         this.field("content");
         data.forEach(function (doc, i) {
           doc.id = i;

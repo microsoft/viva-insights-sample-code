@@ -41,4 +41,4 @@ do not establish causal impact. Keep customer exports outside this repository.
 
 [Copilot Analytics]({{ site.baseurl }}/copilot/) ·
 [Getting Started]({{ site.baseurl }}/getting-started/) ·
-[Causal Inference]({{ site.baseurl }}/causal-inference/)
+[Causal decision guide]({{ site.baseurl }}/articles/causal-questions-ai-usage/)

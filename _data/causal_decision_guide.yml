@@ -1,0 +1,152 @@
+# Single source of truth for the causal decision guide.
+# Rendered by _includes/causal-decision-guide.html and checked by scripts/test_causal_decision_guide.py.
+# Answer fields: label, to (node or leaf id), set (mode to remember), next (mode -> node id).
+start: q1
+
+nodes:
+  - id: q1
+    question: What do you want to learn?
+    answers:
+      - label: Who uses AI, how much, and which tools
+        to: descriptive
+      - label: Whether giving people access changed an outcome
+        to: q2
+        set: access
+      - label: Whether using AI more changed an outcome
+        to: q2
+        set: intensity
+
+  - id: q2
+    question: Is your outcome measured repeatedly, before and after exposure, at a grain that matches it?
+    help: Weekly Viva Insights metrics usually qualify. Annual ratings copied to every week do not.
+    anchor: "#choosing-outcome"
+    answers:
+      - label: Yes, a weekly or monthly Viva Insights metric
+        to: q3
+      - label: Yes, a team-level KPI with enough teams and periods
+        to: q3
+        help: Analyse it at team-period level. Do not copy team outcomes onto every person.
+      - label: No, it is measured once or only after exposure
+        to: q2b
+
+  - id: q2b
+    question: Your outcome is observed once. Was access assigned at random, or by a cut-off?
+    help: A single post-exposure outcome can still support a randomised comparison or a regression discontinuity.
+    answers:
+      - label: At random, for example a pilot lottery or randomised waves
+        to: randomised
+      - label: By a cut-off on a score or eligibility rule
+        to: rdd
+      - label: Neither
+        to: selection
+
+  - id: q3
+    question: Can you build the person-week exposure panel, resolve each tool's coverage, and aggregate to your outcome's unit and frequency?
+    anchor: "#joined-panel"
+    answers:
+      - label: "Yes"
+        to: q4
+      - label: Not yet
+        to: panel
+
+  - id: q4
+    question: Was access assigned at random, or by an arbitrary rule?
+    answers:
+      - label: At random, for example a pilot lottery or randomised waves
+        to: randomised
+      - label: By a cut-off on a score or eligibility rule
+        to: rdd
+      - label: Neither, it was a business decision
+        next:
+          access: q5
+          intensity: q8
+
+  - id: q5
+    question: Among people eligible for the tool, were some not yet, or never, treated during your window?
+    help: Use of other AI tools does not rule out a comparison group. It changes the question to this tool versus other AI use.
+    anchor: "#joined-panel"
+    answers:
+      - label: "Yes"
+        to: q6
+      - label: No, everyone eligible was treated at about the same time
+        to: q7
+
+  - id: q6
+    question: Did licence dates vary within functions?
+    anchor: "#function-confounding"
+    answers:
+      - label: Yes, several waves within the same function
+        to: staggered-did
+      - label: No, each function was licensed at once, at different times
+        to: between-function
+      - label: Only a few groups were treated, with a long history before
+        to: synthetic
+
+  - id: q7
+    question: There is no comparison group. What variation is left?
+    answers:
+      - label: A long, stable history and a sharp start date
+        to: itsa
+      - label: People differ in how much they use the tool
+        to: dose
+        help: This changes the question from the effect of access to the effect of usage intensity.
+      - label: Neither
+        to: no-estimate
+
+  - id: q8
+    question: Can you compare heavy and light users within function, with rich pre-exposure information?
+    answers:
+      - label: Yes, and I observe each person over time
+        to: dose
+        help: With credible pre-exposure adjustment and overlap, selection on observables may also apply.
+      - label: Yes, but I observe each person once
+        to: selection
+      - label: "No"
+        to: no-estimate
+        help: Consider studying the effect of access instead.
+
+leaves:
+  - id: descriptive
+    anchor: "#route-descriptive"
+    title: Describe use without a causal claim
+    summary: Report who uses which tools and how often. This answers a descriptive question well and makes no claim about outcomes.
+  - id: randomised
+    anchor: "#route-randomised"
+    title: Compare by assignment
+    summary: Random assignment lets you compare the assigned groups directly, which is the strongest design available here.
+  - id: rdd
+    anchor: "#route-rdd"
+    title: Regression discontinuity
+    summary: Compare people just either side of the cut-off. The estimate applies to people close to that threshold.
+  - id: staggered-did
+    anchor: "#route-staggered-did"
+    title: Staggered DiD within function
+    summary: Use a difference-in-differences estimator built for staggered timing, comparing newly licensed people with eligible colleagues in the same function who are not yet, or never, licensed.
+  - id: between-function
+    anchor: "#route-between-function"
+    title: Between-function comparison, with caution
+    summary: Compare functions licensed at different times. Function differences can look like effects, so treat the estimate as tentative.
+  - id: synthetic
+    anchor: "#route-synthetic"
+    title: Synthetic control or controlled ITSA
+    summary: Build a weighted comparison from untreated groups, or add a control series to an interrupted time series, and read the result as suggestive.
+  - id: itsa
+    anchor: "#route-itsa"
+    title: Single-series ITSA, as weak evidence
+    summary: Look for a change in level or trend at the start date. Other events at the same time can produce the same pattern.
+  - id: dose
+    anchor: "#route-dose"
+    title: Dose-response within person
+    summary: Relate changes in usage to changes in the outcome for the same person, which is consistent with an effect but does not prove one.
+  - id: selection
+    anchor: "#route-selection"
+    title: Selection on observables
+    summary: Adjust for what you can measure before exposure. Unmeasured differences between heavy and light users may remain.
+  - id: no-estimate
+    anchor: "#route-no-estimate"
+    title: Report descriptively
+    summary: The data do not support a credible estimate. Describe what you see and say which data would allow one.
+  - id: panel
+    anchor: "#joined-panel"
+    title: Build the joined panel first
+    summary: Join each tool's usage onto the Person Query as a person-week panel before choosing a design.

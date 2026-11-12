@@ -7,9 +7,15 @@ permalink: /articles/
 ---
 # Articles
 
-Long-form editorials and research-led perspectives on Viva Insights, meeting culture, and AI-enabled collaboration.
+Long-form editorials, research-led perspectives and methods guides on Viva Insights, meeting culture, and AI-enabled collaboration.
 
 <div class="vi-card-grid">
+  <a class="vi-card" href="{{ site.baseurl }}/articles/causal-questions-ai-usage/">
+    <span class="vi-card-icon">🧭</span>
+    <span class="vi-card-title">Causal Questions About AI Usage</span>
+    <span class="vi-card-desc">A question-led guide to choosing a causal design for staggered, function-led AI rollouts, from the outcome you measure to the checks you run.</span>
+    <span class="vi-card-more">Read article →</span>
+  </a>
   <a class="vi-card" href="{{ site.baseurl }}/articles/meeting-effectiveness-playbook/">
     <span class="vi-card-icon">📘</span>
     <span class="vi-card-title">The Meeting Effectiveness Playbook</span>

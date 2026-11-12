@@ -126,4 +126,4 @@ When those hold, it can support statements like "for comparable employees, highe
 Treat the estimates as **decision-support evidence** to be triangulated with experiments and domain knowledge, not as definitive proof. The [Interpretation Guide]({{ site.baseurl }}/copilot-causal-toolkit-interpretation-guide/) discusses these caveats per output.
 </div>
 
-New to causal inference more broadly? Start with the conceptual [Causal Inference in Copilot Analytics]({{ site.baseurl }}/causal-inference/) guide.
+New to causal inference more broadly? The [causal decision guide]({{ site.baseurl }}/articles/causal-questions-ai-usage/) helps you check whether this toolkit's design fits your data.
