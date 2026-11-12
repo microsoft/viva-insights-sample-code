@@ -14,27 +14,29 @@ Organizational Network Analysis (ONA) maps the relationships and interactions be
 
 Viva Insights makes network metrics available through four query types. Sample scripts on this page currently cover two of them — pick a card to jump straight to one, or read on for the full picture.
 
+Group-to-Group, Person-to-Person and Person-to-Group share the **Cross collaboration query** icon. Person Query uses its own icon.
+
 <div class="vi-card-grid" markdown="0">
   <a class="vi-card" href="#group-to-group-network-analysis">
-    <span class="vi-card-icon">🏢</span>
+    <span class="vi-card-icon"><img class="vi-query-icon" src="{{ site.baseurl }}/assets/images/queries/cross-collaboration.svg" alt="" width="52" height="52" decoding="async" /></span>
     <span class="vi-card-title">Group-to-Group Query</span>
     <span class="vi-card-desc">An edgelist with each row representing the collaboration of one grouping (organizational) attribute with another.</span>
     <span class="vi-card-more">Jump to section →</span>
   </a>
   <a class="vi-card" href="#person-to-person-network-analysis">
-    <span class="vi-card-icon">🧑‍🤝‍🧑</span>
+    <span class="vi-card-icon"><img class="vi-query-icon" src="{{ site.baseurl }}/assets/images/queries/cross-collaboration.svg" alt="" width="52" height="52" decoding="async" /></span>
     <span class="vi-card-title">Person-to-Person Query</span>
     <span class="vi-card-desc">An edgelist with each row representing the collaboration of one person with another.</span>
     <span class="vi-card-more">Jump to section →</span>
   </a>
   <a class="vi-card" href="https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics">
-    <span class="vi-card-icon">👤</span>
+    <span class="vi-card-icon"><img class="vi-query-icon" src="{{ site.baseurl }}/assets/images/queries/person-query.svg" alt="" width="52" height="52" decoding="async" /></span>
     <span class="vi-card-title">Person Query (Network Metrics)</span>
     <span class="vi-card-desc">Person-date level metrics such as Strong ties, Diverse ties, Influencer score, and Internal network size. No sample script in this repo yet.</span>
     <span class="vi-card-more">Metrics reference →</span>
   </a>
   <a class="vi-card" href="https://learn.microsoft.com/en-us/viva/insights/advanced/reference/metrics">
-    <span class="vi-card-icon">🕸️</span>
+    <span class="vi-card-icon"><img class="vi-query-icon" src="{{ site.baseurl }}/assets/images/queries/cross-collaboration.svg" alt="" width="52" height="52" decoding="async" /></span>
     <span class="vi-card-title">Person-to-Group Query</span>
     <span class="vi-card-desc">An edgelist with each row representing one person's collaboration with respect to a grouping (organizational) attribute. No sample script in this repo yet.</span>
     <span class="vi-card-more">Metrics reference →</span>

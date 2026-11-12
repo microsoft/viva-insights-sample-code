@@ -21,35 +21,165 @@ limitations before sharing the output.
 
 ## Quick start with a coding agent
 
-Start with the [Viva Insights analysis Skill]({{ site.baseurl }}/frontier-analytics-skills/#skill-viva-insights-analysis).
-It helps your agent choose functions from the **vivainsights R or Python
-package**, check export quality and apply the shared analytical conventions.
-You still need the chosen language and package installed.
+Follow these steps to validate a Person Query, then choose a report to build.
+Use a coding agent and data-handling environment approved by your organisation.
+If you want to explore an example first, [open the synthetic dashboard demos](#explore-the-dashboard-demos)
+without installing anything.
 
-1. **Install the whole Skill folder**, including its references and examples.
-   The linked Skill panel includes installation commands.
-2. **Open an approved coding agent** in a private working folder with your
-   export. Keep employee data outside this public sample repository and use
-   an agent approved by your organisation for that data.
-3. **Start with validation.** Paste the following, replacing the file location
-   and choosing R or Python:
+### 1. Prepare a private working folder and your export
 
-```text
-Use the Viva Insights analysis Skill with the vivainsights Python package.
-My Person Query CSV is at [local file path]. Inspect its columns, confirm
-the query cadence and date range, and report data-quality issues first.
-Use existing package functions where available. Do not publish individual
-results or groups below the applicable privacy minimum.
-Then propose an analysis of Copilot usage by organisation for my review.
+Create a folder outside this public sample repository. For example, run the
+following in **PowerShell** from an approved location for your analysis:
+
+```powershell
+New-Item -ItemType Directory -Path viva-insights-workspace
+Set-Location viva-insights-workspace
+New-Item -ItemType Directory -Path data, output
 ```
 
-For R, replace "Python package" with "R package". The Skill selects suitable
-package functions, but does not install dependencies or certify the output.
-Check the validation summary and proposed scope before proceeding.
-For the supplied Consumption or Developer Experience templates, use the
-[Copilot query dashboards Skill]({{ site.baseurl }}/frontier-analytics-skills/#skill-viva-insights-copilot-dashboards)
-alongside the analysis Skill. Business Leaders currently has its own
-[rendering guide]({{ site.baseurl }}/copilot-dashboards/business-leaders-ai-usage/).
+In the Viva Insights Analyst portal, [create and download a Person Query](https://learn.microsoft.com/en-us/viva/insights/advanced/analyst/person-query).
+Save its CSV as `data\person-query.csv`, or use your own filename in the prompt
+below. Keep the query's population, date grouping, week start and metric settings
+alongside the export. Start with the [Person Query schema]({{ site.baseurl }}/frontier-analytics-schemas/#person-query-key-concepts)
+to check the required columns. For several exports, also use the
+[query join guide]({{ site.baseurl }}/query-join-guide/).
+
+No export yet? The [sample-data examples]({{ site.baseurl }}/getting-started/#load-and-explore-your-data)
+show how to load `pq_data` in R or `load_pq_data()` in Python. Tell the agent to
+use that sample instead of a CSV and label every output as sample data.
+
+### 2. Set up R or Python
+
+Choose one language for general analysis. The reference dashboard templates
+require R and their additional rendering dependencies.
+
+<details markdown="1">
+<summary>Python: install the package in an isolated environment</summary>
+
+Install [Python](https://www.python.org/downloads/) if needed, then run these
+commands in PowerShell from your working folder:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install vivainsights
+.\.venv\Scripts\python.exe -c "from importlib.metadata import version; import vivainsights; print(version('vivainsights'))"
+```
+
+The last command should print the installed version without an import error.
+Tell the agent to use `.\.venv\Scripts\python.exe` so it uses this environment.
+For other operating systems, see the [environment setup guide]({{ site.baseurl }}/getting-started/#install-the-vivainsights-package).
+The [Python function guide](https://microsoft.github.io/vivainsights-py/function-discovery.html)
+lists supported analyses.
+
+</details>
+
+<details markdown="1">
+<summary>R: install the package and check it loads</summary>
+
+Install [R](https://cran.r-project.org/) and, optionally,
+[RStudio](https://posit.co/download/rstudio-desktop/). Run this in the R console:
+
+```r
+install.packages("vivainsights")
+library(vivainsights)
+packageVersion("vivainsights")
+```
+
+The last command should print the installed version without an error.
+The [R function guide](https://microsoft.github.io/vivainsights/articles/function-discovery.html)
+lists supported analyses. See [Getting Started]({{ site.baseurl }}/getting-started/)
+for import and plotting examples.
+
+</details>
+
+### 3. Install the analysis Skill and open your agent
+
+For **GitHub Copilot CLI**, install [GitHub CLI](https://cli.github.com/) and
+[Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/set-up-copilot-cli/install-copilot-cli)
+if needed. Run this in your working folder:
+
+```powershell
+gh skill install microsoft/viva-insights-sample-code frontier-analytics/skills/viva-insights-analysis --agent github-copilot --scope user
+copilot skill list
+copilot
+```
+
+Check that `viva-insights-analysis` appears in the Skill list, then sign in if
+prompted when opening Copilot. The install command copies the whole Skill,
+including its references and examples, into your personal Skills directory.
+Review the files before use. The Skill does not install R, Python or packages.
+
+For **Claude Code**, use the same install command with `--agent claude-code`,
+then open Claude Code in your working folder. Its
+[setup guide](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview)
+covers installation and launch. If `gh skill` is unavailable, update GitHub CLI
+or follow the [whole-folder installation instructions](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/skills/README.md#installing-a-skill).
+Review existing customised Skills before replacing them.
+
+If your agent does not support Skills, use the
+[context file](https://github.com/microsoft/viva-insights-sample-code/blob/main/vivainsights-context.md)
+and a [prompt card]({{ site.baseurl }}/frontier-analytics-prompts/) instead.
+
+### 4. Run a validation pass before building
+
+Paste this into the agent. Change the filename if needed. For R, replace the
+Python sentence with "Use R and the vivainsights package."
+
+```text
+Use the installed viva-insights-analysis Skill and its shared analysis policy.
+Confirm that the Skill is available before starting.
+Use Python and the vivainsights package through .\.venv\Scripts\python.exe.
+My Person Query CSV is data\person-query.csv, relative to this working folder.
+Save generated files under output and leave the source export unchanged.
+
+Inspect the actual headers, installed package version, row count, distinct
+people, date range, duplicate person-period keys and missingness. Ask me for
+any missing query settings, including grouping, week start and metric windows.
+Do not infer cadence from gaps between dates.
+
+Use existing package functions after checking their installed signatures.
+Keep individual records out of the report. Apply the stricter organisational
+minimum or 10 distinct people to every published group and its complement.
+Summarise coverage and data-quality issues, separating executed checks from
+checks you could not run. Save the validation summary and reproducible code.
+
+Propose a supported analysis of Copilot usage by available organisational
+attributes. If suitable attributes are absent, propose overall results.
+Stop for my review before building the report or making productivity claims.
+```
+
+Check the saved summary against your query settings. Resolve duplicate keys,
+coverage gaps and uncertain metric definitions before approving the analysis.
+The [data-pitfalls reference](https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/skills/viva-insights-analysis/reference/data-pitfalls.md)
+explains common import problems. The [shared analysis policy]({{ site.baseurl }}/frontier-analytics-policy/)
+sets out privacy, licence and aggregation rules.
+
+### 5. Choose the next prompt
+
+Open a card below, copy its quick or detailed prompt and add your file location
+and preferred language. Use the same agent session so it retains the validation
+results. Check the card's inputs and limitations before asking it to build.
+
+| What you want to produce | Start here |
+|---|---|
+| A Copilot adoption dashboard from a Person Query | [Dashboard Overview]({{ site.baseurl }}/frontier-analytics-prompt-dashboard/) |
+| A short leadership briefing | [Executive Summary]({{ site.baseurl }}/frontier-analytics-prompt-executive-summary/) |
+| AI adoption across Person, Consumption and Agent queries | [AI Adoption Across Tools]({{ site.baseurl }}/frontier-analytics-prompt-ai-adoption/) |
+| Descriptive workload and connected-time signals | [Employee Wellbeing and Workload Signals]({{ site.baseurl }}/frontier-analytics-prompt-employee-wellbeing/) |
+| External participation and collaboration hours | [External Collaboration Patterns]({{ site.baseurl }}/frontier-analytics-prompt-external-collaboration/) |
+
+The AI adoption, wellbeing and external collaboration cards are guided prompts
+without completed end-to-end data trials. Their outputs require validation.
+For the R reference templates, use the [Consumption journey]({{ site.baseurl }}/frontier-analytics-prompt-consumption-dashboard/)
+or [Developer Experience journey]({{ site.baseurl }}/frontier-analytics-prompt-developer-experience-dashboard/).
+Each links its rendering requirements and supported real-data scope. Repeated
+dashboard work can use the [paired dashboard Skill installation]({{ site.baseurl }}/frontier-analytics-skills/#skill-viva-insights-copilot-dashboards).
+Business Leaders has a separate [rendering guide]({{ site.baseurl }}/copilot-dashboards/business-leaders-ai-usage/)
+and no verified real-export adapter.
+
+Before sharing, rerun the saved code, reconcile headline counts and denominators,
+check privacy suppression in charts and embedded data, and open any self-contained
+HTML report offline. Keep the source and validation log with the output.
 
 ---
 

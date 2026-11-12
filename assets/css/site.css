@@ -1075,6 +1075,31 @@ section.vi-section {
   line-height: 1;
   margin-bottom: 0.6rem;
 }
+.vi-query-icon {
+  display: inline-block;
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+  max-width: none;
+  margin: 0;
+  object-fit: contain;
+  vertical-align: middle;
+}
+.vi-query-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.vi-query-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.vi-query-source .vi-query-icon {
+  flex-basis: 32px;
+  width: 32px;
+  height: 32px;
+}
 .vi-card .vi-card-title {
   font-weight: 700;
   font-size: 1.12rem;

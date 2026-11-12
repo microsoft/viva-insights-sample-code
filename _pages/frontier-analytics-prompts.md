@@ -45,7 +45,7 @@ not yet have a dedicated prompt journey or verified real-data adapter.
 - **Granularity matters.** Most prompts assume person-week data. If your export is person-day, instruct the agent to aggregate first.
 - **Privacy thresholds.** Use the stricter of your organisation's requirement and the workflow's stated minimum group size. Keep complementary cells and embedded data protected.
 - **Language preference.** Check the selected card's runtime requirements. Some workflows use R or Python, while the query-dashboard journeys require R. If both are supported, specify your preference.
-- **Intermediary files.** Prompts that produce HTML output instruct the agent to create an RMarkdown (.Rmd) or Jupyter notebook (.ipynb) first, then export to HTML. Keep these files for troubleshooting and iteration.
+- **Reproducible source.** Keep the R or Python scripts, RMarkdown (.Rmd) files or Jupyter notebooks (.ipynb) used to produce an HTML report. The selected card specifies its output files.
 - **Package availability.** Prompts reference the [vivainsights R package](https://microsoft.github.io/vivainsights/) and [vivainsights Python package](https://microsoft.github.io/vivainsights-py/). Install them beforehand.
 
 ## Related resources

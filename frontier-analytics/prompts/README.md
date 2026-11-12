@@ -33,6 +33,7 @@ A prompt card is a structured document that contains:
 | Prompt Card | Description |
 |---|---|
 | [Dashboard Overview](copilot-adoption/dashboard-overview.md) | Generate a comprehensive static HTML dashboard showing Copilot adoption trends, usage patterns, and organizational breakdowns. |
+| [AI Adoption Across Tools](copilot-adoption/ai-adoption-overview.md) | Describe observed AI reach, high-usage cohorts and group differences using Person, Consumption and Agent queries. |
 | [Executive Summary](copilot-adoption/executive-summary.md) | Produce a concise executive memo summarizing Copilot adoption metrics, key findings, and recommendations for VP/C-suite audiences. |
 | [Segmentation & Churn](copilot-adoption/segmentation-and-churn.md) | Classify users into usage segments, track segment transitions over time, and calculate churn rates. |
 | [ROI Estimation](copilot-adoption/roi-estimation.md) | Estimate return on investment for Copilot by quantifying time savings, productivity value, and license cost breakdowns. |
@@ -43,6 +44,8 @@ A prompt card is a structured document that contains:
 
 | Prompt Card | Description |
 |---|---|
+| [Employee Wellbeing and Workload Signals](person-query/employee-wellbeing.md) | Review elevated collaboration and connected-time exposure, group differences and exploratory associations without diagnosing burnout. |
+| [External Collaboration Patterns](person-query/external-collaboration.md) | Report participation, intensity and functional trends, with external counterpart views only when suitable data are supplied. |
 | [Exposure-outcome analysis and causal diagnostics](person-query/causal-diagnostics.md) | Assess actual outcome frequency, coverage and design before running compatible panel diagnostics. Allows a selected metric or organisational outcome, with R/Python guidance. Complements the fixed-treatment Copilot Causal Toolkit. |
 
 ### Query dashboards

@@ -44,9 +44,9 @@ Other export periods require a separately defined integration.
 
 | Source | Contract boundary | Guided journey |
 |---|---|---|
-| Consumption | M365 facts include person, service, spending policy and period. Join people metadata through `PeopleHistoricalId`. Credits and sessions do not establish tokens, task types or monetary value. | [Build a Consumption dashboard]({{ site.baseurl }}/frontier-analytics-prompt-consumption-dashboard/) |
-| GitHub | Activity summary plus four dimensional breakdown files. Synthetic demos use export headers, but a real GitHub dashboard adapter is not verified in v1. | [Build a Developer Experience dashboard]({{ site.baseurl }}/frontier-analytics-prompt-developer-experience-dashboard/) |
-| Agent | Person-agent-week activity, with optional agent metadata. Aggregate sessions across agents before joining to the Person Query. | [Agent schema and joins]({{ site.baseurl }}/query-join-guide/#agent_query) |
+| <span class="vi-query-source"><img class="vi-query-icon" src="{{ site.baseurl }}/assets/images/queries/consumption-query.svg" alt="" width="32" height="32" decoding="async" /> Consumption</span> | M365 facts include person, service, spending policy and period. Join people metadata through `PeopleHistoricalId`. Credits and sessions do not establish tokens, task types or monetary value. | [Build a Consumption dashboard]({{ site.baseurl }}/frontier-analytics-prompt-consumption-dashboard/) |
+| <span class="vi-query-source"><img class="vi-query-icon" src="{{ site.baseurl }}/assets/images/queries/github-query.svg" alt="" width="32" height="32" decoding="async" /> GitHub</span> | Activity summary plus four dimensional breakdown files. Synthetic demos use export headers, but a real GitHub dashboard adapter is not verified in v1. | [Build a Developer Experience dashboard]({{ site.baseurl }}/frontier-analytics-prompt-developer-experience-dashboard/) |
+| <span class="vi-query-source"><img class="vi-query-icon" src="{{ site.baseurl }}/assets/images/queries/agent-query.svg" alt="" width="32" height="32" decoding="async" /> Agent</span> | Person-agent-week activity, with optional agent metadata. Aggregate sessions across agents before joining to the Person Query. | [Agent schema and joins]({{ site.baseurl }}/query-join-guide/#agent_query) |
 
 Use the tutorial for current keys, aggregation, missing-row defaults and privacy
 rules. Assume supplied Viva Insights queries are complete within their configured
@@ -59,7 +59,8 @@ retain dated layouts and analytical context. See the
 for official product documentation. Missing fields exclude panels; agents must not
 generate synthetic replacements in a real-data run.
 
-## Person Query concepts {#person-query-key-concepts}
+## <img class="vi-query-icon" src="{{ site.baseurl }}/assets/images/queries/person-query.svg" alt="" width="52" height="52" decoding="async" /> Person Query concepts {#person-query-key-concepts}
+{: .vi-query-heading }
 
 ### Panel structure
 

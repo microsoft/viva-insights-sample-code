@@ -94,7 +94,8 @@ print(vi.__version__)
 
 ---
 
-## Export your data from Viva Insights
+## <img class="vi-query-icon" src="{{ site.baseurl }}/assets/images/queries/person-query.svg" alt="" width="52" height="52" decoding="async" /> Export your data from Viva Insights {#export-your-data-from-viva-insights}
+{: .vi-query-heading }
 
 Person query data is the most common starting point: one row per person per period, with HR attributes like organization, function, and level as columns. Other query types (Meeting Query, Person-to-Person, Group-to-Group, Person-to-Group) have different grains and are used for more specific analyses.
 

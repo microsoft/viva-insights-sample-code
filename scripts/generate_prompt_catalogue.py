@@ -15,6 +15,7 @@ from generate_analysis_references import sync_policy_bundles, sync_references
 SITE_DATA = ROOT / "_data" / "prompts.json"
 CATEGORY_NAMES = {
     "copilot-adoption": "Copilot adoption",
+    "person-query": "Person Query analysis",
     "copilot-dashboards": "Query dashboards",
     "purview-augmentation": "Purview augmentation",
 }

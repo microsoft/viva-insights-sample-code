@@ -37,7 +37,8 @@ The analysis runs entirely on your machine — no data is uploaded anywhere. The
 </div>
 
 
-## Method 1 — Export a Person Query from Viva Insights
+## <img class="vi-query-icon" src="{{ site.baseurl }}/assets/images/queries/person-query.svg" alt="" width="52" height="52" decoding="async" /> Method 1 — Export a Person Query from Viva Insights {#method-1--export-a-person-query-from-viva-insights}
+{: .vi-query-heading }
 
 1. Open the [Viva Insights analysis page](https://analysis.insights.viva.office.com/Analysis/CreateAnalysis).
 2. Select **Person Query → ‘Set up analysis’**.
