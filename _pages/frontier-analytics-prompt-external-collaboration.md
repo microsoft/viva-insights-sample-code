@@ -40,7 +40,7 @@ When a Person Query includes external collaboration hours and you want to unders
 - Person Query exports in the workspace's `data` folder with `PersonId`, `MetricDate`, `External collaboration hours` and `Collaboration hours`.
 - Available organisational attributes, especially a function or team field for group comparisons.
 - Configured date grouping, metric windows, date range and population scope. One complete period supports a snapshot. Two or more comparable periods are needed for a trend.
-- Optional external collaboration query or other approved counterpart data if external organisations, domains or partner groups need to be described. The Person Query alone does not identify those counterparts.
+- ![External Collaboration query icon]({{ site.baseurl }}/assets/images/queries/external-collaboration.svg) **External Collaboration query (optional)** or other approved counterpart data if external organisations, domains or partner groups need to be described. Verify the supplied fields and keys before adding counterpart views. The Person Query remains the primary source for participation and hours and does not identify those counterparts.
 
 ## Assumptions
 

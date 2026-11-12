@@ -111,6 +111,7 @@
   "repo_only": ["person-query/causal-diagnostics.md"],
   "navigation": ["dashboard", "ai-adoption", "executive-summary", "segmentation", "roi", "powerpoint", "agent-usage", "audit-parsing", "causal-toolkit", "employee-wellbeing", "external-collaboration"],
   "links": {
+    "assets/images/queries/external-collaboration.svg": "/assets/images/queries/external-collaboration.svg",
     "frontier-analytics/starter-kits/consumption-dashboard/README.md": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/starter-kits/consumption-dashboard/README.md",
     "frontier-analytics/starter-kits/developer-experience-dashboard/README.md": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/starter-kits/developer-experience-dashboard/README.md",
     "frontier-analytics/starter-kits/copilot-query-dashboard/README.md": "https://github.com/microsoft/viva-insights-sample-code/blob/main/frontier-analytics/starter-kits/copilot-query-dashboard/README.md",
