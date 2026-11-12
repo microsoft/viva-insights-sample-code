@@ -13,13 +13,12 @@ output:
 ## Introduction
 
 A common question in Copilot Analytics is *causal*: **did a person's
-collaboration behaviour actually change after they started using Copilot**, or
+collaboration behaviour change after they started using Copilot**, or
 are heavy users simply different people to begin with? A plain comparison of
 users vs non-users cannot separate the two, because adoption is not random.
 
-A **within-person event-study** paired with a **two-way fixed-effects (TWFE)
-difference-in-differences (DiD)** model is a standard way to address this. The
-design:
+A **within-person event-study** paired with a **difference-in-differences
+(DiD)** design is a standard way to approach this. The design:
 
 * aligns every adopter on their own **event time** (weeks relative to the week
   they adopted Copilot),
@@ -27,8 +26,22 @@ design:
   calendar weeks,
 * absorbs each person's baseline (**person fixed effects**) and every calendar
   week's common shocks (**week fixed effects**), and
-* reads the treatment effect as the *within-person* change in the treated group
+* reads the estimate as the *within-person* change in the treated group
   relative to the control group.
+
+Adoption here is **staggered**: people adopt in different weeks. A single
+two-way fixed-effects (TWFE) regression can give misleading estimates in that
+setting when effects differ by adoption cohort or change over time, because
+already-adopted people can end up acting as comparisons for later adopters
+(Goodman-Bacon 2021; de Chaisemartin and D'Haultfoeuille 2020). This notebook
+therefore uses the **Sun and Abraham (2021) interaction-weighted estimator** as
+the primary estimate. It estimates an effect for each adoption cohort and
+event week, using never-adopters as the comparison group, then averages those
+effects. The naive TWFE event study is kept only as a comparison.
+
+The results are estimates under assumptions (chiefly parallel trends and no
+anticipation), and are best read as associations consistent with an effect
+rather than proof of one.
 
 Person Query exports do not ship with a clean adoption event, so this notebook
 builds a **small seeded simulation** whose column names match a real Person
@@ -40,7 +53,8 @@ demonstration only and is not a real result.
 
 ## Set-up
 
-This example uses **fixest** for fast fixed-effects estimation; install it with
+This example uses **fixest** (a recent version, tested with 0.14.2) for fast
+fixed-effects estimation; install it with
 `install.packages("fixest")` if you do not already have it.
 
 ```{r setup, message=FALSE, warning=FALSE}
@@ -49,7 +63,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(scales)
-library(fixest)   # fast fixed-effects estimation (feols, i(), iplot)
+library(fixest)   # fast fixed-effects estimation (feols, sunab(), i())
 ```
 
 To run this notebook on your **own** export instead of the simulation, replace
@@ -155,17 +169,49 @@ adopt <- panel %>%
   group_by(PersonId) %>%
   summarise(adopt_date = min(MetricDate), .groups = "drop")
 
-placebo_date <- as.Date(median(adopt$adopt_date))
-
+# Calendar-week number and adoption cohort for the staggered-robust estimator.
+# Never-adopters are coded 1000, a value outside the observed period range, which
+# is how fixest::sunab() identifies the never-treated cohort.
+NEVER <- 1000L
+first_date <- min(panel$MetricDate)
 panel <- panel %>%
   left_join(adopt, by = "PersonId") %>%
   mutate(
     is_adopter = !is.na(adopt_date),
+    week_num   = as.integer((MetricDate - first_date) / 7) + 1L,
+    cohort     = ifelse(is_adopter,
+                        as.integer((adopt_date - first_date) / 7) + 1L,
+                        NEVER)
+  )
+
+# Early adopters with no observed pre-period cannot contribute to an adoption
+# estimate: they look like people treated for the whole window, so there is no
+# "before" to compare with (see the "check pre-adoption" section of
+# https://microsoft.github.io/viva-insights-sample-code/articles/causal-questions-ai-usage/#check-pre-adoption ).
+# Drop people with fewer than MIN_PRE observed pre-adoption weeks.
+MIN_PRE <- 4L
+early <- panel %>%
+  filter(is_adopter) %>%
+  group_by(PersonId) %>%
+  summarise(n_pre = sum(week_num < cohort), .groups = "drop") %>%
+  filter(n_pre < MIN_PRE)
+cat(sprintf(
+  "Dropped %d people who adopted with fewer than %d observed pre-adoption weeks (no usable 'before').\n",
+  nrow(early), MIN_PRE
+))
+panel <- panel %>% filter(!PersonId %in% early$PersonId)
+
+adopt <- filter(adopt, !PersonId %in% early$PersonId)
+placebo_date <- as.Date(median(adopt$adopt_date))
+
+panel <- panel %>%
+  mutate(
     anchor     = dplyr::coalesce(adopt_date, placebo_date),
     event_week = as.integer((MetricDate - anchor) / 7)
   )
 
 # Keep a balanced +/- 8-week window around each person's anchor
+# (used for the naive TWFE comparison only)
 WINDOW <- 8L
 panel_es <- panel %>%
   filter(event_week >= -WINDOW, event_week <= WINDOW) %>%
@@ -183,66 +229,61 @@ panel_es %>%
   count(group = ifelse(treated_grp == 1, "Adopter (treated)", "Non-adopter (control)"))
 ```
 
-## The headline TWFE difference-in-differences
+## Primary estimate: Sun and Abraham interaction-weighted event study
 
-The core model is:
+The estimator fits a coefficient for every adoption cohort $g$ and calendar
+week, relative to the week before adoption (event time -1), with never-adopters
+as the comparison group:
 
-$$y_{it} = \beta\,(\text{post}_{it}\times\text{treated}_i) + \alpha_i + \gamma_t + \varepsilon_{it}$$
+$$y_{it} = \alpha_i + \gamma_t + \sum_{g}\sum_{\ell \ne -1} \delta_{g,\ell}\,\mathbf{1}\{G_i = g\}\,\mathbf{1}\{t - g = \ell\} + \varepsilon_{it}$$
 
 where $\alpha_i$ are person fixed effects, $\gamma_t$ are calendar-week fixed
-effects, and standard errors are clustered by person. The coefficient $\beta$ on
-`treat_post` is the difference-in-differences estimate, the within-person change
-for adopters, net of the control group and of anything common to a given week.
+effects, and standard errors are clustered by person. The cohort-specific
+coefficients are then averaged, weighted by cohort share, to give one effect per
+event week. In `fixest` this is the `sunab(cohort, period)` term. It uses the
+full panel, because the estimator compares each cohort with never-adopters in
+calendar time and needs no placebo adoption week.
 
-```{r twfe}
-did <- fixest::feols(
-  Collaboration_hours ~ treat_post | PersonId + MetricDate,
-  data    = panel_es,
+```{r sunab}
+es_sa <- fixest::feols(
+  Collaboration_hours ~ sunab(cohort, week_num, ref.p = -1) | PersonId + week_num,
+  data    = panel,
   cluster = ~PersonId
 )
 
-summary(did)
+# Average treatment effect on the treated (ATT), averaged over post-adoption weeks
+summary(es_sa, agg = "ATT")
 
-did_beta <- coef(did)[["treat_post"]]
+att <- coeftable(es_sa, agg = "ATT")
 cat(sprintf(
-  "\nDiD estimate: %+.2f collaboration hours/week (injected demo effect was %+.2f)\n",
-  did_beta, TREATMENT_EFFECT
+  "\nSun-Abraham ATT estimate: %+.2f collaboration hours/week (SE %.2f; injected demo effect was %+.2f)\n",
+  att[1, "Estimate"], att[1, "Std. Error"], TREATMENT_EFFECT
 ))
 ```
 
-The recovered coefficient should land close to the injected `TREATMENT_EFFECT`,
-confirming the model is working. On real data you would *not* know the true
-value, and that is the whole point of estimating it.
+The estimate should land close to the injected `TREATMENT_EFFECT`. On real data
+you would not know the true value, and the estimate depends on the assumptions
+listed above.
 
-## The event-study: check for pre-trends and see the effect emerge
+## The event-study: look at pre-trends and see the estimate emerge
 
-A single DiD number hides a crucial assumption: **parallel trends**. The
-event-study version estimates a separate coefficient for each event week
-(relative to week -1, the week before adoption). If the design is valid, the
-**pre-adoption** coefficients should sit near zero (no divergence before
-treatment), and the **post-adoption** coefficients should step up to the effect.
-
-`fixest::i()` builds these event-time interactions directly, with `ref = -1` as
-the omitted reference week.
+A single average hides the **parallel-trends** assumption. The event-study
+version shows a separate estimate for each event week (relative to week -1). If
+the design is credible, the **pre-adoption** estimates should sit near zero, and
+the **post-adoption** estimates should step up to the effect.
 
 ```{r event-study, fig.width=9, fig.height=5}
-es <- fixest::feols(
-  Collaboration_hours ~ i(event_week, treated_grp, ref = -1) |
-    PersonId + MetricDate,
-  data    = panel_es,
-  cluster = ~PersonId
-)
-
-# Tidy the event-time coefficients for a ggplot
-es_tab <- as.data.frame(coeftable(es))
+# Event-time estimates aggregated across cohorts (one per relative week)
+es_tab <- as.data.frame(coeftable(es_sa))
 es_tab$term <- rownames(es_tab)
 es_coefs <- es_tab %>%
-  filter(grepl("event_week::", term)) %>%
+  filter(grepl("^week_num::", term)) %>%
   mutate(
-    event_week = as.integer(sub(".*event_week::(-?\\d+).*", "\\1", term)),
+    event_week = as.integer(sub("^week_num::(-?\\d+).*", "\\1", term)),
     lwr = Estimate - 1.96 * `Std. Error`,
     upr = Estimate + 1.96 * `Std. Error`
-  )
+  ) %>%
+  filter(event_week >= -WINDOW, event_week <= WINDOW)
 
 # Add the reference week (-1) at exactly 0
 es_coefs <- bind_rows(
@@ -258,23 +299,114 @@ ggplot(es_coefs, aes(event_week, Estimate)) +
   geom_point(size = 2, colour = "#1b4965") +
   scale_x_continuous(breaks = seq(-WINDOW, WINDOW, 2)) +
   labs(
-    title    = "Event-study: collaboration hours around Copilot adoption",
-    subtitle = "Coefficients vs event week (ref = week -1), 95% CI. Flat before, steps up after.",
-    x = "Weeks relative to adoption", y = "Effect vs week -1 (hours/week)"
+    title    = "Event-study (Sun and Abraham): collaboration hours around Copilot adoption",
+    subtitle = "Estimates vs event week (ref = week -1), 95% CI, never-adopters as comparison.",
+    x = "Weeks relative to adoption", y = "Estimate vs week -1 (hours/week)"
   ) +
   theme_minimal(base_size = 12)
 ```
 
-A flat pre-period and a clean post-period step is the visual signature of a
-credible DiD. If the pre-period coefficients trended, you would be worried that
-adopters were already diverging before Copilot and would treat the DiD estimate
-with caution.
+### Pre-trend check
+
+A joint Wald test on the pre-adoption estimates in the plotted window (event
+weeks -8 to -2, excluding the reference week -1) asks whether they are jointly
+different from zero. The averaging weights are rebuilt from the cohort-specific
+coefficients, so the test uses the same person-clustered covariance as the plot.
+
+```{r pretrend}
+b  <- es_sa$coefficients
+V  <- vcov(es_sa)
+mm <- model.matrix(es_sa)
+leads <- -WINDOW:-2
+
+# Weights that average cohort-specific coefficients into one estimate per lead
+A <- t(sapply(leads, function(l) {
+  w  <- numeric(length(b))
+  nm <- grep(sprintf("^week_num::%d:cohort::", l), names(b))
+  n_obs <- colSums(sign(mm[, names(b)[nm], drop = FALSE]))
+  w[nm] <- n_obs / sum(n_obs)
+  w
+}))
+
+lead_est <- as.numeric(A %*% b)
+wald_chi <- as.numeric(t(lead_est) %*% solve(A %*% V %*% t(A)) %*% lead_est)
+cat(sprintf("Joint test of %d pre-adoption leads: chi-squared = %.2f, p = %.3f\n",
+            length(leads), wald_chi,
+            pchisq(wald_chi, df = length(leads), lower.tail = FALSE)))
+```
+
+A non-significant pre-test does not establish parallel trends. The test can
+have low power, and it cannot rule out a trend that starts at adoption. Read it
+together with the plot, and with what you know about why people adopted when
+they did.
+
+## Comparison: naive TWFE (shown for comparison)
+
+For comparison only, the block below fits the single-coefficient TWFE DiD and
+the TWFE event study that many analyses start with. With staggered adoption and
+possibly different effects by cohort, these can be contaminated, so treat them
+as a sensitivity check against the Sun and Abraham estimate above, not as the
+headline. They use the +/- 8-week window around each person's anchor, with a
+placebo anchor for controls.
+
+```{r twfe}
+did <- fixest::feols(
+  Collaboration_hours ~ treat_post | PersonId + MetricDate,
+  data    = panel_es,
+  cluster = ~PersonId
+)
+
+summary(did)
+
+did_beta <- coef(did)[["treat_post"]]
+cat(sprintf(
+  "\nNaive TWFE DiD estimate: %+.2f collaboration hours/week (injected demo effect was %+.2f)\n",
+  did_beta, TREATMENT_EFFECT
+))
+```
+
+```{r twfe-event-study, fig.width=9, fig.height=5}
+es_twfe <- fixest::feols(
+  Collaboration_hours ~ i(event_week, treated_grp, ref = -1) |
+    PersonId + MetricDate,
+  data    = panel_es,
+  cluster = ~PersonId
+)
+
+tw_tab <- as.data.frame(coeftable(es_twfe))
+tw_tab$term <- rownames(tw_tab)
+tw_coefs <- tw_tab %>%
+  filter(grepl("event_week::", term)) %>%
+  mutate(
+    event_week = as.integer(sub(".*event_week::(-?\\d+).*", "\\1", term)),
+    lwr = Estimate - 1.96 * `Std. Error`,
+    upr = Estimate + 1.96 * `Std. Error`
+  )
+tw_coefs <- bind_rows(
+  tw_coefs,
+  tibble(event_week = -1, Estimate = 0, lwr = 0, upr = 0)
+) %>% arrange(event_week)
+
+ggplot(tw_coefs, aes(event_week, Estimate)) +
+  geom_hline(yintercept = 0, colour = "grey60") +
+  geom_vline(xintercept = -0.5, linetype = "dashed", colour = "grey40") +
+  geom_ribbon(aes(ymin = lwr, ymax = upr), fill = "#bc4b51", alpha = 0.2) +
+  geom_line(linewidth = 1, colour = "#bc4b51") +
+  geom_point(size = 2, colour = "#bc4b51") +
+  scale_x_continuous(breaks = seq(-WINDOW, WINDOW, 2)) +
+  labs(
+    title    = "Naive TWFE event-study (shown for comparison)",
+    subtitle = "Estimates vs event week (ref = week -1), 95% CI.",
+    x = "Weeks relative to adoption", y = "Estimate vs week -1 (hours/week)"
+  ) +
+  theme_minimal(base_size = 12)
+```
 
 ## Bonus: run the same design on a composite index
 
-Individual metrics can be noisy. A robust alternative is to combine several
+Individual metrics can be noisy. One option is to combine several
 related collaboration metrics into a single **z-scored composite index**, then
-run the identical DiD on the index. Each component is standardised across the
+run the same Sun and Abraham estimate on the index. Each component is standardised across the
 panel (mean 0, sd 1) and averaged, so no single metric's scale dominates.
 
 ```{r composite, fig.width=9, fig.height=4}
@@ -282,17 +414,21 @@ components <- c("Collaboration_hours", "Chat_hours", "Emails_sent")
 
 zscore <- function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
 
-panel_es <- panel_es %>%
+panel <- panel %>%
   mutate(across(all_of(components), zscore, .names = "z_{.col}")) %>%
   mutate(collab_index = rowMeans(across(starts_with("z_")), na.rm = TRUE))
 
-did_index <- fixest::feols(
-  collab_index ~ treat_post | PersonId + MetricDate,
-  data    = panel_es,
+panel_es <- panel_es %>%
+  left_join(select(panel, PersonId, MetricDate, collab_index),
+            by = c("PersonId", "MetricDate"))
+
+es_index <- fixest::feols(
+  collab_index ~ sunab(cohort, week_num, ref.p = -1) | PersonId + week_num,
+  data    = panel,
   cluster = ~PersonId
 )
 
-summary(did_index)
+summary(es_index, agg = "ATT")
 
 # Event-time trajectory of the composite, treated vs control
 idx_traj <- panel_es %>%
@@ -317,10 +453,13 @@ ggplot(idx_traj, aes(event_week, idx, colour = grp)) +
 
 ## Wrapping up
 
-The event-study + TWFE DiD pattern is a portable way to ask *"did behaviour
-change after adoption, within the same person?"* without being fooled by the
-fact that adopters differ from non-adopters. To apply it to your own data,
-replace the simulation chunk with `vivainsights::import_query()`, derive the
-adoption week from the first non-zero Copilot action, set `TREATMENT_EFFECT`
-aside entirely, and let the model estimate the effect. Always inspect the
-event-study pre-trends before trusting the single DiD number.
+The Sun and Abraham event-study is a portable way to ask *"did behaviour
+change after adoption, within the same person?"* while allowing for the fact
+that adopters differ from non-adopters and adopt at different times. To apply it
+to your own data, replace the simulation chunk with
+`vivainsights::import_query()`, derive the adoption week from the first non-zero
+Copilot action, set `TREATMENT_EFFECT` aside entirely, and let the model
+estimate the effect. Inspect the pre-adoption estimates, compare against the
+naive TWFE result, and remember that the output is an estimate under
+assumptions. People who adopt Copilot choose to do so, so treat any estimate as
+an association unless the design justifies more.

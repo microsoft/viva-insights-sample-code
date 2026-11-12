@@ -163,6 +163,8 @@
 
     // path holds one entry per answered question: { node, label, mode }
     var path = [];
+    // The live region stays silent until the user acts, so nothing is announced on page load.
+    var hasInteracted = false;
 
     function el(tag, cls, text) {
       var e = document.createElement(tag);
@@ -190,7 +192,7 @@
         var b = el('button', 'cdg-crumb', (i + 1) + '. ' + step.label);
         b.type = 'button';
         b.setAttribute('aria-label', 'Go back to question ' + (i + 1) + ': ' + step.question);
-        b.addEventListener('click', function () { path = path.slice(0, i); render(); });
+        b.addEventListener('click', function () { hasInteracted = true; path = path.slice(0, i); render(); });
         li.appendChild(b);
         trailEl.appendChild(li);
       });
@@ -201,13 +203,13 @@
         var back = el('button', 'cdg-btn', 'Back');
         back.type = 'button';
         back.disabled = !path.length;
-        back.addEventListener('click', function () { path.pop(); render(); });
+        back.addEventListener('click', function () { hasInteracted = true; path.pop(); render(); });
         row.appendChild(back);
       }
       var again = el('button', 'cdg-btn', 'Start again');
       again.type = 'button';
       again.disabled = !path.length;
-      again.addEventListener('click', function () { path = []; render(); });
+      again.addEventListener('click', function () { hasInteracted = true; path = []; render(); });
       row.appendChild(again);
       card.appendChild(row);
       return row;
@@ -234,11 +236,11 @@
         card.appendChild(row);
         var again = el('button', 'cdg-btn', 'Start again');
         again.type = 'button';
-        again.addEventListener('click', function () { path = []; render(); });
+        again.addEventListener('click', function () { hasInteracted = true; path = []; render(); });
         row.appendChild(again);
         var back = el('button', 'cdg-btn', 'Back');
         back.type = 'button';
-        back.addEventListener('click', function () { path.pop(); render(); });
+        back.addEventListener('click', function () { hasInteracted = true; path.pop(); render(); });
         row.insertBefore(back, again);
         stage.appendChild(card);
         announce = 'Result: ' + leaf.title + '. ' + leaf.summary;
@@ -269,6 +271,7 @@
           b.type = 'button';
           if (!next) { b.disabled = true; }
           b.addEventListener('click', function () {
+            hasInteracted = true;
             path.push({
               question: node.question,
               label: answer.label,
@@ -289,7 +292,9 @@
         announce = 'Question ' + (path.length + 1) + ': ' + node.question;
       }
       live.textContent = '';
-      window.setTimeout(function () { live.textContent = announce; }, 30);
+      if (hasInteracted) {
+        window.setTimeout(function () { live.textContent = announce; }, 30);
+      }
       heading.setAttribute('tabindex', '-1');
       // Leave focus alone on first load so the page does not scroll to the widget.
       if (stage.dataset.moved) heading.focus();

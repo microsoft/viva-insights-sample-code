@@ -42,7 +42,7 @@ Pick a card to jump straight to a section, or read on for the full picture.
   <a class="vi-card" href="#causal-analysis">
     <span class="vi-card-icon">🔬</span>
     <span class="vi-card-title">Causal Analysis</span>
-    <span class="vi-card-desc">Difference-in-differences and event-study methods that isolate Copilot's effect from a company-wide trend.</span>
+    <span class="vi-card-desc">Difference-in-differences and event-study methods that estimate how behaviour changes around Copilot adoption, compared with people who have not adopted it.</span>
     <span class="vi-card-more">Jump to section →</span>
   </a>
 </div>
@@ -167,6 +167,8 @@ Sums individual Copilot-action columns, classifies each person-week with `identi
 
 ## Causal Analysis
 
+For help choosing a design before you run these examples, see the guide [Causal questions about AI usage]({{ site.baseurl }}/articles/causal-questions-ai-usage/).
+
 These two examples build small, clearly labelled seeded simulations so that the models have something to recover; swap the simulation block for your own export before drawing conclusions.
 
 ### Difference-in-Differences Metric Scan
@@ -179,6 +181,7 @@ Runs a within-person DiD per metric across two both-licensed groups (Power vs Lo
 - **Format**: R Markdown
 - **Prerequisites**: vivainsights R package, fixest, dplyr, tidyr, ggplot2, purrr, scales
 - **Key Features**: Per-metric TWFE DiD, significance stars, forest plot, honest reporting of null effects
+- **Caveat**: Groups are defined by chosen usage, so selection into them is not random, and scanning many metrics needs a multiplicity adjustment. Treat results as exploratory.
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/did-metric-scan.Rmd)**
 - **[🌐 View HTML Output](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/did-metric-scan.html)**
 </div>
@@ -188,6 +191,7 @@ Runs a within-person DiD per metric across two both-licensed groups (Power vs Lo
 - **Purpose**: Run a within-person DiD per metric (Power vs Low Copilot users) into one sortable table
 - **Prerequisites**: vivainsights Python package, linearmodels, pandas, numpy, matplotlib
 - **Key Features**: Per-metric TWFE DiD, significance stars, forest plot, honest reporting of null effects
+- **Caveat**: Groups are defined by chosen usage, so selection into them is not random, and scanning many metrics needs a multiplicity adjustment. Treat results as exploratory.
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/did-metric-scan.py)**
 </div>
 
@@ -195,23 +199,23 @@ Runs a within-person DiD per metric across two both-licensed groups (Power vs Lo
 
 ### Event-Study & Difference-in-Differences
 
-Aligns each adopter on their own event time, checks the parallel-trends assumption before trusting a single headline number, and reads the within-person change net of a non-adopting control.
+Aligns each adopter on their own event time, estimates the change with a staggered-robust (Sun and Abraham style) event study against never-adopters, and checks the pre-adoption estimates before reading any headline number. A naive TWFE version is included for comparison only.
 
 <div data-lang-block="r" markdown="1">
 **📄 [event-study-did.Rmd](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/event-study-did.Rmd)**
-- **Purpose**: Measure within-person behaviour change around Copilot adoption with a TWFE event-study/DiD
+- **Purpose**: Estimate within-person behaviour change around staggered Copilot adoption with a Sun and Abraham event study, with naive TWFE shown for comparison
 - **Format**: R Markdown
-- **Prerequisites**: vivainsights R package, fixest, dplyr, tidyr, ggplot2, scales
-- **Key Features**: Event-time alignment, pre-trend check, person + week fixed effects, z-scored composite index
+- **Prerequisites**: vivainsights R package, fixest (a recent version, tested with 0.14.2), dplyr, tidyr, ggplot2, scales
+- **Key Features**: Event-time alignment, staggered-robust `sunab()` estimate and ATT, pre-adoption lead check, person + week fixed effects, z-scored composite index
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/event-study-did.Rmd)**
 - **[🌐 View HTML Output](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/event-study-did.html)**
 </div>
 
 <div data-lang-block="python" markdown="1">
 **📄 [event-study-did.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/event-study-did.py)**
-- **Purpose**: Measure within-person behaviour change around Copilot adoption with a TWFE event-study/DiD
-- **Prerequisites**: vivainsights Python package, linearmodels, pandas, numpy, matplotlib
-- **Key Features**: Event-time alignment, pre-trend check, person + week fixed effects, z-scored composite index
+- **Purpose**: Estimate within-person behaviour change around staggered Copilot adoption with a saturated (Sun and Abraham style) event study, with naive TWFE shown for comparison
+- **Prerequisites**: vivainsights Python package, pyfixest (tested with 0.60.0), pandas, numpy, matplotlib
+- **Key Features**: Event-time alignment, staggered-robust saturated event study and ATT, pre-adoption lead check, person + week fixed effects, z-scored composite index
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/event-study-did.py)**
 </div>
 

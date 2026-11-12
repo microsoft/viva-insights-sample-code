@@ -1,17 +1,26 @@
 """Structural checks for _data/causal_decision_guide.yml."""
+import re
 from pathlib import Path
 import unittest
 
 import yaml
 
-DATA = Path(__file__).resolve().parent.parent / "_data" / "causal_decision_guide.yml"
+ROOT = Path(__file__).resolve().parent.parent
+DATA = ROOT / "_data" / "causal_decision_guide.yml"
+ARTICLE = ROOT / "_pages" / "causal-questions-ai-usage.md"
+INCLUDE = ROOT / "_includes" / "causal-decision-guide.html"
+PAGES = ROOT / "_pages"
+ARTICLE_URL = "/articles/causal-questions-ai-usage/"
+MODES = ("access", "intensity")
 
-ALLOWED_ANCHORS = {
-    "#route-descriptive", "#route-randomised", "#route-rdd",
-    "#route-staggered-did", "#route-between-function", "#route-synthetic",
-    "#route-itsa", "#route-dose", "#route-selection", "#route-no-estimate",
-    "#joined-panel",
-}
+ID_ATTR = re.compile(r'\bid\s*=\s*"([^"]+)"')
+
+
+def article_ids():
+    """Ids written in the article source plus ids rendered by the include."""
+    ids = set(ID_ATTR.findall(ARTICLE.read_text(encoding="utf-8")))
+    ids |= set(ID_ATTR.findall(INCLUDE.read_text(encoding="utf-8")))
+    return ids
 
 
 def targets(answer):
@@ -20,12 +29,53 @@ def targets(answer):
     return list(answer.get("next", {}).values())
 
 
+def stateful_walk(data):
+    """Walk (node, mode) states from start, mirroring the widget.
+
+    `next` is resolved against the mode held before the answer; `set` updates
+    the mode afterwards. Returns (visited ids, error messages).
+    """
+    nodes = {n["id"]: n for n in data["nodes"]}
+    leaves = {l["id"] for l in data["leaves"]}
+    seen, visited, errors = set(), set(), []
+    stack = [(data["start"], None)]
+    while stack:
+        state = stack.pop()
+        if state in seen:
+            continue
+        seen.add(state)
+        node_id, mode = state
+        visited.add(node_id)
+        if node_id in leaves or node_id not in nodes:
+            continue
+        for answer in nodes[node_id]["answers"]:
+            if "to" in answer:
+                dest = answer["to"]
+            else:
+                if mode is None:
+                    errors.append(f"{node_id}: next fork reachable with no mode")
+                    continue
+                dest = answer.get("next", {}).get(mode)
+                if dest is None:
+                    errors.append(f"{node_id}: no next entry for mode {mode}")
+                    continue
+            stack.append((dest, answer.get("set", mode)))
+    return visited, errors
+
+
+def parse_stub(path):
+    text = path.read_text(encoding="utf-8")
+    front = text.split("---")[1]
+    return yaml.safe_load(front)
+
+
 class DecisionGuideTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.data = yaml.safe_load(DATA.read_text(encoding="utf-8"))
         cls.nodes = {n["id"]: n for n in cls.data["nodes"]}
         cls.leaves = {l["id"]: l for l in cls.data["leaves"]}
+        cls.ids = article_ids()
 
     def edges(self, node_id):
         return [t for a in self.nodes[node_id]["answers"] for t in targets(a)]
@@ -50,9 +100,33 @@ class DecisionGuideTests(unittest.TestCase):
                 if "next" in answer:
                     self.assertEqual(set(answer["next"]), {"access", "intensity"})
 
-    def test_anchors_allowed(self):
-        for leaf in self.data["leaves"]:
-            self.assertIn(leaf["anchor"], ALLOWED_ANCHORS, leaf["id"])
+    def test_anchors_exist_in_article(self):
+        self.assertIn("decision-guide-widget", self.ids)
+        for item in self.data["nodes"] + self.data["leaves"]:
+            anchor = item.get("anchor")
+            if item in self.data["leaves"]:
+                self.assertTrue(anchor, f"{item['id']}: leaf without anchor")
+            if anchor:
+                self.assertTrue(anchor.startswith("#"), item["id"])
+                self.assertIn(anchor[1:], self.ids, f"{item['id']}: {anchor} not in article")
+
+    def test_redirect_stubs(self):
+        stubs = sorted(PAGES.glob("causal-inference*.md"))
+        self.assertEqual(len(stubs), 10, [s.name for s in stubs])
+        for stub in stubs:
+            meta = parse_stub(stub)
+            self.assertEqual(meta.get("layout"), "redirect", stub.name)
+            self.assertEqual(meta.get("permalink"), f"/{stub.stem}/", stub.name)
+            target, _, fragment = meta["redirect_to"].partition("#")
+            self.assertEqual(target, ARTICLE_URL, stub.name)
+            if fragment:
+                self.assertIn(fragment, self.ids, f"{stub.name}: #{fragment}")
+
+    def test_stateful_walk(self):
+        visited, errors = stateful_walk(self.data)
+        self.assertEqual(errors, [])
+        everything = set(self.nodes) | set(self.leaves)
+        self.assertEqual(everything - visited, set(), "unreachable under stateful walk")
 
     def test_reachability(self):
         seen, stack = set(), [self.data["start"]]

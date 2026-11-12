@@ -6,7 +6,7 @@ permalink: /articles/causal-questions-ai-usage/
 eyebrow: "Copilot Analytics Lab · PANDAS Team · November 2026"
 dek: "Most AI rollouts are staggered, product-specific and led by function. This guide asks a short series of questions about your data and points you to a design that fits, or says plainly when none does."
 byline: "By the PANDAS team · A Copilot Analytics Lab methods guide"
-read_time: "29 min read"
+read_time: "33 min read"
 css: "/assets/css/article.css"
 image: /assets/images/articles/causal-questions-ai-usage-card.png
 keywords:
@@ -70,6 +70,41 @@ keywords:
 
 <p>This article is for people analytics practitioners and data scientists who hold Viva Insights exports and know regression. Many will be new to modern difference-in-differences. It routes you to a design based on your data and does not catalogue every method. It replaces the site's earlier technique-by-technique guide to causal inference.</p>
 
+<h3 id="key-terms">Key terms</h3>
+
+<p>These terms recur throughout. Each one is also underlined where it first appears in the text.</p>
+
+<dl class="key-terms">
+  <dt id="term-anticipation">Anticipation</dt>
+  <dd>People changing their behaviour before access starts, for example after training or an announcement. It makes pre-period weeks partly treated.</dd>
+  <dt id="term-clustering">Clustering</dt>
+  <dd>Allowing for the fact that outcomes within a group, such as a function or team, or repeated weeks for one person, are correlated. Standard errors are usually clustered at least at the level at which exposure was assigned.</dd>
+  <dt id="term-cohort">Cohort and not-yet-treated</dt>
+  <dd>A cohort is the group of people whose exposure started in the same week. Not-yet-treated people are eligible but start later, so they are valid comparisons only for the weeks before their own start.</dd>
+  <dt id="term-conditional-parallel-trends">Conditional parallel trends</dt>
+  <dd>The assumption that, among comparable people (here, within the same function), treated and comparison groups would have moved in parallel without treatment.</dd>
+  <dt id="term-complier">Compliers (local average treatment effect)</dt>
+  <dd>Compliers are the people whose use changes because of their assignment. The effect estimated for them, using assignment as an instrument, is the local average treatment effect.</dd>
+  <dt id="term-estimand">Estimand</dt>
+  <dd>The exact quantity you want to estimate, such as the average effect of access for later licence cohorts in one function over a stated set of weeks.</dd>
+  <dt id="term-event-study">Event study and leads</dt>
+  <dd>A model that estimates effects for each week relative to the start date. Leads are the estimates for weeks before the start, and they should be close to zero if the comparison is fair.</dd>
+  <dt id="term-exclusion-monotonicity">Exclusion restriction and monotonicity</dt>
+  <dd>Two assumptions for using assignment as an instrument. Exclusion says assignment affects the outcome only through use. Monotonicity says assignment never pushes anyone to use less.</dd>
+  <dt id="term-exposure">Exposure and treatment</dt>
+  <dd>Exposure is a person's contact with an AI tool, such as a licence, first use or an amount of use. Treatment is the exposure whose effect you are estimating.</dd>
+  <dt id="term-itt">Intention to treat</dt>
+  <dd>Comparing people by the group they were assigned to, whether or not they used the tool. It estimates the effect of giving access.</dd>
+  <dt id="term-negative-control">Negative control</dt>
+  <dd>An outcome the tool should not plausibly change. An apparent effect on it signals confounding or a shared shock.</dd>
+  <dt id="term-surrogate">Surrogate</dt>
+  <dd>A short-term measure that stands in for a longer-term outcome. It is valid only if it captures all of the effect on that outcome, which needs strong assumptions.</dd>
+  <dt id="term-twfe">Two-way fixed effects (TWFE)</dt>
+  <dd>A regression with person and period fixed effects. With staggered start dates, a single TWFE coefficient can use already-treated people as comparisons and give misleading weights.</dd>
+  <dt id="term-unconfoundedness">Unconfoundedness and overlap</dt>
+  <dd>Unconfoundedness says that, given the covariates, exposure is unrelated to the outcome a person would have had without it. Overlap says comparable people exist at each exposure level.</dd>
+</dl>
+
 <section id="choosing-outcome" class="part-head">
 <h2>Choose the outcome first</h2>
 </section>
@@ -81,7 +116,7 @@ keywords:
 <p>Revenue, cases closed and cycle time are what leaders want to hear about. They are also the hardest outcomes to tie to AI use, for four reasons.</p>
 
 <ul>
-  <li><strong>Many functions contribute.</strong> A KPI is produced by several functions working together, so one person's or one function's AI exposure is a single contribution among many.</li>
+  <li><strong>Many functions contribute.</strong> A KPI is produced by several functions working together, so one person's or one function's AI <a class="term" href="#term-exposure" data-def="Contact with an AI tool, such as a licence, first use or amount of use. Treatment is the exposure being studied.">exposure</a> is a single contribution among many.</li>
   <li><strong>Processes are long.</strong> A KPI comes from a drawn-out, multi-step process. The lag between exposure and the KPI can exceed the window you have.</li>
   <li><strong>The grain does not match.</strong> KPIs are usually recorded for teams or business units, monthly or quarterly. Exposure is individual and weekly. Few units and few periods also leave little statistical power.</li>
   <li><strong>Attribution is rarely defensible.</strong> Pinning a KPI movement on one tool or one function is hard to justify when other tools, reorganisations and market conditions moved at the same time.</li>
@@ -142,8 +177,8 @@ keywords:
 - Pre-declare one primary outcome and its expected direction. Treat everything else as secondary or exploratory.
 - Label proxy results as behavioural outcomes or candidate leading indicators. Do not report a proxy shift as business impact.
 - Where a KPI exists at team grain with enough teams and periods, analyse it separately at that grain and compare it with the proxy result.
-- Check whether the proxy has tracked the KPI historically. That is predictive evidence only. Treating a proxy as a surrogate for the KPI needs much stronger assumptions <a class="cite" href="#ref-surrogate">[1]</a> <a class="cite" href="#ref-prentice1989">[2]</a>, so state which you are relying on, or say that surrogacy has not been established.
-- Add a negative-control outcome that the tool should not plausibly affect (see [the negative-control check](#check-negative-control)).
+- Check whether the proxy has tracked the KPI historically. That is predictive evidence only. Treating a proxy as a <a class="term" href="#term-surrogate" data-def="A short-term measure standing in for a longer-term outcome. It needs strong assumptions to be valid.">surrogate</a> for the KPI needs much stronger assumptions <a class="cite" href="#ref-surrogate">[1]</a> <a class="cite" href="#ref-prentice1989">[2]</a>, so state which you are relying on, or say that surrogacy has not been established.
+- Add a <a class="term" href="#term-negative-control" data-def="An outcome the tool should not plausibly change. An apparent effect on it signals confounding or a shared shock.">negative-control</a> outcome that the tool should not plausibly affect (see [the negative-control check](#check-negative-control)).
 - Confirm how often the outcome is really measured. An annual rating copied onto weekly rows is one observation a year. This matches the outcome-frequency gate in the causal Skill. Network-size metrics also repeat within a month, so they are not weekly outcomes.
 </aside>
 
@@ -172,24 +207,34 @@ keywords:
   <dt>Where to run it</dt><dd>The <a href="{{ site.baseurl }}/frontier-analytics-prompt-ai-adoption/">AI Adoption Across Tools prompt</a>.</dd>
 </dl>
 
+<details class="route-more">
+<summary>Read the full route<span class="vi-sr-only">: Describe use without a causal claim</span></summary>
+
 <p>If the question is about the spread of use across Microsoft 365 Copilot, Cowork, Agents, Consumption credits and GitHub Copilot, you do not need a causal design. Report counts, shares and trends by function and tool, keep unlike units such as actions, tasks, sessions and credits separate, and treat unresolved coverage as unknown.</p>
+
+</details>
 
 <h3 id="route-randomised">Randomised access</h3>
 
 <dl class="route-facts">
   <dt>Use when</dt><dd>Access was assigned at random, for example a pilot lottery or waves randomised within function.</dd>
-  <dt>Key assumption</dt><dd>Assignment is as good as random. To estimate the effect of usage, assignment must affect the outcome only through use (exclusion) and must not push anyone to use less (monotonicity).</dd>
+  <dt>Key assumption</dt><dd>Assignment is as good as random. To estimate the effect of usage, assignment must affect the outcome only through use (<a class="term" href="#term-exclusion-monotonicity" data-def="Exclusion: assignment affects the outcome only through use. Monotonicity: assignment never pushes anyone to use less.">exclusion</a>) and must not push anyone to use less (<a class="term" href="#term-exclusion-monotonicity" data-def="Monotonicity: assignment never pushes anyone to use less. Exclusion: assignment affects the outcome only through use.">monotonicity</a>).</dd>
   <dt>What would break it</dt><dd>Assignment that was not truly random, unequal attrition between arms, or assignment that changes behaviour without any use, for example through training or announcements.</dd>
   <dt>Where to run it</dt><dd><code>fixest</code> (<code>feols</code> with its IV syntax), <code>pyfixest</code>, or <code>linearmodels</code> IV. Seek specialist review if the randomisation was partial.</dd>
 </dl>
 
-<p>Compare people by the group they were assigned to, whether or not they used the tool. This is the intention-to-treat comparison, and it answers the question of what giving access did. It is the cleanest estimate available in this setting, and waves randomised within function are the strongest design you are likely to meet, because function is balanced by construction.</p>
+<details class="route-more">
+<summary>Read the full route<span class="vi-sr-only">: Randomised access</span></summary>
 
-<p>For the effect of usage, assignment can serve as an instrument. For a binary measure such as any use, a relevant random assignment identifies a local effect for compliers, the people whose use changed because of assignment, provided exclusion and monotonicity hold <a class="cite" href="#ref-ia1994">[3]</a>. It says little about people who would have used the tool anyway, or never would. For continuous usage intensity, the instrumental-variable estimate is a weighted average of effects across the range of use and needs its own stated assumptions and interpretation.</p>
+<p>Compare people by the group they were assigned to, whether or not they used the tool. This is the <a class="term" href="#term-itt" data-def="Comparing people by the group they were assigned to, whether or not they used the tool. It estimates the effect of access.">intention-to-treat</a> comparison, and it answers the question of what giving access did. It is the cleanest estimate available in this setting, and waves randomised within function are the strongest design you are likely to meet, because function is balanced by construction.</p>
+
+<p>For the effect of usage, assignment can serve as an instrument. For a binary measure such as any use, a relevant random assignment identifies a local effect for <a class="term" href="#term-complier" data-def="People whose use changes because of their assignment. Their effect is the local average treatment effect.">compliers</a>, the people whose use changed because of assignment, provided exclusion and monotonicity hold <a class="cite" href="#ref-ia1994">[3]</a>. It says little about people who would have used the tool anyway, or never would. For continuous usage intensity, the instrumental-variable estimate is a weighted average of effects across the range of use and needs its own stated assumptions and interpretation.</p>
 
 <p>Randomised access does not make chosen usage random. Among the people who were given access, those who use it heavily still differ from those who do not. Keep the assignment effect and the usage effect as separate results.</p>
 
-<p>Instruments that were not randomised, such as a manager's early adoption or an office's rollout date, need a separate argument that they affect the outcome only through use. In workplace data that argument is rarely convincing, because managers and offices also shape outcomes directly. Treat such designs as specialist work and seek review before relying on them.</p>
+<p>Instruments that were not randomised, such as a manager's early adoption or an office's rollout date, need a separate argument that they are as good as random and affect the outcome only through use. In workplace data that argument is rarely convincing, because managers and offices also shape outcomes directly. Treat such designs as specialist work and seek review before relying on them.</p>
+
+</details>
 
 <h3 id="route-rdd">An eligibility cut-off</h3>
 
@@ -200,27 +245,35 @@ keywords:
   <dt>Where to run it</dt><dd>Rare here. Flag for specialist review.</dd>
 </dl>
 
+<details class="route-more">
+<summary>Read the full route<span class="vi-sr-only">: An eligibility cut-off</span></summary>
+
 <p>Regression discontinuity compares people just either side of the threshold <a class="cite" href="#ref-ll2010">[4]</a>. Rollouts here rarely use a sharp rule, so expect to confirm first that one exists. If it does, check how many people fall near the cut-off and whether managers could adjust who sat on which side.</p>
+
+</details>
 
 <h3 id="route-staggered-did">Staggered rollout, compared within function</h3>
 
 <dl class="route-facts">
-  <dt>Use when</dt><dd>Licences or access arrived in waves, several waves or both treated and not-yet-treated people exist inside the same function, and you hold repeated pre-adoption weeks.</dd>
-  <dt>Key assumption</dt><dd>Within function, people treated in a wave would have followed the same path as comparable people not yet treated, had they not been treated (conditional parallel trends).</dd>
-  <dt>What would break it</dt><dd>Licences going first to people already on a different path, comparison people taking up other AI tools at a different rate from the treated group during the window, behaviour changing before the licence date, or too few clusters.</dd>
+  <dt>Use when</dt><dd>Licences or access arrived in waves, several waves or both treated and <a class="term" href="#term-cohort" data-def="Eligible people whose exposure starts later. They are valid comparisons only for weeks before their own start.">not-yet-treated</a> people exist inside the same function, and you hold repeated pre-adoption weeks.</dd>
+  <dt>Key assumption</dt><dd>Within function, people treated in a wave would have followed the same path as comparable people not yet treated, had they not been treated (<a class="term" href="#term-conditional-parallel-trends" data-def="Among comparable people, here within function, treated and comparison groups would have moved in parallel without treatment.">conditional parallel trends</a>).</dd>
+  <dt>What would break it</dt><dd>Licences going first to people already on a different path, comparison people taking up other AI tools at a different rate from the treated group during the window, behaviour changing before the licence date, or too few <a class="term" href="#term-clustering" data-def="Groups, such as functions or teams, within which outcomes are correlated. Standard errors are usually clustered at least at the level of assignment.">clusters</a>.</dd>
   <dt>Where to run it</dt><dd><code>did</code> in R, <code>didimputation</code>, <code>did2s</code>, <code>fixest::sunab()</code> or <code>pyfixest</code>. In Python, <code>differences</code> or <code>csdid</code>. The repository notebook is a starting point only.</dd>
 </dl>
 
+<details class="route-more" open>
+<summary>Read the full route<span class="vi-sr-only">: Staggered rollout, compared within function</span></summary>
+
 <p>This is the usual case here, so it gets the most care. Build the comparison from the same population that could have received the tool. For GitHub Copilot, that means people who could hold a licence, such as developers without one yet. People who will never be licensed are not a comparison group. Within that population, label each person as treated with a dated start, not yet treated, or never treated in the window. Not-yet-treated people are valid comparisons only for the weeks before their own start, and only inside an estimator built for that. People never treated within the eligible population are the other valid comparison.</p>
 
-<p>Avoid reading the effect from a single two-way fixed-effects coefficient. When start dates differ, that coefficient is a weighted average of many two-group comparisons, and some of them use people who were already treated as the comparison <a class="cite" href="#ref-gb2021">[5]</a>. If effects differ across cohorts or change over time, the coefficient can place negative weight on some of the underlying effects, so it may not represent any meaningful average <a class="cite" href="#ref-cdh2020">[6]</a> <a class="cite" href="#ref-sa2021">[7]</a>. The estimators below avoid this. For a wider orientation, see the overview in <a class="cite" href="#ref-rsbp2023">[8]</a>.</p>
+<p>Avoid reading the effect from a single <a class="term" href="#term-twfe" data-def="A regression with person and period fixed effects. With staggered starts it can use already-treated people as comparisons.">two-way fixed-effects</a> coefficient. When start dates differ, that coefficient is a weighted average of many two-group comparisons, and some of them use people who were already treated as the comparison <a class="cite" href="#ref-gb2021">[5]</a>. If effects differ across <a class="term" href="#term-cohort" data-def="A group of people whose exposure started in the same week.">cohorts</a> or change over time, the coefficient can place negative weight on some of the underlying effects, so it may not represent any meaningful average <a class="cite" href="#ref-cdh2020">[6]</a> <a class="cite" href="#ref-sa2021">[7]</a>. The estimators below avoid this. For a wider orientation, see the overview in <a class="cite" href="#ref-rsbp2023">[8]</a>.</p>
 
 <p>Pick one of these, with function in the set of things you condition on:</p>
 
 <ul>
   <li><strong>Group-time estimates.</strong> Estimate an effect for each start cohort and week, then summarise <a class="cite" href="#ref-cs2021">[9]</a>. In R, use <code>did::att_gt()</code> with <code>xformla</code> to put function in the parallel-trends conditioning set and <code>control_group = "notyettreated"</code>. In Python, <code>differences</code> and <code>csdid</code> are available. Check their documentation for option parity with R before relying on them.</li>
   <li><strong>Imputation.</strong> Fit the untreated outcomes with person and function-by-period fixed effects, then compare treated people with their predictions <a class="cite" href="#ref-bjs2024">[10]</a>. Packages are <code>didimputation</code>, <code>did2s</code> and <code>pyfixest.did2s()</code>.</li>
-  <li><strong>Sun and Abraham event studies.</strong> Use <code>fixest::sunab()</code> for an event study that keeps cohorts apart <a class="cite" href="#ref-sa2021">[7]</a>.</li>
+  <li><strong>Sun and Abraham event studies.</strong> Use <code>fixest::sunab()</code> for an <a class="term" href="#term-event-study" data-def="Effects estimated for each week relative to the start date. Leads are the estimates for weeks before the start.">event study</a> that keeps cohorts apart <a class="cite" href="#ref-sa2021">[7]</a>.</li>
   <li><strong>Stacked DiD.</strong> Build a separate data set for each cohort, with a clean comparison window and comparison people from the same function, then combine them with the weights needed for the average effect you want to report <a class="cite" href="#ref-wfh2024">[11]</a>. Stacking the data and fitting one pooled regression without those weights is not enough.</li>
 </ul>
 
@@ -228,9 +281,11 @@ keywords:
 
 <p>Cluster at the level at which licences were assigned, which is often function or team and seldom the person <a class="cite" href="#ref-cluster2023">[12]</a> <a class="cite" href="#ref-cm2015">[13]</a>. Repeated weeks for the same person add dependence too. Count the effective clusters in each model sample. With few clusters, consider small-sample corrections or randomisation-based inference. If no method is defensible, say that uncertainty cannot be reliably quantified, and do not present the intervals as if it can.</p>
 
-<p>Two data choices change the estimand. First, decide whether the start date is the licence date or the first week of use. Licence date supports an assignment effect. First use follows a chosen behaviour, so it carries selection and belongs with the usage questions. Second, these estimates cover only cohorts with an observed pre-period. See <a href="#check-pre-adoption">when there is no before</a>.</p>
+<p>Two data choices change the <a class="term" href="#term-estimand" data-def="The exact quantity you want to estimate, for example the effect of access for later cohorts in one function over stated weeks.">estimand</a>. First, decide whether the start date is the licence date or the first week of use. Licence date supports an assignment effect. First use follows a chosen behaviour, so it carries selection and belongs with the usage questions. Second, these estimates cover only cohorts with an observed pre-period. See <a href="#check-pre-adoption">when there is no before</a>.</p>
 
 <p>The repository's <a href="https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/causal-inference/did-itsa">DiD and ITSA notebook</a> is useful for learning the mechanics. It is not a staggered-robust estimator, and it has no clustered errors, so do not use it for the main estimate. For a published example of a staggered AI rollout, Brynjolfsson, Li and Raymond study an AI assistant introduced to customer-support agents at different times <a class="cite" href="#ref-brynjolfsson2025">[14]</a>.</p>
+
+</details>
 
 <h3 id="route-between-function">Whole functions treated at once</h3>
 
@@ -241,9 +296,14 @@ keywords:
   <dt>Where to run it</dt><dd>The staggered estimators above with function as the unit of comparison, and <code>HonestDiD</code> for sensitivity. Seek specialist review.</dd>
 </dl>
 
+<details class="route-more">
+<summary>Read the full route<span class="vi-sr-only">: Whole functions treated at once</span></summary>
+
 <p>When a whole function is treated at once, its effect is not separately identified from whatever else changed in that function at that time. Only cross-function comparisons remain. They need a defensible case that the functions would have moved together, supported by pre-period evidence, and a sensitivity analysis that shows how far the conclusion survives violations of parallel trends <a class="cite" href="#ref-rr2023">[15]</a>. <code>HonestDiD</code> takes the event-study coefficients and their covariance from any estimator.</p>
 
 <p>If you cannot make that case, report the result as unidentified for that function. Before you do, check whether any sub-function, such as a team or region, has variation in timing. If it does, the within-function route above applies at that level.</p>
+
+</details>
 
 <h3 id="route-synthetic">A few treated groups with a long history</h3>
 
@@ -254,9 +314,14 @@ keywords:
   <dt>Where to run it</dt><dd><code>tidysynth</code> or <code>pysyncon</code> for synthetic control, <code>synthdid</code> for synthetic DiD, and segmented regression for controlled ITSA.</dd>
 </dl>
 
+<details class="route-more">
+<summary>Read the full route<span class="vi-sr-only">: A few treated groups with a long history</span></summary>
+
 <p>Synthetic control builds a comparison from a weighted set of untreated groups <a class="cite" href="#ref-adh2010">[16]</a>. Synthetic DiD combines that weighting with a DiD comparison <a class="cite" href="#ref-sdid2021">[17]</a>. Note that <code>synthdid</code> is available from GitHub only, is not actively maintained and assumes block adoption, where all treated groups start together. Controlled ITSA fits a pre-existing trend and a change at the start date for the treated group and for a comparison group <a class="cite" href="#ref-lb2018">[18]</a>.</p>
 
 <p>Inference with few treated units is limited. Use placebo-in-space, which assigns the treatment to each donor in turn, to see whether the treated group's gap stands out. Report that, and the pre-period fit, alongside the estimate.</p>
+
+</details>
 
 <h3 id="route-itsa">Everyone treated at once: single-series ITSA</h3>
 <dl class="route-facts">
@@ -265,8 +330,13 @@ keywords:
   <dt>What would break it</dt><dd>A concurrent event, seasonality, a reorganisation or another AI tool launching around the same date. Any of these can produce the same break.</dd>
   <dt>Where to run it</dt><dd>Segmented regression with <code>statsmodels</code> OLS and Newey-West (HAC) errors, or the single-series and controlled ITSA examples in the <a href="https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/causal-inference/did-itsa">repository notebook</a>.</dd>
 </dl>
+<details class="route-more">
+<summary>Read the full route<span class="vi-sr-only">: Everyone treated at once: single-series ITSA</span></summary>
+
 <p>Single-series interrupted time series fits a level and a slope before the start date, then asks whether the level or slope changes afterwards <a class="cite" href="#ref-lb2017">[19]</a>. It needs many weekly points before the change, so a short export rarely supports it. Treat the result as weak evidence, because anything else that happened that week is folded into the estimate.</p>
 <p>Period fixed effects are unavailable here. When everyone is treated together, period effects absorb the treatment completely. Two checks remain. Run the same model on a negative-control outcome that the tool should not plausibly change. Then place several false breakpoints inside the pre-period and see how often a break of similar size appears. If it appears often, the series is too noisy for a single-series claim. Where another group was not treated, the controlled version is stronger, and the notebook covers it too.</p>
+
+</details>
 
 <h3 id="route-dose">Variation in how much people use AI</h3>
 <dl class="route-facts">
@@ -275,19 +345,29 @@ keywords:
   <dt>What would break it</dt><dd>Usage responding to workload, deadlines or projects (time-varying confounding), or the outcome driving usage (reverse causality).</dd>
   <dt>Where to run it</dt><dd>Within-person fixed effects (M2 in the <a href="{{ site.baseurl }}/frontier-analytics-skills/#skill-viva-insights-causal-analysis">causal Skill</a>), <code>contdid</code> for continuous-treatment DiD (early release), or <code>DIDmultiplegtDYN</code> for non-binary treatment.</dd>
 </dl>
+<details class="route-more">
+<summary>Read the full route<span class="vi-sr-only">: Variation in how much people use AI</span></summary>
+
 <p>A within-person model compares the same person in heavier and lighter weeks. It removes stable differences between people, such as role or working style. It does not remove changes that move usage and the outcome together. Busy weeks may raise both Copilot use and meeting load, for example.</p>
 <p>Continuous-treatment DiD compares groups by dose, and it needs stronger parallel-trends assumptions than the binary case <a class="cite" href="#ref-cgs2024">[20]</a>. Both packages are young or niche, so read their documentation and confirm the estimator supports doses that change from week to week. Timing checks are diagnostics. A causal reading also needs a justified strategy for time-varying confounding and assumptions that fit the observed pattern of use. Without them, report associations.</p>
 <p>Avoid adding a lagged outcome to a short fixed-effects panel. It induces dynamic panel bias <a class="cite" href="#ref-nickell1981">[21]</a>. Keep unlike units separate. Actions, tasks, sessions and credits each get their own dose measure, and you never sum them into one AI score.</p>
 
+</details>
+
 <h3 id="route-selection">Selection on observables</h3>
 <dl class="route-facts">
   <dt>Use when</dt><dd>You can credibly adjust for confounders measured before exposure, and comparable people exist across exposure levels within function. The outcome may be observed only once.</dd>
-  <dt>Key assumption</dt><dd>After conditioning on the covariates, exposure is unrelated to the outcome you would have seen without it (unconfoundedness), and comparable people exist in both groups (overlap).</dd>
+  <dt>Key assumption</dt><dd>After conditioning on the covariates, exposure is unrelated to the outcome you would have seen without it (<a class="term" href="#term-unconfoundedness" data-def="Given the covariates, exposure is unrelated to the outcome a person would have had without it. Overlap means comparable people exist at each exposure level.">unconfoundedness</a>), and comparable people exist in both groups (overlap).</dd>
   <dt>What would break it</dt><dd>Unmeasured drivers of adoption such as motivation, manager support or project type, and heavy users who exist only in one function.</dd>
   <dt>Where to run it</dt><dd>Regression, matching, doubly robust estimation or double machine learning <a class="cite" href="#ref-dml2018">[22]</a> with <code>DoubleML</code> or <code>econml</code>. For Copilot actions, see the <a href="{{ site.baseurl }}/copilot-causal-toolkit/">Copilot Causal Toolkit</a>.</dd>
 </dl>
+<details class="route-more">
+<summary>Read the full route<span class="vi-sr-only">: Selection on observables</span></summary>
+
 <p>The covariates must be measured before exposure and must include function. Check overlap within function, using the distribution of estimated scores in each group. Do not rely on an AUC rule of thumb. If heavy users sit in one function only, the comparison extrapolates.</p>
 <p>When access was neither randomised nor set by a defensible cut-off, this is also the route for an outcome observed once, with heavy caveats, because no fixed effect or timing check is available. The Toolkit implements double machine learning for <code>Total Copilot actions taken</code>. It is Copilot-specific and relies on unconfoundedness. No universal E-value threshold turns a sensitivity number into a pass, so report the sensitivity analysis and let readers judge it.</p>
+
+</details>
 
 <h3 id="route-no-estimate">When no design fits</h3>
 <dl class="route-facts">
@@ -296,7 +376,12 @@ keywords:
   <dt>What would break it</dt><dd>Wording that slips an effect into a descriptive result.</dd>
   <dt>Where to run it</dt><dd>The <a href="{{ site.baseurl }}/frontier-analytics-prompt-ai-adoption/">AI Adoption Across Tools prompt</a> for descriptive reporting.</dd>
 </dl>
+<details class="route-more">
+<summary>Read the full route<span class="vi-sr-only">: When no design fits</span></summary>
+
 <p>Say plainly that a causal estimate is unavailable, and report what you can describe. Then list what would change the answer. Useful additions are randomised waves, staggered waves inside a function, a longer pre-period, or an outcome that repeats weekly.</p>
+
+</details>
 
 <section id="joined-panel" class="part-head">
 <h2>Build the joined panel</h2>
@@ -343,7 +428,7 @@ keywords:
     <tr><td>Finance (hypothetical)</td><td>Not yet licensed</td><td>A between-function comparison for Sales, with the caveat in the Sales row</td><td>No effect for Finance itself</td></tr>
   </tbody>
 </table>
-<p>Prefer within-function comparisons where suitable untreated observations remain. Holding function fixed does not make them valid on its own. They still need conditional parallel trends, no anticipation and a clear treatment definition. Between-function comparisons rest on stronger assumptions. Sales and Engineering differ for many reasons, and a Sales-wide reorganisation looks identical to a Sales-wide AI effect. For a function treated all at once, the effect is not identified separately from function-specific shocks. Report it as unidentified unless you can show convincing pre-period parallel trends.</p>
+<p>Prefer within-function comparisons where suitable untreated observations remain. Holding function fixed does not make them valid on its own. They still need conditional parallel trends, no <a class="term" href="#term-anticipation" data-def="People changing behaviour before access starts, for example after an announcement. It makes pre-period weeks partly treated.">anticipation</a> and a clear treatment definition. Between-function comparisons rest on stronger assumptions. Sales and Engineering differ for many reasons, and a Sales-wide reorganisation looks identical to a Sales-wide AI effect. For a function treated all at once, the effect is not identified separately from function-specific shocks. Report it as unidentified unless you can show convincing pre-period parallel trends.</p>
 <p>Function-specific estimates are useful in their own right, since effects probably differ by function. Report them where privacy thresholds allow.</p>
 
 <h3 id="function-selection">Selection inside a function</h3>
