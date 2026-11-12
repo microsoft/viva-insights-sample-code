@@ -1,0 +1,303 @@
+<!-- Causal decision guide. Data lives in _data/causal_decision_guide.yml. -->
+{% assign cdg = site.data.causal_decision_guide %}
+<style>
+.cdg {
+  --cdg-accent: var(--art-navy, #335CCC);
+  --cdg-accent-deep: var(--art-navy-deep, #294DAE);
+  --cdg-ink: var(--art-ink, #0E1726);
+  --cdg-muted: var(--art-muted, #616161);
+  --cdg-line: var(--art-line, #E0E0E0);
+  --cdg-tint: var(--art-tint, #EBF0FB);
+  --cdg-sans: var(--art-sans, "Segoe UI", system-ui, sans-serif);
+  margin: 1.75rem 0;
+  padding: 1.25rem;
+  border: 1px solid var(--cdg-line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--cdg-ink);
+  font-family: var(--cdg-sans);
+  line-height: 1.5;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.cdg *, .cdg *::before, .cdg *::after { box-sizing: border-box; }
+.cdg-title { margin: 0 0 0.35rem; font-size: 1.25rem; }
+.cdg-intro { margin: 0 0 1rem; color: var(--cdg-muted); }
+.cdg h4 { margin: 0 0 0.5rem; font-size: 1.1rem; line-height: 1.35; }
+.cdg h4:focus { outline: none; }
+.cdg h4:focus-visible { outline: 3px solid var(--cdg-accent); outline-offset: 3px; border-radius: 4px; }
+.cdg a { color: var(--cdg-accent-deep); }
+.cdg-static ol, .cdg-static ul { padding-left: 1.25rem; }
+.cdg-static > ol > li { margin: 0 0 1.25rem; }
+.cdg-static li { margin: 0.3rem 0; }
+.cdg-help { margin: 0 0 0.75rem; color: var(--cdg-muted); font-size: 0.95rem; }
+.cdg-js { display: none; }
+.cdg-ready .cdg-static { display: none; }
+.cdg-ready .cdg-js { display: block; }
+.cdg-trail { list-style: none; margin: 0 0 1rem; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.cdg-trail:empty { display: none; }
+.cdg-trail li { margin: 0; max-width: 100%; }
+.cdg-crumb {
+  max-width: 100%;
+  padding: 0.3rem 0.65rem;
+  border: 1px solid var(--cdg-line);
+  border-radius: 999px;
+  background: var(--cdg-tint);
+  color: var(--cdg-ink);
+  font: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+}
+.cdg-card {
+  padding: 1rem;
+  border: 1px solid var(--cdg-line);
+  border-left: 4px solid var(--cdg-accent);
+  border-radius: 8px;
+  background: #fff;
+  animation: cdg-in 0.18s ease-out;
+}
+.cdg-result { background: var(--cdg-tint); }
+.cdg-answers { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.cdg-answers li { margin: 0; }
+.cdg-answer {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--cdg-accent);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--cdg-accent-deep);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.cdg-answer:hover { background: var(--cdg-tint); }
+.cdg-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; align-items: center; }
+.cdg-btn {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--cdg-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--cdg-ink);
+  font: inherit;
+  cursor: pointer;
+}
+.cdg-btn:hover { background: var(--cdg-tint); }
+.cdg-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.cdg-link {
+  display: inline-block;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  background: var(--cdg-accent);
+  color: #fff !important;
+  text-decoration: none;
+}
+.cdg-link:hover { background: var(--cdg-accent-deep); }
+.cdg button:focus-visible, .cdg a:focus-visible { outline: 3px solid var(--cdg-accent); outline-offset: 2px; }
+.cdg-live { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+@keyframes cdg-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .cdg-card { animation: none; } }
+@media (max-width: 480px) { .cdg { padding: 0.85rem; } .cdg-btn, .cdg-link { flex: 1 1 100%; text-align: center; } }
+</style>
+
+<section id="decision-guide-widget" class="cdg" aria-labelledby="cdg-title">
+  <h3 id="cdg-title" class="cdg-title">Answer a few questions</h3>
+  <p class="cdg-intro">Answer a few questions about your data and the guide points to a design. Every question and answer is listed below if scripting is unavailable.</p>
+
+  <div class="cdg-static" id="cdg-static">
+    <ol>
+    {% for n in cdg.nodes %}
+      <li id="cdg-s-{{ n.id }}">
+        <h4>{{ n.question | escape }}</h4>
+        {% if n.help %}<p class="cdg-help">{{ n.help | escape }}{% if n.anchor %} <a href="{{ n.anchor }}">Read more</a>{% endif %}</p>
+        {% elsif n.anchor %}<p class="cdg-help"><a href="{{ n.anchor }}">Read more</a></p>{% endif %}
+        <ul>
+        {% for a in n.answers %}
+          {% if a.to %}
+            {% assign tn = cdg.nodes | where: "id", a.to | first %}
+            {% assign tl = cdg.leaves | where: "id", a.to | first %}
+            <li>{{ a.label | escape }}:
+              {% if tn %}<a href="#cdg-s-{{ tn.id }}">next question</a>{% elsif tl %}<a href="{{ tl.anchor }}">{{ tl.title | escape }}</a>{% endif %}
+              {% if a.help %}<span class="cdg-help"> {{ a.help | escape }}</span>{% endif %}
+            </li>
+          {% elsif a.next %}
+            {% assign na = a.next.access %}
+            {% assign ni = a.next.intensity %}
+            <li>{{ a.label | escape }}:
+              <ul>
+                <li><a href="#cdg-s-{{ na }}">If you are studying access</a></li>
+                <li><a href="#cdg-s-{{ ni }}">If you are studying intensity</a></li>
+              </ul>
+            </li>
+          {% endif %}
+        {% endfor %}
+        </ul>
+      </li>
+    {% endfor %}
+    </ol>
+  </div>
+
+  <div class="cdg-js" id="cdg-stepper">
+    <ol class="cdg-trail" id="cdg-trail" aria-label="Your answers so far"></ol>
+    <div id="cdg-stage"></div>
+  </div>
+  <div class="cdg-live" id="cdg-live" aria-live="polite" role="status"></div>
+
+  <script type="application/json" id="cdg-data">{{ cdg | jsonify | replace: '</', '<\/' }}</script>
+  <script>
+  (function () {
+    var root = document.getElementById('decision-guide-widget');
+    var dataEl = document.getElementById('cdg-data');
+    if (!root || !dataEl) return;
+    var data;
+    try { data = JSON.parse(dataEl.textContent); } catch (e) { return; }
+    var stage = document.getElementById('cdg-stage');
+    var trailEl = document.getElementById('cdg-trail');
+    var live = document.getElementById('cdg-live');
+    if (!stage || !trailEl || !live || !data.nodes || !data.leaves || !data.start) return;
+
+    var nodes = {}, leaves = {};
+    data.nodes.forEach(function (n) { nodes[n.id] = n; });
+    data.leaves.forEach(function (l) { leaves[l.id] = l; });
+    if (!nodes[data.start]) return;
+
+    // path holds one entry per answered question: { node, label, mode }
+    var path = [];
+
+    function el(tag, cls, text) {
+      var e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text != null) e.textContent = text;
+      return e;
+    }
+    function currentMode() {
+      return path.length ? path[path.length - 1].mode : null;
+    }
+    function resolve(answer, mode) {
+      if (answer.to) return answer.to;
+      if (answer.next) return answer.next[mode] || null;
+      return null;
+    }
+    function currentTarget() {
+      if (!path.length) return data.start;
+      var last = path[path.length - 1];
+      return last.target;
+    }
+    function trail() {
+      trailEl.textContent = '';
+      path.forEach(function (step, i) {
+        var li = el('li');
+        var b = el('button', 'cdg-crumb', (i + 1) + '. ' + step.label);
+        b.type = 'button';
+        b.setAttribute('aria-label', 'Go back to question ' + (i + 1) + ': ' + step.question);
+        b.addEventListener('click', function () { path = path.slice(0, i); render(); });
+        li.appendChild(b);
+        trailEl.appendChild(li);
+      });
+    }
+    function actions(card, withBack) {
+      var row = el('div', 'cdg-actions');
+      if (withBack) {
+        var back = el('button', 'cdg-btn', 'Back');
+        back.type = 'button';
+        back.disabled = !path.length;
+        back.addEventListener('click', function () { path.pop(); render(); });
+        row.appendChild(back);
+      }
+      var again = el('button', 'cdg-btn', 'Start again');
+      again.type = 'button';
+      again.disabled = !path.length;
+      again.addEventListener('click', function () { path = []; render(); });
+      row.appendChild(again);
+      card.appendChild(row);
+      return row;
+    }
+    function render() {
+      var target = currentTarget();
+      var mode = currentMode();
+      trail();
+      stage.textContent = '';
+      var heading, announce;
+      if (leaves[target]) {
+        var leaf = leaves[target];
+        var card = el('div', 'cdg-card cdg-result');
+        card.setAttribute('role', 'group');
+        card.setAttribute('aria-labelledby', 'cdg-heading');
+        heading = el('h4', null, leaf.title);
+        heading.id = 'cdg-heading';
+        card.appendChild(heading);
+        card.appendChild(el('p', null, leaf.summary));
+        var row = el('div', 'cdg-actions');
+        var link = el('a', 'cdg-link', 'Read this route');
+        link.href = leaf.anchor;
+        row.appendChild(link);
+        card.appendChild(row);
+        var again = el('button', 'cdg-btn', 'Start again');
+        again.type = 'button';
+        again.addEventListener('click', function () { path = []; render(); });
+        row.appendChild(again);
+        var back = el('button', 'cdg-btn', 'Back');
+        back.type = 'button';
+        back.addEventListener('click', function () { path.pop(); render(); });
+        row.insertBefore(back, again);
+        stage.appendChild(card);
+        announce = 'Result: ' + leaf.title + '. ' + leaf.summary;
+      } else {
+        var node = nodes[target];
+        if (!node) { path = []; target = data.start; node = nodes[target]; }
+        var qcard = el('div', 'cdg-card');
+        qcard.setAttribute('role', 'group');
+        qcard.setAttribute('aria-labelledby', 'cdg-heading');
+        heading = el('h4', null, node.question);
+        heading.id = 'cdg-heading';
+        qcard.appendChild(heading);
+        var helpText = node.help;
+        if (helpText || node.anchor) {
+          var p = el('p', 'cdg-help', helpText ? helpText + ' ' : '');
+          if (node.anchor) {
+            var rm = el('a', null, 'Read more');
+            rm.href = node.anchor;
+            p.appendChild(rm);
+          }
+          qcard.appendChild(p);
+        }
+        var list = el('ul', 'cdg-answers');
+        node.answers.forEach(function (answer) {
+          var next = resolve(answer, mode);
+          var li = el('li');
+          var b = el('button', 'cdg-answer', answer.label);
+          b.type = 'button';
+          if (!next) { b.disabled = true; }
+          b.addEventListener('click', function () {
+            path.push({
+              question: node.question,
+              label: answer.label,
+              mode: answer.set || mode,
+              target: next
+            });
+            render();
+          });
+          li.appendChild(b);
+          if (answer.help) {
+            li.appendChild(el('span', 'cdg-help', answer.help));
+          }
+          list.appendChild(li);
+        });
+        qcard.appendChild(list);
+        actions(qcard, true);
+        stage.appendChild(qcard);
+        announce = 'Question ' + (path.length + 1) + ': ' + node.question;
+      }
+      live.textContent = '';
+      window.setTimeout(function () { live.textContent = announce; }, 30);
+      heading.setAttribute('tabindex', '-1');
+      // Leave focus alone on first load so the page does not scroll to the widget.
+      if (stage.dataset.moved) heading.focus();
+      stage.dataset.moved = '1';
+    }
+
+    render();
+    root.classList.add('cdg-ready');
+  })();
+  </script>
+</section>

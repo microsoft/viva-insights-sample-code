@@ -126,7 +126,7 @@ need to answer a leadership question rather than explore the data.
 - **Prerequisites**: vivainsights, pandas, NumPy, SciPy, statsmodels, matplotlib, and a Copilot-rich Person Query export with at least 12 weeks of data. Add pyarrow if you are loading a Parquet export
 - **Key Features**: 12-week Power/Habitual/Novice/Low/Non-user segmentation, entry-cohort and function analysis, native Viva Insights scans, adjusted associations, and same-person diagnostics
 - **Interpretation**: Observational associations only. Set `INPUT_FILE` to your own export before running; any metric or attribute your query lacks is reported as unavailable and skipped
-- **Related**: [Copilot Usage Segments]({{ site.baseurl }}/copilot-usage-segments/) for the segment definitions, and [Causal Inference]({{ site.baseurl }}/causal-inference/) when you need an effect rather than an association
+- **Related**: [Copilot Usage Segments]({{ site.baseurl }}/copilot-usage-segments/) for the segment definitions, and the [causal decision guide]({{ site.baseurl }}/articles/causal-questions-ai-usage/) when you need an effect estimate rather than an association
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/copilot-adoption-journey-analysis.ipynb)**
 </div>
 
@@ -281,7 +281,7 @@ These five segments form a **single mutually-exclusive ladder**, evaluated top-d
 - [Copilot Usage Segments]({{ site.baseurl }}/copilot-usage-segments/): how Power, Habitual, and Novice segments are defined
 - [DAX Calculated Columns]({{ site.baseurl }}/dax-calculated-columns/): ready-to-use Power BI formulas for segmentation
 - [Copilot Causal Toolkit]({{ site.baseurl }}/copilot-causal-toolkit/): measure the causal impact of Copilot on business outcomes
-- [Causal Inference in Copilot Analytics]({{ site.baseurl }}/causal-inference/): methods for isolating Copilot's true effect
+- [Causal Questions About AI Usage]({{ site.baseurl }}/articles/causal-questions-ai-usage/): a decision guide for choosing a causal design across Copilot and other AI tools
 - [Frontier Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/): generate Copilot reports and dashboards with coding agents
 - [Advanced Analytics]({{ site.baseurl }}/advanced/): machine learning, regression, and statistical testing
 - [Network Analysis]({{ site.baseurl }}/network/): organizational network analysis (ONA)

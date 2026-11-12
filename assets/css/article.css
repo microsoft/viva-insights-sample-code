@@ -411,6 +411,39 @@
 }
 .article-body tbody tr:nth-child(odd) td { background: rgba(51, 92, 204, 0.04); }
 
+/* ---- Route summary cards (decision-guide article) ---- */
+.route-facts {
+  display: grid;
+  grid-template-columns: minmax(8rem, max-content) minmax(0, 1fr);
+  gap: 0.45rem 1.1rem;
+  font-family: var(--art-sans);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  border: 1px solid var(--art-line);
+  border-left: 3px solid var(--art-navy);
+  border-radius: 8px;
+  background: #fff;
+  padding: 1rem 1.2rem;
+  margin: 0.4rem auto 1.4rem;
+}
+.route-facts dt {
+  font-weight: 700;
+  color: var(--art-navy);
+}
+.route-facts dd { margin: 0; color: var(--art-ink); min-width: 0; }
+.route-facts a { color: var(--art-navy); }
+@media (max-width: 560px) {
+  .route-facts { grid-template-columns: minmax(0, 1fr); gap: 0.15rem; }
+  .route-facts dd { margin-bottom: 0.55rem; }
+}
+
+/* ---- Numbered citations ---- */
+.article-body a.cite {
+  font-size: 0.82em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
 /* ---- Figures ---- */
 .article-figure {
   max-width: 62rem;

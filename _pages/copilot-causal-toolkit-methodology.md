@@ -31,7 +31,7 @@ Causal inference methods estimate what would happen if we *increased* someone's 
 - Time trends (work patterns change over time for everyone)
 - Confounding factors (people with more meetings might also use Copilot more)
 
-For a broader introduction, see the conceptual [Causal Inference in Copilot Analytics]({{ site.baseurl }}/causal-inference/) guide.
+For a broader introduction, see the [causal decision guide]({{ site.baseurl }}/articles/causal-questions-ai-usage/), which covers when selection on observables is a reasonable design.
 
 ## The Double Machine Learning framework
 

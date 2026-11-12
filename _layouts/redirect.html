@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+{%- assign target = page.redirect_to | relative_url -%}
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex">
+  <meta http-equiv="refresh" content="0; url={{ target }}">
+  <link rel="canonical" href="{{ page.redirect_to | absolute_url }}">
+  <title>Moved</title>
+  <script>location.replace({{ target | jsonify }});</script>
+</head>
+<body>
+  <p>This page has moved to <a href="{{ target }}">{{ page.redirect_to | absolute_url }}</a>.</p>
+</body>
+</html>
