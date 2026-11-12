@@ -3,10 +3,36 @@ layout: article
 title: "Causal Questions About AI Usage"
 description: "A question-led guide to choosing a causal design for AI usage data from Viva Insights, covering staggered, function-led rollouts, proxy outcomes and the checks every analysis should run."
 permalink: /articles/causal-questions-ai-usage/
-eyebrow: "Copilot Analytics Lab · Methods guide · November 2026"
+eyebrow: "Copilot Analytics Lab · PANDAS Team · November 2026"
 dek: "Most AI rollouts are staggered, product-specific and led by function. This guide asks a short series of questions about your data and points you to a design that fits, or says plainly when none does."
+byline: "By the PANDAS team · A Copilot Analytics Lab methods guide"
 read_time: "29 min read"
 css: "/assets/css/article.css"
+image: /assets/images/articles/causal-questions-ai-usage-card.png
+keywords:
+  - causal inference
+  - difference-in-differences
+  - staggered adoption
+  - event study
+  - parallel trends
+  - fixed effects
+  - instrumental variables
+  - regression discontinuity
+  - propensity score
+  - matching
+  - doubly robust
+  - double machine learning
+  - synthetic control
+  - synthetic difference-in-differences
+  - interrupted time series
+  - ITSA
+  - placebo test
+  - negative control
+  - clustering
+  - Copilot
+  - Cowork
+  - Agents
+  - GitHub Copilot
 ---
 
 <nav class="article-contents reveal" aria-label="Article contents">
@@ -162,6 +188,8 @@ css: "/assets/css/article.css"
 <p>For the effect of usage, assignment can serve as an instrument. For a binary measure such as any use, a relevant random assignment identifies a local effect for compliers, the people whose use changed because of assignment, provided exclusion and monotonicity hold <a class="cite" href="#ref-ia1994">[3]</a>. It says little about people who would have used the tool anyway, or never would. For continuous usage intensity, the instrumental-variable estimate is a weighted average of effects across the range of use and needs its own stated assumptions and interpretation.</p>
 
 <p>Randomised access does not make chosen usage random. Among the people who were given access, those who use it heavily still differ from those who do not. Keep the assignment effect and the usage effect as separate results.</p>
+
+<p>Instruments that were not randomised, such as a manager's early adoption or an office's rollout date, need a separate argument that they affect the outcome only through use. In workplace data that argument is rarely convincing, because managers and offices also shape outcomes directly. Treat such designs as specialist work and seek review before relying on them.</p>
 
 <h3 id="route-rdd">An eligibility cut-off</h3>
 
@@ -424,6 +452,8 @@ Copilot and other AI features have been available for more than two years, so an
 <ul>
 <li><a href="{{ site.baseurl }}/frontier-analytics-skills/#skill-viva-insights-causal-analysis">The causal Skill</a> checks that a panel is ready and runs within-person diagnostics. It returns a proposed plan for DiD, event studies and instruments rather than running them.</li>
 <li><a href="{{ site.baseurl }}/copilot-causal-toolkit/">The Copilot Causal Toolkit</a> runs a double machine learning workflow. It is specific to Copilot and suits the selection-on-observables route.</li>
+<li>The event-study scripts in <a href="https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/event-study-did.Rmd">R</a> and <a href="https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/event-study-did.py">Python</a> fit a staggered-adoption event study on synthetic data, with <code>fixest::sunab()</code> in R and a saturated event study in <code>pyfixest</code>. They do not condition on function, so add function-by-period fixed effects for the within-function comparison described in the <a href="#route-staggered-did">staggered route</a>.</li>
+<li>The difference-in-differences metric scans in <a href="https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/did-metric-scan.Rmd">R</a> and <a href="https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/did-metric-scan.py">Python</a> compare heavy and light users across many metrics. Treat them as exploratory. Groups defined by chosen usage carry selection, and testing many metrics needs a multiplicity adjustment.</li>
 <li><a href="https://github.com/microsoft/viva-insights-sample-code/tree/main/examples/utility-python/causal-inference/did-itsa">The DiD/ITSA notebook</a> implements 2x2 DiD, a two-way fixed-effects event study, and controlled and single-series ITSA. It is not a staggered-robust estimator and does not use clustered errors, so use it to learn the structure and not for a staggered rollout.</li>
 <li><a href="{{ site.baseurl }}/query-join-guide/">The query join guide</a> explains how to join other sources onto the Person Query before you build the panel.</li>
 </ul>

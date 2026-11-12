@@ -7,7 +7,7 @@ permalink: /articles/
 ---
 # Articles
 
-Long-form editorials and research-led perspectives on Viva Insights, meeting culture, and AI-enabled collaboration.
+Long-form editorials, research-led perspectives and methods guides on Viva Insights, meeting culture, and AI-enabled collaboration.
 
 <div class="vi-card-grid">
   <a class="vi-card" href="{{ site.baseurl }}/articles/causal-questions-ai-usage/">
