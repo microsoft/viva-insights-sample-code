@@ -844,15 +844,40 @@ test("AI usage dashboard renderer applies a configured minimum and rejects one b
             !file.exists("ai-usage-dashboard-four.html"))
 })
 test("legacy renderer forwards arguments and cannot overwrite the legacy HTML redirect", {
-  command <- file.path(utility, "render-business-leaders-ai.R")
+  wrapper <- file.path(utility, "render-business-leaders-ai.R")
+  renderer <- file.path(utility, "render-ai-usage-dashboard.R")
   rscript <- file.path(R.home("bin"), "Rscript")
-  result <- system2(rscript, c(shQuote(command), shQuote("ai-usage-dashboard-legacy-wrapper.html"),
+  result <- system2(rscript, c(shQuote(wrapper), shQuote("ai-usage-dashboard-legacy-wrapper.html"),
                                "--minimum=5"), stdout = TRUE, stderr = TRUE)
   stopifnot(is.null(attr(result, "status")),
             file.exists("ai-usage-dashboard-legacy-wrapper.html"))
-  rejected <- suppressWarnings(system2(rscript, c(shQuote(command),
-    shQuote("ai-usage-dashboard-legacy-rejected.html"), "--minimum=4"),
-    stdout = TRUE, stderr = TRUE))
+
+  legacy_html <- file.path(utility, "business-leaders-ai-adoption.html")
+  before <- readBin(legacy_html, what = "raw", n = file.info(legacy_html)$size)
+  rejected <- suppressWarnings(system2(rscript, c(shQuote(renderer), shQuote(legacy_html)),
+                                       stdout = TRUE, stderr = TRUE))
+  after <- readBin(legacy_html, what = "raw", n = file.info(legacy_html)$size)
   stopifnot(!is.null(attr(rejected, "status")),
-            !file.exists("ai-usage-dashboard-legacy-rejected.html"))
+            any(grepl("legacy HTML path is reserved", rejected, fixed = TRUE)),
+            identical(before, after))
+
+  scratch <- file.path(root, "legacy-renderer-default")
+  dir.create(scratch)
+  needed <- c("render-business-leaders-ai.R", "render-ai-usage-dashboard.R",
+              "ai-usage-dashboard.Rmd", "ai-usage-dashboard-helpers.R",
+              "ai-usage-dashboard-simulation.R", "copilot-super-panel-helpers.R")
+  stopifnot(all(file.copy(file.path(utility, needed), scratch)))
+  stopifnot(file.copy(legacy_html, scratch))
+  stopifnot(file.copy(file.path(utility, "_data"), scratch, recursive = TRUE))
+  old_wd <- setwd(scratch)
+  on.exit(setwd(old_wd), add = TRUE)
+  defaulted <- system2(rscript, shQuote(file.path(scratch, "render-business-leaders-ai.R")),
+                       stdout = TRUE, stderr = TRUE)
+  stopifnot(is.null(attr(defaulted, "status")), file.exists("ai-usage-dashboard.html"),
+            identical(readBin("business-leaders-ai-adoption.html", "raw",
+                              n = file.info("business-leaders-ai-adoption.html")$size),
+                      before),
+            grepl("<title>AI Usage Dashboard</title>",
+                  paste(readLines("ai-usage-dashboard.html", warn = FALSE), collapse = "\n"),
+                  fixed = TRUE))
 })
