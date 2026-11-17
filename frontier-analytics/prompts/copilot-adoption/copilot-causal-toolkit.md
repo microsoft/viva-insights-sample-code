@@ -249,7 +249,7 @@ If subgroup results are unavailable, say why and do not invent group findings.
 
 FORMATTING
 - Use clear section headers.
-- Explain p-values, confidence intervals and E-values in plain language (e.g., "We are 95% confident the true effect is between X and Y").
+- Explain p-values, confidence intervals and E-values in plain language (for confidence intervals, say a 95% interval comes from a method that would contain the true value in 95% of repeated samples. Describe it as the range of effects consistent with the data under the model's assumptions. Do not describe it as a 95% probability that the true effect lies in this specific range).
 - Use bold text for key numbers and findings.
 - Target length: 2-4 pages.
 - Save as "copilot_causal_analysis_interpretation_YYYYMMDD.md".

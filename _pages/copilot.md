@@ -180,8 +180,8 @@ Runs a within-person DiD per metric across two both-licensed groups (Power vs Lo
 - **Purpose**: Run a within-person DiD per metric (Power vs Low Copilot users) into one sortable table
 - **Format**: R Markdown
 - **Prerequisites**: vivainsights R package, fixest, dplyr, tidyr, ggplot2, purrr, scales
-- **Key Features**: Per-metric TWFE DiD, significance stars, forest plot, honest reporting of null effects
-- **Caveat**: Groups are defined by chosen usage, so selection into them is not random, and scanning many metrics needs a multiplicity adjustment. Treat results as exploratory.
+- **Key Features**: Per-metric TWFE DiD, raw and Holm-adjusted p-values with significance stars based on the adjusted values, forest plot, honest reporting of null effects
+- **Caveat**: Groups are defined by chosen usage, so selection into them is not random. Treat results as exploratory.
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/did-metric-scan.Rmd)**
 - **[🌐 View HTML Output](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/did-metric-scan.html)**
 </div>
@@ -190,8 +190,8 @@ Runs a within-person DiD per metric across two both-licensed groups (Power vs Lo
 **📄 [did-metric-scan.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/did-metric-scan.py)**
 - **Purpose**: Run a within-person DiD per metric (Power vs Low Copilot users) into one sortable table
 - **Prerequisites**: vivainsights Python package, linearmodels, pandas, numpy, matplotlib
-- **Key Features**: Per-metric TWFE DiD, significance stars, forest plot, honest reporting of null effects
-- **Caveat**: Groups are defined by chosen usage, so selection into them is not random, and scanning many metrics needs a multiplicity adjustment. Treat results as exploratory.
+- **Key Features**: Per-metric TWFE DiD, raw and Holm-adjusted p-values with significance stars based on the adjusted values, forest plot, honest reporting of null effects
+- **Caveat**: Groups are defined by chosen usage, so selection into them is not random. Treat results as exploratory.
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/did-metric-scan.py)**
 </div>
 
@@ -206,7 +206,7 @@ Aligns each adopter on their own event time, estimates the change with a stagger
 - **Purpose**: Estimate within-person behaviour change around staggered Copilot adoption with a Sun and Abraham event study, with naive TWFE shown for comparison
 - **Format**: R Markdown
 - **Prerequisites**: vivainsights R package, fixest (a recent version, tested with 0.14.2), dplyr, tidyr, ggplot2, scales
-- **Key Features**: Event-time alignment, staggered-robust `sunab()` estimate and ATT, pre-adoption lead check, person + week fixed effects, z-scored composite index
+- **Key Features**: Event-time alignment, staggered-robust `sunab()` estimate and ATT, pre-adoption lead check, person + function-by-week fixed effects (maps your HR function attribute to `Function`), z-scored composite index
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-r/event-study-did.Rmd)**
 - **[🌐 View HTML Output](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/event-study-did.html)**
 </div>
@@ -214,8 +214,8 @@ Aligns each adopter on their own event time, estimates the change with a stagger
 <div data-lang-block="python" markdown="1">
 **📄 [event-study-did.py](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/event-study-did.py)**
 - **Purpose**: Estimate within-person behaviour change around staggered Copilot adoption with a saturated (Sun and Abraham style) event study, with naive TWFE shown for comparison
-- **Prerequisites**: vivainsights Python package, pyfixest (tested with 0.60.0), pandas, numpy, matplotlib
-- **Key Features**: Event-time alignment, staggered-robust saturated event study and ATT, pre-adoption lead check, person + week fixed effects, z-scored composite index
+- **Prerequisites**: vivainsights Python package, pyfixest (tested with 0.60.0 and 0.70.0), pandas, numpy, matplotlib
+- **Key Features**: Event-time alignment, staggered-robust saturated event study and ATT, pre-adoption lead check, person + function-by-week fixed effects (maps your HR function attribute to `Function`), z-scored composite index
 - **[📥 Download](https://raw.githubusercontent.com/microsoft/viva-insights-sample-code/main/examples/utility-python/event-study-did.py)**
 </div>
 

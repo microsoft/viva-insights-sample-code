@@ -25,7 +25,8 @@ A **within-person event-study** paired with a **difference-in-differences
 * compares adopters against a control group of non-adopters over the same
   calendar weeks,
 * absorbs each person's baseline (**person fixed effects**) and every calendar
-  week's common shocks (**week fixed effects**), and
+  week's common shocks within each organisational function
+  (**function-by-week fixed effects**), and
 * reads the estimate as the *within-person* change in the treated group
   relative to the control group.
 
@@ -76,6 +77,14 @@ app_cols <- grep("^Copilot_actions_taken_in", names(panel), value = TRUE)
 panel <- panel %>%
   mutate(across(all_of(app_cols), ~ tidyr::replace_na(.x, 0))) %>%
   mutate(Total_Copilot_actions_taken = rowSums(across(all_of(app_cols))))
+# map your HR function attribute (for example FunctionType or Organization) to
+# Function. Use a value measured before adoption, so that Copilot use cannot
+# have changed it. Freezing each person's first observed value keeps a later
+# move between functions out of the fixed effects.
+panel <- panel %>%
+  group_by(PersonId) %>%
+  mutate(Function = dplyr::first(FunctionType, order_by = MetricDate)) %>%
+  ungroup()
 # choose the outcome column(s) to model, e.g. Collaboration_hours, Chat_hours,
 # Emails_sent -- these are standard Person Query columns.
 ```
@@ -83,11 +92,14 @@ panel <- panel %>%
 ## Simulate a Person-Query-shaped panel
 
 The block below creates a weekly panel with the same shape as a Person Query:
-one row per `PersonId` x `MetricDate`, a `Total_Copilot_actions_taken` column,
+one row per `PersonId` x `MetricDate`, a synthetic organisational `Function`
+column, a `Total_Copilot_actions_taken` column,
 and a few collaboration outcomes (`Collaboration_hours`, `Chat_hours`,
 `Emails_sent`). Treated people adopt Copilot at a **staggered** week; control
-people never adopt. We add person baselines, calendar-week seasonality, and
-noise so the panel looks realistic.
+people never adopt. Rollout follows function (each function has its own
+adoption window and its own collaboration trend), but adoption weeks still vary
+within each function. We also add person baselines, calendar-week seasonality,
+and noise so the panel looks realistic.
 
 > **Replace this chunk for real data.** Load your export with
 > `vivainsights::import_query()` and derive the adoption week from the first week
@@ -108,18 +120,31 @@ weeks     <- seq(as.Date("2024-01-01"), by = "week", length.out = n_weeks)
 TREATMENT_EFFECT <- 0.8   # extra collaboration hours/week once adopted
 # ---------------------------------------------------------------------------
 
+# Synthetic organisational function. Rollout follows function: earlier-rolled-out
+# functions also have rising collaboration trends. Values are illustrative.
+FUNCTIONS      <- c("Sales", "Engineering", "Operations", "Finance")
+P_ADOPT        <- c(Sales = 0.8, Engineering = 0.6, Operations = 0.5, Finance = 0.4)
+ROLLOUT_START  <- c(Sales = 10L, Engineering = 12L, Operations = 16L, Finance = 18L)
+FUNCTION_TREND <- c(Sales = 0.04, Engineering = 0, Operations = -0.02, Finance = -0.04)
+
 persons <- tibble(
   PersonId    = sprintf("P%04d", seq_len(n_persons)),
-  treated     = rbinom(n_persons, 1, 0.6),
-  # person baseline (some people simply collaborate more than others)
-  base_collab = rnorm(n_persons, mean = 12, sd = 3)
-)
+  # synthetic organisational function: rollout follows function, so function
+  # confounds adoption (see the Function section below)
+  Function    = sample(FUNCTIONS, n_persons, replace = TRUE)
+) %>%
+  mutate(
+    treated     = rbinom(n_persons, 1, P_ADOPT[Function]),
+    # person baseline (some people simply collaborate more than others)
+    base_collab = rnorm(n_persons, mean = 12, sd = 3)
+  )
 
-# Treated people adopt at a staggered week (10..28); controls never adopt.
+# Treated people adopt at a staggered week. Each function has its own rollout
+# window, but adoption weeks still vary within function. Controls never adopt.
 persons <- persons %>%
   mutate(adopt_week = ifelse(
     treated == 1,
-    sample(10:28, n_persons, replace = TRUE),
+    ROLLOUT_START[Function] + sample(0:10, n_persons, replace = TRUE),
     NA_integer_
   ))
 
@@ -130,24 +155,31 @@ week_shock <- tibble(
   season    = 1.5 * sin(2 * pi * seq_len(n_weeks) / 26)
 )
 
+# function-specific week shocks: a linear trend plus random weekly noise
+function_shock <- tidyr::crossing(Function = FUNCTIONS, week_idx = seq_len(n_weeks)) %>%
+  mutate(function_shock = FUNCTION_TREND[Function] * week_idx +
+           rnorm(n(), 0, 0.5))
+
 panel <- tidyr::crossing(PersonId = persons$PersonId, week_idx = seq_len(n_weeks)) %>%
   left_join(persons, by = "PersonId") %>%
   left_join(week_shock, by = "week_idx") %>%
+  left_join(function_shock, by = c("Function", "week_idx")) %>%
   mutate(
     adopted_now = treated == 1 & week_idx >= adopt_week,
     # Copilot actions: 0 before adoption, positive afterwards (treated only)
     Total_Copilot_actions_taken = ifelse(
       adopted_now, rpois(n(), lambda = 25), 0L
     ),
-    # primary outcome: baseline + season + injected effect (post-adoption) + noise
-    Collaboration_hours = base_collab + season +
+    # primary outcome: baseline + season + function shock + injected effect
+    # (post-adoption) + noise
+    Collaboration_hours = base_collab + season + function_shock +
       ifelse(adopted_now, TREATMENT_EFFECT, 0) +
       rnorm(n(), 0, 2),
     # two correlated collaboration outcomes for the composite index later
     Chat_hours  = 0.35 * Collaboration_hours + rnorm(n(), 0, 0.8),
     Emails_sent = 20 + 1.2 * Collaboration_hours + rnorm(n(), 0, 4)
   ) %>%
-  select(PersonId, MetricDate, week_idx, treated,
+  select(PersonId, Function, MetricDate, week_idx, treated,
          Total_Copilot_actions_taken,
          Collaboration_hours, Chat_hours, Emails_sent)
 
@@ -235,18 +267,33 @@ The estimator fits a coefficient for every adoption cohort $g$ and calendar
 week, relative to the week before adoption (event time -1), with never-adopters
 as the comparison group:
 
-$$y_{it} = \alpha_i + \gamma_t + \sum_{g}\sum_{\ell \ne -1} \delta_{g,\ell}\,\mathbf{1}\{G_i = g\}\,\mathbf{1}\{t - g = \ell\} + \varepsilon_{it}$$
+$$y_{it} = \alpha_i + \gamma_{f(i)t} + \sum_{g}\sum_{\ell \ne -1} \delta_{g,\ell}\,\mathbf{1}\{G_i = g\}\,\mathbf{1}\{t - g = \ell\} + \varepsilon_{it}$$
 
-where $\alpha_i$ are person fixed effects, $\gamma_t$ are calendar-week fixed
-effects, and standard errors are clustered by person. The cohort-specific
+where $\alpha_i$ are person fixed effects, $\gamma_{f(i)t}$ are
+**function-by-calendar-week fixed effects**, and standard errors are clustered
+by person. The cohort-specific
 coefficients are then averaged, weighted by cohort share, to give one effect per
 event week. In `fixest` this is the `sunab(cohort, period)` term. It uses the
 full panel, because the estimator compares each cohort with never-adopters in
 calendar time and needs no placebo adoption week.
 
+### Why function-by-week effects
+
+In many organisations Copilot rollout follows function, and functions can have
+their own collaboration trends. If so, a plain week fixed effect compares an
+early-rollout function with never-adopters in other functions that were on a
+different path. Function-by-week fixed effects (`Function^week_num` in
+`fixest`) compare adopters with never-adopters in the same function and the
+same calendar week, which is the function-confounding point in the
+[causal decision guide](https://microsoft.github.io/viva-insights-sample-code/articles/causal-questions-ai-usage/#function-confounding).
+This conditions on function as measured, so it addresses function-level
+differences and nothing else. The chunk after the primary fit shows the same
+model with week fixed effects only, for comparison.
+
 ```{r sunab}
 es_sa <- fixest::feols(
-  Collaboration_hours ~ sunab(cohort, week_num, ref.p = -1) | PersonId + week_num,
+  Collaboration_hours ~ sunab(cohort, week_num, ref.p = -1) |
+    PersonId + Function^week_num,
   data    = panel,
   cluster = ~PersonId
 )
@@ -256,8 +303,22 @@ summary(es_sa, agg = "ATT")
 
 att <- coeftable(es_sa, agg = "ATT")
 cat(sprintf(
-  "\nSun-Abraham ATT estimate: %+.2f collaboration hours/week (SE %.2f; injected demo effect was %+.2f)\n",
+  "\nSun-Abraham ATT estimate (function-by-week FE): %+.2f collaboration hours/week (SE %.2f; injected demo effect was %+.2f)\n",
   att[1, "Estimate"], att[1, "Std. Error"], TREATMENT_EFFECT
+))
+```
+
+```{r sunab-no-function}
+# Comparison only: week fixed effects without conditioning on function
+es_sa_nf <- fixest::feols(
+  Collaboration_hours ~ sunab(cohort, week_num, ref.p = -1) | PersonId + week_num,
+  data    = panel,
+  cluster = ~PersonId
+)
+att_nf <- coeftable(es_sa_nf, agg = "ATT")
+cat(sprintf(
+  "Same model, week FE only (no function conditioning): ATT %+.2f (SE %.2f)\n",
+  att_nf[1, "Estimate"], att_nf[1, "Std. Error"]
 ))
 ```
 
@@ -312,6 +373,9 @@ A joint Wald test on the pre-adoption estimates in the plotted window (event
 weeks -8 to -2, excluding the reference week -1) asks whether they are jointly
 different from zero. The averaging weights are rebuilt from the cohort-specific
 coefficients, so the test uses the same person-clustered covariance as the plot.
+
+The primary estimate above conditions on function through function-by-week fixed
+effects, as described earlier. The pre-trend test in the next chunk is built from the same model, so it conditions on function as well.
 
 ```{r pretrend}
 b  <- es_sa$coefficients
@@ -423,7 +487,7 @@ panel_es <- panel_es %>%
             by = c("PersonId", "MetricDate"))
 
 es_index <- fixest::feols(
-  collab_index ~ sunab(cohort, week_num, ref.p = -1) | PersonId + week_num,
+  collab_index ~ sunab(cohort, week_num, ref.p = -1) | PersonId + Function^week_num,
   data    = panel,
   cluster = ~PersonId
 )

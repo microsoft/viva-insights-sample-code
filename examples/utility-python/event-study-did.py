@@ -36,9 +36,20 @@ outcome columns (see below). The simulation injects a CLEARLY-LABELLED
 illustrative effect so the model has something to recover; this is for
 demonstration only and is not a real result.
 
-Requires: pyfixest (`pip install pyfixest`; tested with 0.60.0) in addition to
-vivainsights. The saturated event study is marked as beta in pyfixest, so check
-the version you have installed.
+The primary estimate also conditions on organisational function. Copilot
+rollouts often follow function, and functions can have their own trends, so the
+model uses function-by-week fixed effects (Function^week_idx): adopters are
+compared with never-adopters in the same function and the same calendar week.
+See https://microsoft.github.io/viva-insights-sample-code/articles/causal-questions-ai-usage/#function-confounding
+for why. The simulation adds a synthetic `Function` column with function-specific
+trends and function-specific adoption timing.
+
+Requires: pyfixest (`pip install pyfixest`; tested with 0.60.0 and 0.70.0) in addition to
+vivainsights. Check the version you have installed. pyfixest's `pf.event_study` does not accept
+extra fixed effects, so the estimate is fitted with `pf.feols` using saturated
+cohort-by-relative-time interactions, `i(rel_time, C(cohort), ref=-1, ref2=0)`,
+and `PersonId + Function^week_idx` fixed effects, then averaged across cohorts
+with cell-size weights.
 
 To run on a real export instead of the simulation, replace section 1 with:
 
@@ -46,6 +57,12 @@ To run on a real export instead of the simulation, replace section 1 with:
     app_cols = [c for c in pq.columns if c.startswith("Copilot_actions_taken_in")]
     pq[app_cols] = pq[app_cols].fillna(0)
     pq["Total_Copilot_actions_taken"] = pq[app_cols].sum(axis=1)
+    # map your HR function attribute (for example FunctionType or Organization)
+    # to Function. Use a value measured before adoption, so that it cannot be
+    # changed by Copilot use. Freezing each person's first observed value keeps
+    # a later move between functions out of the fixed effects.
+    pq["Function"] = (pq.sort_values("MetricDate")
+                        .groupby("PersonId")["FunctionType"].transform("first"))
     # pick the outcome column(s) you want to model, e.g. "Collaboration_hours",
     # "Chat_hours", "Emails_sent"; these are standard Person Query columns.
     panel = pq  # then continue from section 2 unchanged
@@ -75,12 +92,23 @@ weeks = pd.date_range("2024-01-01", periods=n_weeks, freq="W-MON")
 # effect, not have it baked in.
 TREATMENT_EFFECT = 0.8  # extra collaboration hours/week once adopted
 
-treated = rng.binomial(1, 0.6, n_persons)
+# Synthetic organisational function. Rollout follows function: earlier-rolled-out
+# functions also have rising collaboration trends, so function confounds adoption.
+# Within each function, adoption weeks still vary and some people never adopt.
+FUNCTIONS = ["Sales", "Engineering", "Operations", "Finance"]
+P_ADOPT = {"Sales": 0.8, "Engineering": 0.6, "Operations": 0.5, "Finance": 0.4}
+ROLLOUT_START = {"Sales": 10, "Engineering": 12, "Operations": 16, "Finance": 18}
+FUNCTION_TREND = {"Sales": 0.04, "Engineering": 0.0, "Operations": -0.02, "Finance": -0.04}
+
+function = rng.choice(FUNCTIONS, n_persons)
+treated = rng.binomial(1, [P_ADOPT[f] for f in function])
 base_collab = rng.normal(12, 3, n_persons)
-adopt_week = np.where(treated == 1, rng.integers(10, 29, n_persons), -1)
+start = np.array([ROLLOUT_START[f] for f in function])
+adopt_week = np.where(treated == 1, start + rng.integers(0, 11, n_persons), -1)
 
 persons = pd.DataFrame({
     "PersonId": [f"P{i:04d}" for i in range(n_persons)],
+    "Function": function,
     "treated": treated,
     "base_collab": base_collab,
     "adopt_week": adopt_week,
@@ -89,12 +117,20 @@ persons = pd.DataFrame({
 week_idx = np.arange(1, n_weeks + 1)
 season_by_week = 1.5 * np.sin(2 * np.pi * week_idx / 26)
 
+# function-specific week shocks: a linear trend plus random weekly noise
+function_shock = pd.DataFrame(
+    [(f, w, FUNCTION_TREND[f] * w + rng.normal(0, 0.5))
+     for f in FUNCTIONS for w in week_idx],
+    columns=["Function", "week_idx", "function_shock"],
+)
+
 # cross join person x week
 panel = (
     persons.assign(key=1)
     .merge(pd.DataFrame({"key": 1, "week_idx": week_idx,
                          "MetricDate": weeks, "season": season_by_week}), on="key")
     .drop(columns="key")
+    .merge(function_shock, on=["Function", "week_idx"])
 )
 
 panel["adopted_now"] = (panel["treated"] == 1) & (panel["week_idx"] >= panel["adopt_week"])
@@ -104,9 +140,9 @@ panel["Total_Copilot_actions_taken"] = np.where(
     panel["adopted_now"], rng.poisson(25, len(panel)), 0
 )
 
-# primary outcome: baseline + season + injected effect (post-adoption) + noise
+# primary outcome: baseline + season + function shock + injected effect + noise
 panel["Collaboration_hours"] = (
-    panel["base_collab"] + panel["season"]
+    panel["base_collab"] + panel["season"] + panel["function_shock"]
     + np.where(panel["adopted_now"], TREATMENT_EFFECT, 0.0)
     + rng.normal(0, 2, len(panel))
 )
@@ -115,7 +151,7 @@ panel["Chat_hours"] = 0.35 * panel["Collaboration_hours"] + rng.normal(0, 0.8, l
 panel["Emails_sent"] = 20 + 1.2 * panel["Collaboration_hours"] + rng.normal(0, 4, len(panel))
 
 panel = panel[[
-    "PersonId", "MetricDate", "week_idx", "treated",
+    "PersonId", "Function", "MetricDate", "week_idx", "treated",
     "Total_Copilot_actions_taken",
     "Collaboration_hours", "Chat_hours", "Emails_sent",
 ]]
@@ -190,31 +226,31 @@ print("Adopters (treated): {}   Non-adopters (control): {}".format(
 # pyfixest fits one coefficient per adoption cohort x event week, with the never-
 # adopters (cohort 0) as the comparison group, then averages the cohort-specific
 # estimates into one estimate per event week (Sun and Abraham style weighting).
-# Person and calendar-week fixed effects are absorbed and standard errors are
-# clustered by person. Event week -1 is the reference period.
+# Person fixed effects and function-by-week fixed effects are absorbed, so
+# adopters are compared with never-adopters in the same function and calendar
+# week. Standard errors are clustered by person. Event week -1 is the reference.
+# pf.event_study() cannot take extra fixed effects, so the saturated model is
+# fitted directly with pf.feols() and averaged below.
 
 
-def saturated_event_study(df, yname):
+def saturated_event_study(df, yname, fe="PersonId + Function^week_idx"):
     """Fit the saturated event study and return (fit, by-week table, ATT, lead test)."""
+    d = df.assign(rel_time=np.where(df["cohort"] > 0, df["week_idx"] - df["cohort"], -1))
     with warnings.catch_warnings():
-        # Silence only the beta notice and the expected reference-period collinearity
-        warnings.filterwarnings("ignore", category=UserWarning,
-                                message=".*SaturatedEventStudyClass is currently in beta.*")
+        # Silence only the expected reference-period collinearity notice
         warnings.filterwarnings("ignore", category=UserWarning,
                                 message=r"(?s).*variables dropped due to multicollinearity.*")
-        fit = pf.event_study(
-            df, yname=yname, idname="PersonId", tname="week_idx",
-            gname="cohort", estimator="saturated", cluster="PersonId",
+        fit = pf.feols(
+            f"{yname} ~ i(rel_time, C(cohort), ref=-1, ref2=0) | {fe}",
+            data=d, vcov={"CRV1": "PersonId"},
         )
-        by_week = fit.aggregate()  # per-event-week estimates averaged over cohorts
 
     # Linear combinations of the cohort x week coefficients, tested with the
     # public fit.wald_test(). Weights are cohort x event-week cell sizes.
     b = fit.coef()
     cell_n = (
-        df[df["cohort"] > 0]
-        .assign(rel=lambda d: d["week_idx"] - d["cohort"])
-        .groupby(["cohort", "rel"]).size()
+        d[d["cohort"] > 0]
+        .groupby(["cohort", "rel_time"]).size()
     )
     parsed = []
     for i, nm in enumerate(b.index):
@@ -226,33 +262,60 @@ def saturated_event_study(df, yname):
         for p in parsed:
             if p and keep(p[1]):
                 w[p[0]] = cell_n.get((p[2], int(p[1])), 0)
-        return w / w.sum()
+        return w / w.sum() if w.sum() > 0 else w
+
+    def wald(R):
+        # pyfixest 0.60.0 returns a Series, 0.70.0 returns a WaldTest object
+        res = fit.wald_test(R=R, distribution="chi2")
+        if hasattr(res, "stat"):
+            return float(res.stat), float(res.pvalue)
+        return float(res.iloc[0]), float(res.iloc[1])
+
+    def estimate(r):
+        # For one combination the Wald statistic is estimate^2 / variance, which
+        # recovers the standard error without touching private attributes.
+        # An estimate of exactly zero gives 0/0, so report NaN rather than dividing.
+        est = float(r @ b.values)
+        wald_stat, _ = wald(r.reshape(1, -1))
+        se = abs(est) / np.sqrt(wald_stat) if est != 0 and wald_stat > 0 else np.nan
+        return est, se
+
+    # One estimate per event week, averaged over cohorts
+    rows = []
+    for k in range(-WINDOW, WINDOW + 1):
+        r = combo(lambda t, k=k: t == k)
+        if k != -1 and r.any():
+            est, se = estimate(r)
+            rows.append({"event_week": k, "estimate": est, "se": se,
+                         "lwr": est - 1.96 * se, "upr": est + 1.96 * se})
+    by_week = pd.DataFrame(rows)
 
     # ATT: average over all post-adoption event weeks, weighted by cell size.
-    # For one combination the Wald statistic is estimate^2 / variance, which
-    # recovers the standard error without touching private attributes.
-    r_att = combo(lambda t: t >= 0)
-    att_est = float(r_att @ b.values)
-    att_wald = float(fit.wald_test(R=r_att.reshape(1, -1), distribution="chi2").iloc[0])
-    # An estimate of exactly zero gives 0/0, so report NaN rather than dividing
-    att_se = abs(att_est) / np.sqrt(att_wald) if att_est != 0 and att_wald > 0 else np.nan
+    att = estimate(combo(lambda t: t >= 0))
 
     # Joint Wald test on the pre-adoption leads in the plotted window (-8 to -2)
     leads = [t for t in range(-WINDOW, -1)]
     R = np.vstack([combo(lambda t, k=k: t == k) for k in leads])
-    lead_res = fit.wald_test(R=R, distribution="chi2")
-    return (fit, by_week, (att_est, att_se),
-            (float(lead_res.iloc[0]), len(leads), float(lead_res.iloc[1])))
+    lead_stat, lead_p = wald(R)
+    return (fit, by_week, att, (lead_stat, len(leads), lead_p))
 
 
 fit_sa, sa_week, (att, att_se), (pre_chi2, pre_df, pre_p) = saturated_event_study(
     panel, "Collaboration_hours")
 
-print("\nSun-Abraham style ATT estimate: {:+.2f} collaboration hours/week "
-      "(SE {:.2f}; injected demo effect was {:+.2f})".format(
+print("\nSun-Abraham style ATT estimate (function-by-week FE): {:+.2f} collaboration "
+      "hours/week (SE {:.2f}; injected demo effect was {:+.2f})".format(
           att, att_se, TREATMENT_EFFECT))
 print("Joint test of {} pre-adoption leads: chi-squared = {:.2f}, p = {:.3f}".format(
     pre_df, pre_chi2, pre_p))
+
+# Comparison: the same saturated model with week fixed effects only, which does
+# not condition on function.
+_, _, (att_nf, att_nf_se), (pre_chi2_nf, _, pre_p_nf) = saturated_event_study(
+    panel, "Collaboration_hours", fe="PersonId + week_idx")
+print("Same model, week FE only (no function conditioning): ATT {:+.2f} (SE {:.2f}); "
+      "lead test chi-squared = {:.2f}, p = {:.3f}".format(
+          att_nf, att_nf_se, pre_chi2_nf, pre_p_nf))
 # A non-significant pre-test does not establish parallel trends. The test can
 # have low power and cannot rule out a trend that starts at adoption. Read it
 # together with the plot and with what you know about why people adopted when
@@ -266,10 +329,7 @@ print("Joint test of {} pre-adoption leads: chi-squared = {:.2f}, p = {:.3f}".fo
 # One average hides the parallel-trends assumption. The event-study shows an
 # estimate for each event week (relative to week -1). Pre-adoption estimates
 # should sit near zero; post-adoption ones should step up to the effect.
-es_coefs = sa_week.reset_index().rename(columns={
-    "period": "event_week", "Estimate": "estimate",
-    "Std. Error": "se", "2.5%": "lwr", "97.5%": "upr"})
-es_coefs = es_coefs[["event_week", "estimate", "se", "lwr", "upr"]].astype(float)
+es_coefs = sa_week[["event_week", "estimate", "se", "lwr", "upr"]].astype(float)
 es_coefs = es_coefs[(es_coefs["event_week"] >= -WINDOW) & (es_coefs["event_week"] <= WINDOW)]
 # add the reference week (-1) at exactly 0
 es_coefs = pd.concat([

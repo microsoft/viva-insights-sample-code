@@ -147,6 +147,11 @@ confounder control.
 Difference-in-differences, event studies, instruments and discontinuities need
 their own design-specific review. V1 returns a proposed plan for those requests.
 Existing examples are resources to inspect, not automatic evidence of validity.
+For choosing among these designs under staggered, function-led rollouts, see the
+[causal decision guide](https://microsoft.github.io/viva-insights-sample-code/articles/causal-questions-ai-usage/).
+Staggered-robust event-study examples are available in
+[R](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/event-study-did.Rmd)
+and [Python](https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-python/event-study-did.py).
 
 ## Claim language
 

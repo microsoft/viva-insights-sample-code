@@ -145,6 +145,20 @@
           spy();
         }
 
+        // Expand collapsed sections for printing, then restore them.
+        window.addEventListener('beforeprint', function () {
+          document.querySelectorAll('.article-body details:not([open])').forEach(function (d) {
+            d.setAttribute('data-print-opened', '');
+            d.open = true;
+          });
+        });
+        window.addEventListener('afterprint', function () {
+          document.querySelectorAll('.article-body details[data-print-opened]').forEach(function (d) {
+            d.removeAttribute('data-print-opened');
+            d.open = false;
+          });
+        });
+
         // Copy-link share button.
         var copyBtn = document.querySelector('.article-share-copy');
         if (copyBtn && navigator.clipboard) {

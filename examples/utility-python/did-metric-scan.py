@@ -15,7 +15,10 @@ intensity, not licence access.
 
 For a single-metric event-study and the parallel-trends assumption, see the
 companion `event-study-did` example; here the focus is the scan across metrics
-and honest reporting of significance, including metrics that do NOT move.
+and honest reporting of significance, including metrics that do NOT move. Because
+many metrics are tested at once, the table reports raw and Holm-adjusted p-values
+and bases the significance stars on the adjusted values. Power and Low groups are
+defined by chosen usage, so the results are exploratory.
 
 As in that example, a Person Query does not ship with a clean adoption event, so
 we build a small SEEDED SIMULATION whose column names match a real Person Query.
@@ -121,6 +124,16 @@ def stars(p):
     return "***" if p < 0.001 else "**" if p < 0.01 else "*" if p < 0.05 else "n.s."
 
 
+def holm_adjust(p):
+    """Holm step-down adjusted p-values (same as statsmodels method="holm")."""
+    p = np.asarray(p, dtype=float)
+    order = np.argsort(p)
+    adj = np.maximum.accumulate((len(p) - np.arange(len(p))) * p[order])
+    out = np.empty_like(p)
+    out[order] = np.minimum(adj, 1.0)
+    return out
+
+
 rows = []
 for m in EFFECTS:
     fit = PanelOLS(pdata[m], pdata[["treat_post"]],
@@ -132,24 +145,35 @@ for m in EFFECTS:
     base_pre = panel_es.loc[(panel_es["treated"] == 1) & (panel_es["post"] == 0), m].mean()
     rows.append({
         "metric": m, "estimate": est, "conf_low": lo, "conf_high": hi,
-        "p_value": p, "sig": stars(p),
+        "p_value": p,
         "baseline_pre": base_pre, "pct_of_baseline": est / base_pre,
     })
 
-results = pd.DataFrame(rows).sort_values("estimate", ascending=False).reset_index(drop=True)
+results = pd.DataFrame(rows)
+# Holm-adjusted p-values across the scanned metrics control the chance of any
+# false positive in the scan. Stars and the forest plot colours use the adjusted values.
+# The plotted confidence intervals are not adjusted for multiple testing.
+results["p_holm"] = holm_adjust(results["p_value"].to_numpy())
+results["sig"] = results["p_holm"].map(stars)
+results = results.sort_values("estimate", ascending=False).reset_index(drop=True)
 
 display = results.assign(
     estimate=results["estimate"].round(3),
     CI=results.apply(lambda r: f"[{r.conf_low:+.2f}, {r.conf_high:+.2f}]", axis=1),
     pct=(results["pct_of_baseline"] * 100).round(1).astype(str) + "%",
     p=results["p_value"].map(lambda x: f"{x:.2g}"),
-)[["metric", "estimate", "CI", "pct", "p", "sig"]]
-display.columns = ["Metric", "Delta (units)", "95% CI", "% of baseline", "p", "Sig"]
-print("\nPower vs Low DiD (one row per metric, sorted by effect):")
+    p_adj=results["p_holm"].map(lambda x: f"{x:.2g}"),
+)[["metric", "estimate", "CI", "pct", "p", "p_adj", "sig"]]
+display.columns = ["Metric", "Delta (units)", "95% CI", "% of baseline",
+                   "p (raw)", "p (Holm)", "Sig"]
+print("\nPower vs Low DiD (one row per metric, sorted by effect; Sig uses the "
+      "Holm-adjusted p-value):")
 print(display.to_string(index=False))
 # Read as: within-person, Power users changed this metric by Delta more than Low
-# users after adoption. The Sig column separates signal from noise, and the
-# deliberately null metric should land n.s.
+# users after adoption. The Sig column uses the Holm-adjusted p-value, and the
+# deliberately null metric should land n.s. Power and Low groups are defined by
+# chosen usage, so people sort themselves into them. The results are exploratory
+# and best read as associations.
 
 # ---------------------------------------------------------------------------
 # 4. Forest plot
