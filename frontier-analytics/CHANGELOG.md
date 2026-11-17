@@ -134,6 +134,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Renamed Business Leaders AI Usage to AI Usage Dashboard, with a canonical
+  guide route and a redirect from the previous guide URL. Updated catalogue
+  references and navigation so dashboards are grouped under Copilot rather
+  than Frontier.
 - The Consumption contract now records the four-file layout and
   `SpendingPolicyId` native key observed in real exports, keeps the earlier
   documented layout as a dated variant, and separates key uniqueness from

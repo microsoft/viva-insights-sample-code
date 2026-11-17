@@ -3,6 +3,7 @@
   <div class="dashboard-grid">
     {% for dashboard in site.data.copilot_dashboards %}
     <article class="dashboard-card" id="{{ dashboard.slug }}" aria-labelledby="dashboard-card-{{ dashboard.slug }}">
+      {% if dashboard.legacy_slug %}<span class="dashboard-hash-alias" id="{{ dashboard.legacy_slug }}" aria-hidden="true"></span>{% endif %}
       {% if dashboard.image %}
       <img src="{{ dashboard.image | relative_url }}" alt="{{ dashboard.image_alt }}" loading="lazy">
       {% endif %}
@@ -16,7 +17,7 @@
   </div>
   <div data-dashboard-details>
     {% for dashboard in site.data.copilot_dashboards %}
-    <section class="dashboard-details" id="dashboard-{{ dashboard.slug }}" data-dashboard-panel="{{ dashboard.slug }}" aria-labelledby="dashboard-title-{{ dashboard.slug }}">
+    <section class="dashboard-details" id="dashboard-{{ dashboard.slug }}" data-dashboard-panel="{{ dashboard.slug }}"{% if dashboard.legacy_slug %} data-dashboard-aliases="dashboard-{{ dashboard.legacy_slug }}"{% endif %} aria-labelledby="dashboard-title-{{ dashboard.slug }}">
       <h3 id="dashboard-title-{{ dashboard.slug }}" tabindex="-1">{{ dashboard.name }}</h3>
       <p class="dashboard-badge">Synthetic data · R template</p>
       <p>{{ dashboard.scope }}</p>

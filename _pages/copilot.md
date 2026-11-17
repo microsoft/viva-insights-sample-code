@@ -24,7 +24,7 @@ Pick a card to jump straight to a section, or read on for the full picture.
   <a class="vi-card" href="#interactive-dashboards">
     <span class="vi-card-icon">📊</span>
     <span class="vi-card-title">Interactive Dashboards</span>
-    <span class="vi-card-desc">Three ready-to-view reports covering business leaders' AI usage, credit consumption and developer experience — see what a finished stakeholder report looks like.</span>
+    <span class="vi-card-desc">Three ready-to-view reports covering cross-product AI usage, credit consumption and developer experience — see what a finished stakeholder report looks like.</span>
     <span class="vi-card-more">Jump to section →</span>
   </a>
   <a class="vi-card" href="#analysis-scripts">

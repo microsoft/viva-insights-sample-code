@@ -10,10 +10,11 @@
 // Usage, from the repository root:
 //   node scripts/capture-report-screenshots.js
 //   node scripts/capture-report-screenshots.js --github-only
-//   node scripts/capture-report-screenshots.js --business-only
+//   node scripts/capture-report-screenshots.js --ai-usage-only
+// Legacy alias: --business-only
 //
 // Render the selected reports first if their source/data has changed:
-//   Rscript examples/utility-r/render-business-leaders-ai.R
+//   Rscript examples/utility-r/render-ai-usage-dashboard.R
 //   cd examples/utility-r
 //   Rscript -e "rmarkdown::render('copilot-consumption-ways-of-working-simulation.Rmd')"
 //   Rscript render-github-developer-experience.R
@@ -26,14 +27,16 @@ const OUT = path.join(REPO, 'assets', 'images', 'reports');
 
 const SHOTS = [
   {
-    html: 'business-leaders-ai-adoption.html',
+    html: 'ai-usage-dashboard.html',
+    group: 'ai-usage-dashboard',
     section: 'overview',
-    file: 'business-leaders-ai-overview.png',
+    file: 'ai-usage-dashboard-overview.png',
   },
   {
-    html: 'business-leaders-ai-adoption.html',
+    html: 'ai-usage-dashboard.html',
+    group: 'ai-usage-dashboard',
     section: 'collaboration',
-    file: 'business-leaders-ai-collaboration.png',
+    file: 'ai-usage-dashboard-collaboration.png',
   },
   {
     html: 'copilot-consumption-ways-of-working-simulation.html',
@@ -67,11 +70,12 @@ const SHOTS = [
     const page = await context.newPage();
 
     const githubOnly = process.argv.includes('--github-only');
-    const businessOnly = process.argv.includes('--business-only');
-    if (githubOnly && businessOnly) throw new Error('Choose only one report filter.');
+    const aiUsageOnly = process.argv.includes('--ai-usage-only') || process.argv.includes('--business-only');
+    if (githubOnly && aiUsageOnly) throw new Error('Choose only one report filter.');
     const shots = SHOTS.filter((shot) =>
       (!githubOnly || shot.html.startsWith('github-')) &&
-      (!businessOnly || shot.html.startsWith('business-')));
+      (!aiUsageOnly || shot.group === 'ai-usage-dashboard'));
+    if (aiUsageOnly && shots.length !== 2) throw new Error(`Expected two AI Usage Dashboard screenshots, found ${shots.length}.`);
     for (const shot of shots) {
       const url = 'file:///' + path.join(UTILITY, shot.html).replace(/\\/g, '/');
       await page.goto(url, { waitUntil: 'load' });

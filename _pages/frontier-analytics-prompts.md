@@ -30,9 +30,9 @@ Each card opens a copyable quick prompt. The full prompt cards retain the detail
 Start with the existing R reports and let an agent guide the next step. These journeys work with a pasted prompt or the optional dashboard Skill.
 
 The [dashboard catalogue]({{ site.baseurl }}/copilot-dashboards/) has three
-synthetic demos, including **Business Leaders AI Usage**, with source and input
+synthetic demos, including **AI Usage Dashboard**, with source and input
 requirements. Viewing them needs only a browser. The two query-dashboard prompts
-below cover Consumption and Developer Experience. Business Leaders AI Usage does
+below cover Consumption and Developer Experience. AI Usage Dashboard does
 not yet have a dedicated prompt journey or verified real-data adapter.
 
 {% include prompt-catalogue.html %}

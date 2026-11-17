@@ -5,6 +5,7 @@
   if (!catalogue || typeof document.createElement('dialog').showModal !== 'function') return;
 
   var dialogs = {};
+  var aliasesByHash = Object.create(null);
   var current = null;
   var returnFocus = null;
 
@@ -16,11 +17,19 @@
     var id;
     try { id = decodeURIComponent(location.hash.slice(1)); } catch (error) { return null; }
     var panel = document.getElementById(id);
-    return panel && panel.getAttribute('data-dashboard-panel');
+    if (panel && panel.hasAttribute('data-dashboard-panel')) {
+      return panel.getAttribute('data-dashboard-panel');
+    }
+    return aliasesByHash[id] || null;
   }
 
   catalogue.querySelectorAll('[data-dashboard-panel]').forEach(function (panel) {
     var slug = panel.getAttribute('data-dashboard-panel');
+    var aliases = panel.getAttribute('data-dashboard-aliases');
+    // Panels move out of the catalogue below, so retain aliases for hash synchronization.
+    if (aliases) {
+      aliases.split(/\s+/).forEach(function (alias) { aliasesByHash[alias] = slug; });
+    }
     var title = panel.querySelector('h3');
     var dialog = document.createElement('dialog');
     dialog.className = 'dashboard-dialog';

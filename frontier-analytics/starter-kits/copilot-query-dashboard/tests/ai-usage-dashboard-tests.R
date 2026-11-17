@@ -1,8 +1,8 @@
 # Invoked by run-tests.R. All inputs are committed synthetic fixtures.
 business <- new.env()
 sys.source(file.path(utility, "copilot-super-panel-helpers.R"), business)
-sys.source(file.path(utility, "business-leaders-ai-simulation.R"), business)
-sys.source(file.path(utility, "business-leaders-ai-helpers.R"), business)
+sys.source(file.path(utility, "ai-usage-dashboard-simulation.R"), business)
+sys.source(file.path(utility, "ai-usage-dashboard-helpers.R"), business)
 business_data <- business$read_business_leaders_data(file.path(utility, "_data"))
 business_payload <- business$business_dashboard_payload(business_data)
 test("AI union preserves positives across sources and unresolved non-use", {
@@ -812,32 +812,47 @@ test("collaboration results reconcile to raw person-weeks in every window and fi
     }
   }
 })
-test("business renderer resolves relative output from an unrelated working directory", {
-  destination <- "business-leaders-relative.html"
-  command <- file.path(utility, "render-business-leaders-ai.R")
+test("AI usage dashboard renderer resolves relative output from an unrelated working directory", {
+  destination <- "ai-usage-dashboard-relative.html"
+  command <- file.path(utility, "render-ai-usage-dashboard.R")
   result <- system2(file.path(R.home("bin"), "Rscript"),
                     c(shQuote(command), shQuote(destination)), stdout = TRUE, stderr = TRUE)
   stopifnot(is.null(attr(result, "status")), file.exists(destination),
             file.info(destination)$size < 200 * 1024)
   html <- paste(readLines(destination, warn = FALSE), collapse = "\n")
-  stopifnot(grepl("SYNTHETIC DEMO", html, fixed = TRUE),
+  stopifnot(grepl("<title>AI Usage Dashboard</title>", html, fixed = TRUE),
+            grepl("<h1[^>]*>\\s*AI Usage Dashboard\\s*</h1>", html),
+            grepl("SYNTHETIC DEMO", html, fixed = TRUE),
             grepl('id="dashboard-data"', html, fixed = TRUE),
             !grepl('src="https?://|href="https?://[^"]+\\.css', html),
             !any(vapply(unique(business_data$panel$PersonId),
                         function(id) grepl(id, html, fixed = TRUE), logical(1))))
 })
-test("business renderer applies a configured minimum and rejects one below five", {
-  command <- file.path(utility, "render-business-leaders-ai.R")
+test("AI usage dashboard renderer applies a configured minimum and rejects one below five", {
+  command <- file.path(utility, "render-ai-usage-dashboard.R")
   rscript <- file.path(R.home("bin"), "Rscript")
-  result <- system2(rscript, c(shQuote(command), shQuote("business-leaders-five.html"),
+  result <- system2(rscript, c(shQuote(command), shQuote("ai-usage-dashboard-five.html"),
                                "--minimum=5"), stdout = TRUE, stderr = TRUE)
   stopifnot(is.null(attr(result, "status")))
-  html <- paste(readLines("business-leaders-five.html", warn = FALSE), collapse = "\n")
+  html <- paste(readLines("ai-usage-dashboard-five.html", warn = FALSE), collapse = "\n")
   stopifnot(grepl('"minimum":5,', html, fixed = TRUE),
             grepl("minimum group size of 5 people", html, fixed = TRUE))
   rejected <- suppressWarnings(system2(rscript, c(shQuote(command),
-    shQuote("business-leaders-four.html"), "--minimum=4"), stdout = TRUE, stderr = TRUE))
+    shQuote("ai-usage-dashboard-four.html"), "--minimum=4"), stdout = TRUE, stderr = TRUE))
   stopifnot(!is.null(attr(rejected, "status")),
             any(grepl("at least five", rejected, fixed = TRUE)),
-            !file.exists("business-leaders-four.html"))
+            !file.exists("ai-usage-dashboard-four.html"))
+})
+test("legacy renderer forwards arguments and cannot overwrite the legacy HTML redirect", {
+  command <- file.path(utility, "render-business-leaders-ai.R")
+  rscript <- file.path(R.home("bin"), "Rscript")
+  result <- system2(rscript, c(shQuote(command), shQuote("ai-usage-dashboard-legacy-wrapper.html"),
+                               "--minimum=5"), stdout = TRUE, stderr = TRUE)
+  stopifnot(is.null(attr(result, "status")),
+            file.exists("ai-usage-dashboard-legacy-wrapper.html"))
+  rejected <- suppressWarnings(system2(rscript, c(shQuote(command),
+    shQuote("ai-usage-dashboard-legacy-rejected.html"), "--minimum=4"),
+    stdout = TRUE, stderr = TRUE))
+  stopifnot(!is.null(attr(rejected, "status")),
+            !file.exists("ai-usage-dashboard-legacy-rejected.html"))
 })

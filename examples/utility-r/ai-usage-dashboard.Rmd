@@ -1,5 +1,5 @@
 ---
-pagetitle: "Business Leaders AI Usage"
+pagetitle: "AI Usage Dashboard"
 lang: en-GB
 params:
   minimum: 10
@@ -8,8 +8,8 @@ params:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 source("copilot-super-panel-helpers.R")
-source("business-leaders-ai-simulation.R")
-source("business-leaders-ai-helpers.R")
+source("ai-usage-dashboard-simulation.R")
+source("ai-usage-dashboard-helpers.R")
 inputs <- read_business_leaders_data("_data", scenario = TRUE)
 payload <- business_dashboard_payload(inputs, params$minimum)
 ```
@@ -76,7 +76,7 @@ details{margin-top:14px}summary{cursor:pointer;color:#115ea3;padding:4px 0}dl{ma
 </div>
 <div class="content">
 <section class="section" id="overview">
-<h1>AI usage across your organisation</h1>
+<h1>AI Usage Dashboard</h1>
 <p class="intro">Who is using AI, what they use, and how usage is changing. A synthetic rollout across M365 Copilot, Cowork, agents and GitHub Copilot. Usage intensity is recorded activity per person per week, including everyone in the roster, not just AI users.</p>
 <div class="kpis" id="kpis"></div>
 <div class="card">

@@ -24,7 +24,7 @@ example in the relevant guide, then choose a supported real-data path.
 
 | Report | Real-data support |
 |---|---|
-| [Business Leaders AI Usage]({{ site.baseurl }}/copilot-dashboards/business-leaders-ai-usage/) | Synthetic reference only. No verified real-export adapter. |
+| [AI Usage Dashboard]({{ site.baseurl }}/copilot-dashboards/ai-usage-dashboard/) | Synthetic reference only. No verified real-export adapter. |
 | [Consumption and Ways of Working]({{ site.baseurl }}/copilot-dashboards/copilot-consumption-and-ways-of-working/) | M365 credits-only build from Consumption activity and people metadata, with explicit mapping approval. |
 | [Developer Experience and Copilot]({{ site.baseurl }}/copilot-dashboards/developer-experience-and-copilot/) | Input-readiness inspection only. No verified real GitHub dashboard adapter. |
 

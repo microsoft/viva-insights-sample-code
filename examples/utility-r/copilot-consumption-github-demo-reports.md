@@ -13,9 +13,9 @@ The general tutorial does not extend the real runner's supported inputs.
 |---|---|---|---|
 | Copilot Consumption and Ways of Working | [Rmd](copilot-consumption-ways-of-working-simulation.Rmd) | [HTML](copilot-consumption-ways-of-working-simulation.html) | Copilot credit consumption alongside collaboration patterns, by service, organisation and function, including credit concentration and heavy-user consumption patterns. |
 | Developer Experience and Copilot | [Rmd](github-copilot-developer-productivity-simulation.Rmd) | [HTML](github-copilot-developer-productivity-simulation.html) | Baseline working conditions for the developer population organised around GitHub Copilot usage: a heavy GitHub-use group defined and profiled on the Overview, collaboration, focus, after-hours and network breadth each compared across the three GitHub-intensity groups, plus feature/model/language breakdowns, GitHub coverage, M365 Copilot credit consumption and an evaluation framework. |
-| Business Leaders AI Usage | [Rmd](business-leaders-ai-adoption.Rmd) | [HTML](business-leaders-ai-adoption.html) | Cross-service observed AI reach, usage per person per week, rollout trends, separate credit rates, group comparisons and collaboration activity by credit level. |
+| AI Usage Dashboard | [Rmd](ai-usage-dashboard.Rmd) | [HTML](ai-usage-dashboard.html) | Cross-service observed AI reach, usage per person per week, rollout trends, separate credit rates, group comparisons and collaboration activity by credit level. |
 
-## Business Leaders AI Usage
+## AI Usage Dashboard
 
 This dashboard answers five questions: who is using AI, what they use, how much
 they use, whether usage changes over time, and how groups differ. It combines
@@ -27,11 +27,11 @@ person's latest attributes in that window.
 Render from the repository root:
 
 ```powershell
-Rscript examples/utility-r/render-business-leaders-ai.R
+Rscript examples/utility-r/render-ai-usage-dashboard.R
 ```
 
-Keep [business-leaders-ai-helpers.R](business-leaders-ai-helpers.R),
-[business-leaders-ai-simulation.R](business-leaders-ai-simulation.R),
+Keep [ai-usage-dashboard-helpers.R](ai-usage-dashboard-helpers.R),
+[ai-usage-dashboard-simulation.R](ai-usage-dashboard-simulation.R),
 [copilot-super-panel-helpers.R](copilot-super-panel-helpers.R), the R Markdown
 source and `_data/` in their repository layout. Dependencies are `dplyr`, `tidyr`,
 `jsonlite`, `knitr`, `rmarkdown` and Pandoc. The dedicated renderer knits the
@@ -41,7 +41,7 @@ argument selects another HTML output path.
 
 The minimum group size defaults to 10 people. To match an organisation's Viva
 Insights minimum group size, pass a whole number of at least 5, for example
-`Rscript examples/utility-r/render-business-leaders-ai.R --minimum=5`. The
+`Rscript examples/utility-r/render-ai-usage-dashboard.R --minimum=5`. The
 `minimum` parameter in the R Markdown header does the same when knitting from
 RStudio or `rmarkdown::render()`. Values below 5 are rejected. A lower minimum
 shows more small groups, but it also makes it easier to infer information about

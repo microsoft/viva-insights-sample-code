@@ -554,7 +554,7 @@ test("policy-mapped build with group=true sums policy rows within each group", {
             !any(grepl("synthetic-policy|synthetic-person|synthetic-history", unlist(csv))))
 })
 source(file.path(kit, "tests", "query-fixture-tests.R"))
-source(file.path(kit, "tests", "business-leaders-tests.R"))
+source(file.path(kit, "tests", "ai-usage-dashboard-tests.R"))
 test("demo source isolation preflight: tracked references and exact copy targets", {
   for (report in c("consumption", "github")) {
     demo <- list(report = report, mode = "demo", repo_root = repo,

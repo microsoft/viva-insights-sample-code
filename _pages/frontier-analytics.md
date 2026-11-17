@@ -174,7 +174,7 @@ For the R reference templates, use the [Consumption journey]({{ site.baseurl }}/
 or [Developer Experience journey]({{ site.baseurl }}/frontier-analytics-prompt-developer-experience-dashboard/).
 Each links its rendering requirements and supported real-data scope. Repeated
 dashboard work can use the [paired dashboard Skill installation]({{ site.baseurl }}/frontier-analytics-skills/#skill-viva-insights-copilot-dashboards).
-Business Leaders has a separate [rendering guide]({{ site.baseurl }}/copilot-dashboards/business-leaders-ai-usage/)
+AI Usage Dashboard has a separate [rendering guide]({{ site.baseurl }}/copilot-dashboards/ai-usage-dashboard/)
 and no verified real-export adapter.
 
 Before sharing, rerun the saved code, reconcile headline counts and denominators,
@@ -237,7 +237,7 @@ Open any of these three reports in your browser without installing anything.
 They use synthetic data and include R Markdown source and rendering requirements.
 Select **Start using** for the links and capability limits.
 
-**Business Leaders AI Usage** brings together M365 Copilot, Cowork, Agent,
+**AI Usage Dashboard** brings together M365 Copilot, Cowork, Agent,
 Consumption and GitHub Copilot fixtures. Explore reach, usage and trends over
 four, eight or thirteen weeks by organisation, function and team. It is a synthetic
 reference dashboard, with no verified real-export adapter or dedicated prompt

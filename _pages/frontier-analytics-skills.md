@@ -13,7 +13,7 @@ An agent Skill is a folder containing a `SKILL.md` file and supporting reference
 
 For a single task without installation, use the [Prompt Library]({{ site.baseurl }}/frontier-analytics-prompts/). Check your agent's documentation for Skill support and installation locations.
 
-To explore the three synthetic reports, including **Business Leaders AI Usage**,
+To explore the three synthetic reports, including **AI Usage Dashboard**,
 open the [dashboard catalogue]({{ site.baseurl }}/copilot-dashboards/).
 Viewing a demo needs only a browser. The dashboard Skill supports the Consumption
 and Developer Experience workflows described below.

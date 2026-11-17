@@ -1,25 +1,26 @@
-- slug: business-leaders-ai-usage
-  name: Business Leaders AI Usage
-  summary: Who is using AI, how much, and how does usage vary over time and across groups?
-  guide: /copilot-dashboards/business-leaders-ai-usage/
-  image: /assets/images/reports/business-leaders-ai-overview.png
-  image_alt: Synthetic Business Leaders AI Usage overview with cross-service reach and weekly trends
-  demo: /examples/utility-r/business-leaders-ai-adoption.html
-  source: https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/business-leaders-ai-adoption.Rmd
-  requirements: https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-github-demo-reports.md#business-leaders-ai-usage
+- slug: ai-usage-dashboard
+  legacy_slug: business-leaders-ai-usage
+  name: AI Usage Dashboard
+  summary: Synthetic cross-product usage reference showing who uses AI, how much, and how usage varies over time and across groups.
+  guide: /copilot-dashboards/ai-usage-dashboard/
+  image: /assets/images/reports/ai-usage-dashboard-overview.png
+  image_alt: Synthetic AI Usage Dashboard overview with cross-service reach and weekly trends
+  demo: /examples/utility-r/ai-usage-dashboard.html
+  source: https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/ai-usage-dashboard.Rmd
+  requirements: https://github.com/microsoft/viva-insights-sample-code/blob/main/examples/utility-r/copilot-consumption-github-demo-reports.md#ai-usage-dashboard
   inputs: Person, M365 Copilot, Cowork, Agent, Consumption and GitHub Copilot fixtures.
   scope: Explore four, eight or thirteen weeks by organisation, function and team. Reach counts distinct people across sources; recorded usage is per person per week across the full roster, including non-users.
   limitation: This is a synthetic reference, not a verified real-export adapter. Coverage is limited to observed usage within the Person Query roster. M365 Copilot credits and GitHub AI credits remain separate; descriptive comparisons do not establish causation.
   packages: [dplyr, tidyr, jsonlite, knitr, rmarkdown]
   command: |-
-    New-Item -ItemType Directory -Force ..\copilot-dashboard-work\business-leaders
-    Rscript examples\utility-r\render-business-leaders-ai.R ..\copilot-dashboard-work\business-leaders\dashboard.html
-  output: ..\copilot-dashboard-work\business-leaders\dashboard.html, outside the checkout so the tracked demo is not overwritten. It is a self-contained HTML file with four-, eight- and thirteen-week views, group comparisons and separate product credit rates.
+    New-Item -ItemType Directory -Force ..\copilot-dashboard-work\ai-usage-dashboard
+    Rscript examples\utility-r\render-ai-usage-dashboard.R ..\copilot-dashboard-work\ai-usage-dashboard\dashboard.html
+  output: ..\copilot-dashboard-work\ai-usage-dashboard\dashboard.html, outside the checkout so the tracked demo is not overwritten. It is a self-contained HTML file with four-, eight- and thirteen-week views, group comparisons and separate product credit rates.
   real_support: Synthetic reference only. A real-data adaptation needs a separately implemented and verified mapping, coverage assessment and disclosure review.
   prompt: >-
-    Reproduce the synthetic Business Leaders AI Usage report from my local
+    Reproduce the synthetic AI Usage Dashboard report from my local
     viva-insights-sample-code checkout at [path]. Read its rendering guide
-    and use render-business-leaders-ai.R, not the dashboard Skill runner.
+    and use render-ai-usage-dashboard.R, not the dashboard Skill runner.
     Check dependencies first and ask before installing them. Save to a fresh
     output HTML path and report the command, validation and coverage limits.
 
