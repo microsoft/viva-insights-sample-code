@@ -151,8 +151,8 @@ panel_es |> distinct(PersonId, group) |> count(group)
 
 We fit `y ~ treat_post | PersonId + MetricDate` (person + week fixed effects,
 person-clustered SE) for every metric, then record the effect, its 95% CI, the
-p-value, significance stars, and the effect as a share of the Power group's
-pre-adoption baseline.
+raw and Holm-adjusted p-values, significance stars, and the effect as a share of
+the Power group's pre-adoption baseline.
 
 ```{r scan}
 stars <- function(p) dplyr::case_when(
@@ -174,13 +174,18 @@ run_did <- function(metric) {
     conf_low        = ci[[1]],
     conf_high       = ci[[2]],
     p_value         = ct[["Pr(>|t|)"]],
-    sig             = stars(ct[["Pr(>|t|)"]]),
     baseline_pre    = base_pre,
     pct_of_baseline = ct[["Estimate"]] / base_pre
   )
 }
 
+# Holm-adjusted p-values across the scanned metrics control the chance of any
+# false positive in the scan. Stars and "significant" labels use the adjusted values.
 results <- purrr::map_dfr(names(EFFECTS), run_did) |>
+  mutate(
+    p_holm = p.adjust(p_value, method = "holm"),
+    sig    = stars(p_holm)
+  ) |>
   arrange(desc(estimate))
 
 results |>
@@ -188,23 +193,28 @@ results |>
     estimate        = round(estimate, 3),
     `95% CI`        = sprintf("[%+.2f, %+.2f]", conf_low, conf_high),
     `% of baseline` = scales::percent(pct_of_baseline, accuracy = 0.1),
-    p_value         = signif(p_value, 2)
+    p_value         = format.pval(p_value, digits = 2, eps = 1e-16),
+    p_holm          = format.pval(p_holm, digits = 2, eps = 1e-16)
   ) |>
   select(Metric = metric, `Δ (units)` = estimate, `95% CI`,
-         `% of baseline`, p = p_value, Sig = sig) |>
-  knitr::kable(caption = "Power vs Low DiD: one row per metric, sorted by effect")
+         `% of baseline`, `p (raw)` = p_value, `p (Holm)` = p_holm, Sig = sig) |>
+  knitr::kable(caption = "Power vs Low DiD: one row per metric, sorted by effect. Sig is based on the Holm-adjusted p-value.")
 ```
 
 Read the table as: *within-person, Power users changed this metric by `Δ` more
-than Low users did after adoption.* The `Sig` column separates real signals from
-noise, and note the deliberately null metric lands **n.s.**, which is exactly the
-kind of honest result this scan is meant to surface.
+than Low users did after adoption.* The `Sig` column uses the Holm-adjusted
+p-value, so it allows for scanning several metrics at once. The deliberately
+null metric lands **n.s.**, which is the kind of honest result this scan is
+meant to surface. Power and Low groups are defined by chosen usage, so people
+sort themselves into them, and the results are exploratory and best read as
+associations.
 
 ## Forest plot
 
 The forest plot shows each effect as a share of the Power baseline, with 95%
 confidence intervals. Intervals crossing the zero line are not statistically
-distinguishable from "no differential change".
+distinguishable from "no differential change". The intervals are not adjusted
+for multiple testing, while the colours follow the Holm-adjusted p-values.
 
 ```{r forest, fig.width=9, fig.height=4.5}
 ggplot(results,
@@ -217,7 +227,7 @@ ggplot(results,
                   linewidth = 0.7, size = 0.5) +
   scale_x_continuous(labels = scales::percent) +
   scale_colour_manual(values = c(`TRUE` = "#1b4965", `FALSE` = "#bc4b51"),
-                      labels = c(`TRUE` = "Significant (p<0.05)", `FALSE` = "n.s."),
+                      labels = c(`TRUE` = "Significant (Holm-adjusted p<0.05)", `FALSE` = "n.s."),
                       name = NULL) +
   labs(
     title    = "Power vs Low Copilot users: DiD effect by metric",

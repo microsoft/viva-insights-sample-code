@@ -6,15 +6,28 @@ Run from the repo root:
 Output: assets/images/articles/when-ai-met-the-meeting-card.png
 """
 from __future__ import annotations
+import re
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 W, H = 1200, 630
+ARTICLE_MD = Path(__file__).resolve().parents[3] / "_pages" / "when-ai-met-the-meeting.md"
 NAVY = (17, 54, 90)
 NAVY_DEEP = (12, 39, 64)
 GOLD = (233, 200, 119)
 WHITE = (255, 255, 255)
 INK_SOFT = (215, 228, 241)
+
+
+def front_matter_value(md_path, key):
+    text = md_path.read_text(encoding="utf-8")
+    fm = re.match(r"\A---\s*\n(.*?)\n---\s*(?:\n|\Z)", text, re.S)
+    if not fm:
+        raise RuntimeError(f"No YAML front matter found in {md_path}")
+    value = re.search(rf'^{re.escape(key)}:\s*"([^"]+)"\s*$', fm.group(1), re.M)
+    if not value:
+        raise RuntimeError(f"{key} missing from front matter of {md_path}")
+    return value.group(1)
 
 
 def vertical_gradient(size, top, bottom):
@@ -39,6 +52,18 @@ def add_radial_glow(base, center, radius, color, alpha=180):
                    fill=(color[0], color[1], color[2], a))
     glow = glow.filter(ImageFilter.GaussianBlur(radius=40))
     base.alpha_composite(glow)
+
+
+def composite_translucent_motif(base):
+    overlay = Image.new("RGBA", base.size, (0, 0, 0, 0))
+    od = ImageDraw.Draw(overlay)
+    for r in (80, 140, 200, 260, 320):
+        od.ellipse((960 - r, 120 - r, 960 + r, 120 + r),
+                   outline=(255, 255, 255, 30), width=1)
+    for offset in (0, 40, 80):
+        od.line([(440 + offset, 0), (1200, 760 - offset)],
+                fill=(GOLD[0], GOLD[1], GOLD[2], 70), width=1)
+    base.alpha_composite(overlay)
 
 
 def load_font(candidates, size):
@@ -72,14 +97,9 @@ def main():
 
     bg = vertical_gradient((W, H), NAVY, NAVY_DEEP).convert("RGBA")
     add_radial_glow(bg, center=(960, 120), radius=420, color=GOLD, alpha=180)
+    composite_translucent_motif(bg)
 
     draw = ImageDraw.Draw(bg)
-    for r in (80, 140, 200, 260, 320):
-        draw.ellipse((960 - r, 120 - r, 960 + r, 120 + r),
-                     outline=(255, 255, 255, 30), width=1)
-    for offset in (0, 40, 80):
-        draw.line([(440 + offset, 0), (1200, 760 - offset)],
-                  fill=(GOLD[0], GOLD[1], GOLD[2], 70), width=1)
     draw.rectangle((0, H - 6, W, H), fill=GOLD)
 
     pad_x, pad_top, text_max = 72, 96, 760
@@ -117,7 +137,7 @@ def main():
         ["seguisb.ttf", "segoeuib.ttf", "arialbd.ttf", "DejaVuSans-Bold.ttf"], 22
     )
     draw.text((pad_x, H - 72),
-              "A Copilot Analytics Lab long-read  \u00b7  22 min read",
+              f"A Copilot Analytics Lab long-read  \u00b7  {front_matter_value(ARTICLE_MD, 'read_time')}",
               font=foot_font, fill=(255, 255, 255, 200))
 
     bg.convert("RGB").save(out_path, "PNG", optimize=True)

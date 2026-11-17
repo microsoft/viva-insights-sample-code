@@ -1,2 +1,4 @@
 # Includes mandatory executable analytics recipes, not optional skipped checks.
 -r requirements-recipes.txt
+# Parses _data/causal_decision_guide.yml in test_causal_decision_guide.py.
+PyYAML==6.0.3

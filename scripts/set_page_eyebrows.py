@@ -23,17 +23,8 @@ EYEBROW_MAP = {
     "_pages/copilot.md": "Copilot analytics",
     "_pages/copilot-usage-segments.md": "Copilot analytics",
     "_pages/dax-calculated-columns.md": "Copilot analytics \u00b7 Power BI",
-    # Causal Inference (under Copilot in the nav, but its own section editorially)
-    "_pages/causal-inference.md": "Causal inference",
-    "_pages/causal-inference-data-prep.md": "Causal inference",
-    "_pages/causal-inference-did.md": "Causal inference",
-    "_pages/causal-inference-doubly-robust.md": "Causal inference",
-    "_pages/causal-inference-experimentation-guide.md": "Causal inference",
-    "_pages/causal-inference-iv.md": "Causal inference",
-    "_pages/causal-inference-propensity.md": "Causal inference",
-    "_pages/causal-inference-regression.md": "Causal inference",
-    "_pages/causal-inference-technical.md": "Causal inference",
-    "_pages/causal-inference-validation.md": "Causal inference",
+    # Causal inference (the method guide now lives in Articles; the old
+    # causal-inference-*.md pages are redirect stubs and need no eyebrow)
     "_pages/copilot-causal-toolkit.md": "Causal inference \u00b7 Toolkit",
     "_pages/copilot-causal-toolkit-interpretation-guide.md": "Causal inference \u00b7 Toolkit",
     # Frontier
@@ -55,6 +46,7 @@ EYEBROW_MAP = {
     "_pages/articles.md": "Articles",
     "_pages/when-ai-met-the-meeting.md": "Articles",
     "_pages/meeting-effectiveness-playbook.md": "Articles",
+    "_pages/causal-questions-ai-usage.md": "Articles",
     # Search
     "_pages/search.md": "Search",
 }

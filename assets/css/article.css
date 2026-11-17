@@ -411,6 +411,41 @@
 }
 .article-body tbody tr:nth-child(odd) td { background: rgba(51, 92, 204, 0.04); }
 
+/* ---- Route summary cards (decision-guide article) ---- */
+/* Keep in-page targets clear of the 48px sticky site navigation. */
+.article-page .article-body [id] { scroll-margin-top: var(--sticky-offset, 5rem); }
+.route-facts {
+  display: grid;
+  grid-template-columns: minmax(8rem, max-content) minmax(0, 1fr);
+  gap: 0.45rem 1.1rem;
+  font-family: var(--art-sans);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  border: 1px solid var(--art-line);
+  border-left: 3px solid var(--art-navy);
+  border-radius: 8px;
+  background: #fff;
+  padding: 1rem 1.2rem;
+  margin: 0.4rem auto 1.4rem;
+}
+.route-facts dt {
+  font-weight: 700;
+  color: var(--art-navy);
+}
+.route-facts dd { margin: 0; color: var(--art-ink); min-width: 0; }
+.route-facts a { color: var(--art-navy); }
+@media (max-width: 560px) {
+  .route-facts { grid-template-columns: minmax(0, 1fr); gap: 0.15rem; }
+  .route-facts dd { margin-bottom: 0.55rem; }
+}
+
+/* ---- Numbered citations ---- */
+.article-body a.cite {
+  font-size: 0.82em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
 /* ---- Figures ---- */
 .article-figure {
   max-width: 62rem;
@@ -907,4 +942,112 @@
   .article-editorial .article-table-scroll table { min-width: 0; }
   .article-editorial .article-hero { background: #fff; padding: 0 0 1rem; }
   .article-editorial .recap-band { print-color-adjust: exact; }
+}
+
+/* ==========================================================================
+   Readability additions: key-terms glossary, inline term definitions and
+   collapsible route detail. Appended block, no earlier rules changed.
+   ========================================================================== */
+
+/* Glossary */
+.article-body dl.key-terms {
+  margin: 1rem 0 1.5rem;
+  padding: 0.25rem 1.1rem;
+  background: var(--art-tint);
+  border: 1px solid var(--art-tint-line);
+  border-radius: 8px;
+}
+.article-body dl.key-terms dt {
+  margin: 0.9rem 0 0.15rem;
+  font-weight: 600;
+  color: var(--art-navy-deep);
+}
+.article-body dl.key-terms dd {
+  margin: 0 0 0.9rem;
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: var(--art-ink);
+}
+.article-body dl.key-terms dt:target { color: var(--art-ink); text-decoration: underline; }
+
+/* Inline term with CSS-only definition popup */
+.article-body :is(p, li, dd):has(> a.term) { position: relative; }
+.article-body a.term {
+  position: static;
+  color: inherit;
+  text-decoration: underline dotted var(--art-navy);
+  text-underline-offset: 0.2em;
+  border-bottom: 0;
+  cursor: help;
+}
+.article-body a.term:hover,
+.article-body a.term:focus-visible { color: var(--art-navy-deep); }
+.article-body a.term:focus-visible {
+  outline: 2px solid var(--art-navy);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.article-body a.term::after {
+  content: attr(data-def);
+  display: none;
+  position: absolute;
+  left: 0;
+  margin-top: 1.7em;
+  width: min(18rem, 80vw);
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.55rem 0.7rem;
+  background: var(--art-ink);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.45;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(14, 23, 38, 0.25);
+  z-index: 20;
+  pointer-events: none;
+}
+.article-body a.term:hover::after,
+.article-body a.term:focus-visible::after { display: block; }
+@media (hover: none) {
+  .article-body a.term::after,
+  .article-body a.term:hover::after,
+  .article-body a.term:focus-visible::after { display: none; }
+}
+
+/* Collapsible route detail */
+details.route-more { margin: 0.25rem 0 1.5rem; }
+details.route-more > summary {
+  display: inline-block;
+  padding: 0.45rem 0.9rem;
+  color: var(--art-navy);
+  font-weight: 600;
+  font-size: 1rem;
+  background: #fff;
+  border: 1px solid var(--art-navy);
+  border-radius: 6px;
+  cursor: pointer;
+  list-style: none;
+}
+details.route-more > summary::-webkit-details-marker { display: none; }
+details.route-more > summary::before {
+  content: "+";
+  display: inline-block;
+  width: 1.1em;
+  font-weight: 700;
+}
+details.route-more[open] > summary::before { content: "\2212"; }
+details.route-more > summary:hover { background: var(--art-tint); }
+details.route-more > summary:focus-visible {
+  outline: 3px solid var(--art-navy);
+  outline-offset: 2px;
+}
+details.route-more[open] > summary {
+  margin-bottom: 0.9rem;
+  border-color: var(--art-line);
+  color: var(--art-navy-deep);
 }

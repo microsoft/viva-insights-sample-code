@@ -633,7 +633,7 @@ Prepare your findings for stakeholders:
 | **ATE** | Average Treatment Effect — the estimated causal effect of treatment on the outcome, averaged across all individuals |
 | **CATE** | Conditional Average Treatment Effect — the treatment effect conditional on individual characteristics (allows for heterogeneity) |
 | **CausalForestDML** | A machine learning-based causal inference estimator that discovers heterogeneous treatment effects across subgroups |
-| **Confidence Interval (CI)** | A range of values within which the true effect is likely to fall (95% of the time at the 95% confidence level) |
+| **Confidence Interval (CI)** | A range of effects consistent with the data under the model's assumptions. At the 95% level, the method used would produce intervals containing the true value in 95% of repeated samples |
 | **Confounder** | A variable that affects both the treatment (Copilot usage) and the outcome, which must be controlled for to avoid bias |
 | **DML** | Double Machine Learning — a framework that uses ML to flexibly model confounding while maintaining valid causal inference |
 | **Dose-response curve** | A curve showing how the outcome changes across different treatment levels (rather than just comparing treated vs. untreated) |

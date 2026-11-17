@@ -292,7 +292,7 @@ pip install vivainsights pandas numpy scikit-learn linearmodels matplotlib seabo
 
 ## Related pages
 
-- [Causal Inference in Copilot Analytics]({{ site.baseurl }}/causal-inference/): move beyond correlation to measure the true impact of an intervention
+- [Causal Questions About AI Usage]({{ site.baseurl }}/articles/causal-questions-ai-usage/): a decision guide for choosing a causal design, from the outcome you measure to the checks you run
 - [Network Analysis]({{ site.baseurl }}/network/): organizational network analysis (ONA) as a complementary advanced technique
 - [Copilot Analytics]({{ site.baseurl }}/copilot/): adoption metrics and Power/Habitual user segmentation
 - [Essentials]({{ site.baseurl }}/essentials/): utilities and visualizations to prepare your data
