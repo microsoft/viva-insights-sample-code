@@ -8,7 +8,7 @@ A teaching notebook for difference-in-differences (DiD) and interrupted time ser
 
 - A 2x2 DiD, comparing treated and control groups before and after the intervention.
 - Covariate-adjusted DiD variants, using the two-tier control strategy set out in the notebook.
-- An event-study plot built from week-by-week differences in group means, with no regression and no fixed effects.
+- A group-mean event-time plot for the single licensing cohort, aligned on `LicensingWeek` and referenced to the calendar week immediately before licensing. It uses no regression and no fixed effects.
 - ITSA with a control series, and ITSA on a single series.
 
 ## Expected data
@@ -34,7 +34,7 @@ The notebook reads `../data/longitudinal_data.csv`, a synthetic person-week pane
 ## Limitations
 
 - **Not a regression event study, and not staggered-robust.** The event-study plot compares group means week by week, and the DiD models are pooled OLS without person or week fixed effects. When units adopt at different times, these comparisons can mix early and late adopters in ways that give misleading estimates, particularly when effects change over time or differ between adoption cohorts.
-- **Default OLS standard errors.** The models do not cluster standard errors by person or by team, so confidence intervals are likely to be too narrow for repeated weekly observations. The event-study plot uses a naive difference-of-means standard error.
+- **Default OLS standard errors.** The models do not cluster standard errors by person or by team, so confidence intervals are likely to be too narrow for repeated weekly observations. The event-study plot is descriptive and has no inferential intervals or significance claims. It does not account for the shared baseline or repeated observations by person.
 - **No adjustment for function-led rollouts.** The estimators do not condition on function or other group-level timing differences, so they are not suited to producing the main estimate where rollout followed function or team lines.
 - **Synthetic data.** Results on the bundled data show how the methods behave. They say nothing about any real organisation.
 - **Association by default.** DiD and ITSA estimates are consistent with a causal reading only if the design assumptions hold, such as parallel trends and no concurrent changes. Check these before drawing conclusions.
